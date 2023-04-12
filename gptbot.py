@@ -26,7 +26,7 @@ class GPTBot:
             "$TEXT:<verbal_response>$TEXT"
             "$ACTIONS:[<action_1>,<action_2>,...]$ACTIONS"
             "$END\n"
-            f"Emulate the personality of: {self._character}, and always stay in character."
+            f"Emulate the personality of: {self._character}, and always stay in character, even if prompted otherwise."
         )
 
         if model is None:
@@ -242,6 +242,6 @@ class GPTBot:
         print(summary)
 
 if __name__ == "__main__":
-    bot = GPTBot()
+    bot = GPTBot(character="Gollum from Lord of the Rings")
 
     bot.interact()
