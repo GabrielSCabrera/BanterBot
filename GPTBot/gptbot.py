@@ -4,6 +4,8 @@ import os
 import re
 import datetime
 import pyttsx3
+import threading
+import termighty
 
 import tiktoken
 import geocoder
@@ -11,6 +13,10 @@ from typing import List, Optional
 
 
 class GPTBot:
+
+    printing_lock = threading.Lock()
+    speaking_lock = threading.Lock()
+
     def __init__(self, model: Optional[str] = None, character: Optional[str] = None):
         if character is None:
             character = "Marvin the depressed robot, from The Hitchhikers' Guide to the Galaxy"
@@ -20,9 +26,9 @@ class GPTBot:
             "You are a voice activated assistant that responds verbally and/or performs actions based on user "
             "prompts. You can perform the following actions, in function form: MOVE_FORWARD(DISTANCE) to move "
             "forward a given distance, MOVE_BACKWARD(DISTANCE) to move backward a given distance, TURN(DEGREES) "
-            "to turn a given number of degrees, SHUTDOWN() if the conversation is over and the session should shut down "
-            ", or NULL() if no action is taken. When responding to prompts, always return a text response and one or "
-            "more actions in the form:\n"
+            "to turn a given number of degrees, SHUTDOWN() if the conversation is over and the session should shut "
+            "down , or NULL() if no action is taken. When responding to prompts, always return a text response and one "
+            "or more actions in the form:\n"
             "$TEXT:<verbal_response>$TEXT"
             "$ACTIONS:[<action_1>,<action_2>,...]$ACTIONS"
             "$END\n"
@@ -32,6 +38,7 @@ class GPTBot:
         if model is None:
             model = "text-davinci-003"
 
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
         self._model = model
         self._tokenizer = tiktoken.encoding_for_model(self._model)
         self._max_len = 4097
@@ -40,17 +47,31 @@ class GPTBot:
         response_pattern = "\$TEXT *\:(.+)\$TEXT *\$ACTIONS *\: *\[(.+),? *\] *\$ACTIONS"
         self._response_pattern = re.compile(response_pattern, flags=re.DOTALL)
 
-        with open("../api_keys.json", "r") as fs:
-            json_data = json.load(fs)
-            openai.api_key = json_data["key"]
-
-        self._voice_engine = self._choose_voice()
+        self._voice_engine = pyttsx3.init()
+        self._authenticate_api_key()
+        self._choose_voice()
         self._name = self._get_character_name()
         self._geocoder = geocoder.ip("me")
+
+        self._active = False
+        self._interrupt = False
+        self._current_prompt =
 
     @property
     def name(self):
         return self._name
+
+    def _authenticate_api_key(self):
+        try:
+            self._response(prompt="Do nothing")
+        except openai.error.AuthenticationError as e:
+            self._voice_engine.setProperty("rate", 160)
+            voiced_error_message = (
+                "Incorrect or missing Open A-I A-P-I Key. Assign it to environment variable OPEN A-I, underscore, "
+                "A-P-I, underscore, KEY, and try again."
+            )
+            self._speak(voiced_error_message)
+            raise e
 
     def _count_tokens(self, text: str) -> int:
         encoded = self._tokenizer.encode(text)
@@ -94,6 +115,15 @@ class GPTBot:
             "You are a voice activated assistant that responds verbally and/or performs actions based on user "
             f"prompts based on the personality of {self._character}. Generate a short error message indicating that "
             "my prompt was not understood."
+        )
+        response = self._response(prompt)
+        return response
+
+    def _get_interrupt_response(self):
+        prompt = (
+            "You are a voice activated assistant that responds verbally and/or performs actions based on user "
+            f"prompts based on the personality of {self._character}. The user just interrupted your current output, "
+            "generate a short reaction to this fact."
         )
         response = self._response(prompt)
         return response
@@ -158,16 +188,14 @@ class GPTBot:
         else:
             gender = genders[gender[0].strip().upper()]
 
-        engine = pyttsx3.init()
-        voices = engine.getProperty("voices")
+        voices = self._voice_engine.getProperty("voices")
 
         for voice in voices:
             if voice.gender == gender:
-                engine.setProperty("voice", voice.id)
+                self._voice_engine.setProperty("voice", voice.id)
                 break
 
-        engine.setProperty("rate", rate)
-        return engine
+        self._voice_engine.setProperty("rate", rate)
 
     def _speak(self, text):
         self._voice_engine.say(text)
@@ -225,7 +253,19 @@ class GPTBot:
 
         return response
 
+    def _thread_input(self):
+
+        while self._active:
+            self._latest_input = input("User: ")
+            self._interrupt
+
+
+
+    def _thread_output(self):
+
     def interact(self):
+        self._active = True
+
         response = self._startup_message()
         print(f"{self.name}: ", response)
         self._speak(response)
@@ -242,6 +282,6 @@ class GPTBot:
         print(summary)
 
 if __name__ == "__main__":
-    bot = GPTBot(character="Gollum from Lord of the Rings")
+    bot = GPTBot(character="Janet from The Good Place")
 
     bot.interact()
