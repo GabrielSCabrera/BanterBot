@@ -1,17 +1,17 @@
 from setuptools import setup, find_packages
 
-dependencies = ["openai", "pyttsx3", "tiktoken", "geocoder", "termighty"]
+dependencies = ["openai", "tiktoken", "geocoder", "termighty", "azure-cognitiveservices-speech"]
 
 url = "https://github.com/GabrielSCabrera/GPTBot"
 
-with open("README.md", 'r') as fs:
+with open("README.md", "r") as fs:
     long_description = fs.read()
 
 setup(
     name="GPTBot",
     packages=find_packages(where="GPTBot"),
     package_dir={"": "GPTBot"},
-    version="3.0.1",
+    version="0.0.1",
     description="GPTX-Powered Interactive Assistant",
     long_description=long_description,
     author="Gabriel S. Cabrera",

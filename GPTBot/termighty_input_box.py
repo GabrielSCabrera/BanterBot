@@ -4,10 +4,9 @@ from termighty.widgets.text_editor import TextEditor
 
 import textwrap
 
+
 class InputBox(TextEditor):
-    def __init__(
-        self, *args, **kwargs
-    ):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._outputs = []
 
@@ -19,13 +18,33 @@ class InputBox(TextEditor):
         self._raw_text = self._text
         getch_iterator = Listener.getch_iterator()
 
+        ignore_keys = [
+            "Enter",
+            "Up",
+            "Keypad-Up",
+            "Down",
+            "Keypad-Down",
+            "Alt-Up",
+            "Alt-Down",
+            "Ctrl-Up",
+            "Ctrl-Keypad-Up",
+            "Ctrl-Down",
+            "Ctrl-Keypad-Down",
+            "PgDn",
+            "PgUp",
+            "Alt-PgDn",
+            "Alt-PgUp",
+            "\n",
+            "\r",
+        ]
+
         self._term.cursor_show(flush=True)
         for key in getch_iterator:
             if not self._frozen:
                 if key == "Enter":
-                    self._outputs.append(self._raw_text)
+                    self._outputs.append(self._raw_text[0])
                     self._raw_text = [""]
-                    self._cursor_position = (0,0)
+                    self._cursor_position = (0, 0)
                     self._selected = []
                     call = True
                 else:
@@ -35,6 +54,7 @@ class InputBox(TextEditor):
                         selected=self._selected,
                         shape=self._shape,
                         key=key,
+                        ignore_keys=ignore_keys,
                     )
                 if call:
                     if self._wrap_text:

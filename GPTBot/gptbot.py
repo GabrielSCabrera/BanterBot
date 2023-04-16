@@ -10,6 +10,7 @@ import termighty
 import tiktoken
 import geocoder
 from typing import List, Optional
+from tts_synthesizer import TTSSynthesizer
 
 
 class GPTBot:
@@ -47,31 +48,17 @@ class GPTBot:
         response_pattern = "\$TEXT *\:(.+)\$TEXT *\$ACTIONS *\: *\[(.+),? *\] *\$ACTIONS"
         self._response_pattern = re.compile(response_pattern, flags=re.DOTALL)
 
-        self._voice_engine = pyttsx3.init()
-        self._authenticate_api_key()
-        self._choose_voice()
+        self._tts_synthesizer = TTSSynthesizer()
+        # self._choose_voice()
         self._name = self._get_character_name()
         self._geocoder = geocoder.ip("me")
 
         self._active = False
         self._interrupt = False
-        self._current_prompt =
 
     @property
     def name(self):
         return self._name
-
-    def _authenticate_api_key(self):
-        try:
-            self._response(prompt="Do nothing")
-        except openai.error.AuthenticationError as e:
-            self._voice_engine.setProperty("rate", 160)
-            voiced_error_message = (
-                "Incorrect or missing Open A-I A-P-I Key. Assign it to environment variable OPEN A-I, underscore, "
-                "A-P-I, underscore, KEY, and try again."
-            )
-            self._speak(voiced_error_message)
-            raise e
 
     def _count_tokens(self, text: str) -> int:
         encoded = self._tokenizer.encode(text)
@@ -81,9 +68,7 @@ class GPTBot:
     def _get_context(self):
         now = datetime.datetime.now()
         timestamp = now.strftime("%I:%M %p on %A %B %d %Y")
-        context = (
-            f"It is currently {timestamp}. Position is: {self._geocoder.city}, {self._geocoder.country}."
-        )
+        context = f"It is currently {timestamp}. Position is: {self._geocoder.city}, {self._geocoder.country}."
         return context
 
     def _get_character_name(self):
@@ -93,7 +78,7 @@ class GPTBot:
             "name, no extra text."
         )
         response = self._response(prompt)
-        return response.capitalize()
+        return response.capitalize().strip()
 
     def _wrap_new_prompt(self, text: str, count: int):
         wrapped = f"$PROMPT {count}:{text}$END PROMPT {count}\n"
@@ -198,8 +183,8 @@ class GPTBot:
         self._voice_engine.setProperty("rate", rate)
 
     def _speak(self, text):
-        self._voice_engine.say(text)
-        self._voice_engine.runAndWait()
+
+        self._tts_synthesizer.speak(text=text)
 
     def _process_response(self, response):
         search = re.findall(self._response_pattern, response)
@@ -212,15 +197,22 @@ class GPTBot:
 
     def _response(self, prompt, stop: Optional[str] = None):
         token_count = self._count_tokens(prompt)
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=self._max_len - token_count,
-            n=1,
-            stop=stop,
-            temperature=0.7,
-        )
-        return response.choices[0].text.strip()
+        try:
+            response = openai.Completion.create(
+                engine="text-davinci-003",
+                prompt=prompt,
+                max_tokens=self._max_len - token_count,
+                n=1,
+                stop=stop,
+                temperature=0.7,
+            )
+            return response.choices[0].text.strip()
+        except openai.error.AuthenticationError as e:
+            voiced_error_message = (
+                "Incorrect or missing OpenAI API Key. Assign it to environment variable OPENAI_API_KEY, and try again."
+            )
+            self._speak(voiced_error_message)
+            raise e
 
     def _startup_message(self):
         prompt = (
@@ -229,10 +221,10 @@ class GPTBot:
             "user with a sentence that befits your character."
         )
         response = self._response(self._get_context() + prompt)
-        response_dict = {"text":response, "actions":["NULL()"]}
+        response_dict = {"text": response, "actions": ["NULL()"]}
         self._history.append(("Initialize", response_dict))
 
-        return response
+        return response_dict
 
     def get_response(self, new_prompt: str):
 
@@ -253,16 +245,6 @@ class GPTBot:
 
         return response
 
-    def _thread_input(self):
-
-        while self._active:
-            self._latest_input = input("User: ")
-            self._interrupt
-
-
-
-    def _thread_output(self):
-
     def interact(self):
         self._active = True
 
@@ -281,7 +263,8 @@ class GPTBot:
         summary = bot._summarize_conversation()
         print(summary)
 
+
 if __name__ == "__main__":
-    bot = GPTBot(character="Janet from The Good Place")
+    bot = GPTBot()
 
     bot.interact()
