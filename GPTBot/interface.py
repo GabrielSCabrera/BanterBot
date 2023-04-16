@@ -5,13 +5,14 @@ from gptbot import GPTBot
 from tts_synthesizer import TTSSynthesizer
 import threading
 import time
+import sys
 
 
 class Interface:
-    def __init__(self, border_color: str = "Charcoal", background_color: str = "Black"):
+    def __init__(self, border_color: str = "Charcoal", background_color: str = "Black", character=None):
         self._border_color = border_color
         self._background_color = background_color
-        self._gptbot = GPTBot()
+        self._gptbot = GPTBot(character = character)
         self._tts_synthesizer = TTSSynthesizer()
         self._history = []
         self._current_entry = None
@@ -182,5 +183,8 @@ class Interface:
 
 
 if __name__ == "__main__":
-    interface = Interface()
+    character = None
+    if len(sys.argv) > 1:
+        character = " ".join(sys.argv[1:])
+    interface = Interface(character=character)
     interface.start()
