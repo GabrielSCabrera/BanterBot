@@ -9,6 +9,7 @@ class OutputBox(TextEditor):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._outputs = []
+        self._scroll_override = False
 
     def _run_getch_thread(self) -> None:
         """
@@ -61,20 +62,25 @@ class OutputBox(TextEditor):
         self._term.cursor_show(flush=True)
         for key in getch_iterator:
             if not self._frozen:
-                if len(key) > 1:
-                    call, self._raw_text, self._cursor_position, self._selected = KeyProcessor.process_key(
-                        raw_text=self._raw_text,
-                        cursor_position=self._cursor_position,
-                        selected=self._selected,
-                        shape=self._shape,
-                        key=key,
-                        ignore_keys=ignore_keys,
-                    )
-                    if call:
-                        if self._wrap_text:
-                            self.__call__([i for i in self._raw_text for j in textwrap.wrap(i, self._shape[1])])
-                        else:
-                            self.__call__(self._raw_text)
+                new_row = None
+                bottom = max(0, len(self._new_line) - self._shape[0])
+
+                if key == "Up":
+                    new_row = max(0, self._origin[0] - 1)
+                elif key == "Down":
+                    new_row = min(bottom, self._origin[0] + 1)
+                elif key == "PgUp":
+                    new_row = 0
+                elif key == "PgDn":
+                    new_row = bottom
+
+                if new_row is not None and self._origin[0] != new_row:
+                    self._origin = (new_row, 0)
+                    if new_row == bottom:
+                        self._scroll_override = False
+                    else:
+                        self._scroll_override = True
+                    super(TextEditor, self)._set_view()
 
     def _set_view(self) -> None:
         """ """
@@ -90,28 +96,16 @@ class OutputBox(TextEditor):
             col + self._ref_col_start - self._origin[1],
         )
 
-        self._set_scroll_buffer()
+        # # Vertically scrolls the view of the text based on the cursor position.
+        # if (diff := cursor_position[0] - self._shape[0] + self._scroll_buffer[0]) >= 0:
+        #     self._origin = (self._origin[0] + diff, self._origin[1])
+        # elif (diff := cursor_position[0] - self._scroll_buffer[0]) < 0:
+        #     self._origin = (max(0, self._origin[0] + diff - self._row_start), self._origin[1])
 
-        # Number of columns reserved for displaying line numbers -- accounts for the number of lines in the text.
-        if self._line_numbers:
-            w = max(self._line_numbers_width, int(np.log10(len(self._text))) + 2)
-        else:
-            w = 0
-
-        if self._wrap_text:
-            pass
-        else:
-
-            # Vertically scrolls the view of the text based on the cursor position.
-            if (diff := cursor_position[0] - self._shape[0] + self._scroll_buffer[0]) >= 0:
-                self._origin = (self._origin[0] + diff, self._origin[1])
-            elif (diff := cursor_position[0] - self._scroll_buffer[0]) < 0:
-                self._origin = (max(0, self._origin[0] + diff - self._row_start), self._origin[1])
-
-            cursor_position = (
-                row + self._row_start - self._origin[0],
-                col + self._col_start - self._origin[1] + w,
-            )
+        cursor_position = (
+            row + self._row_start - self._origin[0],
+            col + self._col_start - self._origin[1],
+        )
 
         self._selected_processed = [
             (position[0] + self._row_start - self._origin[0], position[1] + self._col_start - self._origin[1])

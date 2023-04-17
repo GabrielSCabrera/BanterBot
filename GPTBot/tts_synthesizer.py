@@ -62,7 +62,7 @@ class TTSSynthesizer:
         # Synthesize SSML to speech
         self._synthesizer.speak_ssml(ssml)
 
-    def _create_ssml(self, text, voice_name="en-US-GuyNeural", style="customerservice"):
+    def _create_ssml(self, text, voice_name="en-US-JasonNeural", style="sad"):
         ssml = (
             '<speak version="1.0" '
             'xmlns="http://www.w3.org/2001/10/synthesis" '
@@ -106,7 +106,7 @@ class TTSSynthesizer:
         self._reset()
         self._synthesizer.stop_speaking_async()
 
-    def speak(self, text, voice_name="en-US-GuyNeural", style="customerservice"):
+    def speak(self, text, voice_name="en-US-JasonNeural", style="sad"):
         ssml = self._create_ssml(text, voice_name, style)
         thread1 = threading.Thread(target=self._synthesizer_speak_ssml, args=(ssml,), daemon=True)
         thread1.start()
@@ -115,8 +115,9 @@ class TTSSynthesizer:
 
 if __name__ == "__main__":
     text = "Hey, you! Drink my bottled warter, it's not water, it's warter!"
-    voice_name = "en-US-GuyNeural"  # Replace with the desired voice
+    text = "Hello, my name is Gabriel, I am a german techno fiend"
+    voice_name = "de-DE-ConradNeural"  # Replace with the desired voice
     style = "shouting"  # Replace with the desired emotion or speaking style
 
     tts_synthesizer = TTSSynthesizer()
-    tts_synthesizer.speak(text)  # , voice_name, style)
+    tts_synthesizer.speak(text, voice_name, style)

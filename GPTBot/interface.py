@@ -12,7 +12,7 @@ class Interface:
     def __init__(self, border_color: str = "Charcoal", background_color: str = "Black", character=None):
         self._border_color = border_color
         self._background_color = background_color
-        self._gptbot = GPTBot(character = character)
+        self._gptbot = GPTBot(character=character)
         self._tts_synthesizer = TTSSynthesizer()
         self._history = []
         self._current_entry = None
@@ -38,7 +38,7 @@ class Interface:
             edge_R,
             background=self._background_color,
             wrap_text=True,
-            wrap_subsequent_indent=" " * (2 + max(len(self._user_name), len(self._gptbot._name))),
+            # wrap_subsequent_indent=" " * (2 + max(len(self._user_name), len(self._gptbot._name))),
         )
         self._input_prompt = TextBox(
             edge_B - 1, w_size, edge_B, w_size + len(input_prompt_text), background=self._background_color
@@ -50,6 +50,7 @@ class Interface:
             edge_R,
             line_numbers=False,
             background=self._background_color,
+            horizontal_scroll_buffer=0,
         )
 
         self._title.alignment = "center"
@@ -76,6 +77,9 @@ class Interface:
                 new_output = [f"{self._gptbot._name.upper()}: " + "".join(self._tts_synthesizer._output[-1])]
                 output = self._process_history() + new_output
                 self._output_window(output)
+                if not self._output_window._scroll_override:
+                    bottom = max(0, len(self._output_window._new_line) - self._output_window._shape[0])
+                    self._output_window._origin = (bottom, 0)
                 N = length
             time.sleep(0.005)
 
@@ -89,7 +93,11 @@ class Interface:
             length = len(self._history)
             if length > N:
                 entry = self._history[-1]
-                self._tts_synthesizer.speak(entry["full_response"]["text"])
+                self._tts_synthesizer.speak(
+                    entry["full_response"]["text"],
+                    voice_name=self._gptbot._voice,
+                    style=entry["full_response"]["emotion"],
+                )
                 entry["response"] = "".join(self._tts_synthesizer._output[-1])
                 entry["completed"] = True
                 N = length
@@ -105,11 +113,12 @@ class Interface:
             length = len(self._input_window._outputs)
             if length > N:
                 entry = self._input_window._outputs[-1].strip()
-                # interrupt_response = None
-                # if self._tts_synthesizer._synthesis_completed = True and self._tts_synthesizer._synthesis_started = True:
-                #     self._tts_synthesizer._interrupt = True
-                #     interrupt_response = self._gptbot._get_interrupt_response()
+                interrupt_response = None
+                if self._tts_synthesizer._synthesis_completed and self._tts_synthesizer._synthesis_started:
+                    self._tts_synthesizer._interrupt = True
+                    interrupt_response = self._gptbot._get_interrupt_response()
                 response = self._gptbot.get_response(entry)
+
                 self._history.append(
                     {
                         "prompt": entry,
@@ -164,7 +173,8 @@ class Interface:
                 "response": None,
                 "interrupted": False,
                 "completed": False,
-            })
+            }
+        )
 
         thread_speak = threading.Thread(target=self._thread_speak, daemon=True)
         thread_output_text = threading.Thread(target=self._thread_output_text, daemon=True)
