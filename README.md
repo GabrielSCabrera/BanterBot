@@ -12,7 +12,7 @@ Features
 * Input history tracking and conversation summarization
 * Threading for efficient and smooth operation
 
-Usage
+## Usage
 
 To start the GPTBot interface, run the following command in your terminal:
 
@@ -21,3 +21,11 @@ python interface.py [character]
 Replace [character] with the desired character for the chatbot (optional). If no character is provided, GPTBot will use a default character.
 
 Once the interface is started, you can type your messages in the input box, and GPTBot will provide its responses in the output window. You can also listen to the synthesized speech of GPTBot's responses.
+
+## Requirements
+
+Requires three environment variables for full functionality:
+
+1. `OPENAI_API_KEY` must be a valid OpenAI API key, 
+2. `AZURE_SPEECH_KEY` must be a valid Azure Speech Service API key, for TTS functionality,
+3. `AZURE_SPEECH_REGION` must be the region associated with the Azure Speech Service API key.
