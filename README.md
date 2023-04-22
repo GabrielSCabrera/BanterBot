@@ -4,19 +4,17 @@
 GPTBot is an interactive command-line-based chatbot that utilizes the ChatGPT architecture to engage users in natural language conversations. The program is designed to provide an immersive and visually appealing experience by leveraging the termighty library to create a terminal interface with rich text formatting and colors. In addition to text-based interactions, GPTBot also supports text-to-speech synthesis, enabling the chatbot to speak its responses with a variety of voices and emotional styles.
 Features
 
-    Interactive command-line interface with rich text formatting and colors using the termighty library
-    Text-based conversation with a chatbot powered by ChatGPT
-    Text-to-speech synthesis for spoken responses using Azure Speech TTS
-    Customizable chatbot character for personalized experiences
-    Real-time response display and updates
-    Input history tracking and conversation summarization
-    Threading for efficient and smooth operation
+* Interactive command-line interface with rich text formatting and colors using the termighty library
+* Text-based conversation with a chatbot powered by ChatGPT
+* Text-to-speech synthesis for spoken responses using Azure Speech TTS
+* Customizable chatbot character for personalized experiences
+* Real-time response display and updates
+* Input history tracking and conversation summarization
+* Threading for efficient and smooth operation
 
 Usage
 
 To start the GPTBot interface, run the following command in your terminal:
-
-css
 
 python interface.py [character]
 
