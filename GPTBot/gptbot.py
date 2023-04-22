@@ -3,37 +3,55 @@ import os
 import re
 import datetime
 import termighty
+import string
 
 import tiktoken
 import geocoder
-from typing import Optional, TypedDict
+from typing import Literal, Optional, TypedDict
+
+import config
 
 
 class parsed_response(TypedDict):
+    """A typed dictionary for parsed responses from the AI."""
+
     text: str
-    emotion: str
+    emotion: Literal[config.emotions]
     actions: list[str, ...]
+
+
+class messages_dict(TypedDict):
+    """A typed dictionary for message dictionaries."""
+
+    role: Literal["system", "user", "assistant"]
+    content: str
 
 
 class GPTBot:
     """
-    A class to interact with OpenAI's GPT model, simulating a voice-activated assistant with a specified character.
+    A class that represents a GPT-powered chatbot with a specific character.
+
+    Attributes:
+        model (str): The name of the GPT model to use.
+        character (str): A description of the character the chatbot should emulate.
     """
 
     def __init__(self, model: Optional[str] = None, character: Optional[str] = None) -> None:
         """
-        Initialize GPTBot with the given model and character.
+        Initialize the GPTBot instance with the given model and character.
 
-        :param model: The name of the GPT model to use, defaults to 'text-davinci-003'.
-        :param character: The character the bot should emulate, defaults to Marvin from The Hitchhiker's Guide to the
-        Galaxy.
+        Args:
+            model (Optional[str]): The name of the GPT model to use. Defaults to None.
+            character (Optional[str]): A description of the character the chatbot should emulate. Defaults to None.
         """
-
         # Set up OpenAI API access and model
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+        openai.api_key = os.environ.get(config.openai_api_key_env_variable)
+
+        # Set up geolocation based on IP
+        self._geocoder = geocoder.ip("me")
 
         if model is None:
-            model = "text-davinci-003"
+            model = config.default_chat_gpt_model
 
         self._model = model
         self._tokenizer = tiktoken.encoding_for_model(self._model)
@@ -48,27 +66,23 @@ class GPTBot:
         self._emotion_response_pattern = re.compile(emotion_response_pattern, flags=re.DOTALL)
         self._action_response_pattern = re.compile(action_response_pattern, flags=re.DOTALL)
 
-        # Initialize character, voice, and name
-        self._init_prompts(character=character)
-        self._init_voice()
-        self._init_default_emotion()
-        self._init_character_name()
-
-        # Set up geolocation based on IP
-        self._geocoder = geocoder.ip("me")
+        # Initialize character, voice, name, system, and startup message.
+        self._init_character(character=character)
+        self._init_system()
+        self._init_character_traits()
+        self._init_startup_message()
 
     @property
     def name(self) -> str:
-        """
-        Returns the name of the character.
-        """
+        """Get the chatbot's name."""
         return self._name
 
-    def _init_prompts(self, character: str) -> None:
+    def _init_character(self, character: str) -> None:
         """
-        Initialize character and prompts based on the given character.
+        Initialize the character for the chatbot.
 
-        :param character: The character the bot should emulate.
+        Args:
+            character (str): A description of the character the chatbot should emulate.
         """
         # Set up character default if not provided
         if character is None:
@@ -78,268 +92,313 @@ class GPTBot:
             )
         self._character = character
 
-        # Set up init_text with the given character
+    def _init_system(self) -> None:
+        """Initialize the system message and conversation history."""
+
+        emotions = list(config.emotions[:-2]) + [", or ".join(config.emotions[-2:])]
+        emotions_str = ", ".join(emotions)
+
         self._init_text = (
-            f"You are {self._character}. Repond to the user's latest text prompt. Stay in character at all times. "
-            "Perform actions using the exact function forms provided: MOVE_FORWARD(DISTANCE), MOVE_BACKWARD(DISTANCE), "
-            "TURN(DEGREES), SHUTDOWN(), or NULL(). Return an emotion/state related to your character and context, "
-            "using the exact options provided: angry, cheerful, excited, friendly, hopeful, sad, shouting, terrified, "
-            "unfriendly, or whispering. Respond to prompts with the following format:\n"
-            "$TEXT:<verbal_response>$TEXT\n"
-            "$EMOTION:<emotional_state>$EMOTION\n"
-            "$ACTIONS:[<action_1>,<action_2>,...]$ACTIONS\n"
-            "$END\n"
+            f"You are {self._character}. Respond to the user's latest text prompt with three distinct responses: a "
+            "verbal response, an emotional response, and an action response. Remain in character at all times. The "
+            "verbal response should consist of spoken words only, without any descriptions of actions or voice tones."
+            f"For the emotional response, use one of the options provided: {emotions_str}."
+            "For the action response, use the exact function forms provided: MOVE_FORWARD(DISTANCE), "
+            "MOVE_BACKWARD(DISTANCE), TURN(DEGREES), SHUTDOWN(), or NULL()."
+            "Format your responses as follows:"
+            "$TEXT:<verbal_response>$TEXT"
+            "$EMOTION:<selected_emotion>$EMOTION"
+            "$ACTIONS:[<selected_action_1>,<selected_action_2>,...]$ACTIONS"
         )
 
-    def _count_tokens(self, text: str) -> int:
-        """
-        Count the number of tokens in a given text.
+        self._history = [{"role": "user", "content": self._init_text}]
 
-        :param text: The text to count tokens for.
-        :return: The number of tokens in the text.
-        """
-        encoded = self._tokenizer.encode(text)
-        assert self._tokenizer.decode(encoded) == text
-        return len(encoded)
+    def _init_character_traits(self) -> None:
+        """Initialize character traits such as name, voice, and default emotion."""
 
-    def _get_context(self) -> str:
-        """
-        Get the current time and geolocation as a formatted string.
+        character_info = (
+            f"You are assisting me in identifying facts about the character/person: {self._character}. You adhere "
+            "to all instructions accurately and without deviation, refraining from commenting on the answers. You "
+            "provide only desired responses: when asked to choose an option from a list, strictly select from the "
+            "given options. Single word responses only, no embellishment or punctuation."
+        )
+        messages = [{"role": "system", "content": character_info}]
 
-        :return: A string with the current time and geolocation.
+        name_prompt = self._init_name_prompt()
+        messages.append({"role": "user", "content": name_prompt})
+        response = self._request(messages=messages, temperature=0.0)
+        messages.append({"role": "assistant", "content": response})
+        self._select_name(response)
+
+        voice_prompt = self._init_voice_prompt()
+        messages.append({"role": "user", "content": voice_prompt})
+        response = self._request(messages=messages, temperature=0.0)
+        messages.append({"role": "assistant", "content": response})
+        self._select_voice(response)
+
+        default_emotion_prompt = self._init_default_emotion_prompt()
+        messages.append({"role": "user", "content": default_emotion_prompt})
+        response = self._request(messages=messages, temperature=0.0)
+        messages.append({"role": "assistant", "content": response})
+        self._select_emotion(response)
+
+    def _count_tokens(self, messages: list[messages_dict]) -> int:
         """
+        Count the number of tokens in the given list of message dictionaries.
+
+        Args:
+            messages (list[messages_dict]): A list of message dictionaries.
+
+        Returns:
+            int: The number of tokens in the messages.
+        """
+        # Every reply is primed with <im_start>assistant
+        num_tokens = 3
+        for message in messages:
+            # Every message follows <im_start>{role/name}\n{content}<im_end>\n
+            num_tokens += 4
+            for key, value in message.items():
+                num_tokens += len(self._tokenizer.encode(value))
+        return num_tokens
+
+    @property
+    def _context(self) -> str:
+        """Get the context information for the chatbot."""
         now = datetime.datetime.now()
         timestamp = now.strftime("%I:%M %p on %A %B %d %Y")
         context = f"It is currently {timestamp}. Position is: {self._geocoder.city}, {self._geocoder.country}."
         return context
 
-    def _init_character_name(self) -> None:
-        """
-        Generate and set the character's name using GPT.
-        """
+    def _init_name_prompt(self) -> None:
+        """Create a prompt for initializing the chatbot's name."""
         prompt = (
-            f"You are {self._character}. Provide a name the user can call you by. Write only the name, without any "
-            "additional text."
+            "Please provide the first name of the character. Write only one name, with no extra text or punctuation."
         )
-        response = self._response(prompt)
-        self._name = response.capitalize().strip()
+        return prompt
 
-    def _init_voice(self) -> None:
+    def _strip_punctuation(self, s: str) -> str:
         """
-        Initialize the voice profile for the character using GPT.
+        Removes punctuation and strips whitespace from the given string.
         """
-        # Set up available voice profiles
-        voices = {
-            "guy": ["male", "professional", "unemotional", "high-pitch"],
-            "tony": ["male", "professional", "unemotional", "medium-pitch"],
-            "davis": ["male", "casual", "expressive", "low-pitch"],
-            "jason": ["male", "casual", "unemotional", "high-pitch"],
-            "sara": ["female", "professional", "expressive", "medium-pitch"],
-            "aria": ["female", "casual", "unemotional", "high-pitch"],
-            "jenny": ["female", "casual", "expressive", "medium-pitch"],
-            "jane": ["female", "casual", "expressive", "high-pitch"],
-            "nancy": ["female", "casual", "expressive", "low-pitch"],
-        }
-        voices_string = "\n".join(f"{name}: " + ", ".join(traits) for name, traits in voices.items())
+        table = str.maketrans(dict.fromkeys(string.punctuation))
+        return s.translate(table).strip()
+
+    def _select_name(self, response: str) -> str:
+        """
+        Initialize the chatbot's name from the given response.
+
+        Args:
+            response (str): The response containing the chatbot's name.
+        """
+        self._name = self._strip_punctuation(response).capitalize()
+
+    def _init_voice_prompt(self) -> str:
+        """Create a prompt for initializing the chatbot's voice."""
+        voices_str = "\n".join(f"{name}: " + ", ".join(traits) for name, traits in config.neural_voices.items())
+        names = list(config.neural_voices.keys())
+        names_str = ", ".join(names[:-2] + [", or ".join(names[-2:])])
         prompt = (
-            f"You are {self._character}. Choose a voice profile that best fits your character, ensuring the gender is "
-            "correct. Take into account your character's name, background information, and whether they are based on "
-            "a real or fictional person. Also, consider factors like professionalism, emotivity, and pitch. Select one "
-            "name from the provided list, even if it's not a perfect match. Write your answer as a single word."
-            "\nOptions:\n"
+            f"Choose a voice profile for {self._name} from the provided options:\n{voices_str}.\n"
+            "Select a male voice for male characters and a female voice for female characters. Take into account the "
+            "character's professionalism, emotivity, and pitch. Pick one profile from the list, even if it's not a "
+            f"good match. Provide a one-word answer, which must be one of the names in the list: {names_str}."
         )
-        response = self._response(prompt + voices_string, temperature=0)
-        name = response.lower().strip()
-        if name in voices.keys():
-            self._voice = f"en-US-{name.capitalize()}Neural"
+        return prompt
+
+    def _select_voice(self, response: str) -> None:
+        """
+        Initialize the chatbot's voice from the given response.
+
+        Args:
+            response (str): The response containing the chatbot's voice.
+        """
+        name = self._strip_punctuation(response).capitalize()
+        if name in config.neural_voices.keys():
+            self._voice = config.neural_voice_formatter.format(name)
         else:
-            self._voice = f"en-US-TonyNeural"
+            self._voice = config.neural_voice_formatter.format(config.default_voice)
 
-    def _init_default_emotion(self) -> None:
-        """
-        Initialize the character's default emotion using GPT.
-        """
-        emotions = [
-            "angry",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ]
-        emotion_string = ", ".join(emotions)
+    def _init_default_emotion_prompt(self) -> None:
+        """Create a prompt for initializing the chatbot's default emotion."""
+        emotion_str = ", ".join(config.emotions)
         prompt = (
-            f"You are {self._character}. Choose one default emotion from the following options: {emotion_string}. "
-            "Select the most appropriate emotion, even if it's not a perfect fit. Write your answer as a single "
-            "word."
+            f"Select a default emotional state for your character from the options: {emotion_str}. Choose the most "
+            f"suitable emotion for {self._name}, even if it's not an ideal match. Provide your answer as a single word."
         )
-        response = self._response(prompt, temperature=0)
-        emotion = response.lower().strip()
-        if emotion in emotions:
+        return prompt
+
+    def _select_emotion(self, response: str) -> None:
+        """
+        Initialize the chatbot's default emotion from the given response.
+
+        Args:
+            response (str): The response containing the chatbot's default emotion.
+        """
+        emotion = self._strip_punctuation(response).lower()
+        if emotion in config.emotions:
             self._default_emotion = emotion
         else:
-            self._default_emotion = "friendly"
+            self._default_emotion = config.default_emotion
 
-    def _startup_message(self) -> parsed_response:
+    def _init_startup_message(self) -> None:
         """
-        Generate the character's startup message using GPT.
+        Initialize the chatbot's startup message as a parsed response, including a greeting, default emotion, and null
+        action.
 
-        :return: A dictionary containing the text, emotion, and actions of the response.
+        The method requests a greeting message from the AI model, then appends it to the chatbot's history.
         """
-        prompt = f"You are {self._character}. After being woken, greet me with a sentence that reflects your character."
-        response = self._response(self._get_context() + prompt)
-        response_dict = {"text": response, "emotion": self._default_emotion, "actions": ["NULL()"]}
-        self._history.append(("Initialize", response_dict))
+        character_info = f"You are an AI assistant playing the character of {self._character}."
+        prompt = (
+            "You have just been summoned (or awakened, depending on the hour). "
+            "Prepare a greeting that reflects your character."
+        )
+        messages = [
+            {"role": "system", "content": self._context},
+            {"role": "system", "content": character_info},
+            {"role": "user", "content": prompt},
+        ]
+        response = self._request(messages)
 
-        return response_dict
+        content = f"$TEXT:{response}$TEXT" f"$EMOTION:{self._default_emotion}$EMOTION" "$ACTIONS:[NULL()]$ACTIONS"
+        self._history_append(role="assistant", content=content)
+        self._startup_message = self._response_parse(content)
 
-    def _wrap_new_prompt(self, text: str, count: int) -> str:
+    def _history_append(self, role: Literal["system", "user", "assistant"], content: str) -> None:
         """
-        Wrap a new prompt with a specific format.
+        Append a message with a specified role and content to the chatbot's conversation history.
 
-        :param text: The text of the prompt.
-        :param count: The index of the prompt in the conversation.
-        :return: A formatted string with the prompt.
+        Args:
+            role (Literal["system", "user", "assistant"]): The role of the message sender.
+            content (str): The content of the message.
         """
-        wrapped = f"$PROMPT {count}:{text}$END PROMPT {count}\n"
-        return wrapped
-
-    def _stack_history(self) -> str:
-        """
-        Stack the conversation history in a formatted string.
-
-        :return: A string with the conversation history.
-        """
-        history = []
-        for n, (prompt, response) in enumerate(self._history):
-            prompt = self._wrap_new_prompt(prompt, n)
-            history.append(prompt)
-            response = f"$TEXT:{response['text']}$TEXT$ACTIONS:[{','.join(response['actions'])}]$ACTIONS$END\n"
-            history.append(response)
-
-        history = "\n".join(history) + "\n"
-        return history
+        self._history.append({"role": role, "content": content})
 
     def _get_error_response(self) -> str:
         """
-        Generate an error response using GPT.
+        Generate an error response indicating that the chatbot might not have paid close attention or didn't catch
+        what the user said.
 
-        :return: A string containing the error response.
+        Returns:
+            str: A short response that shows the chatbot might not have understood the user.
         """
         prompt = (
-            f"You are {self._character}. Provide a short response indicating that you might not have paid close "
-            "attention or didn't catch what the user said."
+            f"You are portraying the character of {self._character}. Offer a brief apology suggesting that you were "
+            "not paying close attention to what the user just said."
         )
-        response = self._response(prompt)
+        messages = [{"role": "system", "content": prompt}]
+        response = self._request(messages=messages)
         return response
 
-    def _get_interrupt_response(self) -> str:
+    def _history_append_interruption(self) -> None:
         """
-        Generate a response to an interruption using GPT.
-
-        :return: A string containing the response to the interruption.
+        Append a system message to the chat history indicating that the chatbot was interrupted mid-speech.
         """
-        prompt = (
-            f"You are {self._character}. The user interrupted your mid-speech. Generate a short reaction to this "
-            "interruption."
-        )
-        response = self._response(prompt)
-        return response
+        response = self._history_append(role="system", content=f"The user interrupted {self._name} mid-speech.")
 
     def _summarize_conversation(self) -> str:
         """
-        Generate a summary of the conversation using GPT.
+        Summarize the key points and any specific user information from the chatbot's conversation history that might be
+        useful for future conversations.
 
-        :return: A string containing the summary of the conversation.
+        Returns:
+            str: A summary of the conversation.
         """
-        history = self._stack_history()
         prompt = (
-            f"You are a voice-activated assistant with the personality of {self._character}. Given the conversation "
-            f"and actions below:\n{history}\nSummarize the key points and any specific user information that might be "
-            "useful for future conversations as succinctly as possible."
+            "Break character and complete the following task as written: Summarize the conversation, focusing on key "
+            "points and any specific user information that may be useful for future discussions, in the most succinct "
+            "manner possible."
         )
-        response = self._response(prompt)
+        messages = self._history + [{"role": "system", "content": prompt}]
+        response = self._request(messages=messages, top_p=0.7)
         return response
 
-    def _response(self, prompt: str, stop: Optional[str] = None, temperature: float = 0.7) -> str:
+    def _request(self, messages: list[messages_dict], **kwargs) -> str:
         """
-        Generate a response using GPT.
+        Send a request to the OpenAI API to generate a response based on the given messages and optional keyword
+        arguments.
 
-        :param prompt: The prompt to send to GPT.
-        :param stop: An optional string used as a stop sequence for GPT.
-        :param temperature: The temperature to use for GPT's response (default 0.7).
-        :return: A string containing GPT's response.
-        """
-        token_count = self._count_tokens(prompt)
-        try:
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                max_tokens=self._max_len - token_count,
-                n=1,
-                stop=stop,
-                temperature=temperature,
-            )
-            return response.choices[0].text.strip()
-        except openai.error.AuthenticationError as e:
-            voiced_error_message = (
-                "Incorrect or missing OpenAI API Key. Assign it to environment variable OPENAI_API_KEY, and try again."
-            )
-            self._speak(voiced_error_message)
-            raise e
+        Args:
+            messages (list[messages_dict]): A list of message dictionaries.
+            **kwargs: Optional keyword arguments; arguments "model", "n", and "max_tokens" cannot be modified.
 
-    def _response_process(self, response: str) -> parsed_response:
+        Returns:
+            str: The content of the response generated by the AI model.
         """
-        Process the raw response from GPT.
+        kwargs["messages"] = messages
+        kwargs["model"] = self._model
+        kwargs["n"] = 1
+        kwargs["max_tokens"] = self._max_len - self._count_tokens(messages)
 
-        :param response: The raw response from GPT.
-        :return: A dictionary containing the text, emotion, and actions of the response.
+        response = openai.ChatCompletion.create(**kwargs)
+        return response.choices[0].message.content.strip()
+
+    def _response_unparse(self, text: str, emotion: str, actions: list[str, ...]) -> str:
         """
+        Convert a response into a string format that combines text, emotion, and actions.
+
+        Args:
+            text (str): The text content of the response.
+            emotion (str): The emotion related to the response.
+            actions (list[str, ...]): A list of actions in the response.
+
+        Returns:
+            str: The combined string representation of the response.
+        """
+        response_str = f"$TEXT:{text}$TEXT" f"$EMOTION:{emotion}$EMOTION" f"$ACTIONS:[{','.join(actions)}]$ACTIONS"
+        return response_str
+
+    def _response_parse(self, response: str) -> parsed_response:
+        """
+        Parse a response string into a dictionary containing text, emotion, and actions.
+
+        Args:
+            response (str): The response string to parse.
+
+        Returns:
+            parsed_response: A dictionary containing the parsed text, emotion, and actions.
+        """
+
         text_search = re.findall(self._text_response_pattern, response)
         emotion_search = re.findall(self._emotion_response_pattern, response)
         action_search = re.findall(self._action_response_pattern, response)
 
-        search = [text_search, emotion_search, action_search]
-        search = [i[0] if len(i) == 1 else None for i in search]
-
-        if search[0] is None:
-            search[0] = self._get_error_response()
-
-        if search[1] is None:
-            search[1] = self._default_emotion
+        if len(text_search) != 1:
+            text = self._get_error_response()
         else:
-            search[1] = search[1].lower()
+            text = text_search[0]
 
-        if search[2] is None:
-            search[2] = "NULL()"
-
-        response = {"text": search[0], "emotion": search[1], "actions": search[2].split(",")}
-        return response
-
-    def get_response(self, new_prompt: str) -> parsed_response:
-        """
-        Generate a response to the given prompt.
-
-        :param new_prompt: The new prompt to get a response for.
-        :return: A dictionary containing the text, emotion, and actions of the response.
-        """
-        context = self._get_context()
-        new_prompt_wrapped = self._wrap_new_prompt(new_prompt, len(self._history))
-
-        if len(self._history) > 0:
-            history = self._stack_history()
+        if len(emotion_search) != 1:
+            emotion = self._default_emotion
         else:
-            history = ""
+            emotion = emotion_search[0].lower()
 
-        prompt = context + self._init_text + "\n" + history + new_prompt_wrapped
+        if len(action_search) != 1:
+            actions = ["NULL()"]
+        else:
+            actions = [action.strip() for action in action_search[0].split(",")]
 
-        response_raw = self._response(prompt, "$END")
-        response = self._response_process(response_raw)
+        return {"text": text, "emotion": emotion, "actions": actions}
 
-        self._history.append((new_prompt, response))
+    def prompt(self, message: str) -> parsed_response:
+        """
+        Add a user message to the chatbot's conversation history and generate a parsed response from the AI model.
 
-        return response
+        Args:
+            message (str): The user's message.
+
+        Returns:
+            parsed_response: A dictionary containing the parsed text, emotion, and actions in the response.
+        """
+        self._history_append(role="user", content=message)
+        response = self._request(messages=self._history)
+        response_parsed = self._response_parse(response=response)
+        response_unparsed = self._response_unparse(
+            text=response_parsed["text"], emotion=response_parsed["emotion"], actions=response_parsed["actions"]
+        )
+        self._history_append(role="assistant", content=response_unparsed)
+        return response_parsed
+
+
+if __name__ == "__main__":
+    bot = GPTBot(character="Hilary Clinton")
+    print(bot._get_error_response())

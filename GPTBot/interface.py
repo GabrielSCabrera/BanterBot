@@ -20,6 +20,16 @@ class Interface:
         self._user_name = "USER"
         self._init_gui()
 
+        self._history.append(
+            {
+                "prompt": None,
+                "full_response": self._gptbot._startup_message,
+                "response": None,
+                "interrupted": False,
+                "completed": False,
+            }
+        )
+
     def _init_gui(self):
         self._term = Term()
 
@@ -38,7 +48,6 @@ class Interface:
             edge_R,
             background=self._background_color,
             wrap_text=True,
-            # wrap_subsequent_indent=" " * (2 + max(len(self._user_name), len(self._gptbot._name))),
         )
         self._input_prompt = TextBox(
             edge_B - 1, w_size, edge_B, w_size + len(input_prompt_text), background=self._background_color
@@ -117,7 +126,7 @@ class Interface:
                 if self._tts_synthesizer._synthesis_completed and self._tts_synthesizer._synthesis_started:
                     self._tts_synthesizer._interrupt = True
                     interrupt_response = self._gptbot._get_interrupt_response()
-                response = self._gptbot.get_response(entry)
+                response = self._gptbot.prompt(entry)
 
                 self._history.append(
                     {
@@ -163,18 +172,6 @@ class Interface:
 
         Listener.start()
         self._input_window.start()
-
-        startup_message = self._gptbot._startup_message()
-
-        self._history.append(
-            {
-                "prompt": None,
-                "full_response": startup_message,
-                "response": None,
-                "interrupted": False,
-                "completed": False,
-            }
-        )
 
         thread_speak = threading.Thread(target=self._thread_speak, daemon=True)
         thread_output_text = threading.Thread(target=self._thread_output_text, daemon=True)
