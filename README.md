@@ -16,23 +16,23 @@ Features
 
 Requires three environment variables for full functionality:
 
-1. `OPENAI_API_KEY` must be a valid OpenAI API key,
-2. `AZURE_SPEECH_KEY` must be a valid Azure Speech Service API key, for TTS functionality,
-3. `AZURE_SPEECH_REGION` must be the region associated with the Azure Speech Service API key.
+1. `OPENAI_API_KEY`: A valid OpenAI API key,
+2. `AZURE_SPEECH_KEY`: A valid Azure Cognitive Services Speech API key for TTS functionality,
+3. `AZURE_SPEECH_REGION`: The region associated with your Azure Cognitive Services Speech API key.
 
 ## Usage
 
-To start the GPTBot interface, run the following command in your terminal:
+To initiate the GPTBot interface, navigate to the `GPTBot` subdirectory and execute the following command in your terminal:
 
 `python interface.py [character]`
 
-Replace [character] with the desired character for the chatbot (optional). If no character is provided, GPTBot will use a default character (Marvin the Paranoid Android).
+Replace [character] with your preferred chatbot character (optional). If no character is specified, GPTBot defaults to Marvin the Paranoid Android.
 
-You may also have the interface select a character at random with:
+Alternatively, let the interface randomly select a character with:
 
 `python interface.py random`
 
-Once the interface is started, you can type your messages in the input box, and GPTBot will provide its responses in the output window. You can also listen to the synthesized speech of GPTBot's responses.
+Upon launching the interface, enter your messages in the input box, and GPTBot will respond in the output window. You can also listen to GPTBot's responses through synthesized speech.
 
 ## Dependencies
 1. `openai`: The OpenAI library is a Python package that provides a convenient and user-friendly way to interact with the OpenAI API. It allows developers to access various AI models, such as GPT-3, for tasks like natural language processing, translation, and text generation.
