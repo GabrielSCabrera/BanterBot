@@ -19,7 +19,7 @@ class InputBox(TextEditor):
         **kwargs: keyword arguments to be passed to the TextEditor class
         """
         super().__init__(*args, **kwargs)
-        self._outputs = []
+        self._inputs = []
 
     def _run_getch_thread(self) -> None:
         """
@@ -55,12 +55,13 @@ class InputBox(TextEditor):
         for key in getch_iterator:
             if not self._frozen:
                 if key == "Enter":
-                    self._outputs.append(self._raw_text[0])
-                    self._raw_text = [""]
-                    self._cursor_position = (0, 0)
-                    self._origin = (0, 0)
-                    self._selected = []
-                    self.__call__(self._raw_text)
+                    if self._raw_text[0] != "":
+                        self._inputs.append(self._raw_text[0])
+                        self._raw_text = [""]
+                        self._cursor_position = (0, 0)
+                        self._origin = (0, 0)
+                        self._selected = []
+                        self.__call__(self._raw_text)
                 else:
                     call, self._raw_text, self._cursor_position, self._selected = KeyProcessor.process_key(
                         raw_text=self._raw_text,

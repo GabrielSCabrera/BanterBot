@@ -34,6 +34,9 @@ class TTSSynthesizer:
             subscription=os.environ.get("AZURE_SPEECH_KEY"), region=os.environ.get("AZURE_SPEECH_REGION")
         )
 
+        # Create a lock that prevents race conditions when speaking & appending text
+        self._speech_lock = threading.Lock()
+
         # Initialize the output and total length variables
         self._output = []
         self._total_length = 0
@@ -56,6 +59,12 @@ class TTSSynthesizer:
         Returns the output of the TTS synthesizer.
         """
         return self._output
+
+    def interrupt(self) -> None:
+        """
+        Interrupts an ongoing TTS process, if in progress.
+        """
+        self._interrupt = True
 
     def _callback_completed(self, event: speechsdk.SessionEventArgs) -> speechsdk.SessionEventArgs:
         """
@@ -159,6 +168,9 @@ class TTSSynthesizer:
         self._synthesis_started = False
         self._interrupt = False
 
+    def _speak(self, ssml: str):
+        self._synthesizer.speak_ssml(ssml)
+
     def _synthesizer_events_connect(self) -> None:
         """
         Connects the TTS synthesizer events to their corresponding callbacks.
@@ -202,15 +214,14 @@ class TTSSynthesizer:
                     self._total_length += 1
                     word_index += 1
                 else:
-                    # If not enough time has elapsed for the current boundary, exit the loop and wait for the next iteration
+                    # If not enough time has elapsed for the current boundary, exit loop and wait for the next iteration
                     break
 
             # Wait for a short amount of time before checking the synthesis progress again
             time.sleep(0.005)
 
-        # Reset the state of the object and stop the synthesizer
-        self._reset()
-        self._synthesizer.stop_speaking_async()
+        # Stop the synthesizer
+        self._synthesizer.stop_speaking()
 
     def speak(self, text: str, voice_name: str, style: str) -> None:
         """
@@ -224,9 +235,14 @@ class TTSSynthesizer:
         # Create SSML markup for the given text, voice, and style
         ssml = self._create_ssml(text, voice_name, style)
 
-        # Create a new thread to handle the speech synthesis, and start it
-        thread1 = threading.Thread(target=self._synthesizer.speak_ssml, args=(ssml,), daemon=True)
-        thread1.start()
+        with self._speech_lock:
 
-        # Continuously monitor the synthesis progress in the main thread
-        self._text_generator()
+            # Reset all state attributes
+            self._reset()
+
+            # Create a new thread to handle the speech synthesis, and start it
+            thread1 = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
+            thread1.start()
+
+            # Continuously monitor the synthesis progress in the main thread
+            self._text_generator()
