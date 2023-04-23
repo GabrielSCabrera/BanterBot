@@ -9,10 +9,22 @@ import sys
 
 
 class Interface:
-    def __init__(self, border_color: str = "Charcoal", background_color: str = "Black", character=None):
+    def __init__(
+        self, border_color: str = "Charcoal", background_color: str = "Black", character=None, random_character=False
+    ) -> None:
+        """
+        Initializes the interface by setting up the graphical elements and creating instances of the GPTBot and
+        TTSSynthesizer classes for processing user input and synthesizing speech, respectively.
+
+        Args:
+            border_color (str): The color of the interface's border (default "Charcoal").
+            background_color (str): The color of the interface's background (default "Black").
+            character (str): The character to use as the GPTBot's icon (default None).
+            random_character (bool): Whether to choose a random character for the GPTBot's icon (default False).
+        """
         self._border_color = border_color
         self._background_color = background_color
-        self._gptbot = GPTBot(character=character)
+        self._gptbot = GPTBot(character=character, random_character=random_character)
         self._tts_synthesizer = TTSSynthesizer()
         self._history = []
         self._current_entry = None
@@ -30,7 +42,11 @@ class Interface:
             }
         )
 
-    def _init_gui(self):
+    def _init_gui(self) -> None:
+        """
+        Initializes the graphical interface by creating instances of the TextBox and InputBox classes from the Termighty
+        library and setting their properties.
+        """
         self._term = Term()
 
         size = 1
@@ -75,10 +91,21 @@ class Interface:
         self._input_prompt([input_prompt_text])
 
     @property
-    def input_history(self):
+    def input_history(self) -> list[str, ...]:
+        """
+        Returns a list of strings representing the user's input history. Each string in the list corresponds to a single
+        line of input entered by the user.
+
+        Return:
+        self._input_window._outputs (list[str,...]): a list of strings representing the user's input history
+        """
         return self._input_window._outputs
 
-    def _thread_output_text(self):
+    def _thread_output_text(self) -> None:
+        """
+        Runs in an independent thread to continuously check for new output from the text-to-speech synthesizer and
+        update the graphical interface accordingly.
+        """
         N = 0
         while not System.kill_all and not self._shutdown:
             length = self._tts_synthesizer._total_length
@@ -92,11 +119,19 @@ class Interface:
                 N = length
             time.sleep(0.005)
 
-    def _shutdown_output(self):
+    def _shutdown_output(self) -> None:
+        """
+        Displays the final output from the chat session, including a summary message from the GPTBot, when the user
+        initiates a shutdown of the program.
+        """
         output = self._process_history() + [self._gptbot._summarize_conversation()]
         self._output_window(output)
 
-    def _thread_speak(self):
+    def _thread_speak(self) -> None:
+        """
+        Runs in an independent thread to continuously check for new prompts in the chat history and synthesize speech
+        for the ChatGPT model's responses.
+        """
         N = 0
         while not System.kill_all:
             length = len(self._history)
@@ -116,7 +151,11 @@ class Interface:
                     break
             time.sleep(0.005)
 
-    def _thread_gpt_response(self):
+    def _thread_gpt_response(self) -> None:
+        """
+        Runs in an independent thread to continuously check for new user input in the graphical interface, send the
+        input to the ChatGPT model for processing, and update the chat history with the model's response.
+        """
         N = 0
         while not System.kill_all:
             length = len(self._input_window._outputs)
@@ -145,7 +184,11 @@ class Interface:
                     break
             time.sleep(0.005)
 
-    def _process_history(self):
+    def _process_history(self) -> None:
+        """
+        Returns a formatted list of strings representing the chat history, including both user input and GPT-3 model
+        responses.
+        """
         output = []
         max_name_len = max(len(self._user_name), len(self._gptbot._name))
         for entry in self._history:
@@ -160,7 +203,11 @@ class Interface:
 
         return output
 
-    def start(self):
+    def start(self) -> None:
+        """
+        Starts the graphical interface and all the independent threads for processing speech synthesis and ChatGPT model
+        responses.
+        """
         self._term.clear(flush=True)
 
         self._title.start()
@@ -181,17 +228,15 @@ class Interface:
         thread_output_text.start()
         thread_gpt_response.start()
 
-        # prompt = input("User: ")
-        # response = self.get_response(prompt)
-        # print(f"{self.name}: ", response["text"])
-        # self._speak(response["text"])
-        # if "SHUTDOWN()" in response["actions"]:
-        #     break
-
 
 if __name__ == "__main__":
-    character = None
+    kwargs = {}
     if len(sys.argv) > 1:
         character = " ".join(sys.argv[1:])
-    interface = Interface(character=character)
+        if character.lower().strip() in ("random", "rand"):
+            kwargs = {"random_character": True}
+        else:
+            kwargs = {"character": character}
+
+    interface = Interface(**kwargs)
     interface.start()

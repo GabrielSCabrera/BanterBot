@@ -2,18 +2,31 @@ from termighty.utils.listener import Listener
 from termighty.utils import KeyProcessor
 from termighty.widgets.text_editor import TextEditor
 
-import textwrap
-
 
 class InputBox(TextEditor):
-    def __init__(self, *args, **kwargs):
+    """
+    A widget that allows users to input text and store it in a list of outputs.
+
+    Inherits from the TextEditor class.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        """
+        Initialize an InputBox object.
+
+        Args:
+        *args: positional arguments to be passed to the TextEditor class
+        **kwargs: keyword arguments to be passed to the TextEditor class
+        """
         super().__init__(*args, **kwargs)
         self._outputs = []
 
     def _run_getch_thread(self) -> None:
         """
-        Keeps updating the window every set number of seconds (given by `dt`) and accounts for changes in the terminal
-        size (useful when dealing with relative coordinates on initialization).
+        Override the _run_getch_thread method of the TextEditor class.
+
+        This method is run in a separate thread and waits for user input. It processes user input
+        and updates the text and cursor position accordingly.
         """
         self._raw_text = self._text
         getch_iterator = Listener.getch_iterator()
@@ -45,8 +58,9 @@ class InputBox(TextEditor):
                     self._outputs.append(self._raw_text[0])
                     self._raw_text = [""]
                     self._cursor_position = (0, 0)
+                    self._origin = (0, 0)
                     self._selected = []
-                    call = True
+                    self.__call__(self._raw_text)
                 else:
                     call, self._raw_text, self._cursor_position, self._selected = KeyProcessor.process_key(
                         raw_text=self._raw_text,
@@ -56,8 +70,5 @@ class InputBox(TextEditor):
                         key=key,
                         ignore_keys=ignore_keys,
                     )
-                if call:
-                    if self._wrap_text:
-                        self.__call__([i for i in self._raw_text for j in textwrap.wrap(i, self._shape[1])])
-                    else:
+                    if call:
                         self.__call__(self._raw_text)

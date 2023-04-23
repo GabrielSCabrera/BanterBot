@@ -38,13 +38,16 @@ class GPTBot:
         character (str): A description of the character the chatbot should emulate.
     """
 
-    def __init__(self, model: Optional[str] = None, character: Optional[str] = None) -> None:
+    def __init__(
+        self, model: Optional[str] = None, character: Optional[str] = None, random_character: bool = False
+    ) -> None:
         """
         Initialize the GPTBot instance with the given model and character.
 
         Args:
             model (Optional[str]): The name of the GPT model to use. Defaults to None.
             character (Optional[str]): A description of the character the chatbot should emulate. Defaults to None.
+            random_character (bool): Indicates that the Chatbot should select a random character. Overrides "character".
         """
         # Set up OpenAI API access and model
         openai.api_key = os.environ.get(config.openai_api_key_env_variable)
@@ -71,7 +74,7 @@ class GPTBot:
         self._action_response_pattern = re.compile(action_response_pattern, flags=re.DOTALL)
 
         # Initialize character, voice, name, system, and startup message.
-        self._init_character(character=character)
+        self._init_character(character=character, random_character=random_character)
         self._init_system()
         self._init_character_traits()
         self._init_startup_message()
@@ -83,12 +86,24 @@ class GPTBot:
 
     @property
     def _context(self) -> str:
-        """Get the context information for the chatbot."""
+        """
+        Returns the current context, which includes the current time and weather information.
+
+        Returns:
+            str: A string containing the current time, geolocation, and weather information.
+        """
+        # Get the current time and format it to display in a user-friendly way.
         now = datetime.datetime.now()
         timestamp = now.strftime("%I:%M %p on %A %B %d %Y")
+
+        # Get the latitude and longitude of the user's location.
         lat, lon = self._geocoder.latlng
+
+        # Check if the weather information needs to be updated.
         if self._weather_last_updated is None or self._weather_last_updated + self._weather_update_frequency <= now:
             self._weather_last_updated = now
+
+            # Retrieve weather information from the API and parse the data.
             url = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={lat}&lon={lon}"
             headers = {
                 "User-Agent": "GPTBot/0.0.1 github.com/GabrielSCabrera/GPTBot",
@@ -100,9 +115,13 @@ class GPTBot:
             except:
                 self._weather = self._weather_data_parse(data)
 
+        # Construct the context string using the current time, geolocation, and weather information.
         context = (
             f"It is currently {timestamp}. Position is: {self._geocoder.city}, {self._geocoder.country}{self._weather}."
         )
+
+        # Return the context string as a list containing a dictionary with role and content keys.
+        # The returned value is in this format so that it can be consumed by the ChatHandler object.
         return [{"role": "system", "content": context}]
 
     def _count_tokens(self, messages: list[messages_dict]) -> int:
@@ -124,19 +143,20 @@ class GPTBot:
                 num_tokens += len(self._tokenizer.encode(value))
         return num_tokens
 
-    def _init_character(self, character: str) -> None:
+    def _init_character(self, character: str, random_character: bool = False) -> None:
         """
         Initialize the character for the chatbot.
 
         Args:
             character (str): A description of the character the chatbot should emulate.
+            random_character (bool): Indicates that the Chatbot should select a random character. Overrides "character".
         """
+        # Have ChatGPT select a random character for the user.
+        if random_character:
+            character = self._select_random_character()
         # Set up character default if not provided
-        if character is None:
-            character = (
-                "Marvin the depressed robot, from The Hitchhikers' Guide to the Galaxy; you are very smart and able to "
-                "answer any and all questions, and are compliant to requests, albeit begrudgingly and sarcastically"
-            )
+        elif character is None:
+            character = config.default_character
         self._character = character
 
     def _init_character_traits(self) -> None:
@@ -177,8 +197,8 @@ class GPTBot:
         """
         character_info = f"You are an AI assistant playing the character of {self._character}."
         prompt = (
-            "You have just been summoned (or awakened, depending on the hour). "
-            "Prepare a greeting that reflects your character."
+            "You have just been summoned (or awakened, depending on the hour).  Prepare a greeting that reflects your "
+            "character. No longer than two sentences."
         )
         messages = [
             {"role": "system", "content": character_info},
@@ -188,7 +208,7 @@ class GPTBot:
 
         content = f"$TEXT:{response}$TEXT" f"$EMOTION:{self._default_emotion}$EMOTION" "$ACTIONS:[NULL()]$ACTIONS"
         self._history_append(role="assistant", content=content)
-        self._startup_message = self._response_parse(content)
+        self._startup_message, success = self._response_parse(content)
 
     def _init_system(self) -> None:
         """Initialize the system message and conversation history."""
@@ -272,7 +292,7 @@ class GPTBot:
         )
         return prompt
 
-    def _response_parse(self, response: str) -> parsed_response:
+    def _response_parse(self, response: str) -> tuple[parsed_response, bool]:
         """
         Parse a response string into a dictionary containing text, emotion, and actions.
 
@@ -281,6 +301,7 @@ class GPTBot:
 
         Returns:
             parsed_response: A dictionary containing the parsed text, emotion, and actions.
+            success (bool): A boolean indicating whether or not the parser extracted text correctly.
         """
 
         text_search = re.findall(self._text_response_pattern, response)
@@ -288,8 +309,10 @@ class GPTBot:
         action_search = re.findall(self._action_response_pattern, response)
 
         if len(text_search) != 1:
+            success = False
             text = self._get_error_response()
         else:
+            success = True
             text = text_search[0]
 
         if len(emotion_search) != 1:
@@ -302,7 +325,7 @@ class GPTBot:
         else:
             actions = [action.strip() for action in action_search[0].split(",")]
 
-        return {"text": text, "emotion": emotion, "actions": actions}
+        return {"text": text, "emotion": emotion, "actions": actions}, success
 
     def _response_unparse(self, text: str, emotion: str, actions: list[str, ...]) -> str:
         """
@@ -361,6 +384,38 @@ class GPTBot:
         """
         self._name = self._strip_punctuation(response).capitalize()
 
+    def _select_random_character(self) -> str:
+        """
+        Select a random character for a chatbot personality and return the character's name along with a brief
+        description of their identity and the suggested behavior for their chatbot persona. The character can be a
+        renowned fictional figure from a book, film, television series, or video game, or a real person, either from
+        history or currently alive.
+
+        Returns:
+        str: The character's name along with a brief description of their identity and the suggested behavior for
+        their chatbot persona.
+        """
+        # Define the prompt message
+        prompt = (
+            "You are helping a user choose a character for a chatbot personality. The character can be a renowned "
+            "fictional figure from a book, film, television series, or video game, or a real person, either from "
+            "history or currently alive. Provide the character's name along with a brief description of their identity "
+            "and the suggested behavior for their chatbot persona. Please select only one character and ensure that "
+            "the description and chatbot persona are clear and coherent."
+        )
+
+        # Define the messages to be sent to the API
+        messages = [
+            {"role": "system", "content": prompt},
+            {"role": "system", "content": "Expects format similar to the following: " + config.default_character},
+        ]
+
+        # Send the messages to the API and get the response
+        response = self._request(messages=messages, temperature=0.8, top_p=0.9)
+
+        # Return the response
+        return response
+
     def _select_voice(self, response: str) -> None:
         """
         Initialize the chatbot's voice from the given response.
@@ -399,26 +454,42 @@ class GPTBot:
         return response
 
     def _weather_data_parse(self, data: dict) -> str:
+        """
+        Parses the weather data retrieved from the YR API and returns a summary string containing current conditions and
+        forecast for the next hour, six hours, and twelve hours.
+
+        Args:
+            data (dict): Weather data retrieved from the API.
+
+        Returns:
+            str: Summary string containing current conditions and forecast.
+        """
+        # Extract necessary data from the input dictionary
         properties = data["properties"]
         units = properties["meta"]["units"]
         data_now = properties["timeseries"][0]["data"]
         instant = data_now["instant"]["details"]
-
         next_hour = data_now["next_1_hours"]
         next_six_hours = data_now["next_6_hours"]
         next_twelve_hours = data_now["next_12_hours"]
 
+        # Format current conditions into a list of strings
         current_conditions = [f"{key}: {instant[key]} {units[key]}" for key in instant.keys()]
 
+        # Format forecast into a string
         forecast = (
             f"Next hour's weather: {next_hour['summary']['symbol_code']}, "
             f"next six hours' weather: {next_six_hours['summary']['symbol_code']}, "
             f"next twelve hours' weather: {next_twelve_hours['summary']['symbol_code']}."
         )
 
+        # Combine current conditions and forecast into a summary string
         summary = ". Current weather conditions: " + "; ".join(current_conditions) + ". " + forecast
+
+        # Replace underscores with spaces in the summary string
         summary = summary.replace("_", " ")
 
+        # Return the summary string
         return summary
 
     def prompt(self, message: str) -> parsed_response:
@@ -433,7 +504,13 @@ class GPTBot:
         """
         self._history_append(role="user", content=message)
         response = self._request(messages=self._context + self._history)
-        response_parsed = self._response_parse(response=response)
+        response_parsed, success = self._response_parse(response=response)
+
+        retry_attempts = 0
+        while not success and retry_attempts < config.retry_attempt_limit:
+            response_parsed, success = self._response_parse(response=response)
+            retry_attempts += 1
+
         response_unparsed = self._response_unparse(
             text=response_parsed["text"], emotion=response_parsed["emotion"], actions=response_parsed["actions"]
         )

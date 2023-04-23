@@ -3,66 +3,131 @@ from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 import os
 import time
 import threading
+from typing import Optional
 
 
 class TTSSynthesizer:
+    """
+    A text-to-speech (TTS) synthesizer that uses the Azure Cognitive Services Speech SDK to convert text into spoken
+    audio.
+
+    The `TTSSynthesizer` class initializes the Azure speech configuration with the subscription key and region stored in
+    environment variables. The `speak()` method is used to speak the specified text using the specified voice and style,
+    and the audio is generated asynchronously. The `_text_generator()` method is used to monitor the synthesis progress
+    and update the output accordingly. The `_reset()` method is used to reset the state variables of the TTS
+    synthesizer.
+    """
+
     def __init__(
         self,
         output_format: SpeechSynthesisOutputFormat = SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3,
-    ):
+    ) -> None:
+        """
+        Initialize the TTS synthesizer with the specified output format.
+
+        Args:
+            output_format (SpeechSynthesisOutputFormat, optional): The output audio format. Defaults to
+            SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3.
+        """
+        # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
             subscription=os.environ.get("AZURE_SPEECH_KEY"), region=os.environ.get("AZURE_SPEECH_REGION")
         )
+
+        # Initialize the output and total length variables
         self._output = []
         self._total_length = 0
+
+        # Initialize the speech synthesizer with the speech configuration
         self._synthesizer = speechsdk.SpeechSynthesizer(speech_config=self._speech_config)
-        self._speech_config.set_speech_synthesis_output_format(SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3)
+
+        # Set the speech synthesis output format to the specified output format
+        self._speech_config.set_speech_synthesis_output_format(output_format)
+
+        # Connect the speech synthesizer events to their corresponding callbacks
         self._synthesizer_events_connect()
+
+        # Reset the state variables of the TTS synthesizer
         self._reset()
 
-    def _reset(self):
-        self._boundaries = []
-        self._synthesis_completed = False
-        self._synthesis_started = False
-        self._interrupt = False
-
     @property
-    def output(self):
+    def output(self) -> None:
+        """
+        Returns the output of the TTS synthesizer.
+        """
         return self._output
 
-    def _synthesizer_events_connect(self):
-        self._synthesizer.synthesis_started.connect(self._synthesizer_synthesis_started_cb)
-        self._synthesizer.synthesis_word_boundary.connect(self._synthesizer_word_boundary_cb)
-        self._synthesizer.synthesis_canceled.connect(self._synthesizer_synthesis_completed_cb)
-        self._synthesizer.synthesis_completed.connect(self._synthesizer_synthesis_completed_cb)
+    def _callback_completed(self, event: speechsdk.SessionEventArgs) -> speechsdk.SessionEventArgs:
+        """
+        Callback function for synthesis completed event.
 
-    def _synthesizer_word_boundary_cb(self, evt: speechsdk.SessionEventArgs):
-        if evt.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
+        Args:
+            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.
 
-            offset_ns = 100 * evt.audio_offset
-            duration = 1e9 * evt.duration.total_seconds()
+        Returns:
+            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
+        """
+        self._synthesis_completed = True
+        return event
+
+    def _callback_started(self, event: speechsdk.SessionEventArgs) -> speechsdk.SessionEventArgs:
+        """
+        Callback function for synthesis started event.
+
+        Args:
+            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
+
+        Returns:
+            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
+        """
+        self._synthesis_started = True
+        return event
+
+    def _callback_word_boundary(self, event: speechsdk.SessionEventArgs) -> speechsdk.SessionEventArgs:
+        """
+        Callback function for word boundary event.
+
+        Args:
+            event (speechsdk.SessionEventArgs): Event arguments containing information about the word boundary.
+
+        Returns:
+            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
+        """
+        # Check if the boundary is not a sentence boundary
+        if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
+
+            # Calculate the offset and duration of the boundary in nanoseconds
+            offset_ns = 100 * event.audio_offset
+            duration = 1e9 * event.duration.total_seconds()
+
+            # Add the boundary information to the list of boundaries
             self._boundaries.append(
                 {
                     "offset_ns": offset_ns,
-                    "text": evt.text,
-                    "word_length": evt.word_length,
+                    "text": event.text,
+                    "word_length": event.word_length,
                     "duration": duration,
-                    "boundary_type": evt.boundary_type,
-                    "t_word": offset_ns + duration / evt.word_length,
+                    "boundary_type": event.boundary_type,
+                    "t_word": offset_ns + duration / event.word_length,
                 }
             )
 
-    def _synthesizer_synthesis_started_cb(self, evt: speechsdk.SessionEventArgs):
-        self._synthesis_started = True
+        # Return the event arguments (required by the speech SDK)
+        return event
 
-    def _synthesizer_synthesis_completed_cb(self, evt: speechsdk.SessionEventArgs):
-        self._synthesis_completed = True
+    def _create_ssml(self, text: str, voice_name: str, style: Optional[str] = None) -> str:
+        """
+        Creates an SSML string from the given text, voice, and style.
 
-    def _synthesizer_speak_ssml(self, ssml):
-        # Synthesize SSML to speech
-        self._synthesizer.speak_ssml(ssml)
+        Args:
+            text (str): The text to be converted to SSML.
+            voice_name (str): The name of the voice to be used.
+            style (str, optional): The speaking style to be applied.
 
-    def _create_ssml(self, text, voice_name="en-US-JasonNeural", style="sad"):
+        Returns:
+            str: The SSML string.
+        """
+        # Start the SSML string with the required header and voice tag
         ssml = (
             '<speak version="1.0" '
             'xmlns="http://www.w3.org/2001/10/synthesis" '
@@ -71,53 +136,97 @@ class TTSSynthesizer:
             f'<voice name="{voice_name}">'
         )
 
+        # If a speaking style is specified, add the express-as tag
         if style:
-            ssml += f'<mstts:express-as style="{style}">'
+            text = f'<mstts:express-as style="{style}">{text}</mstts:express-as>'
 
+        # Add the text to the SSML string
         ssml += text
 
-        if style:
-            ssml += "</mstts:express-as>"
-
+        # Close the voice and speak tags and return the SSML string
         ssml += "</voice></speak>"
         return ssml
 
-    def _synthesizer_text(self):
+    def _reset(self) -> None:
+        """
+        Resets the state variables of the TTS synthesizer.
+        """
+        # Reset the list of boundaries that have been processed
+        self._boundaries = []
+
+        # Reset the synthesis completed, synthesis started, and interrupt flags
+        self._synthesis_completed = False
+        self._synthesis_started = False
+        self._interrupt = False
+
+    def _synthesizer_events_connect(self) -> None:
+        """
+        Connects the TTS synthesizer events to their corresponding callbacks.
+        """
+        # Connect the synthesis_started event to the _callback_started method
+        self._synthesizer.synthesis_started.connect(self._callback_started)
+
+        # Connect the synthesis_word_boundary event to the _callback_word_boundary method
+        self._synthesizer.synthesis_word_boundary.connect(self._callback_word_boundary)
+
+        # Connect the synthesis_canceled and synthesis_completed events to the _callback_completed method
+        self._synthesizer.synthesis_canceled.connect(self._callback_completed)
+        self._synthesizer.synthesis_completed.connect(self._callback_completed)
+
+    def _text_generator(self) -> None:
+        """
+        Monitors the synthesis progress and updates the output accordingly.
+        """
+        # Wait until the synthesis has started before proceeding
         while not self._synthesis_started:
             time.sleep(0.005)
 
-        t0 = time.perf_counter_ns()
-        N = 0
+        # Record the start time and initialize variables
+        start_time = time.perf_counter_ns()
+        word_index = 0
         self._output.append([])
+
+        # Continuously monitor the synthesis progress
         while not self._synthesis_completed and not self._interrupt:
-            dt = time.perf_counter_ns() - t0
-            for boundary in self._boundaries[N:]:
-                if dt >= boundary["t_word"]:
-                    output = boundary["text"]
-                    if N > 0 and boundary["boundary_type"] == speechsdk.SpeechSynthesisBoundaryType.Word:
-                        output = " " + boundary["text"]
-                    self._output[-1].append(output)
+            # Compute the elapsed time since the start of the synthesis
+            elapsed_time = time.perf_counter_ns() - start_time
+
+            # Process each boundary that hasn't been processed yet
+            for boundary in self._boundaries[word_index:]:
+                # If enough time has elapsed for the current boundary, add its text to the output
+                if elapsed_time >= boundary["t_word"]:
+                    word_text = boundary["text"]
+                    if word_index > 0 and boundary["boundary_type"] == speechsdk.SpeechSynthesisBoundaryType.Word:
+                        word_text = " " + word_text
+                    self._output[-1].append(word_text)
                     self._total_length += 1
-                    N += 1
-                elif dt < boundary["t_word"]:
+                    word_index += 1
+                else:
+                    # If not enough time has elapsed for the current boundary, exit the loop and wait for the next iteration
                     break
 
+            # Wait for a short amount of time before checking the synthesis progress again
             time.sleep(0.005)
+
+        # Reset the state of the object and stop the synthesizer
         self._reset()
         self._synthesizer.stop_speaking_async()
 
-    def speak(self, text, voice_name="en-US-JasonNeural", style="sad"):
+    def speak(self, text: str, voice_name: str, style: str) -> None:
+        """
+        Speaks the given text using the specified voice and style.
+
+        Args:
+            text (str): The text to be spoken.
+            voice_name (str, optional): The name of the voice to be used.
+            style (str, optional): The speaking style to be applied.
+        """
+        # Create SSML markup for the given text, voice, and style
         ssml = self._create_ssml(text, voice_name, style)
-        thread1 = threading.Thread(target=self._synthesizer_speak_ssml, args=(ssml,), daemon=True)
+
+        # Create a new thread to handle the speech synthesis, and start it
+        thread1 = threading.Thread(target=self._synthesizer.speak_ssml, args=(ssml,), daemon=True)
         thread1.start()
-        self._synthesizer_text()
 
-
-if __name__ == "__main__":
-    text = "Hey, you! Drink my bottled warter, it's not water, it's warter!"
-    text = "Hello, my name is Gabriel, I am a german techno fiend"
-    voice_name = "de-DE-ConradNeural"  # Replace with the desired voice
-    style = "shouting"  # Replace with the desired emotion or speaking style
-
-    tts_synthesizer = TTSSynthesizer()
-    tts_synthesizer.speak(text, voice_name, style)
+        # Continuously monitor the synthesis progress in the main thread
+        self._text_generator()
