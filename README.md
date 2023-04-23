@@ -26,6 +26,20 @@ Once the interface is started, you can type your messages in the input box, and 
 
 Requires three environment variables for full functionality:
 
-1. `OPENAI_API_KEY` must be a valid OpenAI API key, 
+1. `OPENAI_API_KEY` must be a valid OpenAI API key,
 2. `AZURE_SPEECH_KEY` must be a valid Azure Speech Service API key, for TTS functionality,
 3. `AZURE_SPEECH_REGION` must be the region associated with the Azure Speech Service API key.
+
+
+## Dependencies
+1. `openai`: The OpenAI library is a Python package that provides a convenient and user-friendly way to interact with the OpenAI API. It allows developers to access various AI models, such as GPT-3, for tasks like natural language processing, translation, and text generation.
+
+2. `tiktoken`: Tiktoken is a lightweight Python library for tokenizing text data. It is particularly useful when working with APIs that have token-based usage limits, as it enables developers to count the number of tokens in a text string without making an actual API call.
+
+3. `geocoder`: Geocoder is a Python library that simplifies the process of geocoding and reverse geocoding. It allows developers to obtain geographic coordinates (latitude and longitude) for a given address or location, or retrieve the address for a given set of coordinates, by accessing various geocoding providers like Google Maps, OpenStreetMap, and more.
+
+4. `requests`: The Requests library is a popular Python package for making HTTP requests in a simple and user-friendly manner. It streamlines the process of sending and receiving data from web services, handling tasks like URL encoding, handling query parameters, and managing cookies.
+
+5. `termighty`: Termighty is a Python package that offers a toolkit for creating interactive terminal-based applications. It provides developers with functionalities like handling user input, managing terminal colors and styles, and organizing content on the screen.
+
+6. `azure-cognitiveservices-speech`: The Azure Cognitive Services Speech SDK is a Python package that enables developers to integrate Microsoft's speech recognition, text-to-speech, and speech translation services into their applications. It provides a simple interface for working with speech data and supports various languages and dialects.
