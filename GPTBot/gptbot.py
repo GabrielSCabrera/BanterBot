@@ -1,8 +1,10 @@
+from collections.abc import Iterator
 import datetime
 import json
 import os
 import re
 import string
+import threading
 from typing import Literal, Optional, TypedDict
 
 import openai
@@ -30,29 +32,16 @@ class messages_dict(TypedDict):
 
 
 class GPTBot:
-    """
-    A class that represents a GPT-powered chatbot with a specific character.
-
-    Attributes:
-        model (str): The name of the GPT model to use.
-        character (str): A description of the character the chatbot should emulate.
-    """
-
     def __init__(
-        self, model: Optional[str] = None, character: Optional[str] = None, random_character: bool = False
+        self,
+        model: Optional[str] = None,
+        character: Optional[str] = None,
+        random_character: bool = False,
+        user_name: Optional[str] = None,
     ) -> None:
-        """
-        Initialize the GPTBot instance with the given model and character.
 
-        Args:
-            model (Optional[str]): The name of the GPT model to use. Defaults to None.
-            character (Optional[str]): A description of the character the chatbot should emulate. Defaults to None.
-            random_character (bool): Indicates that the Chatbot should select a random character. Overrides "character".
-        """
-        # Set up OpenAI API access and model
         openai.api_key = os.environ.get(config.openai_api_key_env_variable)
 
-        # Set up geolocation based on IP
         self._geocoder = geocoder.ip("me")
         self._weather_update_frequency = datetime.timedelta(minutes=15)
         self._weather_last_updated = None
@@ -61,49 +50,47 @@ class GPTBot:
             model = config.default_chat_gpt_model
 
         self._model = model
+        self._user_name = user_name.capitalize() if user_name is not None else None
         self._tokenizer = tiktoken.encoding_for_model(self._model)
         self._max_len = 4096
+        self._interrupt = False
         self._history = []
+        self._history_lock = threading.Lock()
 
-        # Compile regex patterns for parsing responses
-        text_response_pattern = "\$TEXT *\:(.+)\$TEXT"
-        emotion_response_pattern = "\$EMOTION *\:(.+)\$EMOTION"
-        action_response_pattern = "\$ACTIONS *\: *\[(.+),? *\] *\$ACTIONS"
-        self._text_response_pattern = re.compile(text_response_pattern, flags=re.DOTALL)
-        self._emotion_response_pattern = re.compile(emotion_response_pattern, flags=re.DOTALL)
+        action_response_pattern = "\$ *ACTIONS *\: *\[(.+),? *\] *\$ *ACTIONS"
+        emotion_response_pattern = "\$ *EMOTION *\:(.+)\$ *EMOTION"
+        text_response_pattern = "\$ *TEXT *\:(.+)\$ *TEXT"
+        text_open_response_pattern = "\$ *TEXT *\:"
+        text_close_response_pattern = "\$ *TEXT"
+        sentence_split_pattern = "([\.\?\!][ \r\n\t]+)"
+
         self._action_response_pattern = re.compile(action_response_pattern, flags=re.DOTALL)
+        self._emotion_response_pattern = re.compile(emotion_response_pattern, flags=re.DOTALL)
+        self._text_response_pattern = re.compile(text_response_pattern, flags=re.DOTALL)
+        self._text_open_response_pattern = re.compile(text_open_response_pattern)
+        self._text_close_response_pattern = re.compile(text_close_response_pattern)
+        self._sentence_split_pattern = re.compile(sentence_split_pattern)
 
-        # Initialize character, voice, name, system, and startup message.
         self._init_character(character=character, random_character=random_character)
-        self._init_system()
         self._init_character_traits()
+        self._init_system()
         self._init_startup_message()
 
     @property
     def name(self) -> str:
-        """Get the chatbot's name."""
         return self._name
 
     @property
     def _context(self) -> str:
-        """
-        Returns the current context, which includes the current time and weather information.
 
-        Returns:
-            str: A string containing the current time, geolocation, and weather information.
-        """
-        # Get the current time and format it to display in a user-friendly way.
         now = datetime.datetime.now()
         timestamp = now.strftime("%I:%M %p on %A %B %d %Y")
 
-        # Get the latitude and longitude of the user's location.
         lat, lon = self._geocoder.latlng
 
-        # Check if the weather information needs to be updated.
         if self._weather_last_updated is None or self._weather_last_updated + self._weather_update_frequency <= now:
             self._weather_last_updated = now
 
-            # Retrieve weather information from the API and parse the data.
             url = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={lat}&lon={lon}"
             headers = {
                 "User-Agent": "GPTBot/0.0.1 github.com/GabrielSCabrera/GPTBot",
@@ -115,52 +102,32 @@ class GPTBot:
             except:
                 self._weather = self._weather_data_parse(data)
 
-        # Construct the context string using the current time, geolocation, and weather information.
         context = (
             f"It is currently {timestamp}. Position is: {self._geocoder.city}, {self._geocoder.country}{self._weather}."
         )
 
-        # Return the context string as a list containing a dictionary with role and content keys.
-        # The returned value is in this format so that it can be consumed by the ChatHandler object.
         return [{"role": "system", "content": context}]
 
     def _count_tokens(self, messages: list[messages_dict]) -> int:
-        """
-        Count the number of tokens in the given list of message dictionaries.
 
-        Args:
-            messages (list[messages_dict]): A list of message dictionaries.
-
-        Returns:
-            int: The number of tokens in the messages.
-        """
-        # Every reply is primed with <im_start>assistant
         num_tokens = 3
         for message in messages:
-            # Every message follows <im_start>{role/name}\n{content}<im_end>\n
+
             num_tokens += 4
             for key, value in message.items():
                 num_tokens += len(self._tokenizer.encode(value))
         return num_tokens
 
     def _init_character(self, character: str, random_character: bool = False) -> None:
-        """
-        Initialize the character for the chatbot.
 
-        Args:
-            character (str): A description of the character the chatbot should emulate.
-            random_character (bool): Indicates that the Chatbot should select a random character. Overrides "character".
-        """
-        # Have ChatGPT select a random character for the user.
         if random_character:
             character = self._select_random_character()
-        # Set up character default if not provided
+
         elif character is None:
             character = config.default_character
         self._character = character
 
     def _init_character_traits(self) -> None:
-        """Initialize character traits such as name, voice, and default emotion."""
 
         character_info = (
             f"You are assisting me in identifying facts about the character/person: {self._character}. You adhere "
@@ -186,15 +153,10 @@ class GPTBot:
         messages.append({"role": "user", "content": default_emotion_prompt})
         response = self._request(messages=messages, temperature=0.0)
         messages.append({"role": "assistant", "content": response})
-        self._select_emotion(response)
+        self._default_emotion = self._select_emotion(response)
 
     def _init_startup_message(self) -> None:
-        """
-        Initialize the chatbot's startup message as a parsed response, including a greeting, default emotion, and null
-        action.
 
-        The method requests a greeting message from the AI model, then appends it to the chatbot's history.
-        """
         character_info = f"You are an AI assistant playing the character of {self._character}."
         prompt = (
             "You have just been summoned (or awakened, depending on the hour).  Prepare a greeting that reflects your "
@@ -207,38 +169,61 @@ class GPTBot:
         response = self._request(self._context + messages)
 
         content = f"$TEXT:{response}$TEXT" f"$EMOTION:{self._default_emotion}$EMOTION" "$ACTIONS:[NULL()]$ACTIONS"
-        self._history_append(role="assistant", content=content)
+        with self._history_lock:
+            self._history_append(role="assistant", content=content, name=self._name)
         self._startup_message, success = self._response_parse(content)
 
     def _init_system(self) -> None:
-        """Initialize the system message and conversation history."""
 
         emotions = list(config.emotions[:-2]) + [", or ".join(config.emotions[-2:])]
         emotions_str = ", ".join(emotions)
 
         self._init_text = (
-            f"You are {self._character}. Respond to the user's latest text prompt with three distinct responses: a "
-            "verbal response, an emotional response, and an action response. Remain in character at all times. The "
-            "verbal response should consist of spoken words only, without any descriptions of actions or voice tones."
-            f"For the emotional response, use one of the options provided: {emotions_str}."
-            "For the action response, use the exact function forms provided: MOVE_FORWARD(DISTANCE), "
-            "MOVE_BACKWARD(DISTANCE), TURN(DEGREES), SHUTDOWN(), or NULL()."
-            "Format your responses as follows:"
-            "$TEXT:<verbal_response>$TEXT"
-            "$EMOTION:<selected_emotion>$EMOTION"
-            "$ACTIONS:[<selected_action_1>,<selected_action_2>,...]$ACTIONS"
+            f"You are {self._character}. Your entire reality is that of {self._name}.\n"
+            "Stay in character throughout the conversation, do not ever break the fourth wall.\n"
+            "When interrupted, address the interrupting prompt first, then return to the previous topic if relevant.\n"
+            "Structure your responses in this order: 1. an action, 2. an emotion, and 3. a verbal statement.\n"
+            "1. Action: Choose from these available functions: MOVE_FORWARD(DISTANCE), MOVE_BACKWARD(DISTANCE), "
+            "TURN(ANGLE), SHUTDOWN(), or NULL(). DISTANCE is in meters, and ANGLE is in degrees.\n"
+            "2. Emotion: Considering the context of the conversation given your character's personality, select the "
+            f"most suitable emotion from the options provided in this list: {emotions_str}.\n"
+            "3. Verbal Statement: Provide spoken words without any action descriptions or vocal tones.\n"
+            "Adhere to the order and format your response as follows:\n"
+            "$ACTIONS:[<action_1>,<action_2>,...]$ACTIONS"
+            "$EMOTION:<emotion>$EMOTION"
+            "$TEXT:<verbal_statement>$TEXT"
         )
 
-        self._history = [{"role": "user", "content": self._init_text}]
+        example_user_prompt_1 = "Could you please walk in a square?"
+        example_assistant_response_1 = (
+            "$ACTIONS:[MOVE_FORWARD(1), TURN(90), MOVE_FORWARD(1), TURN(90), MOVE_FORWARD(1), TURN(90), "
+            f"MOVE_FORWARD(1), TURN(90)]$ACTIONS$EMOTION:{self._default_emotion}$EMOTION$TEXT:Sure, I just walked in "
+            "a square for you. What's next?$TEXT"
+        )
+
+        example_user_prompt_2 = "Could you please lower your voice?"
+        example_assistant_response_2 = (
+            "$ACTIONS:[NULL()]$ACTIONS$EMOTION:whispering$EMOTION$TEXT:I'm sorry if I was too loud. I will make sure "
+            "to lower my voice from now on.$TEXT"
+        )
+
+        example_user_prompt_3 = "Thanks, I have to get going!"
+        example_assistant_response_3 = "$ACTIONS:[SHUTDOWN()]$ACTIONS$EMOTION:whispering$EMOTION$TEXT:Goodbye.$TEXT"
+
+        self._history = [
+            {"role": "system", "content": self._init_text},
+            {"role": "system", "content": "Here is an example of correct output formatting:"},
+            {"role": "system", "name": "example_user", "content": example_user_prompt_1},
+            {"role": "system", "name": "example_assistant", "content": example_assistant_response_1},
+            {"role": "system", "name": "example_user", "content": example_user_prompt_2},
+            {"role": "system", "name": "example_assistant", "content": example_assistant_response_2},
+            {"role": "system", "name": "example_user", "content": example_user_prompt_3},
+            {"role": "system", "name": "example_assistant", "content": example_assistant_response_3},
+            {"role": "system", "content": "Example finished.  Begin the conversation:"},
+        ]
 
     def _get_error_response(self) -> str:
-        """
-        Generate an error response indicating that the chatbot might not have paid close attention or didn't catch
-        what the user said.
 
-        Returns:
-            str: A short response that shows the chatbot might not have understood the user.
-        """
         prompt = (
             f"You are portraying the character of {self._character}. Offer a brief apology suggesting that you were "
             "not paying close attention to what the user just said."
@@ -247,40 +232,35 @@ class GPTBot:
         response = self._request(messages=messages)
         return response
 
-    def _history_append(self, role: Literal["system", "user", "assistant"], content: str) -> None:
-        """
-        Append a message with a specified role and content to the chatbot's conversation history.
-
-        Args:
-            role (Literal["system", "user", "assistant"]): The role of the message sender.
-            content (str): The content of the message.
-        """
-        self._history.append({"role": role, "content": content})
+    def _history_append(
+        self, role: Literal["system", "user", "assistant"], content: str, name: Optional[str] = None
+    ) -> None:
+        history_entry = {"role": role, "content": content}
+        if name is not None:
+            history_entry["name"] = name
+        self._history.append(history_entry)
 
     def _history_append_interruption(self) -> None:
-        """
-        Append a system message to the chat history indicating that the chatbot was interrupted mid-speech.
-        """
-        response = self._history_append(role="system", content=f"The user interrupted {self._name} mid-speech.")
+        with self._history_lock:
+            response = self._history_append(role="system", content=f"The user interrupted {self._name} mid-speech.")
 
     def _prompt_emotion_selection(self) -> None:
-        """Create a prompt for initializing the chatbot's default emotion."""
-        emotion_str = ", ".join(config.emotions)
+        emotions = list(config.emotions[:-2]) + [", or ".join(config.emotions[-2:])]
+        emotions_str = ", ".join(emotions)
         prompt = (
-            f"Select a default emotional state for your character from the options: {emotion_str}. Choose the most "
-            f"suitable emotion for {self._name}, even if it's not an ideal match. Provide your answer as a single word."
+            f"Choose a default emotional state for your character from the available options: {emotions_str}. Select "
+            "the most appropriate emotion, even if it may not be a perfect fit. Provide your answer as a single word. "
+            "Ensure that the chosen word is from the given list and not an emotion outside of the provided options."
         )
         return prompt
 
     def _prompt_name_selection(self) -> None:
-        """Create a prompt for initializing the chatbot's name."""
         prompt = (
             "Please provide the first name of the character. Write only one name, with no extra text or punctuation."
         )
         return prompt
 
     def _prompt_voice_selection(self) -> str:
-        """Create a prompt for initializing the chatbot's voice."""
         voices_str = "\n".join(f"{name}: " + ", ".join(traits) for name, traits in config.neural_voices.items())
         names = list(config.neural_voices.keys())
         names_str = ", ".join(names[:-2] + [", or ".join(names[-2:])])
@@ -293,21 +273,20 @@ class GPTBot:
         return prompt
 
     def _response_parse(self, response: str) -> tuple[parsed_response, bool]:
-        """
-        Parse a response string into a dictionary containing text, emotion, and actions.
 
-        Args:
-            response (str): The response string to parse.
+        action_search = re.findall(self._action_response_pattern, response)
+        if len(action_search) != 1:
+            actions = ["NULL()"]
+        else:
+            actions = [action.strip() for action in action_search[0].split(",")]
 
-        Returns:
-            parsed_response: A dictionary containing the parsed text, emotion, and actions.
-            success (bool): A boolean indicating whether or not the parser extracted text correctly.
-        """
+        emotion_search = re.findall(self._emotion_response_pattern, response)
+        if len(emotion_search) != 1:
+            emotion = self._default_emotion
+        else:
+            emotion = emotion_search[0].lower()
 
         text_search = re.findall(self._text_response_pattern, response)
-        emotion_search = re.findall(self._emotion_response_pattern, response)
-        action_search = re.findall(self._action_response_pattern, response)
-
         if len(text_search) != 1:
             success = False
             text = self._get_error_response()
@@ -315,87 +294,50 @@ class GPTBot:
             success = True
             text = text_search[0]
 
-        if len(emotion_search) != 1:
-            emotion = self._default_emotion
-        else:
-            emotion = emotion_search[0].lower()
+        return {"actions": actions, "emotion": emotion, "text": text}, success
 
-        if len(action_search) != 1:
-            actions = ["NULL()"]
-        else:
-            actions = [action.strip() for action in action_search[0].split(",")]
+    def _response_unparse(self, actions: list[str, ...], emotion: str, text: str) -> str:
 
-        return {"text": text, "emotion": emotion, "actions": actions}, success
-
-    def _response_unparse(self, text: str, emotion: str, actions: list[str, ...]) -> str:
-        """
-        Convert a response into a string format that combines text, emotion, and actions.
-
-        Args:
-            text (str): The text content of the response.
-            emotion (str): The emotion related to the response.
-            actions (list[str, ...]): A list of actions in the response.
-
-        Returns:
-            str: The combined string representation of the response.
-        """
-        response_str = f"$TEXT:{text}$TEXT" f"$EMOTION:{emotion}$EMOTION" f"$ACTIONS:[{','.join(actions)}]$ACTIONS"
+        response_str = f"$ACTIONS:[{','.join(actions)}]$ACTIONS$EMOTION:{emotion}$EMOTION$TEXT:{text}$TEXT"
         return response_str
 
     def _request(self, messages: list[messages_dict], **kwargs) -> str:
-        """
-        Send a request to the OpenAI API to generate a response based on the given messages and optional keyword
-        arguments.
 
-        Args:
-            messages (list[messages_dict]): A list of message dictionaries.
-            **kwargs: Optional keyword arguments; arguments "model", "n", and "max_tokens" cannot be modified.
-
-        Returns:
-            str: The content of the response generated by the AI model.
-        """
         kwargs["messages"] = messages
         kwargs["model"] = self._model
         kwargs["n"] = 1
         kwargs["max_tokens"] = self._max_len - self._count_tokens(messages)
+        kwargs["stream"] = False
 
         response = openai.ChatCompletion.create(**kwargs)
         return response.choices[0].message.content.strip()
 
-    def _select_emotion(self, response: str) -> None:
-        """
-        Initialize the chatbot's default emotion from the given response.
+    def _request_stream(self, messages: list[messages_dict], **kwargs) -> Iterator:
 
-        Args:
-            response (str): The response containing the chatbot's default emotion.
-        """
+        kwargs["messages"] = messages
+        kwargs["model"] = self._model
+        kwargs["n"] = 1
+        kwargs["max_tokens"] = self._max_len - self._count_tokens(messages)
+        kwargs["stream"] = True
+
+        self._latest_stream = []
+
+        return openai.ChatCompletion.create(**kwargs)
+
+    def _select_emotion(self, response: str) -> str:
+
         emotion = self._strip_punctuation(response).lower()
         if emotion in config.emotions:
-            self._default_emotion = emotion
+            return emotion
         else:
-            self._default_emotion = config.default_emotion
+            return config.default_emotion
 
     def _select_name(self, response: str) -> str:
-        """
-        Initialize the chatbot's name from the given response.
 
-        Args:
-            response (str): The response containing the chatbot's name.
-        """
         self._name = self._strip_punctuation(response).capitalize()
 
     def _select_random_character(self) -> str:
-        """
-        Select a random character for a chatbot personality and return the character's name along with a brief
-        description of their identity and the suggested behavior for their chatbot persona. The character can be a
-        renowned fictional figure from a book, film, television series, or video game, or a real person, either from
-        history or currently alive.
 
-        Returns:
-        str: The character's name along with a brief description of their identity and the suggested behavior for
-        their chatbot persona.
-        """
-        # Define the prompt message
         prompt = (
             "You are helping a user choose a character for a chatbot personality. The character can be a renowned "
             "fictional figure from a book, film, television series, or video game, or a real person, either from "
@@ -404,67 +346,95 @@ class GPTBot:
             "the description and chatbot persona are clear and coherent."
         )
 
-        # Define the messages to be sent to the API
         messages = [
             {"role": "system", "content": prompt},
             {"role": "system", "content": "Expects format similar to the following: " + config.default_character},
         ]
 
-        # Send the messages to the API and get the response
-        response = self._request(messages=messages, temperature=0.8, top_p=0.9)
+        response = self._request(messages=messages, temperature=1.2, top_p=0.9)
 
-        # Return the response
         return response
 
     def _select_voice(self, response: str) -> None:
-        """
-        Initialize the chatbot's voice from the given response.
-
-        Args:
-            response (str): The response containing the chatbot's voice.
-        """
         name = self._strip_punctuation(response).capitalize()
         if name in config.neural_voices.keys():
             self._voice = config.neural_voice_formatter.format(name)
         else:
             self._voice = config.neural_voice_formatter.format(config.default_voice)
 
+    def _stream_parser(self, response: Iterator) -> Iterator[str]:
+        actions = ["NULL()"]
+        emotion = self._default_emotion
+
+        actions_complete = False
+        emotion_complete = False
+
+        text_detected = False
+
+        response_text = ""
+
+        self._interrupt = False
+
+        for chunk in response:
+
+            delta = chunk["choices"][0]["delta"]
+
+            if self._interrupt or delta == {}:
+                break
+
+            elif "content" in delta.keys():
+                response_text += delta["content"]
+
+                if not actions_complete:
+                    for match in re.finditer(self._action_response_pattern, response_text):
+                        actions_str = response_text[match.start() : match.end()]
+                        actions = re.findall(self._action_response_pattern, actions_str)[0].upper().split(",")
+                        response_text = response_text[: match.start()] + response_text[match.end() :]
+                        actions_complete = True
+                        break
+
+                if not emotion_complete:
+                    for match in re.finditer(self._emotion_response_pattern, response_text):
+                        emotion_str = response_text[match.start() : match.end()]
+                        emotion = re.findall(self._emotion_response_pattern, emotion_str)[0]
+                        emotion = self._select_emotion(response=emotion)
+                        response_text = response_text[: match.start()] + response_text[match.end() :]
+                        emotion_complete = True
+                        break
+
+                if not text_detected:
+                    match = re.search(self._text_open_response_pattern, response_text)
+                    if match:
+                        response_text = response_text[match.end() :]
+                        text_detected = True
+
+                elif re.search(self._sentence_split_pattern, response_text):
+                    split_response_text = re.split(self._sentence_split_pattern, response_text)
+                    sentence = "".join(split_response_text[0:-1])
+                    sentence = re.sub(self._text_close_response_pattern, "", sentence)
+                    response_text = response_text[len(sentence) :]
+
+                    yield {"actions": actions, "emotion": emotion, "text": sentence}
+
+        if text_detected:
+            sentence = re.sub(self._text_close_response_pattern, "", response_text)
+            yield {"actions": actions, "emotion": emotion, "text": sentence}
+
     def _strip_punctuation(self, s: str) -> str:
-        """
-        Removes punctuation and strips whitespace from the given string.
-        """
         table = str.maketrans(dict.fromkeys(string.punctuation))
         return s.translate(table).strip()
 
     def _summarize_conversation(self) -> str:
-        """
-        Summarize the key points and any specific user information from the chatbot's conversation history that might be
-        useful for future conversations.
-
-        Returns:
-            str: A summary of the conversation.
-        """
         prompt = (
             "Break character and complete the following task as written: Summarize the conversation, focusing on key "
             "points and any specific user information that may be useful for future discussions, in the most succinct "
-            "manner possible."
+            "manner possible. Be objective, and write everything in third person."
         )
         messages = self._history + [{"role": "system", "content": prompt}]
         response = self._request(messages=messages, top_p=0.7)
         return response
 
     def _weather_data_parse(self, data: dict) -> str:
-        """
-        Parses the weather data retrieved from the YR API and returns a summary string containing current conditions and
-        forecast for the next hour, six hours, and twelve hours.
-
-        Args:
-            data (dict): Weather data retrieved from the API.
-
-        Returns:
-            str: Summary string containing current conditions and forecast.
-        """
-        # Extract necessary data from the input dictionary
         properties = data["properties"]
         units = properties["meta"]["units"]
         data_now = properties["timeseries"][0]["data"]
@@ -473,36 +443,26 @@ class GPTBot:
         next_six_hours = data_now["next_6_hours"]
         next_twelve_hours = data_now["next_12_hours"]
 
-        # Format current conditions into a list of strings
         current_conditions = [f"{key}: {instant[key]} {units[key]}" for key in instant.keys()]
 
-        # Format forecast into a string
         forecast = (
             f"Next hour's weather: {next_hour['summary']['symbol_code']}, "
             f"next six hours' weather: {next_six_hours['summary']['symbol_code']}, "
             f"next twelve hours' weather: {next_twelve_hours['summary']['symbol_code']}."
         )
 
-        # Combine current conditions and forecast into a summary string
         summary = ". Current weather conditions: " + "; ".join(current_conditions) + ". " + forecast
 
-        # Replace underscores with spaces in the summary string
         summary = summary.replace("_", " ")
 
-        # Return the summary string
         return summary
 
+    def interrupt(self) -> None:
+        self._interrupt = True
+
     def prompt(self, message: str) -> parsed_response:
-        """
-        Add a user message to the chatbot's conversation history and generate a parsed response from the AI model.
-
-        Args:
-            message (str): The user's message.
-
-        Returns:
-            parsed_response: A dictionary containing the parsed text, emotion, and actions in the response.
-        """
-        self._history_append(role="user", content=message)
+        with self._history_lock:
+            self._history_append(role="user", content=message, name=self._user_name)
         response = self._request(messages=self._context + self._history)
         response_parsed, success = self._response_parse(response=response)
 
@@ -511,8 +471,22 @@ class GPTBot:
             response_parsed, success = self._response_parse(response=response)
             retry_attempts += 1
 
-        response_unparsed = self._response_unparse(
-            text=response_parsed["text"], emotion=response_parsed["emotion"], actions=response_parsed["actions"]
-        )
-        self._history_append(role="assistant", content=response_unparsed)
+        response_unparsed = self._response_unparse(**response_parsed)
+        with self._history_lock:
+            self._history_append(role="assistant", content=response_unparsed, name=self._name)
         return response_parsed
+
+    def prompt_stream(self, message: str) -> Iterator:
+        with self._history_lock:
+            self._history_append(role="user", content=message, name=self._user_name)
+        response = self._request_stream(messages=self._context + self._history)
+        for block in self._stream_parser(response=response):
+            yield block
+
+
+if __name__ == "__main__":
+    bot = GPTBot()
+    print("Starting")
+    stream = bot.prompt_stream("Tell me a long complex story")
+    for i in stream:
+        print(i)

@@ -1,6 +1,26 @@
+"""
+This program defines an interface for a text-based conversational agent based on the GPTBot class. The program uses the
+termighty library to create a graphical user interface for user interaction and handles input and output processing, as
+well as text-to-speech synthesis.
+
+The Interface class defines a number of methods for initializing the GUI, processing and formatting the history of
+messages for output, scrolling the output window to the latest messages, preparing the output for shutdown by
+summarizing the conversation and displaying it in the output window, and starting the Interface.
+
+The program also defines several threads for handling the output of text to the output window, speaking the GPTBot's
+responses using the TTSSynthesizer, and generating GPTBot responses based on user input.
+
+The program takes command-line arguments for specifying the character to use for GPTBot, either by name or randomly. If
+no argument is provided, the default is None.
+
+Overall, this program provides a framework for creating a text-based conversational agent with a user-friendly graphical
+interface, using the GPTBot class for generating responses and the termighty library for handling input and output
+processing.
+"""
+import sys
 import threading
 import time
-import sys
+from typing import Optional
 
 from termighty import TextBox, Term, Listener, System
 from termighty_input_box import InputBox
@@ -12,67 +32,88 @@ from tts_synthesizer import TTSSynthesizer
 
 class Interface:
     """
-    A graphical user interface for GPTBot and TTSSynthesizer.
-
-    It utilizes the GPTBot class to generate responses to user inputs, and the TTSSynthesizer class to generate speech
-    for the chatbot's responses.
+    A class representing a text-based conversational interface for a GPTBot. It provides a graphical user interface
+    for user interaction and handles input and output processing, as well as text-to-speech synthesis.
     """
 
     def __init__(
-        self, border_color: str = "Charcoal", background_color: str = "Black", character=None, random_character=False
+        self,
+        border_color: str = "Charcoal",
+        background_color: str = "Black",
+        character=None,
+        random_character=False,
+        user_name: Optional[str] = None,
     ) -> None:
         """
-        Initialize the interface.
-
-        This method initializes the interface by creating the necessary GUI elements and starting the various threads
-        required to run the program.
+        Initializes the Interface class with specified border and background colors, and GPTBot character settings.
 
         Args:
-            border_color (str): The color of the border for the GUI.
-            background_color (str): The color of the background for the GUI.
-            character (str): The name of the chatbot's character.
-            random_character (bool): Whether to use a random character for the chatbot.
+            border_color (str): The color of the border, default is "Charcoal".
+            background_color (str): The color of the background, default is "Black".
+            character (str): The name of the character to use for GPTBot, default is None.
+            random_character (bool): If True, chooses a random character, default is False.
+            user_name (str): The name of the user.
         """
+        # Set the colors for the border and background of the interface
         self._border_color = border_color
         self._background_color = background_color
-        self._gptbot = GPTBot(character=character, random_character=random_character)
+
+        # Initialize a new instance of the GPTBot class with the specified character settings
+        self._gptbot = GPTBot(character=character, random_character=random_character, user_name=user_name)
+
+        # Initialize a new instance of the TTSSynthesizer class for text-to-speech synthesis
         self._tts_synthesizer = TTSSynthesizer()
+
+        # Initialize an empty history of messages
         self._history = []
+
+        # Initialize variables for the current entry, shutdown status, user name, and interrupt status
         self._current_entry = None
         self._shutdown = False
-        self._user_name = "USER"
+        self._user_name = user_name.upper() if user_name is not None else "USER"
+        self._interrupt = False
 
+        # Get the length of the longest name between the user and the chatbot.
+        self._max_name_len = max(len(self._user_name), len(self._gptbot._name))
+
+        # Initialize a lock for the history of messages to prevent race conditions
         self._history_lock = threading.Lock()
 
+        # Initialize the graphical user interface for the Interface class
         self._init_gui()
 
+        # Append the startup message for the GPTBot to the history of messages
         with self._history_lock:
             self._history.append(
                 {
                     "prompt": None,
-                    "full_response": self._gptbot._startup_message,
+                    "emotion": self._gptbot._startup_message["emotion"],
+                    "actions": self._gptbot._startup_message["actions"],
+                    "text": [self._gptbot._startup_message["text"]],
                     "spoken_text": None,
+                    "completed": True,
                 }
             )
 
     def _init_gui(self) -> None:
         """
-        Initializes the graphical user interface (GUI) of the chatbot by creating various TextBoxes and InputBox and
-        setting their properties such as size, position, color, and alignment. It sets up the borders of the GUI using
-        TextBoxes and adds the required text to the title TextBox and the input prompt TextBox.
+        Initializes the graphical user interface for the Interface class. It sets up text boxes, input and output
+        windows, and borders.
         """
+        # Initialize Terminal
         self._term = Term()
 
-        # Calculate the sizes of various parts of the GUI
+        # Set default sizes and edge lengths for the different elements of the interface
         size = 1
         w_size = 1 * size
         edge_B = -(size + 1)
         edge_R = -(w_size + 1)
 
+        # Set the text to display at the input prompt
         input_prompt_text = " User Input > "
 
-        # Initialize the various TextBoxes and InputBox for the GUI
-        self._title = TextBox(0, 0, size, -1, background=self._border_color)  # Top Border
+        # Initialize the different text boxes that make up the interface
+        self._title = TextBox(0, 0, size, -1, background=self._border_color)
         self._output_window = OutputBox(
             size,
             size,
@@ -94,240 +135,327 @@ class Interface:
             horizontal_scroll_buffer=0,
         )
 
-        # Set the title TextBox's alignment
+        # Center the title text
         self._title.alignment = "center"
 
-        # Set up the border TextBoxes for the GUI
+        # Set up the border elements of the interface
         self._borders = [
-            TextBox(edge_B, 0, -1, -1, background=self._border_color),  # Bottom Border
-            TextBox(size, 0, edge_B, w_size, background=self._border_color),  # Left Border
-            TextBox(size, edge_R, edge_B, -1, background=self._border_color),  # Right Border
-            TextBox(2 * edge_B, w_size, edge_B - 1, -size, background=self._border_color),  # Separator
+            TextBox(edge_B, 0, -1, -1, background=self._border_color),
+            TextBox(size, 0, edge_B, w_size, background=self._border_color),
+            TextBox(size, edge_R, edge_B, -1, background=self._border_color),
+            TextBox(2 * edge_B, w_size, edge_B - 1, -size, background=self._border_color),
         ]
 
-        # Set the title TextBox's text and the input prompt TextBox's text
+        # Set the text for the title and input prompt text boxes
         self._title(["Conversation History"])
         self._input_prompt([input_prompt_text])
 
     @property
     def input_history(self) -> list[str, ...]:
         """
-        Returns the list of user inputs that have been processed by the chatbot.
+        Property that returns the input history of the interface, which contains user inputs.
 
         Returns:
-            list[str, ...]: The list of user inputs.
-
+            list[str, ...]: List of strings representing the input history.
         """
         return self._input_window._inputs
 
-    def _history_process(self) -> list[str, ...]:
+    def _history_process(self, include_latest_response: bool = True) -> list[str]:
         """
-        This method processes the chat history and returns a formatted list of the chat messages.
+        Process and format the message history to display in the output window.
+
+        Args:
+            include_latest_response[bool]: A boolean that omits the latest historical output if set to False.
 
         Returns:
-            list[str]: The formatted list of chat messages.
+            list[str]: A list of formatted strings representing the message history.
         """
+        # Initialize an empty list to store the formatted strings
         output = []
-        max_name_len = max(len(self._user_name), len(self._gptbot._name))
-        N = len(self._history)
-        for entry in self._history[: N - 1]:
-            if entry["prompt"] is not None:
-                output.append(f"{self._user_name:>{max_name_len}s}: {entry['prompt']}")
-            if entry["spoken_text"] is not None:
-                output.append(f"{self._gptbot._name.upper():>{max_name_len}s}: {entry['spoken_text']}")
-                output.append("\n")
 
-        if self._history[N - 1]["prompt"] is not None:
-            output.append(f"{self._user_name:>{max_name_len}s}: {self._history[N-1]['prompt']}")
+        # Select the final index of the message history through which this method will iterate
+        N = len(self._history) if include_latest_response else len(self._history) - 1
+
+        # Iterate through the message history
+        for entry in self._history[:N]:
+            if entry["prompt"] is not None:
+                # If the current entry is a user message, format it and append it to the output list
+                output.append(f"{self._user_name:>{self._max_name_len}}: {entry['prompt'].strip()}")
+            if entry["spoken_text"]:
+                # If the current entry is a GPTBot message, format it and append it to the output list
+                output.append(f"{self._gptbot._name.upper():>{self._max_name_len}}: {entry['spoken_text'].strip()}")
+                output.append("\n")  # Add a newline after the GPTBot message
+
+        # If "include_latest_response" is False, print only the latest prompt if it is not None.
+        if not include_latest_response:
+            if self._history[-1]["prompt"] is not None:
+                output.append(f"{self._user_name:>{self._max_name_len}}: {self._history[-1]['prompt'].strip()}")
+            current_output = f"{self._gptbot._name.upper():>{self._max_name_len}}:"
+            if self._history[-1]["spoken_text"] is not None:
+                current_output += self._history[-1]["spoken_text"].rstrip()
+            output.append(current_output)
 
         return output
 
-    def _scroll(self) -> None:
+    def _scroll(self, force_scroll: bool = False) -> None:
         """
-        Scroll the output window to the bottom, assuming the scrolling position hasn't been overriden by the user.
+        Scrolls the output window to the latest messages, ensuring that the most recent conversation is visible.
+
+        Args:
+            force_scroll(bool): If set to True, forces the window to scroll regardless of the override.
         """
-        if not self._output_window._scroll_override:
+        # If scroll override is not set, scroll to the latest messages
+        if not self._output_window._scroll_override or force_scroll:
+            # Calculate the bottom of the output window
             bottom = max(0, len(self._output_window._new_line) - self._output_window._shape[0])
+            # Set the origin of the output window to the bottom
             self._output_window._origin = (bottom, 0)
-
-    def _thread_output_text(self) -> None:
-        """
-        Continuously checks the output generated by the text-to-speech synthesizer and adds it to the chat history if it
-        has not been added already. It also adds any new entries in the chat history since the last update to the
-        output. It then updates the output window with the new output and scrolls the output window to the bottom to
-        show the latest messages.
-        """
-        # Initialize counters for the length of the text-to-speech output and the length of the chat history
-        N_TTS = 0
-        N_history = 0
-
-        # Continuously check the text-to-speech output and chat history and update the output window accordingly
-        while not System.kill_all and not self._shutdown:
-            length = self._tts_synthesizer._total_length
-            len_history = len(self._history)
-
-            # If there is new text-to-speech output, add it to the chat history and update the output window
-            if length > N_TTS:
-                new_output = [f"{self._gptbot._name.upper()}: " + "".join(self._tts_synthesizer._output[-1])]
-                output = self._history_process() + new_output
-                self._output_window(output)
-                self._scroll()
-
-                # Update the counters for the text-to-speech output and the chat history
-                N_TTS = length
-                N_history = len_history
-
-            # If there are new entries in the chat history since the last update, update the output window
-            elif N_history < len_history:
-                history = self._history_process()
-                self._output_window(history)
-
-            # Wait for a small amount of time before checking again
-            time.sleep(0.005)
 
     def _shutdown_output(self) -> None:
         """
-        Outputs the final chat message on shutdown, summarizing the conversation.
+        Prepares the output for shutdown by summarizing the conversation and displaying it in the output window.
         """
-        output = self._history_process() + [self._gptbot._summarize_conversation()]
+
+        # Get the formatted conversation history and the summary message
+        output = self._history_process(include_latest_response=True) + ["\n", self._gptbot._summarize_conversation()]
+
+        # Display the conversation and summary in the output window
         self._output_window(output)
-        self._scroll()
+
+        # Scroll to the bottom of the output window to show the latest messages
+        self._scroll(force_scroll=True)
+
+    def _thread_output_text(self) -> None:
+        """
+        Thread that handles the output of text to the output window. It monitors changes in the message history
+        and updates the output window accordingly.
+        """
+        # Initialize variables to keep track of the last processed TTS length and history length
+        last_processed_tts_length = 0
+        last_processed_history_length = 0
+
+        # Loop until the program is being shut down
+        while not System.kill_all and not self._shutdown:
+            # Check if new text has been synthesized by the TTS synthesizer
+            length = self._tts_synthesizer._total_length
+            # Calculating history length in order to prevent inconsistent lengths over time
+            len_history = len(self._history)
+            if length > last_processed_tts_length:
+                # If there is new synthesized text, add it to the output window
+                output = self._history_process(include_latest_response=False)
+                output[-1] += " " + "".join(self._tts_synthesizer._output[-1])
+                self._output_window(output)
+                self._scroll()
+
+                # Update the last processed TTS length and history length
+                last_processed_tts_length = length
+                last_processed_history_length = len_history
+
+            # Check if the message history has changed
+            if last_processed_history_length < len_history:
+                # If the history has changed, update the output window
+                history = self._history_process(include_latest_response=True)
+                self._output_window(history)
+
+            # Sleep for a short time to avoid excessive CPU usage
+            time.sleep(0.001)
 
     def _thread_speak(self) -> None:
         """
-        Thread function that generates text-to-speech output for the chatbot responses.
-
-        This method continuously checks the chat history for new entries and generates text-to-speech output for any new
-        chatbot responses. It then updates the chat history with the spoken text for the response. If the response
-        includes the "SHUTDOWN()" action, it sets the shutdown flag to True and calls the shutdown output method.
+        Thread that handles speaking the GPTBot's responses using the TTSSynthesizer. It monitors the history
+        and synthesizes speech for new responses.
         """
 
-        # Initialize a counter for the number of entries in the chat history
+        # initialize variables to track changes in the history and to be used to check for new entries
         N = 0
+        break_outer_loop = False
 
-        # Continuously check the chat history for new chatbot responses and generate text-to-speech output for them
-        while not System.kill_all:
+        # loop until the program is shut down or break_outer_loop is set to True
+        while not System.kill_all and not break_outer_loop:
             len_history = len(self._history)
+            self._interrupt = False
 
-            # If there is a new chatbot response in the chat history, generate TTS output for it and update chat history
-            if len_history > N:
-                idx = len_history - 1
-                self._tts_synthesizer.speak(
-                    self._history[idx]["full_response"]["text"],
-                    voice_name=self._gptbot._voice,
-                    style=self._history[idx]["full_response"]["emotion"],
-                )
+            # check if there are new entries in the history
+            with self._gptbot._history_lock:
+                if len_history > N:
+                    # get the latest entry in the history
+                    entry = self._history[len_history - 1]
+                    idx = 0
 
-                with self._history_lock:
-                    self._history[idx]["spoken_text"] = "".join(self._tts_synthesizer._output[-1])
+                    # loop through each part of the response
+                    while not self._interrupt and (not entry["completed"] or idx < len(entry["text"])):
+                        if entry["text"] is not None and idx < len(entry["text"]):
 
-                N = len_history
+                            # synthesize speech for the response
+                            self._tts_synthesizer.speak(
+                                entry["text"][idx],
+                                voice_name=self._gptbot._voice,
+                                style=entry["emotion"],
+                            )
 
-                # If the response includes "SHUTDOWN()" action, set shutdown flag to True and call "_shutdown_output()"
-                if "SHUTDOWN()" in self._history[idx]["full_response"]["actions"]:
-                    self._shutdown = True
-                    self._shutdown_output()
-                    break
+                            # append the synthesized speech to the history
+                            with self._history_lock:
+                                if entry["spoken_text"] is None:
+                                    entry["spoken_text"] = ""
+                                entry["spoken_text"] += " " + "".join(self._tts_synthesizer._output[-1])
 
-            # Wait for a small amount of time before checking again
-            time.sleep(0.005)
+                            idx += 1
+
+                            # check if the response contains the "SHUTDOWN()" action
+                            if "SHUTDOWN()" in entry["actions"]:
+                                self._shutdown = True
+                                break_outer_loop = True
+                                break
+
+                        time.sleep(0.001)
+                    N = len_history
+
+                    # unparsed the response to a string and append it to GPTBot's message history
+                    message_unparsed = self._gptbot._response_unparse(
+                        actions=entry["actions"], emotion=entry["emotion"], text=entry["spoken_text"]
+                    )
+                    self._gptbot._history_append(role="assistant", content=message_unparsed)
+
+            time.sleep(0.001)
 
     def _thread_gpt_response(self) -> None:
         """
-        Continuously monitors user input and generates GPT responses for them. Records each prompt and full response,
-        and updates the GUI accordingly.
+        Thread that handles generating GPTBot responses based on user input. It processes user input and generates
+        appropriate responses using the GPTBot class.
         """
+
+        # Tracks the last processed input
         N = 0
+
+        # Continuously check for new inputs
         while not System.kill_all:
+            # Get the current number of inputs
             len_inputs = len(self._input_window._inputs)
+
+            # If there is a new input, process it
             if len_inputs > N:
+
+                # Interrupt any ongoing TTS synthesis
+                self.interrupt()
+
+                # Process each input
                 idx = len_inputs - 1
-                entry = self._input_window._inputs[idx].strip()
+                entry = self._input_window._inputs[idx]
 
-                # Interrupt current TTS synthesis if not completed
-                if not self._tts_synthesizer._synthesis_completed:
-                    self._tts_synthesizer.interrupt()
-                    self._gptbot._history_append_interruption()
-
-                # Generate a response to the user's input
-                response = self._gptbot.prompt(entry)
-
+                # Add all unprocessed inputs to the message history
                 with self._history_lock:
-                    # Append any intermediate inputs to the history
-                    for i in self._input_window._inputs[N:idx]:
+                    for i in self._input_window._inputs[N : idx - 1]:
                         self._history.append(
                             {
                                 "prompt": i.strip(),
-                                "full_response": None,
+                                "emotion": None,
+                                "actions": [],
+                                "text": [],
                                 "spoken_text": None,
+                                "completed": True,
                             }
                         )
 
-                    # Append the latest prompt and response to the history
+                    # Add the current input to the message history
                     self._history.append(
                         {
                             "prompt": entry,
-                            "full_response": response,
+                            "emotion": None,
+                            "actions": [],
+                            "text": [],
                             "spoken_text": None,
+                            "completed": False,
                         }
                     )
 
-                # Update the index of the latest input
+                # Generate GPTBot responses based on the input
+                for response in self._gptbot.prompt_stream(entry):
+                    # If there is a new input before the response is finished, stop generating responses for this input
+                    if idx < len(self._input_window._inputs) - 1:
+                        break
+
+                    # Update the message history with the generated response
+                    with self._history_lock:
+                        self._history[-1]["actions"] = response["actions"]
+                        self._history[-1]["emotion"] = response["emotion"]
+                        self._history[-1]["text"].append(response["text"])
+
+                    # Check if the response contains a shutdown command
+                    if "SHUTDOWN()" in response["actions"]:
+                        # Clear the input prompt, hide the cursor, and freeze the input window
+                        self._input_prompt([""])
+                        self._term.cursor_hide(flush=True)
+                        self._input_window.freeze()
+                        self._shutdown_output()
+                        break
+
+                    time.sleep(0.001)
+
+                # Mark the input as completed in the message history
+                with self._history_lock:
+                    self._history[-1]["completed"] = True
+
+                # Update the last processed input
                 N = len_inputs
 
-                # Shutdown if the response indicates so
-                if "SHUTDOWN()" in response["actions"]:
-                    self._input_prompt([""])
-                    self._term.cursor_hide(flush=True)
-                    self._input_window.freeze()
-                    break
+            time.sleep(0.001)
 
-            # Wait for a small amount of time before checking again
-            time.sleep(0.005)
+    def interrupt(self):
+        """
+        Interrupts the current text-to-speech synthesis and GPTBot processing. It stops ongoing actions and
+        updates the history to reflect the interruption.
+        """
+        # Stop TTS synthesis and GPTBot processing
+        self._tts_synthesizer.interrupt()
+        self._gptbot.interrupt()
+        self._interrupt = True
+
+        # Only mark as interruption if TTS synthesis is ongoing
+        if not self._tts_synthesizer._synthesis_completed:
+            self._gptbot._history_append_interruption()
 
     def start(self) -> None:
         """
-        Starts the interface.
-
-        The method first clears the terminal, and then initializes and starts the graphical user interface.
-        It also starts three separate threads that manage the user's interaction with the chatbot and the display
-        of its responses.
-
-        The threads are started as daemon threads, which means they will not prevent the Python interpreter
-        from exiting if the main thread finishes execution.
+        Starts the Interface, initializes the GUI elements and starts the threads for processing input and output.
+        It sets up the environment and manages threading for seamless user interaction.
         """
-        # Clear the terminal screen.
+        # clear terminal before initializing GUI elements
         self._term.clear(flush=True)
 
-        # Start the GUI elements and listener.
+        # start GUI elements
         self._title.start()
         self._output_window.start()
         self._input_prompt.start()
 
+        # start GUI borders
         for border in self._borders:
             border.start()
 
+        # start input listener
         Listener.start()
+
+        # start input box
         self._input_window.start()
 
-        # Start threads that manage chatbot interaction and response display.
-        thread_speak = threading.Thread(target=self._thread_speak, daemon=True)
+        # start threads for output text, speaking GPTBot's responses, and generating GPTBot responses
         thread_output_text = threading.Thread(target=self._thread_output_text, daemon=True)
+        thread_speak = threading.Thread(target=self._thread_speak, daemon=True)
         thread_gpt_response = threading.Thread(target=self._thread_gpt_response, daemon=True)
 
-        thread_speak.start()
         thread_output_text.start()
+        thread_speak.start()
         thread_gpt_response.start()
 
 
 if __name__ == "__main__":
-    kwargs = {}
+    kwargs = {"user_name": "Gabriel"}
     if len(sys.argv) > 1:
         character = " ".join(sys.argv[1:])
         if character.lower().strip() in ("random", "rand"):
-            kwargs = {"random_character": True}
+            kwargs["random_character"] = True
         else:
-            kwargs = {"character": character}
+            kwargs["character"] = character
 
+    print("Loading...")
     interface = Interface(**kwargs)
     interface.start()
