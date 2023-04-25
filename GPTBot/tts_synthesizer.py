@@ -20,8 +20,7 @@ class TTSSynthesizer:
 
     def __init__(
         self,
-        output_format: SpeechSynthesisOutputFormat = SpeechSynthesisOutputFormat.Audio24Khz48KBitRateMonoMp3,
-        # output_format: SpeechSynthesisOutputFormat = SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3,
+        output_format: SpeechSynthesisOutputFormat = SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3,
     ) -> None:
         """
         Initialize the TTS synthesizer with the specified output format.
@@ -196,7 +195,7 @@ class TTSSynthesizer:
         """
         # Wait until the synthesis has started before proceeding
         while not self._synthesis_started:
-            time.sleep(0.001)
+            time.sleep(0.005)
 
         # Record the start time and initialize variables
         start_time = time.perf_counter_ns()
@@ -223,7 +222,7 @@ class TTSSynthesizer:
                     break
 
             # Wait for a short amount of time before checking the synthesis progress again
-            time.sleep(0.001)
+            time.sleep(0.005)
 
         # Stop the synthesizer
         self._synthesizer.stop_speaking()

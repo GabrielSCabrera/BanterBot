@@ -258,7 +258,7 @@ class Interface:
                 self._output_window(history)
 
             # Sleep for a short time to avoid excessive CPU usage
-            time.sleep(0.001)
+            time.sleep(0.005)
 
     def _thread_speak(self) -> None:
         """
@@ -307,7 +307,7 @@ class Interface:
                                 break_outer_loop = True
                                 break
 
-                        time.sleep(0.001)
+                        time.sleep(0.005)
                     N = len_history
 
                     # unparsed the response to a string and append it to GPTBot's message history
@@ -315,8 +315,10 @@ class Interface:
                         actions=entry["actions"], emotion=entry["emotion"], text=entry["spoken_text"]
                     )
                     self._gptbot._history_append(role="assistant", content=message_unparsed)
+                    if self._shutdown:
+                        self._shutdown_output()
 
-            time.sleep(0.001)
+            time.sleep(0.005)
 
     def _thread_gpt_response(self) -> None:
         """
@@ -386,10 +388,9 @@ class Interface:
                         self._input_prompt([""])
                         self._term.cursor_hide(flush=True)
                         self._input_window.freeze()
-                        self._shutdown_output()
                         break
 
-                    time.sleep(0.001)
+                    time.sleep(0.005)
 
                 # Mark the input as completed in the message history
                 with self._history_lock:
@@ -398,7 +399,7 @@ class Interface:
                 # Update the last processed input
                 N = len_inputs
 
-            time.sleep(0.001)
+            time.sleep(0.005)
 
     def interrupt(self):
         """

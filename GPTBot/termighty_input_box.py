@@ -20,6 +20,7 @@ class InputBox(TextEditor):
         """
         super().__init__(*args, **kwargs)
         self._inputs = []
+        self._deactivate = False
 
     def _run_getch_thread(self) -> None:
         """
