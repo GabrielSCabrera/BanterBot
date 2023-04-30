@@ -301,8 +301,8 @@ class Interface:
 
                             idx += 1
 
-                            # check if the response contains the "SHUTDOWN()" action
-                            if "SHUTDOWN()" in entry["actions"]:
+                            # check if the response contains the "EXIT()" action
+                            if "EXIT()" in entry["actions"]:
                                 self._shutdown = True
                                 break_outer_loop = True
                                 break
@@ -383,7 +383,7 @@ class Interface:
                         self._history[-1]["text"].append(response["text"])
 
                     # Check if the response contains a shutdown command
-                    if "SHUTDOWN()" in response["actions"]:
+                    if "EXIT()" in response["actions"]:
                         # Clear the input prompt, hide the cursor, and freeze the input window
                         self._input_prompt([""])
                         self._term.cursor_hide(flush=True)

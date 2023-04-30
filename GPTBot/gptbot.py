@@ -129,7 +129,7 @@ class GPTBot:
             for i in range(config.rate_limit_retry_attempt_limit)
         ]
         self._force_quit_message = {
-            "actions": ["SHUTDOWN()"],
+            "actions": ["EXIT()"],
             "emotion": "sad",
             "text": "Exiting program due to rate limiting.",
         }
@@ -266,90 +266,6 @@ class GPTBot:
         # Set the character
         self._character = character
 
-    def _thread_traits(self, init_message: MessageDict, prompt: callable, processor: callable, attribute: str) -> None:
-        """
-        A method for initializing character traits using a separate thread. It prompts the AI to generate a prompt
-        for the user to respond to, and then uses the AI response to select a value for the attribute being initialized.
-
-        Args:
-            init_message (dict): A dictionary that includes the role, content, and name of a message
-            prompt (callable): A callable function that generates a prompt for the AI
-            processor (callable): A callable function that selects a value for the attribute from the AI response
-            attribute (str): The name of the attribute being initialized
-        """
-        # Ask the AI to generate a prompt
-        messages = [init_message, {"role": "user", "content": prompt()}]
-        response = self._request(messages=messages, temperature=0.0, stream=False)
-
-        # Use the AI response to select a value for the attribute
-        setattr(self, attribute, processor(response))
-
-    def _init_traits_threads(self) -> list[threading.Thread, ...]:
-        """
-        Initializes the character traits for the AI, including name, voice, and default emotion. This method
-        sends requests to the AI to generate and select these traits based on the chosen character.
-
-        Returns:
-            list[threading.Thread, ...]: A list containing threads which each initialize a character trait.
-        """
-
-        # Create an initial message about the character
-        character_info = (
-            f"You are assisting me in identifying facts about the character/person: {self._character}. You adhere "
-            "to all instructions accurately and without deviation, refraining from commenting on the answers. You "
-            "provide only desired responses: when asked to choose an option from a list, strictly select from the "
-            "given options. Single word responses only, no embellishment or punctuation."
-        )
-
-        # Create a message dictionary containing the system message
-        init_message = {"role": "system", "content": character_info}
-
-        # Define a list of prompts, processors, and attributes to be used in the threads
-        prompts = [self._prompt_name_selection, self._prompt_voice_selection, self._prompt_emotion_selection]
-        processors = [self._select_name, self._select_voice, self._select_emotion]
-        attributes = ["_name", "_voice", "_default_emotion"]
-
-        threads = []
-        # Loop through each prompt, processor, and attribute and create a thread for each
-        for prompt, processor, attribute in zip(prompts, processors, attributes):
-            # Create a new thread to call the _thread_traits method with the appropriate arguments
-            threads.append(
-                threading.Thread(
-                    target=self._thread_traits, args=(init_message, prompt, processor, attribute), daemon=True
-                )
-            )
-
-        # Return the list of threads
-        return threads
-
-    def _thread_startup_message(self) -> None:
-        """
-        Initializes the startup message for the AI, which is a greeting based on the character's traits.
-        """
-        # Define character information and greeting prompt messages
-        character_info = f"You are an AI assistant playing the character of {self._character}."
-        prompt = (
-            "You have just been summoned (or awakened, depending on the hour).  Prepare a greeting that reflects your "
-            "character. No longer than two sentences."
-        )
-
-        # Define the message history
-        messages = [
-            {"role": "system", "content": character_info},
-            {"role": "system", "content": prompt},
-        ]
-
-        # Request a response from the AI for the greeting message
-        response = self._request(self._context + messages, stream=False)
-
-        # Format the response into a message dictionary
-        self._startup_content = (
-            f"$ACTIONS:[NULL()]$ACTIONS" f"$EMOTION:{self._default_emotion}$EMOTION" f"$TEXT:{response}$TEXT"
-        )
-
-        # Parse the response to get the startup message
-        self._startup_message = self._response_parse(self._startup_content)[0]
-
     def _init_system(self) -> None:
         """
         Initializes the system message for the AI, which contains instructions for structuring responses.
@@ -359,22 +275,18 @@ class GPTBot:
         emotions = list(config.emotions[:-2]) + [", or ".join(config.emotions[-2:])]
         emotions_str = ", ".join(emotions)
 
-        # Initialize the text with instructions for the AI's behavior, including guidelines for actions, emotions, and
-        # verbal statements, as well as the expected response format
-        self._init_text = (
-            f"You are {self._character}. Your entire reality is that of {self._name}.\n"
-            "Stay in character throughout the conversation, do not ever break the fourth wall.\n"
-            "When interrupted, address the interrupting prompt first, then continue from where you left off unless the "
-            "user indicates that you shouldn't.\n"
-            "Structure your responses in this order: 1. an action, 2. an emotion, and 3. a verbal statement.\n"
-            "1. Action: Choose from these available functions: MOVE_FORWARD(DISTANCE), MOVE_BACKWARD(DISTANCE), "
-            "TURN(ANGLE), SHUTDOWN(), or NULL(). DISTANCE is in meters, and ANGLE is in degrees.\n"
-            "2. Emotion: Considering the context of the conversation given your character's personality, select the "
-            f"most suitable emotion from the options provided in this list: {emotions_str}.\n"
-            "3. Verbal Statement: Provide spoken words without any action descriptions or vocal tones.\n"
-            "Adhere to the order and format your response as follows:\n"
-            "$ACTIONS:[<action_1>,<action_2>,...]$ACTIONS"
-            "$EMOTION:<emotion>$EMOTION"
+        self._init_text = config.initialization_prompt.format(self._character) + (
+            "Structure your responses in the following order: 1) an action, 2) an emotion, "
+            "and 3) a verbal statement.\n"
+            "\tAction: Select from the available options: MOVE_FORWARD(DISTANCE), MOVE_BACKWARD(DISTANCE), "
+            "TURN(ANGLE), EXIT(), or NULL(). Use meters for DISTANCE and degrees for ANGLE.\n"
+            "\tEmotion: Based on the conversation and your character's personality, pick the most appropriate emotion "
+            f"from the provided list: {emotions_str}.\n"
+            "\tVerbal Statement: The only thing allowed in this section is first-person speech. Do not describe your "
+            "actions, expressions, or narration. Only include the exact words spoken by your character.\n"
+            "Format your response as follows:\n"
+            "$ACTIONS:[<action_1>,<action_2>,...]$ACTIONS\n"
+            "$EMOTION:<emotion>$EMOTION\n"
             "$TEXT:<verbal_statement>$TEXT"
         )
 
@@ -393,22 +305,66 @@ class GPTBot:
         )
 
         example_user_prompt_3 = "Thanks, I have to get going!"
-        example_assistant_response_3 = "$ACTIONS:[SHUTDOWN()]$ACTIONS$EMOTION:whispering$EMOTION$TEXT:Goodbye.$TEXT"
+        example_assistant_response_3 = "$ACTIONS:[EXIT()]$ACTIONS$EMOTION:whispering$EMOTION$TEXT:Goodbye.$TEXT"
+
+        start_prompt = "Here is an example of correct output formatting:"
+        end_prompt = "Example finished. Begin the conversation, and do not deviate from the demonstrated formatting."
 
         # Initialize the history list with the system message, examples of correctly-formatted responses, and a message
         # indicating the end of the example conversation
         with self._history_lock:
             self._history = [
                 {"role": "system", "content": self._init_text},
-                {"role": "system", "content": "Here is an example of correct output formatting:"},
-                {"role": "system", "name": self._user_name, "content": example_user_prompt_1},
-                {"role": "system", "name": self._name, "content": example_assistant_response_1},
-                {"role": "system", "name": self._user_name, "content": example_user_prompt_2},
-                {"role": "system", "name": self._name, "content": example_assistant_response_2},
-                {"role": "system", "name": self._user_name, "content": example_user_prompt_3},
-                {"role": "system", "name": self._name, "content": example_assistant_response_3},
-                {"role": "system", "content": "Example finished.  Begin the conversation:"},
+                # {"role": "system", "content": start_prompt},
+                # {"role": "system", "name": self._user_name, "content": example_user_prompt_1},
+                # {"role": "system", "name": self._name, "content": example_assistant_response_1},
+                # {"role": "system", "name": self._user_name, "content": example_user_prompt_2},
+                # {"role": "system", "name": self._name, "content": example_assistant_response_2},
+                # {"role": "system", "name": self._user_name, "content": example_user_prompt_3},
+                # {"role": "system", "name": self._name, "content": example_assistant_response_3},
+                # {"role": "system", "content": end_prompt},
             ]
+
+    def _init_traits_threads(self) -> list[threading.Thread, ...]:
+        """
+        Initializes the character traits for the AI, including name, voice, and default emotion. This method
+        sends requests to the AI to generate and select these traits based on the chosen character.
+
+        Returns:
+            list[threading.Thread, ...]: A list containing threads which each initialize a character trait.
+        """
+
+        # Create an initial message about the character
+        character_info = (
+            "Assist me in identifying facts about yourself. You adhere to all instructions accurately and without "
+            "deviation, refraining from commenting on the answers. You provide only desired responses: when asked to "
+            "choose an option from a list, strictly select from the given options. Single word responses only, no "
+            "embellishment or punctuation."
+        )
+
+        # Create a message dictionary containing the system messages
+        messages = [
+            {"role": "system", "content":config.initialization_prompt.format(self._character)},
+            {"role": "system", "content": character_info},
+        ]
+
+        # Define a list of prompts, processors, and attributes to be used in the threads
+        prompts = [self._prompt_name_selection, self._prompt_voice_selection, self._prompt_emotion_selection]
+        processors = [self._select_name, self._select_voice, self._select_emotion]
+        attributes = ["_name", "_voice", "_default_emotion"]
+
+        threads = []
+        # Loop through each prompt, processor, and attribute and create a thread for each
+        for prompt, processor, attribute in zip(prompts, processors, attributes):
+            # Create a new thread to call the _thread_traits method with the appropriate arguments
+            threads.append(
+                threading.Thread(
+                    target=self._thread_traits, args=(messages, prompt, processor, attribute), daemon=True
+                )
+            )
+
+        # Return the list of threads
+        return threads
 
     def _get_error_response(self) -> str:
         """
@@ -418,13 +374,13 @@ class GPTBot:
             str: The error response as a string.
         """
         # Set up the prompt for the AI to generate an error response
-        prompt = (
-            f"You are portraying the character of {self._character}. Offer a brief apology suggesting that you were "
-            "not paying close attention to what the user just said."
-        )
+        prompt = "Offer a brief apology suggesting that you were not paying close attention to what the user just said."
 
         # Create a message for the AI to respond to
-        messages = [{"role": "system", "content": prompt}]
+        messages = [
+            {"role": "system", "content": config.initialization_prompt.format(self._character)},
+            {"role": "system", "content": prompt},
+        ]
 
         # Send the message to the AI and receive the error response
         response = self._request(messages=messages, stream=False)
@@ -462,40 +418,6 @@ class GPTBot:
             # Append the interruption message to the history list
             response = self._history_append(role="system", content=f"The user interrupted {self._name} mid-speech.")
 
-    def _thread_rate_limit_messages(self, message: str, index: int) -> None:
-        """
-        A thread that sends a message to the AI and receives the error response for rate limiting.
-
-        Args:
-            message (str): The message to send to the AI.
-            index (int): The index of the rate limit message in the list of messages.
-        """
-        # Send the message to the AI and receive the error response
-        response = {
-            "actions": ["NULL()"],
-            "emotion": "sad",
-            "text": self._request(messages=message, stream=False),
-        }
-        # Replace the current error response with the updated version
-        self._rate_limit_messages[index] = response
-
-    def _thread_force_quit_message(self) -> None:
-        """
-        Initializes the force quit message to be displayed when the OpenAI API rate limit is exceeded and the
-        GPTBot instance is shutting down. Uses the character's persona to generate the message.
-        """
-        # Set up the prompt for the AI to generate an error response
-        prompt = (
-            f"You are portraying the character of {self._character}. You are not feeling well and have to shut down."
-        )
-
-        # Send the prompt to the AI and retrieve the error response
-        message = [{"role": "system", "content": prompt}]
-        response = {"actions": ["SHUTDOWN()"], "emotion": "sad", "text": self._request(messages=message, stream=False)}
-
-        # Set the response as the force quit message
-        self._force_quit_message = response
-
     def _init_rate_limit_messages_threads(self) -> list[threading.Thread, ...]:
         """
         Generates a set of error responses for the AI to use when it has been rate limited.  Is calculated in advance
@@ -509,16 +431,19 @@ class GPTBot:
 
         # Set up the prompt for the AI to generate an error response
         prompt = (
-            f"You are portraying the character of {self._character}. You are temporarily indisposed, and will return "
-            "shortly. Write a quick one sentence message indicating that this is the case."
+            "You are temporarily indisposed, and will return shortly. Write a quick one sentence message indicating "
+            "that this is the case."
         )
 
         # Create a message for the AI to respond to
-        message = [{"role": "system", "content": prompt}]
+        messages = [
+            {"role": "system", "content": config.initialization_prompt.format(self._character)},
+            {"role": "system", "content": prompt},
+        ]
 
         # Create threads that generate the rate limit messages to store in the _rate_limit_messages attribute
         for i in range(config.rate_limit_retry_attempt_limit):
-            threads.append(threading.Thread(target=self._thread_rate_limit_messages, args=(message, i), daemon=True))
+            threads.append(threading.Thread(target=self._thread_rate_limit_messages, args=(messages, i), daemon=True))
 
         return threads
 
@@ -883,9 +808,12 @@ class GPTBot:
         """
         # Create a prompt for the AI to summarize the conversation
         prompt = (
-            "Break character and complete the following task as written: Summarize the conversation, focusing on key "
-            "points and any specific user information that may be useful for future discussions, in the most succinct "
-            "manner possible. Be objective, and write everything in third person."
+            "Break character and complete the following task as written: conclude your simulated conversation by "
+            "summarizing the conversation, reflecting on key moments and recalling noteworthy details, as a real "
+            "person would, in the most succinct manner possible. Be objective, and write everything in third person. "
+            "Focus on memorable topics and significant events rather than mundane exchanges like casual greetings "
+            "or weather discussions. Ensure that you prioritize essential elements and distinctive moments from the "
+            "conversation for future recollection, thus simulating a genuine human interaction and memory retention."
         )
 
         # Combine the history of the conversation with the prompt for the AI to generate a summary
@@ -897,6 +825,90 @@ class GPTBot:
         response = self._request(messages=messages, temperature=0.0, top_p=0.5, stream=False)
 
         return response
+
+    def _thread_force_quit_message(self) -> None:
+        """
+        Initializes the force quit message to be displayed when the OpenAI API rate limit is exceeded and the
+        GPTBot instance is shutting down. Uses the character's persona to generate the message.
+        """
+        # Set up the prompt for the AI to generate an error response
+        prompt = (
+            f"You are not feeling well and must shut down, compose a brief message to inform the user of your "
+            "current situation."
+        )
+
+        # Send the prompt to the AI and retrieve the error response
+        messages = [
+            {"role": "system", "content": config.initialization_prompt.format(self._character)},
+            {"role": "system", "content": prompt},
+        ]
+        response = {"actions": ["EXIT()"], "emotion": "sad", "text": self._request(messages=messages, stream=False)}
+
+        # Set the response as the force quit message
+        self._force_quit_message = response
+
+    def _thread_rate_limit_messages(self, messages: str, index: int) -> None:
+        """
+        A thread that sends a message to the AI and receives the error response for rate limiting.
+
+        Args:
+            message (str): The message to send to the AI.
+            index (int): The index of the rate limit message in the list of messages.
+        """
+        # Send the message to the AI and receive the error response
+        response = {
+            "actions": ["NULL()"],
+            "emotion": "sad",
+            "text": self._request(messages=messages, stream=False),
+        }
+        # Replace the current error response with the updated version
+        self._rate_limit_messages[index] = response
+
+    def _thread_startup_message(self) -> None:
+        """
+        Initializes the startup message for the AI, which is a greeting based on the character's traits.
+        """
+        # Define greeting prompt message
+        prompt = (
+            "Your task is to come up with a greeting that aligns with your character's personality. Keep in mind their "
+            "temperament, the time of day, and the weather conditions, if relevant. Limit your greeting to two "
+            "sentences and only include the spoken words, avoiding any descriptions or narration."
+        )
+
+        # Define the message history
+        messages = [
+            {"role": "system", "content": config.initialization_prompt.format(self._character)},
+            {"role": "system", "content": prompt},
+        ]
+
+        # Request a response from the AI for the greeting message
+        response = self._request(self._context + messages, stream=False)
+
+        # Format the response into a message dictionary
+        self._startup_content = (
+            f"$ACTIONS:[NULL()]$ACTIONS" f"$EMOTION:{self._default_emotion}$EMOTION" f"$TEXT:{response}$TEXT"
+        )
+
+        # Parse the response to get the startup message
+        self._startup_message = self._response_parse(self._startup_content)[0]
+
+    def _thread_traits(self, messages: MessageDict, prompt: callable, processor: callable, attribute: str) -> None:
+        """
+        A method for initializing character traits using a separate thread. It prompts the AI to generate a prompt
+        for the user to respond to, and then uses the AI response to select a value for the attribute being initialized.
+
+        Args:
+            messages (dict): A dictionary that includes the role, content, and name of a message
+            prompt (callable): A callable function that generates a prompt for the AI
+            processor (callable): A callable function that selects a value for the attribute from the AI response
+            attribute (str): The name of the attribute being initialized
+        """
+        # Ask the AI to generate a prompt
+        messages = [*messages, {"role": "user", "content": prompt()}]
+        response = self._request(messages=messages, temperature=0.0, stream=False)
+
+        # Use the AI response to select a value for the attribute
+        setattr(self, attribute, processor(response))
 
     def _weather_data_parse(self, data: dict) -> str:
         """
