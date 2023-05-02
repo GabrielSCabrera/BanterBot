@@ -22,17 +22,28 @@ Requires three environment variables for full functionality:
 
 ## Usage
 
+### Basics
+
 To initiate the GPTBot interface, navigate to the `GPTBot` subdirectory and execute the following command in your terminal:
 
-`python interface.py [character]`
+`python interface.py --character [character]`
 
 Replace [character] with your preferred chatbot character (optional). If no character is specified, GPTBot defaults to Marvin the Paranoid Android.
 
 Alternatively, let the interface randomly select a character with:
 
-`python interface.py random`
+`python interface.py --random`
 
 Upon launching the interface, enter your messages in the input box, and GPTBot will respond in the output window. You can also listen to GPTBot's responses through synthesized speech.
+
+### Available Command-Line Arguments
+
+The program accepts the following command-line arguments:
+
+* `-u` or `--username`: Specify the name of the program's user (one word, no spaces),
+* `-c` or `--character`: Provide a name and/or short description of the character GPTBot should emulate. It is recommended to use second-person singular in the format "<name> from <context>, <additional details>",
+* `-m` or `--mode`: Select an OpenAI API mode, either "ChatCompletion" or "Completion"; defaults to "ChatCompletion",
+* `-r`, `--rand`, or `--random`: Override the "character" argument and select a random character.
 
 ## Dependencies
 1. `openai`: The OpenAI library is a Python package that provides a convenient and user-friendly way to interact with the OpenAI API. It allows developers to access various AI models, such as GPT-3, for tasks like natural language processing, translation, and text generation.
@@ -46,3 +57,5 @@ Upon launching the interface, enter your messages in the input box, and GPTBot w
 5. `termighty`: Termighty is a Python package that offers a toolkit for creating interactive terminal-based applications. It provides developers with functionalities like handling user input, managing terminal colors and styles, and organizing content on the screen.
 
 6. `azure-cognitiveservices-speech`: The Azure Cognitive Services Speech SDK is a Python package that enables developers to integrate Microsoft's speech recognition, text-to-speech, and speech translation services into their applications. It provides a simple interface for working with speech data and supports various languages and dialects.
+
+7. `spacy`: SpaCy is an efficient Python library for natural language processing (NLP) tasks, offering features like tokenization, part-of-speech tagging, named entity recognition, and dependency parsing. Its architecture is optimized for speed and scalability, suitable for various text processing applications. It supports pre-trained models for multiple languages and allows customization with custom datasets.

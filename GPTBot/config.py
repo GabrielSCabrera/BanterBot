@@ -1,3 +1,13 @@
+# Set up available actions. If you add custom actions, be sure that they always end in parentheses.
+actions = (
+    "MOVE_FORWARD(DISTANCE)",
+    "MOVE_BACKWARD(DISTANCE)",
+    "TURN(ANGLE)",
+    "SAVE_USER_NAME(NAME)",
+    "EXIT()",
+    "NULL()",
+)
+
 # Set up available voice emotions.
 emotions = (
     "angry",
@@ -30,7 +40,10 @@ neural_voices = {
 default_voice = "Jenny"
 neural_voice_formatter = "en-US-{}Neural"
 
-default_chat_gpt_model = "gpt-3.5-turbo"
+default_chat_gpt_models = {
+    "ChatCompletion": "gpt-3.5-turbo",
+    "Completion": "text-davinci-003",
+}
 
 openai_api_key_env_variable = "OPENAI_API_KEY"
 

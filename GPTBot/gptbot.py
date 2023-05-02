@@ -77,7 +77,7 @@ class GPTBot:
         model (str, optional): The OpenAI model to use. Defaults to None.
         character (str, optional): The character or personality for the AI to adopt. Defaults to None.
         random_character (bool, optional): Whether to select a random character. Defaults to False.
-        user_name (str, optional): The user's name for personalizing interactions. Defaults to None.
+        username (str, optional): The user's name for personalizing interactions. Defaults to None.
     """
 
     def __init__(
@@ -85,19 +85,19 @@ class GPTBot:
         model: Optional[str] = None,
         character: Optional[str] = None,
         random_character: bool = False,
-        user_name: Optional[str] = None,
+        username: Optional[str] = None,
         mode: Literal["ChatCompletion", "Completion"] = "ChatCompletion",
     ) -> None:
         """
-        Initializes the GPTBot instance with the given model, character, random_character flag, and user_name.
+        Initializes the GPTBot instance with the given model, character, random_character flag, and username.
         Sets up the API key, geocoder, tokenizer, and initializes the character traits and startup message.
 
         Args:
             model (str, optional): The OpenAI model to use. Defaults to None.
             character (str, optional): The character or personality for the AI to adopt. Defaults to None.
             random_character (bool, optional): Whether to select a random character. Defaults to False.
-            user_name (str, optional): The user's name for personalizing interactions. Defaults to None.
-            mode (Literal["ChatCompletion", "Completion"]): Whether to call to the ChatCompletion or Completion API.
+            username (str, optional): The user's name for personalizing interactions. Defaults to None.
+            mode (Literal["ChatCompletion", "Completion"]): Whether to call the ChatCompletion or Completion API.
         """
         # Set OpenAI API key
         openai.api_key = os.environ.get(config.openai_api_key_env_variable)
@@ -121,11 +121,11 @@ class GPTBot:
 
         # If no model is specified, use the default one specified in config.py
         if model is None:
-            model = config.default_chat_gpt_model
+            model = config.default_chat_gpt_models[self._mode]
         self._model = model
 
         # Capitalize user name if provided
-        self._user_name = user_name.capitalize() if user_name is not None else None
+        self._username = username.capitalize() if username is not None else "USER"
 
         # Set up tokenizer for model
         self._tokenizer = tiktoken.encoding_for_model(self._model)
@@ -187,7 +187,7 @@ class GPTBot:
             self._history_append(role="assistant", content=self._startup_content, name=self._name)
 
     @property
-    def name(self) -> str:
+    def character_name(self) -> str:
         """
         Returns the short-form name of the selected character.
 
@@ -195,6 +195,26 @@ class GPTBot:
             str: The name of the GPTBot's selected character.
         """
         return self._name
+
+    @property
+    def username(self) -> str:
+        """
+        Returns the name of the user.
+
+        Returns:
+            str: The name of the GPTBot's user.
+        """
+        return self._username
+
+    @username.setter
+    def username(self, username: str) -> None:
+        """
+        Modifies the name of the user.
+
+        Args:
+            username (str): The updated name of the GPTBot's user.
+        """
+        self._username = username.capitalize() if username is not None else "USER"
 
     @property
     def _context(self) -> list[MessageDict]:
@@ -237,27 +257,35 @@ class GPTBot:
 
         return [{"role": "system", "content": context}]
 
-    def _count_tokens(self, messages: list[MessageDict]) -> int:
+    def _count_tokens(
+        self, messages: Union[list[MessageDict], str], mode: Literal["ChatCompletion", "Completion"]
+    ) -> int:
         """
         Counts the number of tokens in a given set of messages.
 
         Args:
-            messages (list): A list of dictionaries containing message information.
+            messages (Union[list[MessageDict], str]): A list of dicts containing message information, or a string.
+            mode (Literal["ChatCompletion", "Completion"]): Whether to call the ChatCompletion or Completion API.
 
         Returns:
-            int: The number of tokens in the given messages.
+            int: The number of tokens in the given message(s).
         """
-        # Set a starting token count of 3 to account for the start prompt and AI response prefix
-        num_tokens = 3
 
-        # Loop through each message in the input list
-        for message in messages:
-            # Add 4 tokens for each message to account for message metadata
-            num_tokens += 4
-            # Loop through each key-value pair in the message dictionary
-            for key, value in message.items():
-                # Encode the message value using the tokenizer and add the number of tokens to the total count
-                num_tokens += len(self._tokenizer.encode(value))
+        if mode == "ChatCompletion":
+            # Set a starting token count of 3 to account for the start prompt and AI response prefix
+            num_tokens = 3
+
+            # Loop through each message in the input list
+            for message in messages:
+                # Add 4 tokens for each message to account for message metadata
+                num_tokens += 4
+                # Loop through each key-value pair in the message dictionary
+                for key, value in message.items():
+                    # Encode the message value using the tokenizer and add the number of tokens to the total count
+                    num_tokens += len(self._tokenizer.encode(value))
+
+        elif mode == "Completion":
+            num_tokens = len(self._tokenizer.encode(text))
 
         return num_tokens
 
@@ -285,6 +313,11 @@ class GPTBot:
         Initializes the system message for the AI, which contains instructions for structuring responses.
         The message includes guidelines for actions, emotions, and verbal statements.
         """
+
+        # Create a list of actions, and use it to generate a string for use in the initialization text
+        actions = list(config.actions[:-2]) + [", or ".join(config.actions[-2:])]
+        actions_str = ", ".join(actions)
+
         # Create a list of emotions, and use it to generate a string for use in the initialization text
         emotions = list(config.emotions[:-2]) + [", or ".join(config.emotions[-2:])]
         emotions_str = ", ".join(emotions)
@@ -292,8 +325,7 @@ class GPTBot:
         self._init_text = config.initialization_prompt.format(self._character) + (
             "Structure your responses in the following order: 1) an action, 2) an emotion, "
             "and 3) a verbal statement.\n"
-            "\tAction: Select from the available options: MOVE_FORWARD(DISTANCE), MOVE_BACKWARD(DISTANCE), "
-            "TURN(ANGLE), EXIT(), or NULL(). Use meters for DISTANCE and degrees for ANGLE.\n"
+            f"\tActions: Select from the available options: {actions_str}. DISTANCE is meters, and ANGLE is degrees.\n"
             "\tEmotion: Based on the conversation and your character's personality, pick the most appropriate emotion "
             f"from the provided list: {emotions_str}.\n"
             "\tVerbal Statement: The only thing allowed in this section is first-person speech. Do not describe your "
@@ -330,11 +362,11 @@ class GPTBot:
             self._history = [
                 {"role": "system", "content": self._init_text},
                 {"role": "system", "content": start_prompt},
-                {"role": "system", "name": self._user_name, "content": example_user_prompt_1},
+                {"role": "system", "name": self._username, "content": example_user_prompt_1},
                 {"role": "system", "name": self._name, "content": example_assistant_response_1},
-                {"role": "system", "name": self._user_name, "content": example_user_prompt_2},
+                {"role": "system", "name": self._username, "content": example_user_prompt_2},
                 {"role": "system", "name": self._name, "content": example_assistant_response_2},
-                {"role": "system", "name": self._user_name, "content": example_user_prompt_3},
+                {"role": "system", "name": self._username, "content": example_user_prompt_3},
                 {"role": "system", "name": self._name, "content": example_assistant_response_3},
                 {"role": "system", "content": end_prompt},
             ]
@@ -378,26 +410,33 @@ class GPTBot:
         # Return the list of threads
         return threads
 
-    def _join_messages(self, messages=list[MessageDict]) -> str:
+    def _join_messages(self, messages=list[MessageDict], start_prompt: bool = True) -> str:
         """
         Joins all a list of messages into a single string that can be read by the OpenAI Completion API (as opposed to
         the OpenAI ChatCompletion API, which can directly parse the list of messages.)
 
         Args:
             messages (list[MessageDict]): A list containing a set of messages compatible with the ChatCompletion API.
+            start_prompt (bool): If True, appends the name of the assistant to the end of the prompt.
 
         Returns:
             str:    A string containing the joined history data.
         """
         prompts = []
+        assistant_name = None
         for message in messages:
             if message["role"] == "system":
                 name = "SYSTEM MESSAGE"
             elif "name" in message.keys():
                 name = message["name"].upper()
+                if message["role"] == "assistant":
+                    assistant_name = name
             else:
                 name = message["role"].upper()
             prompts.append(f":\t{message['content']}")
+
+        if assistant_name is not None and start_prompt:
+            prompts.append(f"{assistant_name}:\t")
 
         return "\n".join(prompts)
 
@@ -530,10 +569,11 @@ class GPTBot:
 
         # Create the prompt with instructions for selecting a voice
         prompt = (
-            f"Choose a voice profile for your character from the provided options:\n{voices_str}.\n"
-            "Select a male voice for male characters and a female voice for female characters. Take into account the "
-            "character's professionalism, emotivity, and pitch. Pick one profile from the list, even if it's not a "
-            f"good match. Provide a one-word answer, which must be one of the names in the list: {names_str}."
+            f"Choose the best-fitting voice profile from the provided options:\n{voices_str}.\n"
+            "If you are male, select a male voice. If female, select a female voice. Consider your level of "
+            "professionalism, emotivity, and voice pitch to select an option once a gender is chosen. Pick one profile "
+            "from the list, even if it's not a good match. Provide a one-word answer, which must be one of the names "
+            f"in the list: {names_str}."
         )
 
         return prompt
@@ -544,6 +584,7 @@ class GPTBot:
 
         Args:
             response (str): The AI's response.
+            mode (Literal["ChatCompletion", "Completion"]): Whether to call the ChatCompletion or Completion API.
 
         Returns:
             tuple: A ParsedResponse object, and a boolean indicating if the parsing was successful.
@@ -575,6 +616,99 @@ class GPTBot:
 
         # Return a ParsedResponse object, and a boolean indicating whether the parsing was successful.
         return {"actions": actions, "emotion": emotion, "text": text}, success
+
+    def _response_parse_stream(
+        self,
+        response: Iterator,
+        mode: Literal["ChatCompletion", "Completion"],
+    ) -> Iterator[ParsedResponse]:
+        """
+        Parses a streaming response from the OpenAI API and yields individual messages as they are received.
+
+        Args:
+            response (Iterator): The streaming response object.
+            mode (Literal["ChatCompletion", "Completion"]): Whether to call the ChatCompletion or Completion API.
+
+        Yields:
+            ParsedResponse: A dictionary containing the parsed message's "actions", "emotion", and "text" attributes.
+        """
+        # Initialize default values
+        actions = ["NULL()"]
+        emotion = self._default_emotion
+
+        # Track whether action and emotion have been extracted from the response
+        actions_complete = False
+        emotion_complete = False
+
+        # Track whether text has been detected in the response
+        text_detected = False
+
+        # Initialize response text and interruption flag
+        response_text = ""
+        self._interrupt = False
+
+        # Iterate over the response chunks
+        for chunk in response:
+
+            # For "ChatCompletion" mode, the response is more complex.
+            if mode == "ChatCompletion":
+                # Extract the delta, which contains the new text from the AI
+                delta = chunk["choices"][0]["delta"]
+
+                # If the interruption flag has been set or the delta is empty, break out of the loop
+                if self._interrupt or delta == {}:
+                    break
+
+                # If there is new content in the delta, add it to the response text and parse it
+                elif "content" in delta.keys():
+                    response_text += delta["content"]
+
+            # For "Completion" mode, the response is easily accessible via the "text" key.
+            elif mode == "Completion":
+                response_text += chunk["choices"][0]["text"]
+
+            else:
+                raise ValueError('Invalid "mode" selection for method "_response_parse_stream" in GPTBot.')
+
+            # Extract actions if they have not already been extracted
+            if not actions_complete:
+                for match in re.finditer(self._action_response_pattern, response_text):
+                    actions_str = response_text[match.start() : match.end()]
+                    actions = re.findall(self._action_response_pattern, actions_str)[0].upper().split(",")
+                    response_text = response_text[: match.start()] + response_text[match.end() :]
+                    actions_complete = True
+                    break
+
+            # Extract emotion if it has not already been extracted
+            if not emotion_complete:
+                for match in re.finditer(self._emotion_response_pattern, response_text):
+                    emotion_str = response_text[match.start() : match.end()]
+                    emotion = re.findall(self._emotion_response_pattern, emotion_str)[0]
+                    emotion = self._select_emotion(response=emotion)
+                    response_text = response_text[: match.start()] + response_text[match.end() :]
+                    emotion_complete = True
+                    break
+
+            # Extract text if it has not already been detected
+            if not text_detected:
+                match = re.search(self._text_open_response_pattern, response_text)
+                if match:
+                    response_text = response_text[match.end() :]
+                    text_detected = True
+
+            # If text has been detected, split it into sentences and yield each sentence with actions and emotion
+            elif re.search(self._sentence_split_pattern, response_text):
+                split_response_text = [str(sentence) for sentence in self._nlp(response_text).sents]
+                sentence = "".join(split_response_text[:-1])
+                sentence = re.sub(self._text_close_response_pattern, "", sentence)
+                response_text = response_text[len(sentence) :]
+
+                yield {"actions": actions, "emotion": emotion, "text": sentence}
+
+        # If there is remaining text in the response, yield it with actions and emotion
+        if text_detected:
+            sentence = re.sub(self._text_close_response_pattern, "", response_text)
+            yield {"actions": actions, "emotion": emotion, "text": sentence}
 
     def _response_unparse(self, actions: list[str, ...], emotion: str, text: str) -> str:
         """
@@ -614,7 +748,7 @@ class GPTBot:
         Args:
             messages (list[dict[str, str]]): A list of messages as dictionaries containing message information.
             stream (bool): Whether the request should return an iterable stream, or the entire response text at once.
-            mode (Literal["ChatCompletion", "Completion"]): Whether to call to the ChatCompletion or Completion API.
+            mode (Literal["ChatCompletion", "Completion"]): Whether to call the ChatCompletion or Completion API.
             **kwargs: Additional parameters to be passed to the OpenAI API request - some are not modifiable.
 
         Returns:
@@ -623,16 +757,17 @@ class GPTBot:
         # Add relevant attributes to the kwargs parameter dictionary
         kwargs["model"] = self._model
         kwargs["n"] = 1
-        kwargs["max_tokens"] = self._max_len - self._count_tokens(messages)
         kwargs["stream"] = stream
 
         if mode == "Completion":
             kwargs["prompt"] = self._join_messages(messages)
+            kwargs["max_tokens"] = self._max_len - self._count_tokens(messages=kwargs["prompt"], mode=mode)
             if "messages" in kwargs.keys():
                 del kwargs["messages"]
 
         elif mode == "ChatCompletion":
             kwargs["messages"] = messages
+            kwargs["max_tokens"] = self._max_len - self._count_tokens(messages=messages, mode=mode)
             if "prompt" in kwargs.keys():
                 del kwargs["prompt"]
         else:
@@ -662,15 +797,15 @@ class GPTBot:
             with self._history_lock:
                 self._history_append(self._force_quit_message)
 
-        # Send request to OpenAI API and retrieve response
-        response = openai.ChatCompletion.create(**kwargs)
-
         if stream:
             # Return the response as an iterator object
             return response
         elif not stream:
             # Extract the generated response from the response object and strip whitespace
-            return response.choices[0].message.content.strip()
+            if mode == "ChatCompletion":
+                return response.choices[0].message.content.strip()
+            elif mode == "Completion":
+                return response.choices[0].text.strip()
 
     def _select_emotion(self, response: str) -> str:
         """
@@ -744,94 +879,18 @@ class GPTBot:
             str: The name of the selected voice profile.
         """
         # Extract the name from the user's response and capitalize it
-        name = self._strip_punctuation(response).capitalize()
-        # Check if the name is a valid option in the config file
-        if name in config.neural_voices.keys():
-            # If it is, set the AI's voice to the selected option
-            voice = config.neural_voice_formatter.format(name)
-        else:
-            # If it isn't, set the AI's voice to the default option
-            voice = config.neural_voice_formatter.format(config.default_voice)
+        names = [self._strip_punctuation(name).capitalize() for name in response.split(" ")]
 
-        return voice
-
-    def _stream_parser(self, response: Iterator) -> Iterator[ParsedResponse]:
-        """
-        Parses a streaming response from the OpenAI API and yields individual messages as they are received.
-
-        Args:
-            response (Iterator): The streaming response object.
-
-        Yields:
-            ParsedResponse: A dictionary containing the parsed message's "actions", "emotion", and "text" attributes.
-        """
-        # Initialize default values
-        actions = ["NULL()"]
-        emotion = self._default_emotion
-
-        # Track whether action and emotion have been extracted from the response
-        actions_complete = False
-        emotion_complete = False
-
-        # Track whether text has been detected in the response
-        text_detected = False
-
-        # Initialize response text and interruption flag
-        response_text = ""
-        self._interrupt = False
-
-        # Iterate over the response chunks
-        for chunk in response:
-            # Extract the delta, which contains the new text from the AI
-            delta = chunk["choices"][0]["delta"]
-
-            # If the interruption flag has been set or the delta is empty, break out of the loop
-            if self._interrupt or delta == {}:
+        # If the name is not a valid option in the config file, set the AI's voice to the default option.
+        voice = config.neural_voice_formatter.format(config.default_voice)
+        for name in names:
+            # Check if the name is a valid option in the config file
+            if name in config.neural_voices.keys():
+                # If it is, set the AI's voice to the selected option
+                voice = config.neural_voice_formatter.format(name)
                 break
 
-            # If there is new content in the delta, add it to the response text and parse it
-            elif "content" in delta.keys():
-                response_text += delta["content"]
-
-                # Extract actions if they have not already been extracted
-                if not actions_complete:
-                    for match in re.finditer(self._action_response_pattern, response_text):
-                        actions_str = response_text[match.start() : match.end()]
-                        actions = re.findall(self._action_response_pattern, actions_str)[0].upper().split(",")
-                        response_text = response_text[: match.start()] + response_text[match.end() :]
-                        actions_complete = True
-                        break
-
-                # Extract emotion if it has not already been extracted
-                if not emotion_complete:
-                    for match in re.finditer(self._emotion_response_pattern, response_text):
-                        emotion_str = response_text[match.start() : match.end()]
-                        emotion = re.findall(self._emotion_response_pattern, emotion_str)[0]
-                        emotion = self._select_emotion(response=emotion)
-                        response_text = response_text[: match.start()] + response_text[match.end() :]
-                        emotion_complete = True
-                        break
-
-                # Extract text if it has not already been detected
-                if not text_detected:
-                    match = re.search(self._text_open_response_pattern, response_text)
-                    if match:
-                        response_text = response_text[match.end() :]
-                        text_detected = True
-
-                # If text has been detected, split it into sentences and yield each sentence with actions and emotion
-                elif re.search(self._sentence_split_pattern, response_text):
-                    split_response_text = [str(sentence) for sentence in self._nlp(response_text).sents]
-                    sentence = "".join(split_response_text[:-1])
-                    sentence = re.sub(self._text_close_response_pattern, "", sentence)
-                    response_text = response_text[len(sentence) :]
-
-                    yield {"actions": actions, "emotion": emotion, "text": sentence}
-
-        # If there is remaining text in the response, yield it with actions and emotion
-        if text_detected:
-            sentence = re.sub(self._text_close_response_pattern, "", response_text)
-            yield {"actions": actions, "emotion": emotion, "text": sentence}
+        return voice
 
     def _strip_punctuation(self, s: str) -> str:
         """
@@ -953,7 +1012,7 @@ class GPTBot:
         )
 
         # Parse the response to get the startup message
-        self._startup_message = self._response_parse(self._startup_content)[0]
+        self._startup_message = self._response_parse(response=self._startup_content)[0]
 
     def _thread_traits(self, messages: MessageDict, prompt: callable, processor: callable, attribute: str) -> None:
         """
@@ -1017,23 +1076,28 @@ class GPTBot:
         # Set the '_interrupt' attribute to True
         self._interrupt = True
 
-    def prompt(self, message: str) -> ParsedResponse:
+    def prompt(self, message: str, mode: Optional[Literal["ChatCompletion", "Completion"]] = None) -> ParsedResponse:
         """
         Takes in a message from the user, appends it to the conversation history, and sends it to the AI for a response.
         The response is then parsed and returned as a ParsedResponse object.
 
         Args:
             message (str): The message from the user.
+            mode (Optional[Literal["ChatCompletion", "Completion"]]): Completion API selection.
 
         Returns:
             ParsedResponse: A ParsedResponse object containing the parsed response from the AI.
         """
+        # Select the default mode if none is provided
+        if mode is None:
+            mode = self._mode
+
         # Append user message to conversation history
         with self._history_lock:
-            self._history_append(role="user", content=message, name=self._user_name)
+            self._history_append(role="user", content=message, name=self._username)
 
         # Send messages to AI and get response
-        response = self._request(messages=self._context + self._history, stream=False, mode=self._mode)
+        response = self._request(messages=self._context + self._history, stream=False, mode=mode)
 
         # Parse response and retry if unsuccessful
         response_parsed, success = self._response_parse(response=response)
@@ -1049,23 +1113,30 @@ class GPTBot:
 
         return response_parsed
 
-    def prompt_stream(self, message: str) -> Iterator[ParsedResponse]:
+    def prompt_stream(
+        self, message: str, mode: Optional[Literal["ChatCompletion", "Completion"]] = None
+    ) -> Iterator[ParsedResponse]:
         """
         Sends the user message to the AI and generates a stream of response blocks parsed from the AI's stream.
 
         Args:
             message (str): The user's message.
+            mode (Optional[Literal["ChatCompletion", "Completion"]]): Completion API selection.
 
         Yields:
             ParsedResponse: A dictionary containing the parsed message's "actions", "emotion", and "text" attributes.
         """
+        # Select the default mode if none is provided
+        if mode is None:
+            mode = self._mode
+
         # Append the user's message to the conversation history with a user role
         with self._history_lock:
-            self._history_append(role="user", content=message, name=self._user_name)
+            self._history_append(role="user", content=message, name=self._username)
 
         # Make a stream request to the AI, passing the history and context messages
-        response = self._request(messages=self._context + self._history, stream=True, mode=self._mode)
+        response = self._request(messages=self._context + self._history, stream=True, mode=mode)
 
         # Parse the response stream and yield each response block
-        for block in self._stream_parser(response=response):
+        for block in self._response_parse_stream(response=response, mode=mode):
             yield block

@@ -17,23 +17,26 @@ Overall, this program provides a framework for creating a text-based conversatio
 interface, using the GPTBot class for generating responses and the termighty library for handling input and output
 processing.
 """
+import argparse
+import re
 import sys
 import threading
 import time
-from typing import Optional
+from typing import Literal, Optional
 
-from termighty import TextBox, Term, Listener, System
+from termighty import Listener, System, Term, TextBox
 from termighty_input_box import InputBox
 from termighty_output_box import OutputBox
 
+import config
 from gptbot import GPTBot
 from tts_synthesizer import TTSSynthesizer
 
 
 class Interface:
     """
-    A class representing a text-based conversational interface for a GPTBot. It provides a graphical user interface
-    for user interaction and handles input and output processing, as well as text-to-speech synthesis.
+    A class representing a text-based conversational interface for a GPTBot. It provides a graphical user interface for
+    user interaction and handles input and output processing, as well as text-to-speech synthesis.
     """
 
     def __init__(
@@ -42,7 +45,8 @@ class Interface:
         background_color: str = "Black",
         character=None,
         random_character=False,
-        user_name: Optional[str] = None,
+        username: Optional[str] = None,
+        mode: Literal["ChatCompletion", "Completion"] = "ChatCompletion",
     ) -> None:
         """
         Initializes the Interface class with specified border and background colors, and GPTBot character settings.
@@ -52,14 +56,14 @@ class Interface:
             background_color (str): The color of the background, default is "Black".
             character (str): The name of the character to use for GPTBot, default is None.
             random_character (bool): If True, chooses a random character, default is False.
-            user_name (str): The name of the user.
+            username (str): The name of the user.
         """
         # Set the colors for the border and background of the interface
         self._border_color = border_color
         self._background_color = background_color
 
         # Initialize a new instance of the GPTBot class with the specified character settings
-        self._gptbot = GPTBot(character=character, random_character=random_character, user_name=user_name)
+        self._gptbot = GPTBot(character=character, random_character=random_character, username=username, mode=mode)
 
         # Initialize a new instance of the TTSSynthesizer class for text-to-speech synthesis
         self._tts_synthesizer = TTSSynthesizer()
@@ -70,11 +74,18 @@ class Interface:
         # Initialize variables for the current entry, shutdown status, user name, and interrupt status
         self._current_entry = None
         self._shutdown = False
-        self._user_name = user_name.upper() if user_name is not None else "USER"
+        self._username = username.upper() if username is not None else "USER"
         self._interrupt = False
 
+        # Init Action Patterns
+        self._action_patterns = {}
+        for action in config.actions:
+            split_action = action.split("(")
+            pattern = re.compile(f"({split_action[0]})\((.*)\)")
+            self._action_patterns[action] = pattern
+
         # Get the length of the longest name between the user and the chatbot.
-        self._max_name_len = max(len(self._user_name), len(self._gptbot._name))
+        self._max_name_len = max(len(self._username), len(self._gptbot._name))
 
         # Initialize a lock for the history of messages to prevent race conditions
         self._history_lock = threading.Lock()
@@ -180,7 +191,7 @@ class Interface:
         for entry in self._history[:N]:
             if entry["prompt"] is not None:
                 # If the current entry is a user message, format it and append it to the output list
-                output.append(f"{self._user_name:>{self._max_name_len}}: {entry['prompt'].strip()}")
+                output.append(f"{self._gptbot.username:>{self._max_name_len}}: {entry['prompt'].strip()}")
             if entry["spoken_text"]:
                 # If the current entry is a GPTBot message, format it and append it to the output list
                 output.append(f"{self._gptbot._name.upper():>{self._max_name_len}}: {entry['spoken_text'].strip()}")
@@ -189,7 +200,7 @@ class Interface:
         # If "include_latest_response" is False, print only the latest prompt if it is not None.
         if not include_latest_response:
             if self._history[-1]["prompt"] is not None:
-                output.append(f"{self._user_name:>{self._max_name_len}}: {self._history[-1]['prompt'].strip()}")
+                output.append(f"{self._gptbot.username:>{self._max_name_len}}: {self._history[-1]['prompt'].strip()}")
             current_output = f"{self._gptbot._name.upper():>{self._max_name_len}}:"
             if self._history[-1]["spoken_text"] is not None:
                 current_output += self._history[-1]["spoken_text"].rstrip()
@@ -306,6 +317,11 @@ class Interface:
                                 self._shutdown = True
                                 break_outer_loop = True
                                 break
+                            else:
+                                for action in entry["actions"]:
+                                    if search := re.findall(self._action_patterns["SAVE_USER_NAME(NAME)"], action):
+                                        new_name = search[0][1].strip().split(" ")[0].strip().title()
+                                        self._gptbot.username = new_name
 
                         time.sleep(0.005)
                     N = len_history
@@ -449,13 +465,68 @@ class Interface:
 
 
 if __name__ == "__main__":
-    kwargs = {"user_name": "Gabriel"}
-    if len(sys.argv) > 1:
-        character = " ".join(sys.argv[1:])
-        if character.lower().strip() in ("random", "rand"):
-            kwargs["random_character"] = True
-        else:
-            kwargs["character"] = character
+
+    parser = argparse.ArgumentParser(
+        prog="GPTBot Interface",
+        description=(
+            "This program defines an interface for a text-based conversational agent based on the GPTBot class. The "
+            "program uses the termighty library to create a graphical user interface for user interaction and handles "
+            "input and output processing, as well as text-to-speech synthesis."
+        ),
+        epilog=(
+            "Requires three environment variables for full functionality. "
+            "1) OPENAI_API_KEY: A valid OpenAI API key, "
+            "2) AZURE_SPEECH_KEY: A valid Azure Cognitive Services Speech API key for TTS functionality, and "
+            "3) AZURE_SPEECH_REGION: The region associated with your Azure Cognitive Services Speech API key."
+        ),
+    )
+
+    parser.add_argument(
+        "-u",
+        "--username",
+        type=str,
+        dest="username",
+        help="The name of the program's user, only one word without spaces is allowed.",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--character",
+        type=str,
+        dest="character",
+        help=(
+            "A name and/or short description of the character GPTBot should emulate. For best results, use the "
+            'second-person singular to describe the character, in the form "<name> from <context>, <details>".'
+        ),
+    )
+
+    parser.add_argument(
+        "-m",
+        "--mode",
+        choices=["ChatCompletion", "Completion"],
+        default="ChatCompletion",
+        type=str,
+        dest="mode",
+        help="OpenAI API Selection. ChatCompletion is cheaper, but often not as good unless you have GPT-4 access.",
+    )
+
+    parser.add_argument(
+        "-r",
+        "--rand",
+        "--random",
+        action="store_true",
+        dest="random",
+        help='Override the "character" argument and have the program select a random character.',
+    )
+
+    args = parser.parse_args()
+
+    kwargs = {
+        "username": args.username,
+        "character": args.character,
+        "mode": args.mode,
+        "random_character": args.random,
+    }
 
     print("Loading...")
     interface = Interface(**kwargs)
