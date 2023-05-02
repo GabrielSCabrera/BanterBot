@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-dependencies = ["openai", "tiktoken", "geocoder", "requests", "termighty", "azure-cognitiveservices-speech"]
+dependencies = ["openai", "tiktoken", "geocoder", "requests", "termighty", "azure-cognitiveservices-speech", "spacy"]
 
 url = "https://github.com/GabrielSCabrera/GPTBot"
 
@@ -22,6 +22,6 @@ setup(
     install_requires=dependencies,
     classifiers=[
         "Development Status :: 3 - Alpha",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )

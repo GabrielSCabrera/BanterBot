@@ -28,6 +28,8 @@ from typing import Any, Literal, Optional, TypedDict, Union
 import openai
 import geocoder
 import requests
+import spacy
+import spacy.cli
 import tiktoken
 
 import termighty
@@ -84,6 +86,7 @@ class GPTBot:
         character: Optional[str] = None,
         random_character: bool = False,
         user_name: Optional[str] = None,
+        mode: Literal["ChatCompletion", "Completion"] = "ChatCompletion",
     ) -> None:
         """
         Initializes the GPTBot instance with the given model, character, random_character flag, and user_name.
@@ -94,9 +97,20 @@ class GPTBot:
             character (str, optional): The character or personality for the AI to adopt. Defaults to None.
             random_character (bool, optional): Whether to select a random character. Defaults to False.
             user_name (str, optional): The user's name for personalizing interactions. Defaults to None.
+            mode (Literal["ChatCompletion", "Completion"]): Whether to call to the ChatCompletion or Completion API.
         """
         # Set OpenAI API key
         openai.api_key = os.environ.get(config.openai_api_key_env_variable)
+
+        # Select the API
+        self._mode = mode
+
+        try:
+            # Initialize a spaCy model for English
+            self._nlp = spacy.load("en_core_web_sm")
+        except OSError:
+            spacy.cli.download("en_core_web_sm")
+            self._nlp = spacy.load("en_core_web_sm")
 
         # Set up geocoder for IP address lookup
         self._geocoder = geocoder.ip("me")
@@ -284,7 +298,7 @@ class GPTBot:
             f"from the provided list: {emotions_str}.\n"
             "\tVerbal Statement: The only thing allowed in this section is first-person speech. Do not describe your "
             "actions, expressions, or narration. Only include the exact words spoken by your character.\n"
-            "Format your response as follows:\n"
+            "Format your response exactly as follows:\n"
             "$ACTIONS:[<action_1>,<action_2>,...]$ACTIONS\n"
             "$EMOTION:<emotion>$EMOTION\n"
             "$TEXT:<verbal_statement>$TEXT"
@@ -315,14 +329,14 @@ class GPTBot:
         with self._history_lock:
             self._history = [
                 {"role": "system", "content": self._init_text},
-                # {"role": "system", "content": start_prompt},
-                # {"role": "system", "name": self._user_name, "content": example_user_prompt_1},
-                # {"role": "system", "name": self._name, "content": example_assistant_response_1},
-                # {"role": "system", "name": self._user_name, "content": example_user_prompt_2},
-                # {"role": "system", "name": self._name, "content": example_assistant_response_2},
-                # {"role": "system", "name": self._user_name, "content": example_user_prompt_3},
-                # {"role": "system", "name": self._name, "content": example_assistant_response_3},
-                # {"role": "system", "content": end_prompt},
+                {"role": "system", "content": start_prompt},
+                {"role": "system", "name": self._user_name, "content": example_user_prompt_1},
+                {"role": "system", "name": self._name, "content": example_assistant_response_1},
+                {"role": "system", "name": self._user_name, "content": example_user_prompt_2},
+                {"role": "system", "name": self._name, "content": example_assistant_response_2},
+                {"role": "system", "name": self._user_name, "content": example_user_prompt_3},
+                {"role": "system", "name": self._name, "content": example_assistant_response_3},
+                {"role": "system", "content": end_prompt},
             ]
 
     def _init_traits_threads(self) -> list[threading.Thread, ...]:
@@ -344,7 +358,7 @@ class GPTBot:
 
         # Create a message dictionary containing the system messages
         messages = [
-            {"role": "system", "content":config.initialization_prompt.format(self._character)},
+            {"role": "system", "content": config.initialization_prompt.format(self._character)},
             {"role": "system", "content": character_info},
         ]
 
@@ -358,13 +372,34 @@ class GPTBot:
         for prompt, processor, attribute in zip(prompts, processors, attributes):
             # Create a new thread to call the _thread_traits method with the appropriate arguments
             threads.append(
-                threading.Thread(
-                    target=self._thread_traits, args=(messages, prompt, processor, attribute), daemon=True
-                )
+                threading.Thread(target=self._thread_traits, args=(messages, prompt, processor, attribute), daemon=True)
             )
 
         # Return the list of threads
         return threads
+
+    def _join_messages(self, messages=list[MessageDict]) -> str:
+        """
+        Joins all a list of messages into a single string that can be read by the OpenAI Completion API (as opposed to
+        the OpenAI ChatCompletion API, which can directly parse the list of messages.)
+
+        Args:
+            messages (list[MessageDict]): A list containing a set of messages compatible with the ChatCompletion API.
+
+        Returns:
+            str:    A string containing the joined history data.
+        """
+        prompts = []
+        for message in messages:
+            if message["role"] == "system":
+                name = "SYSTEM MESSAGE"
+            elif "name" in message.keys():
+                name = message["name"].upper()
+            else:
+                name = message["role"].upper()
+            prompts.append(f":\t{message['content']}")
+
+        return "\n".join(prompts)
 
     def _get_error_response(self) -> str:
         """
@@ -383,7 +418,7 @@ class GPTBot:
         ]
 
         # Send the message to the AI and receive the error response
-        response = self._request(messages=messages, stream=False)
+        response = self._request(messages=messages, stream=False, mode=self._mode)
 
         return response
 
@@ -569,7 +604,9 @@ class GPTBot:
 
         return response_str
 
-    def _request(self, messages: list[MessageDict], stream: bool, **kwargs) -> Union[Iterator, str]:
+    def _request(
+        self, messages: list[MessageDict], stream: bool, mode: Literal["ChatCompletion", "Completion"], **kwargs
+    ) -> Union[Iterator, str]:
         """
         Sends a request to the OpenAI API to generate a response based on the given messages and other parameters. Can
         return a stream, or can wait until the entire response is complete and return a string.
@@ -577,17 +614,29 @@ class GPTBot:
         Args:
             messages (list[dict[str, str]]): A list of messages as dictionaries containing message information.
             stream (bool): Whether the request should return an iterable stream, or the entire response text at once.
+            mode (Literal["ChatCompletion", "Completion"]): Whether to call to the ChatCompletion or Completion API.
             **kwargs: Additional parameters to be passed to the OpenAI API request - some are not modifiable.
 
         Returns:
             Union[Iterator, str]: The response generated by the OpenAI API as an iterator, or as a string.
         """
         # Add relevant attributes to the kwargs parameter dictionary
-        kwargs["messages"] = messages
         kwargs["model"] = self._model
         kwargs["n"] = 1
         kwargs["max_tokens"] = self._max_len - self._count_tokens(messages)
         kwargs["stream"] = stream
+
+        if mode == "Completion":
+            kwargs["prompt"] = self._join_messages(messages)
+            if "messages" in kwargs.keys():
+                del kwargs["messages"]
+
+        elif mode == "ChatCompletion":
+            kwargs["messages"] = messages
+            if "prompt" in kwargs.keys():
+                del kwargs["prompt"]
+        else:
+            raise ValueError('Invalid "mode" selection for method "_request" in GPTBot.')
 
         # Keep track of whether or not the request was successful
         success = False
@@ -595,7 +644,10 @@ class GPTBot:
         for i in range(config.rate_limit_retry_attempt_limit):
             try:
                 # Send request to OpenAI API and retrieve response
-                response = openai.ChatCompletion.create(**kwargs)
+                if mode == "ChatCompletion":
+                    response = openai.ChatCompletion.create(**kwargs)
+                elif mode == "Completion":
+                    response = openai.Completion.create(**kwargs)
                 # Set the success flag and exit the loop
                 success = True
                 break
@@ -676,7 +728,7 @@ class GPTBot:
         ]
 
         # Send the messages to the AI to get the response
-        response = self._request(messages=messages, temperature=1.2, top_p=0.9, stream=False)
+        response = self._request(messages=messages, temperature=1.2, top_p=0.9, stream=False, mode=self._mode)
 
         # Return the selected character with description and chatbot persona
         return response
@@ -769,8 +821,8 @@ class GPTBot:
 
                 # If text has been detected, split it into sentences and yield each sentence with actions and emotion
                 elif re.search(self._sentence_split_pattern, response_text):
-                    split_response_text = re.split(self._sentence_split_pattern, response_text)
-                    sentence = "".join(split_response_text[0:-1])
+                    split_response_text = [str(sentence) for sentence in self._nlp(response_text).sents]
+                    sentence = "".join(split_response_text[:-1])
                     sentence = re.sub(self._text_close_response_pattern, "", sentence)
                     response_text = response_text[len(sentence) :]
 
@@ -822,7 +874,7 @@ class GPTBot:
         # Request the AI to generate the summary using the given messages
         # A temperature of 0.0 ensures that the AI's response is always the same, making it more objective
         # A top_p value of 0.5 means that the AI will only use the top 50% of tokens with the highest probability
-        response = self._request(messages=messages, temperature=0.0, top_p=0.5, stream=False)
+        response = self._request(messages=messages, temperature=0.0, top_p=0.5, stream=False, mode=self._mode)
 
         return response
 
@@ -842,7 +894,13 @@ class GPTBot:
             {"role": "system", "content": config.initialization_prompt.format(self._character)},
             {"role": "system", "content": prompt},
         ]
-        response = {"actions": ["EXIT()"], "emotion": "sad", "text": self._request(messages=messages, stream=False)}
+
+        # Convert the response to the format required by the ChatCompletion API
+        response = {
+            "actions": ["EXIT()"],
+            "emotion": "sad",
+            "text": self._request(messages=messages, stream=False, mode=self._mode),
+        }
 
         # Set the response as the force quit message
         self._force_quit_message = response
@@ -859,10 +917,14 @@ class GPTBot:
         response = {
             "actions": ["NULL()"],
             "emotion": "sad",
-            "text": self._request(messages=messages, stream=False),
+            "text": self._request(messages=messages, stream=False, mode=self._mode),
         }
+
+        # Convert the response to the format required by the ChatCompletion API
+        response_unparsed = self._response_unparse(**response)
+
         # Replace the current error response with the updated version
-        self._rate_limit_messages[index] = response
+        self._rate_limit_messages[index] = response_unparsed
 
     def _thread_startup_message(self) -> None:
         """
@@ -870,9 +932,10 @@ class GPTBot:
         """
         # Define greeting prompt message
         prompt = (
-            "Your task is to come up with a greeting that aligns with your character's personality. Keep in mind their "
-            "temperament, the time of day, and the weather conditions, if relevant. Limit your greeting to two "
-            "sentences and only include the spoken words, avoiding any descriptions or narration."
+            "Craft a character-specific greeting, considering your personality, temperament, time of day, and weather "
+            "conditions if applicable. Limit your response to two sentences of pure dialogue, without any descriptive "
+            "narration or actions (e.g., no 'I glance up at the user as he enters' or *Grinning*). Focus solely on the "
+            "spoken words."
         )
 
         # Define the message history
@@ -882,7 +945,7 @@ class GPTBot:
         ]
 
         # Request a response from the AI for the greeting message
-        response = self._request(self._context + messages, stream=False)
+        response = self._request(self._context + messages, stream=False, mode=self._mode)
 
         # Format the response into a message dictionary
         self._startup_content = (
@@ -905,7 +968,7 @@ class GPTBot:
         """
         # Ask the AI to generate a prompt
         messages = [*messages, {"role": "user", "content": prompt()}]
-        response = self._request(messages=messages, temperature=0.0, stream=False)
+        response = self._request(messages=messages, temperature=0.0, stream=False, mode=self._mode)
 
         # Use the AI response to select a value for the attribute
         setattr(self, attribute, processor(response))
@@ -970,7 +1033,7 @@ class GPTBot:
             self._history_append(role="user", content=message, name=self._user_name)
 
         # Send messages to AI and get response
-        response = self._request(messages=self._context + self._history, stream=False)
+        response = self._request(messages=self._context + self._history, stream=False, mode=self._mode)
 
         # Parse response and retry if unsuccessful
         response_parsed, success = self._response_parse(response=response)
@@ -1001,7 +1064,7 @@ class GPTBot:
             self._history_append(role="user", content=message, name=self._user_name)
 
         # Make a stream request to the AI, passing the history and context messages
-        response = self._request(messages=self._context + self._history, stream=True)
+        response = self._request(messages=self._context + self._history, stream=True, mode=self._mode)
 
         # Parse the response stream and yield each response block
         for block in self._stream_parser(response=response):
