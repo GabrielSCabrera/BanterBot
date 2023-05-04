@@ -87,6 +87,7 @@ class GPTBot:
         random_character: bool = False,
         username: Optional[str] = None,
         mode: Literal["ChatCompletion", "Completion"] = "ChatCompletion",
+        thread_on_init: bool = True,
     ) -> None:
         """
         Initializes the GPTBot instance with the given model, character, random_character flag, and username.
@@ -138,9 +139,9 @@ class GPTBot:
         self._history = []
 
         # Messages to print if a TooManyRequests exception occurs before the custom error messages are generated.
-        self._rate_limit_messages = [
+        self._request_messages = [
             {"actions": ["NULL()"], "emotion": "sad", "text": f"Rate limiting difficulties, retry attempt {i}."}
-            for i in range(config.rate_limit_retry_attempt_limit)
+            for i in range(config.request_retry_attempt_limit)
         ]
         self._force_quit_message = {
             "actions": ["EXIT()"],
@@ -166,7 +167,7 @@ class GPTBot:
         initialization_threads = self._init_traits_threads()
 
         # Initialize rate limit message threads
-        initialization_threads += self._init_rate_limit_messages_threads()
+        initialization_threads += self._init_request_messages_threads()
 
         # Append the startup message thread
         initialization_threads.append(threading.Thread(target=self._thread_startup_message, daemon=True))
@@ -174,10 +175,13 @@ class GPTBot:
         # Start all initialization threads
         for thread in initialization_threads:
             thread.start()
+            if not thread_on_init:
+                thread.join()
 
         # Wait for all initialization threads to finish
-        for thread in initialization_threads:
-            thread.join()
+        if thread_on_init:
+            for thread in initialization_threads:
+                thread.join()
 
         # Initialize system variables and messages
         self._init_system()
@@ -492,7 +496,7 @@ class GPTBot:
             # Append the interruption message to the history list
             response = self._history_append(role="system", content=f"The user interrupted {self._name} mid-speech.")
 
-    def _init_rate_limit_messages_threads(self) -> list[threading.Thread, ...]:
+    def _init_request_messages_threads(self) -> list[threading.Thread, ...]:
         """
         Generates a set of error responses for the AI to use when it has been rate limited.  Is calculated in advance
         in case rate limiting occurs.
@@ -515,9 +519,9 @@ class GPTBot:
             {"role": "system", "content": prompt},
         ]
 
-        # Create threads that generate the rate limit messages to store in the _rate_limit_messages attribute
-        for i in range(config.rate_limit_retry_attempt_limit):
-            threads.append(threading.Thread(target=self._thread_rate_limit_messages, args=(messages, i), daemon=True))
+        # Create threads that generate the rate limit messages to store in the _request_messages attribute
+        for i in range(config.request_retry_attempt_limit):
+            threads.append(threading.Thread(target=self._thread_request_messages, args=(messages, i), daemon=True))
 
         return threads
 
@@ -776,7 +780,7 @@ class GPTBot:
         # Keep track of whether or not the request was successful
         success = False
         # Retry the request if it fails due to rate limiting
-        for i in range(config.rate_limit_retry_attempt_limit):
+        for i in range(config.request_retry_attempt_limit):
             try:
                 # Send request to OpenAI API and retrieve response
                 if mode == "ChatCompletion":
@@ -786,9 +790,9 @@ class GPTBot:
                 # Set the success flag and exit the loop
                 success = True
                 break
-            except openai.error.RateLimitError:
+            except (openai.error.RateLimitError, openai.error.APIError):
                 # If the request fails due to rate limiting, append a rate limit message to the chat history
-                self._history_append(self._rate_limit_messages[i])
+                self._history_append(self._request_messages[i])
                 # Wait for a short period before retrying the request
                 time.sleep(5)
 
@@ -964,7 +968,7 @@ class GPTBot:
         # Set the response as the force quit message
         self._force_quit_message = response
 
-    def _thread_rate_limit_messages(self, messages: str, index: int) -> None:
+    def _thread_request_messages(self, messages: str, index: int) -> None:
         """
         A thread that sends a message to the AI and receives the error response for rate limiting.
 
@@ -983,7 +987,7 @@ class GPTBot:
         response_unparsed = self._response_unparse(**response)
 
         # Replace the current error response with the updated version
-        self._rate_limit_messages[index] = response_unparsed
+        self._request_messages[index] = response_unparsed
 
     def _thread_startup_message(self) -> None:
         """

@@ -49,7 +49,7 @@ openai_api_key_env_variable = "OPENAI_API_KEY"
 
 retry_attempt_limit = 2
 
-rate_limit_retry_attempt_limit = 2
+request_retry_attempt_limit = 2
 
 default_character = (
     "Marvin, the melancholic robot from The Hitchhiker's Guide to the Galaxy. Known for your incredible intelligence "

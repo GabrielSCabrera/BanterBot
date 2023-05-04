@@ -47,6 +47,8 @@ class Interface:
         random_character=False,
         username: Optional[str] = None,
         mode: Literal["ChatCompletion", "Completion"] = "ChatCompletion",
+        thread_on_init: bool = True,
+        gpt4: bool = False,
     ) -> None:
         """
         Initializes the Interface class with specified border and background colors, and GPTBot character settings.
@@ -62,8 +64,23 @@ class Interface:
         self._border_color = border_color
         self._background_color = background_color
 
+        # Have the GPTBot use the GPT-4 API
+        if gpt4:
+            model = "gpt4"
+            mode = "ChatCompletion"
+            thread_on_init = False
+        else:
+            model = None
+
         # Initialize a new instance of the GPTBot class with the specified character settings
-        self._gptbot = GPTBot(character=character, random_character=random_character, username=username, mode=mode)
+        self._gptbot = GPTBot(
+            model=model,
+            character=character,
+            random_character=random_character,
+            username=username,
+            mode=mode,
+            thread_on_init=thread_on_init,
+        )
 
         # Initialize a new instance of the TTSSynthesizer class for text-to-speech synthesis
         self._tts_synthesizer = TTSSynthesizer()
@@ -523,6 +540,22 @@ if __name__ == "__main__":
         help='Override the "character" argument and have the program select a random character.',
     )
 
+    parser.add_argument(
+        "-n",
+        "--no-thread",
+        action="store_false",
+        dest="nothread",
+        help='Disable multithreading on initialization of GPTBot (can help with "Too Many Requests" exceptions).',
+    )
+
+    parser.add_argument(
+        "-g",
+        "--gpt4",
+        action="store_true",
+        dest="gpt4",
+        help="Enable GPT-4; overrides --mode and --no-thread flag, and only works if you have GPT-4 API access.",
+    )
+
     args = parser.parse_args()
 
     kwargs = {
@@ -530,6 +563,8 @@ if __name__ == "__main__":
         "character": args.character,
         "mode": args.mode,
         "random_character": args.random,
+        "thread_on_init": args.nothread,
+        "gpt4": args.gpt4,
     }
 
     print("Loading...")
