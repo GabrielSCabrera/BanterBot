@@ -88,6 +88,7 @@ class GPTBot:
         username: Optional[str] = None,
         mode: Literal["ChatCompletion", "Completion"] = "ChatCompletion",
         thread_on_init: bool = True,
+        temperature: float = 0.7,
     ) -> None:
         """
         Initializes the GPTBot instance with the given model, character, random_character flag, and username.
@@ -122,7 +123,7 @@ class GPTBot:
 
         # If no model is specified, use the default one specified in config.py
         if model is None:
-            model = config.default_chat_gpt_models[self._mode]
+            model = config.default_chat_gpt_models[model]
         self._model = model
 
         # Capitalize user name if provided
@@ -1080,7 +1081,9 @@ class GPTBot:
         # Set the '_interrupt' attribute to True
         self._interrupt = True
 
-    def prompt(self, message: str, mode: Optional[Literal["ChatCompletion", "Completion"]] = None) -> ParsedResponse:
+    def prompt(
+        self, message: str, mode: Optional[Literal["ChatCompletion", "Completion"]] = None, temperature: float = 1.0
+    ) -> ParsedResponse:
         """
         Takes in a message from the user, appends it to the conversation history, and sends it to the AI for a response.
         The response is then parsed and returned as a ParsedResponse object.
@@ -1118,7 +1121,7 @@ class GPTBot:
         return response_parsed
 
     def prompt_stream(
-        self, message: str, mode: Optional[Literal["ChatCompletion", "Completion"]] = None
+        self, message: str, mode: Optional[Literal["ChatCompletion", "Completion"]] = None, temperature: float = 1.0
     ) -> Iterator[ParsedResponse]:
         """
         Sends the user message to the AI and generates a stream of response blocks parsed from the AI's stream.

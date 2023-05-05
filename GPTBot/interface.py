@@ -49,6 +49,7 @@ class Interface:
         mode: Literal["ChatCompletion", "Completion"] = "ChatCompletion",
         thread_on_init: bool = True,
         gpt4: bool = False,
+        temperature: float = 1.0,
     ) -> None:
         """
         Initializes the Interface class with specified border and background colors, and GPTBot character settings.
@@ -64,9 +65,12 @@ class Interface:
         self._border_color = border_color
         self._background_color = background_color
 
+        # Select the API temperature.
+        self._temperature = temperature
+
         # Have the GPTBot use the GPT-4 API
         if gpt4:
-            model = "gpt4"
+            model = "gpt-4"
             mode = "ChatCompletion"
             thread_on_init = False
         else:
@@ -408,7 +412,7 @@ class Interface:
                     )
 
                 # Generate GPTBot responses based on the input
-                for response in self._gptbot.prompt_stream(entry):
+                for response in self._gptbot.prompt_stream(entry, temperature=self._temperature):
                     # If there is a new input before the response is finished, stop generating responses for this input
                     if idx < len(self._input_window._inputs) - 1:
                         break
@@ -556,6 +560,15 @@ if __name__ == "__main__":
         help="Enable GPT-4; overrides --mode and --no-thread flag, and only works if you have GPT-4 API access.",
     )
 
+    parser.add_argument(
+        "-t",
+        "--temp",
+        "--temperature",
+        type=float,
+        dest="temperature",
+        help="Set the model temperature.",
+    )
+
     args = parser.parse_args()
 
     kwargs = {
@@ -565,6 +578,7 @@ if __name__ == "__main__":
         "random_character": args.random,
         "thread_on_init": args.nothread,
         "gpt4": args.gpt4,
+        "temperature": args.temperature,
     }
 
     print("Loading...")
