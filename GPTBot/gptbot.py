@@ -109,10 +109,13 @@ class GPTBot:
 
         try:
             # Initialize a spaCy model for English
-            self._nlp = spacy.load("en_core_web_sm")
+            self._nlp = spacy.load("en_core_web_sm", disable=["tagger", "attribute_ruler", "lemmatizer"])
         except OSError:
             spacy.cli.download("en_core_web_sm")
-            self._nlp = spacy.load("en_core_web_sm")
+            self._nlp = spacy.load("en_core_web_sm", disable=["tagger", "attribute_ruler", "lemmatizer"])
+
+        self._nlp.disable_pipe("parser")
+        self._nlp.enable_pipe("senter")
 
         # Set up geocoder for IP address lookup
         self._geocoder = geocoder.ip("me")
@@ -123,7 +126,7 @@ class GPTBot:
 
         # If no model is specified, use the default one specified in config.py
         if model is None:
-            model = config.default_chat_gpt_models[model]
+            model = config.default_chat_gpt_models[self._mode]
         self._model = model
 
         # Capitalize user name if provided

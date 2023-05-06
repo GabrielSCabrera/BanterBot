@@ -116,6 +116,8 @@ class Interface:
             self._history.append(
                 {
                     "prompt": None,
+                    "username": self._gptbot.username.upper(),
+                    "character_name": self._gptbot.character_name.upper(),
                     "emotion": self._gptbot._startup_message["emotion"],
                     "actions": self._gptbot._startup_message["actions"],
                     "text": [self._gptbot._startup_message["text"]],
@@ -205,30 +207,24 @@ class Interface:
         # Select the final index of the message history through which this method will iterate
         N = len(self._history) if include_latest_response else len(self._history) - 1
 
-        # Prepare the character and user's names.
-        character_name = self._gptbot.character_name.upper()
-        username = self._gptbot.username.upper()
-
-        # Get the length of the longest name between the user and the chatbot.
-        self._max_name_len = max(len(character_name), len(username))
-
         # Iterate through the message history
         for entry in self._history[:N]:
             if entry["prompt"] is not None:
                 # If the current entry is a user message, format it and append it to the output list
-                output.append(f"{username:>{self._max_name_len}}: {entry['prompt'].strip()}")
+                output.append(f"{entry['username']}: {entry['prompt'].strip()}")
             if entry["spoken_text"]:
                 # If the current entry is a GPTBot message, format it and append it to the output list
-                output.append(f"{character_name:>{self._max_name_len}}: {entry['spoken_text'].strip()}")
+                output.append(f"{entry['character_name']}: {entry['spoken_text'].strip()}")
                 output.append("\n")  # Add a newline after the GPTBot message
 
         # If "include_latest_response" is False, print only the latest prompt if it is not None.
         if not include_latest_response:
-            if self._history[-1]["prompt"] is not None:
-                output.append(f"{username:>{self._max_name_len}}: {self._history[-1]['prompt'].strip()}")
-            current_output = f"{character_name:>{self._max_name_len}}:"
-            if self._history[-1]["spoken_text"] is not None:
-                current_output += self._history[-1]["spoken_text"].rstrip()
+            entry = self._history[-1]
+            if entry["prompt"] is not None:
+                output.append(f"{entry['username']}: {entry['prompt'].strip()}")
+            current_output = f"{entry['character_name']}:"
+            if entry["spoken_text"] is not None:
+                current_output += entry["spoken_text"]  # .rstrip()
             output.append(current_output)
 
         return output
@@ -391,6 +387,8 @@ class Interface:
                         self._history.append(
                             {
                                 "prompt": i.strip(),
+                                "username": self._gptbot.username.upper(),
+                                "character_name": self._gptbot.character_name.upper(),
                                 "emotion": None,
                                 "actions": [],
                                 "text": [],
@@ -403,6 +401,8 @@ class Interface:
                     self._history.append(
                         {
                             "prompt": entry,
+                            "username": self._gptbot.username.upper(),
+                            "character_name": self._gptbot.character_name.upper(),
                             "emotion": None,
                             "actions": [],
                             "text": [],
