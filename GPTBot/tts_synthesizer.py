@@ -5,6 +5,8 @@ import time
 import threading
 from typing import Optional
 
+import config
+
 
 class TTSSynthesizer:
     """
@@ -31,7 +33,8 @@ class TTSSynthesizer:
         """
         # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
-            subscription=os.environ.get("AZURE_SPEECH_KEY"), region=os.environ.get("AZURE_SPEECH_REGION")
+            subscription=os.environ.get(config.azure_cognitive_services_speech_api_key),
+            region=os.environ.get(config.azure_cognitive_services_speech_region),
         )
 
         # Create a lock that prevents race conditions when speaking & appending text

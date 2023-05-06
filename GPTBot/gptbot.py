@@ -145,7 +145,7 @@ class GPTBot:
         # Messages to print if a TooManyRequests exception occurs before the custom error messages are generated.
         self._request_messages = [
             {"actions": ["NULL()"], "emotion": "sad", "text": f"Rate limiting difficulties, retry attempt {i}."}
-            for i in range(config.request_retry_attempt_limit)
+            for i in range(config.retry_attempt_limit)
         ]
         self._force_quit_message = {
             "actions": ["EXIT()"],
@@ -524,7 +524,7 @@ class GPTBot:
         ]
 
         # Create threads that generate the rate limit messages to store in the _request_messages attribute
-        for i in range(config.request_retry_attempt_limit):
+        for i in range(config.retry_attempt_limit):
             threads.append(threading.Thread(target=self._thread_request_messages, args=(messages, i), daemon=True))
 
         return threads
@@ -784,7 +784,7 @@ class GPTBot:
         # Keep track of whether or not the request was successful
         success = False
         # Retry the request if it fails due to rate limiting
-        for i in range(config.request_retry_attempt_limit):
+        for i in range(config.retry_attempt_limit):
             try:
                 # Send request to OpenAI API and retrieve response
                 if mode == "ChatCompletion":
@@ -1111,10 +1111,6 @@ class GPTBot:
 
         # Parse response and retry if unsuccessful
         response_parsed, success = self._response_parse(response=response)
-        retry_attempts = 0
-        while not success and retry_attempts < config.retry_attempt_limit:
-            response_parsed, success = self._response_parse(response=response)
-            retry_attempts += 1
 
         # Unparse parsed response and append to conversation history
         response_unparsed = self._response_unparse(**response_parsed)

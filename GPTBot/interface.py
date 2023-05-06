@@ -243,7 +243,7 @@ class Interface:
             # Set the origin of the output window to the bottom
             self._output_window._origin = (bottom, 0)
 
-    def _shutdown_output(self) -> None:
+    def _shutdown(self) -> None:
         """
         Prepares the output for shutdown by summarizing the conversation and displaying it in the output window.
         """
@@ -353,7 +353,7 @@ class Interface:
                     )
                     self._gptbot._history_append(role="assistant", content=message_unparsed)
                     if self._shutdown:
-                        self._shutdown_output()
+                        self._shutdown()
 
             time.sleep(0.005)
 

@@ -28,7 +28,9 @@ To initiate the GPTBot interface, navigate to the `GPTBot` subdirectory and exec
 
 `python interface.py --character [character]`
 
-Replace [character] with your preferred chatbot character (optional). If no character is specified, GPTBot defaults to Marvin the Paranoid Android.
+Replace [character] with your preferred chatbot character (optional). It is recommended to use second-person singular in the format "<name> from <context>, <additional details>", for example "Marvin the Paranoid Android.  You are a sad robot with a brain the size of a planet."
+
+If no character is specified, GPTBot defaults to Marvin the Paranoid Android.
 
 Alternatively, let the interface randomly select a character with:
 
@@ -44,6 +46,9 @@ The program accepts the following command-line arguments:
 * `-c` or `--character`: Provide a name and/or short description of the character GPTBot should emulate. It is recommended to use second-person singular in the format "<name> from <context>, <additional details>",
 * `-m` or `--mode`: Select an OpenAI API mode, either "ChatCompletion" or "Completion"; defaults to "ChatCompletion",
 * `-r`, `--rand`, or `--random`: Override the "character" argument and select a random character.
+* `-n`, `--no-thread`: Disable multithreading on initialization of GPTBot (can help with "Too Many Requests" exceptions).
+* `-g`, `--gpt4`: Enable GPT-4; overrides --mode and --no-thread flag, and only works if you have GPT-4 API access.
+* `-t`, `--temp` or `--temperature`: Set the model temperature.
 
 ## Dependencies
 1. `openai`: The OpenAI library is a Python package that provides a convenient and user-friendly way to interact with the OpenAI API. It allows developers to access various AI models, such as GPT-3, for tasks like natural language processing, translation, and text generation.
