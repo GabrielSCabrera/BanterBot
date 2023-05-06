@@ -1,10 +1,10 @@
 """
-The GPTBot class is a chatbot implemented using the OpenAI ChatGPT architecture, designed to carry on conversations with
-users. The class consists of several methods that allow it to process input messages, generate responses, and store a
-history of the conversation. The bot is capable of handling interruptions from the user, parsing user input to extract
+The Persona class is a chatbot implemented using the OpenAI ChatGPT architecture, designed to carry on conversations
+with users. The class consists of several methods that allow it to process input messages, generate responses, and store
+a history of the conversation. The bot is capable of handling interruptions from the user, parsing user input to extract
 relevant information, and generating responses in a specified emotional state.
 
-The key features of the GPTBot class include:
+The key features of the Persona class include:
 
     * Support for interrupting the bot mid-response.
     * The ability to generate responses in a specified emotional state.
@@ -12,7 +12,7 @@ The key features of the GPTBot class include:
     * The ability to summarize the conversation history.
     * Streaming responses to allow for asynchronous chat conversations.
 
-Overall, the GPTBot class provides a robust chatbot framework that can be customized to fit a wide range of
+Overall, the Persona class provides a robust chatbot framework that can be customized to fit a wide range of
 applications.
 """
 
@@ -33,7 +33,7 @@ import spacy.cli
 import tiktoken
 
 import termighty
-import config
+from gptbot import config
 
 
 class ParsedResponse(TypedDict):
@@ -67,11 +67,11 @@ class MessageDict(TypedDict):
     name: Optional[str] = None
 
 
-class GPTBot:
+class Persona:
     """
-    GPTBot is a class for interacting with an AI language model while maintaining a consistent character and
-    voice based on the selected personality. The class handles various tasks such as fetching weather data,
-    generating responses in a structured format, and handling interruptions.
+    Persona is a class for interacting with an AI language model while maintaining a consistent character and voice
+    based on the selected personality. The class handles various tasks such as fetching weather data, generating
+    responses in a structured format, and handling interruptions.
 
     Args:
         model (str, optional): The OpenAI model to use. Defaults to None.
@@ -91,7 +91,7 @@ class GPTBot:
         temperature: float = 0.7,
     ) -> None:
         """
-        Initializes the GPTBot instance with the given model, character, random_character flag, and username.
+        Initializes the Persona instance with the given model, character, random_character flag, and username.
         Sets up the API key, geocoder, tokenizer, and initializes the character traits and startup message.
 
         Args:
@@ -109,11 +109,15 @@ class GPTBot:
 
         try:
             # Initialize a spaCy model for English
-            self._nlp = spacy.load("en_core_web_sm", disable=["tagger", "attribute_ruler", "lemmatizer"])
+            self._nlp = spacy.load(config.spacy_model, disable=["tagger", "attribute_ruler", "lemmatizer"])
         except OSError:
-            spacy.cli.download("en_core_web_sm")
-            self._nlp = spacy.load("en_core_web_sm", disable=["tagger", "attribute_ruler", "lemmatizer"])
+            # If the model isn't downloaded, download it.
+            print(f'Downloading SpaCy language model: "{config.spacy_model}". This will only happen once.\n\n\n')
+            spacy.cli.download(config.spacy_model)
+            print(f'\n\n\nDownload of "{config.spacy_model}" Complete.')
+            self._nlp = spacy.load(config.spacy_model, disable=["tagger", "attribute_ruler", "lemmatizer"])
 
+        # Since we only need SpaCy to split sentences, we disable the parser pipe to improve performance.
         self._nlp.disable_pipe("parser")
         self._nlp.enable_pipe("senter")
 
@@ -200,7 +204,7 @@ class GPTBot:
         Returns the short-form name of the selected character.
 
         Returns:
-            str: The name of the GPTBot's selected character.
+            str: The name of the Persona's selected character.
         """
         return self._name
 
@@ -210,7 +214,7 @@ class GPTBot:
         Returns the name of the user.
 
         Returns:
-            str: The name of the GPTBot's user.
+            str: The name of the Persona's user.
         """
         return self._username
 
@@ -220,7 +224,7 @@ class GPTBot:
         Modifies the name of the user.
 
         Args:
-            username (str): The updated name of the GPTBot's user.
+            username (str): The updated name of the Persona's user.
         """
         self._username = username.capitalize() if username is not None else "USER"
 
@@ -248,7 +252,7 @@ class GPTBot:
             # Make API call to get weather data
             url = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={lat}&lon={lon}"
             headers = {
-                "User-Agent": "GPTBot/0.0.1 github.com/GabrielSCabrera/GPTBot",
+                "User-Agent": "Persona/0.0.1 github.com/GabrielSCabrera/Persona",
                 "From": "gabriel.sigurd.cabrera@gmail.com",
             }
             try:
@@ -676,7 +680,7 @@ class GPTBot:
                 response_text += chunk["choices"][0]["text"]
 
             else:
-                raise ValueError('Invalid "mode" selection for method "_response_parse_stream" in GPTBot.')
+                raise ValueError('Invalid "mode" selection for method "_response_parse_stream" in Persona.')
 
             # Extract actions if they have not already been extracted
             if not actions_complete:
@@ -779,7 +783,7 @@ class GPTBot:
             if "prompt" in kwargs.keys():
                 del kwargs["prompt"]
         else:
-            raise ValueError('Invalid "mode" selection for method "_request" in GPTBot.')
+            raise ValueError('Invalid "mode" selection for method "_request" in Persona.')
 
         # Keep track of whether or not the request was successful
         success = False
@@ -948,7 +952,7 @@ class GPTBot:
     def _thread_force_quit_message(self) -> None:
         """
         Initializes the force quit message to be displayed when the OpenAI API rate limit is exceeded and the
-        GPTBot instance is shutting down. Uses the character's persona to generate the message.
+        Persona instance is shutting down. Uses the character's persona to generate the message.
         """
         # Set up the prompt for the AI to generate an error response
         prompt = (

@@ -5,7 +5,7 @@ import time
 import threading
 from typing import Optional
 
-import config
+from gptbot import config
 
 
 class TTSSynthesizer:
@@ -16,8 +16,7 @@ class TTSSynthesizer:
     The `TTSSynthesizer` class initializes the Azure speech configuration with the subscription key and region stored in
     environment variables. The `speak()` method is used to speak the specified text using the specified voice and style,
     and the audio is generated asynchronously. The `_text_generator()` method is used to monitor the synthesis progress
-    and update the output accordingly. The `_reset()` method is used to reset the state variables of the TTS
-    synthesizer.
+    and update the output accordingly. The `_reset()` method is used to reset the state variables of `TTSSynthesizer`.
     """
 
     def __init__(

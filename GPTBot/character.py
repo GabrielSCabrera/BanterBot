@@ -1,7 +1,7 @@
-from gptbot import GPTBot
+from gptbot.persona import Persona
 
 
-class Character(GPTBot):
+class Character(Persona):
     def __init__(
         self,
         model: Optional[str] = None,

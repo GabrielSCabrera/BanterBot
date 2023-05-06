@@ -16,34 +16,42 @@ Features
 
 Requires three environment variables for full functionality:
 
-1. `OPENAI_API_KEY`: A valid OpenAI API key,
-2. `AZURE_SPEECH_KEY`: A valid Azure Cognitive Services Speech API key for TTS functionality,
-3. `AZURE_SPEECH_REGION`: The region associated with your Azure Cognitive Services Speech API key.
+* `OPENAI_API_KEY`: A valid OpenAI API key,
+* `AZURE_SPEECH_KEY`: A valid Azure Cognitive Services Speech API key for TTS functionality,
+* `AZURE_SPEECH_REGION`: The region associated with your Azure Cognitive Services Speech API key.
 
 ## Usage
 
+### Manual Installation
+
+To install and initiate the GPTBot interface, follow these steps:
+
+1. Clone the GPTBot repository and navigate to the cloned directory.
+2. Install the necessary package by running `python -m pip install .` in your terminal.
+3. Launch the GPTBot Command Line Interface (CLI) by executing the `gptbot` command.
+
 ### Basics
 
-To initiate the GPTBot interface, navigate to the `GPTBot` subdirectory and execute the following command in your terminal:
+For character customization, utilize the optional `--character` argument as follows:
 
-`python interface.py --character [character]`
+`gptbot --character [character]`
 
-Replace [character] with your preferred chatbot character (optional). It is recommended to use second-person singular in the format "<name> from <context>, <additional details>", for example "Marvin the Paranoid Android.  You are a sad robot with a brain the size of a planet."
+Replace `[character]` with your desired chatbot character. It is advised to use second-person singular in the format "<name> from <context>, <additional details>". For example, "Marvin the Paranoid Android. You are a sad robot with a brain the size of a planet."
 
-If no character is specified, GPTBot defaults to Marvin the Paranoid Android.
+If no character is specified, `GPTBot` will default to Marvin the Paranoid Android.
 
-Alternatively, let the interface randomly select a character with:
+For a randomly selected character, simply use:
 
-`python interface.py --random`
+`gptbot --random`
 
-Upon launching the interface, enter your messages in the input box, and GPTBot will respond in the output window. You can also listen to GPTBot's responses through synthesized speech.
+Once the interface is launched, type your messages in the input box, and GPTBot will generate responses in the output window. Additionally, you can listen to GPTBot's responses through synthesized speech.
 
 ### Available Command-Line Arguments
 
 The program accepts the following command-line arguments:
 
 * `-u` or `--username`: Specify the name of the program's user (one word, no spaces),
-* `-c` or `--character`: Provide a name and/or short description of the character GPTBot should emulate. It is recommended to use second-person singular in the format "<name> from <context>, <additional details>",
+* `-c` or `--character`: Provide a name and/or short description of the persona GPTBot should emulate. It is recommended to use second-person singular in the format "<name> from <context>, <additional details>",
 * `-m` or `--mode`: Select an OpenAI API mode, either "ChatCompletion" or "Completion"; defaults to "ChatCompletion",
 * `-r`, `--rand`, or `--random`: Override the "character" argument and select a random character.
 * `-n`, `--no-thread`: Disable multithreading on initialization of GPTBot (can help with "Too Many Requests" exceptions).

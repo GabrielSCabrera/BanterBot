@@ -1,5 +1,5 @@
 """
-This program defines an interface for a text-based conversational agent based on the GPTBot class. The program uses the
+This program defines an interface for a text-based conversational agent based on the Persona class. The program uses the
 termighty library to create a graphical user interface for user interaction and handles input and output processing, as
 well as text-to-speech synthesis.
 
@@ -7,17 +7,18 @@ The Interface class defines a number of methods for initializing the GUI, proces
 messages for output, scrolling the output window to the latest messages, preparing the output for shutdown by
 summarizing the conversation and displaying it in the output window, and starting the Interface.
 
-The program also defines several threads for handling the output of text to the output window, speaking the GPTBot's
-responses using the TTSSynthesizer, and generating GPTBot responses based on user input.
+The program also defines several threads for handling the output of text to the output window, speaking the Persona's
+responses using the TTSSynthesizer, and generating Persona responses based on user input.
 
-The program takes command-line arguments for specifying the character to use for GPTBot, either by name or randomly. If
+The program takes command-line arguments for specifying the character to use for Persona, either by name or randomly. If
 no argument is provided, the default is None.
 
 Overall, this program provides a framework for creating a text-based conversational agent with a user-friendly graphical
-interface, using the GPTBot class for generating responses and the termighty library for handling input and output
+interface, using the Persona class for generating responses and the termighty library for handling input and output
 processing.
 """
 import argparse
+import datetime
 import re
 import sys
 import threading
@@ -25,17 +26,17 @@ import time
 from typing import Literal, Optional
 
 from termighty import Listener, System, Term, TextBox
-from termighty_input_box import InputBox
-from termighty_output_box import OutputBox
 
-import config
-from gptbot import GPTBot
-from tts_synthesizer import TTSSynthesizer
+from gptbot import config
+from gptbot.input_box import InputBox
+from gptbot.output_box import OutputBox
+from gptbot.persona import Persona
+from gptbot.tts_synthesizer import TTSSynthesizer
 
 
 class Interface:
     """
-    A class representing a text-based conversational interface for a GPTBot. It provides a graphical user interface for
+    A class representing a text-based conversational interface for a Persona. It provides a graphical user interface for
     user interaction and handles input and output processing, as well as text-to-speech synthesis.
     """
 
@@ -52,15 +53,18 @@ class Interface:
         temperature: float = 1.0,
     ) -> None:
         """
-        Initializes the Interface class with specified border and background colors, and GPTBot character settings.
+        Initializes the Interface class with specified border and background colors, and Persona character settings.
 
         Args:
             border_color (str): The color of the border, default is "Charcoal".
             background_color (str): The color of the background, default is "Black".
-            character (str): The name of the character to use for GPTBot, default is None.
+            character (str): The name of the character to use for Persona, default is None.
             random_character (bool): If True, chooses a random character, default is False.
             username (str): The name of the user.
         """
+        # Saving the initialization timestamp.
+        self._init_timestamp = datetime.datetime.now()
+
         # Set the colors for the border and background of the interface
         self._border_color = border_color
         self._background_color = background_color
@@ -68,7 +72,7 @@ class Interface:
         # Select the API temperature.
         self._temperature = temperature
 
-        # Have the GPTBot use the GPT-4 API
+        # Have the Persona use the GPT-4 API
         if gpt4:
             model = "gpt-4"
             mode = "ChatCompletion"
@@ -76,8 +80,8 @@ class Interface:
         else:
             model = None
 
-        # Initialize a new instance of the GPTBot class with the specified character settings
-        self._gptbot = GPTBot(
+        # Initialize a new instance of the Persona class with the specified character settings
+        self._persona = Persona(
             model=model,
             character=character,
             random_character=random_character,
@@ -111,20 +115,88 @@ class Interface:
         # Initialize the graphical user interface for the Interface class
         self._init_gui()
 
-        # Append the startup message for the GPTBot to the history of messages
+        # Append the startup message for the Persona to the history of messages
         with self._history_lock:
             self._history.append(
                 {
                     "prompt": None,
-                    "username": self._gptbot.username.upper(),
-                    "character_name": self._gptbot.character_name.upper(),
-                    "emotion": self._gptbot._startup_message["emotion"],
-                    "actions": self._gptbot._startup_message["actions"],
-                    "text": [self._gptbot._startup_message["text"]],
+                    "username": self._persona.username.upper(),
+                    "character_name": self._persona.character_name.upper(),
+                    "emotion": self._persona._startup_message["emotion"],
+                    "actions": self._persona._startup_message["actions"],
+                    "text": [self._persona._startup_message["text"]],
                     "spoken_text": None,
                     "completed": True,
                 }
             )
+
+    @property
+    def input_history(self) -> list[str, ...]:
+        """
+        Property that returns the input history of the interface, which contains user inputs.
+
+        Returns:
+            list[str, ...]: List of strings representing the input history.
+        """
+        return self._input_window._inputs
+
+    def _execute_shutdown(self) -> None:
+        """
+        Prepares the output for shutdown by summarizing the conversation and displaying it in the output window.
+        """
+
+        # Get the formatted conversation history and the summary message
+        output = self._history_process(include_latest_response=True) + ["\n", self._persona._summarize_conversation()]
+
+        # Save the chat history.
+        self._save_log(output=output)
+
+        # Display the conversation and summary in the output window
+        self._output_window(output)
+
+        # Scroll to the bottom of the output window to show the latest messages
+        self._scroll(force_scroll=True)
+
+    def _history_process(self, include_latest_response: bool = True) -> list[str]:
+        """
+        Process and format the message history to display in the output window.
+
+        Args:
+            include_latest_response[bool]: A boolean that omits the latest historical output if set to False.
+
+        Returns:
+            list[str]: A list of formatted strings representing the message history.
+        """
+        # Initialize an empty list to store the formatted strings
+        output = []
+
+        # Select the final index of the message history through which this method will iterate
+        N = len(self._history) if include_latest_response else len(self._history) - 1
+
+        # Iterate through the message history
+        for entry in self._history[:N]:
+            if entry["prompt"] is not None:
+                # If the current entry is a user message, format it and append it to the output list
+                output.append(f"{entry['username']}: {entry['prompt'].strip()}")
+            if entry["spoken_text"]:
+                # If the current entry is a Persona message, format it and append it to the output list
+                output.append(f"{entry['character_name']}: {entry['spoken_text'].strip()}")
+                output.append("\n")  # Add a newline after the Persona message
+
+        # If "include_latest_response" is False, print only the latest prompt if it is not None.
+        if not include_latest_response:
+            entry = self._history[-1]
+            if entry["prompt"] is not None:
+                output.append(f"{entry['username']}: {entry['prompt'].strip()}")
+            current_output = f"{entry['character_name']}:"
+            if entry["spoken_text"] is not None:
+                current_output += entry["spoken_text"]  # .rstrip()
+            output.append(current_output)
+
+        # Save the history to the chat log.
+        self._save_log(output=output)
+
+        return output
 
     def _init_gui(self) -> None:
         """
@@ -181,54 +253,6 @@ class Interface:
         self._title(["Conversation History"])
         self._input_prompt([input_prompt_text])
 
-    @property
-    def input_history(self) -> list[str, ...]:
-        """
-        Property that returns the input history of the interface, which contains user inputs.
-
-        Returns:
-            list[str, ...]: List of strings representing the input history.
-        """
-        return self._input_window._inputs
-
-    def _history_process(self, include_latest_response: bool = True) -> list[str]:
-        """
-        Process and format the message history to display in the output window.
-
-        Args:
-            include_latest_response[bool]: A boolean that omits the latest historical output if set to False.
-
-        Returns:
-            list[str]: A list of formatted strings representing the message history.
-        """
-        # Initialize an empty list to store the formatted strings
-        output = []
-
-        # Select the final index of the message history through which this method will iterate
-        N = len(self._history) if include_latest_response else len(self._history) - 1
-
-        # Iterate through the message history
-        for entry in self._history[:N]:
-            if entry["prompt"] is not None:
-                # If the current entry is a user message, format it and append it to the output list
-                output.append(f"{entry['username']}: {entry['prompt'].strip()}")
-            if entry["spoken_text"]:
-                # If the current entry is a GPTBot message, format it and append it to the output list
-                output.append(f"{entry['character_name']}: {entry['spoken_text'].strip()}")
-                output.append("\n")  # Add a newline after the GPTBot message
-
-        # If "include_latest_response" is False, print only the latest prompt if it is not None.
-        if not include_latest_response:
-            entry = self._history[-1]
-            if entry["prompt"] is not None:
-                output.append(f"{entry['username']}: {entry['prompt'].strip()}")
-            current_output = f"{entry['character_name']}:"
-            if entry["spoken_text"] is not None:
-                current_output += entry["spoken_text"]  # .rstrip()
-            output.append(current_output)
-
-        return output
-
     def _scroll(self, force_scroll: bool = False) -> None:
         """
         Scrolls the output window to the latest messages, ensuring that the most recent conversation is visible.
@@ -243,19 +267,35 @@ class Interface:
             # Set the origin of the output window to the bottom
             self._output_window._origin = (bottom, 0)
 
-    def _shutdown(self) -> None:
+    def _save_log(self, output: list[str, ...]) -> None:
         """
-        Prepares the output for shutdown by summarizing the conversation and displaying it in the output window.
+        Save the chat log to file.
+
+        Args:
+            output (list[str, ...]): The list of strings to save to the log.
         """
+        # Check that the "Conversations" directory exists -- if not, create it.
+        directory = config.filesystem / "Conversations"
+        directory.mkdir(parents=True, exist_ok=True)
 
-        # Get the formatted conversation history and the summary message
-        output = self._history_process(include_latest_response=True) + ["\n", self._gptbot._summarize_conversation()]
+        # Converting the initialization timestamp to a format that can be used in a file name.
+        timestamp = self._init_timestamp.strftime("%Y%m%dT%H%M%S")
 
-        # Display the conversation and summary in the output window
-        self._output_window(output)
+        # Prepare a description of the user's character initialization prompt.
+        initialization_prompt = config.initialization_prompt.format(self._persona._character)
 
-        # Scroll to the bottom of the output window to show the latest messages
-        self._scroll(force_scroll=True)
+        # Prepare a string giving time context.
+        context = self._init_timestamp.strftime("%Y-%m-%d at %H:%M:%S")
+
+        # Combining all the outputs.
+        output = [context, "", initialization_prompt, "", ""] + output
+
+        # Creating a filename for the chat log.
+        path = directory / f"{self._persona.character_name}_{timestamp}.txt"
+
+        # Write the conversation to file.
+        with open(path, "w+") as fs:
+            fs.write("\n".join([i.strip() for i in output]))
 
     def _thread_output_text(self) -> None:
         """
@@ -294,7 +334,7 @@ class Interface:
 
     def _thread_speak(self) -> None:
         """
-        Thread that handles speaking the GPTBot's responses using the TTSSynthesizer. It monitors the history
+        Thread that handles speaking the Persona's responses using the TTSSynthesizer. It monitors the history
         and synthesizes speech for new responses.
         """
 
@@ -308,7 +348,7 @@ class Interface:
             self._interrupt = False
 
             # check if there are new entries in the history
-            with self._gptbot._history_lock:
+            with self._persona._history_lock:
                 if len_history > N:
                     # get the latest entry in the history
                     entry = self._history[len_history - 1]
@@ -321,7 +361,7 @@ class Interface:
                             # synthesize speech for the response
                             self._tts_synthesizer.speak(
                                 entry["text"][idx],
-                                voice_name=self._gptbot._voice,
+                                voice_name=self._persona._voice,
                                 style=entry["emotion"],
                             )
 
@@ -342,25 +382,25 @@ class Interface:
                                 for action in entry["actions"]:
                                     if search := re.findall(self._action_patterns["SAVE_USER_NAME(NAME)"], action):
                                         new_name = search[0][1].strip().split(" ")[0].strip().title()
-                                        self._gptbot.username = new_name
+                                        self._persona.username = new_name
 
                         time.sleep(0.005)
                     N = len_history
 
-                    # unparsed the response to a string and append it to GPTBot's message history
-                    message_unparsed = self._gptbot._response_unparse(
+                    # unparsed the response to a string and append it to Persona's message history
+                    message_unparsed = self._persona._response_unparse(
                         actions=entry["actions"], emotion=entry["emotion"], text=entry["spoken_text"]
                     )
-                    self._gptbot._history_append(role="assistant", content=message_unparsed)
+                    self._persona._history_append(role="assistant", content=message_unparsed)
                     if self._shutdown:
-                        self._shutdown()
+                        self._execute_shutdown()
 
             time.sleep(0.005)
 
     def _thread_gpt_response(self) -> None:
         """
-        Thread that handles generating GPTBot responses based on user input. It processes user input and generates
-        appropriate responses using the GPTBot class.
+        Thread that handles generating Persona responses based on user input. It processes user input and generates
+        appropriate responses using the Persona class.
         """
 
         # Tracks the last processed input
@@ -387,8 +427,8 @@ class Interface:
                         self._history.append(
                             {
                                 "prompt": i.strip(),
-                                "username": self._gptbot.username.upper(),
-                                "character_name": self._gptbot.character_name.upper(),
+                                "username": self._persona.username.upper(),
+                                "character_name": self._persona.character_name.upper(),
                                 "emotion": None,
                                 "actions": [],
                                 "text": [],
@@ -401,8 +441,8 @@ class Interface:
                     self._history.append(
                         {
                             "prompt": entry,
-                            "username": self._gptbot.username.upper(),
-                            "character_name": self._gptbot.character_name.upper(),
+                            "username": self._persona.username.upper(),
+                            "character_name": self._persona.character_name.upper(),
                             "emotion": None,
                             "actions": [],
                             "text": [],
@@ -411,8 +451,8 @@ class Interface:
                         }
                     )
 
-                # Generate GPTBot responses based on the input
-                for response in self._gptbot.prompt_stream(entry, temperature=self._temperature):
+                # Generate Persona responses based on the input
+                for response in self._persona.prompt_stream(entry, temperature=self._temperature):
                     # If there is a new input before the response is finished, stop generating responses for this input
                     if idx < len(self._input_window._inputs) - 1:
                         break
@@ -444,17 +484,17 @@ class Interface:
 
     def interrupt(self):
         """
-        Interrupts the current text-to-speech synthesis and GPTBot processing. It stops ongoing actions and
+        Interrupts the current text-to-speech synthesis and Persona processing. It stops ongoing actions and
         updates the history to reflect the interruption.
         """
-        # Stop TTS synthesis and GPTBot processing
+        # Stop TTS synthesis and Persona processing
         self._tts_synthesizer.interrupt()
-        self._gptbot.interrupt()
+        self._persona.interrupt()
         self._interrupt = True
 
         # Only mark as interruption if TTS synthesis is ongoing
         if not self._tts_synthesizer._synthesis_completed:
-            self._gptbot._history_append_interruption()
+            self._persona._history_append_interruption()
 
     def start(self) -> None:
         """
@@ -479,7 +519,7 @@ class Interface:
         # start input box
         self._input_window.start()
 
-        # start threads for output text, speaking GPTBot's responses, and generating GPTBot responses
+        # start threads for output text, speaking Persona's responses, and generating Persona responses
         thread_output_text = threading.Thread(target=self._thread_output_text, daemon=True)
         thread_speak = threading.Thread(target=self._thread_speak, daemon=True)
         thread_gpt_response = threading.Thread(target=self._thread_gpt_response, daemon=True)
@@ -487,100 +527,3 @@ class Interface:
         thread_output_text.start()
         thread_speak.start()
         thread_gpt_response.start()
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(
-        prog="GPTBot Interface",
-        description=(
-            "This program defines an interface for a text-based conversational agent based on the GPTBot class. The "
-            "program uses the termighty library to create a graphical user interface for user interaction and handles "
-            "input and output processing, as well as text-to-speech synthesis."
-        ),
-        epilog=(
-            "Requires three environment variables for full functionality. "
-            "1) OPENAI_API_KEY: A valid OpenAI API key, "
-            "2) AZURE_SPEECH_KEY: A valid Azure Cognitive Services Speech API key for TTS functionality, and "
-            "3) AZURE_SPEECH_REGION: The region associated with your Azure Cognitive Services Speech API key."
-        ),
-    )
-
-    parser.add_argument(
-        "-u",
-        "--username",
-        type=str,
-        dest="username",
-        help="The name of the program's user, only one word without spaces is allowed.",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--character",
-        type=str,
-        dest="character",
-        help=(
-            "A name and/or short description of the character GPTBot should emulate. For best results, use the "
-            'second-person singular to describe the character, in the form "<name> from <context>, <details>".'
-        ),
-    )
-
-    parser.add_argument(
-        "-m",
-        "--mode",
-        choices=["ChatCompletion", "Completion"],
-        default="ChatCompletion",
-        type=str,
-        dest="mode",
-        help="OpenAI API Selection. ChatCompletion is cheaper, but often not as good unless you have GPT-4 access.",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--rand",
-        "--random",
-        action="store_true",
-        dest="random",
-        help='Override the "character" argument and have the program select a random character.',
-    )
-
-    parser.add_argument(
-        "-n",
-        "--no-thread",
-        action="store_false",
-        dest="nothread",
-        help='Disable multithreading on initialization of GPTBot (can help with "Too Many Requests" exceptions).',
-    )
-
-    parser.add_argument(
-        "-g",
-        "--gpt4",
-        action="store_true",
-        dest="gpt4",
-        help="Enable GPT-4; overrides --mode and --no-thread flag, and only works if you have GPT-4 API access.",
-    )
-
-    parser.add_argument(
-        "-t",
-        "--temp",
-        "--temperature",
-        type=float,
-        dest="temperature",
-        help="Set the model temperature.",
-    )
-
-    args = parser.parse_args()
-
-    kwargs = {
-        "username": args.username,
-        "character": args.character,
-        "mode": args.mode,
-        "random_character": args.random,
-        "thread_on_init": args.nothread,
-        "gpt4": args.gpt4,
-        "temperature": args.temperature,
-    }
-
-    print("Loading...")
-    interface = Interface(**kwargs)
-    interface.start()

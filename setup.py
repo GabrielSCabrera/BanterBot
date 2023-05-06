@@ -9,8 +9,7 @@ with open("README.md", "r") as fs:
 
 setup(
     name="GPTBot",
-    packages=find_packages(where="GPTBot"),
-    package_dir={"": "GPTBot"},
+    packages=find_packages(),
     version="0.0.1",
     description="ChatGPT-Powered Interactive Assistant",
     long_description=long_description,
@@ -24,4 +23,7 @@ setup(
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3.11",
     ],
+    entry_points={
+        "console_scripts": ["gptbot=gptbot.cli:run"],
+    },
 )

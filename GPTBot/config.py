@@ -1,3 +1,9 @@
+from pathlib import Path
+
+# Initialize the filesystem for GPTBot.
+filesystem = Path.home() / "Documents" / "GPTBot"
+filesystem.mkdir(parents=True, exist_ok=True)
+
 # Set up available actions. If you add custom actions, be sure that they always end in parentheses.
 actions = (
     "MOVE_FORWARD(DISTANCE)",
@@ -53,6 +59,9 @@ default_chat_gpt_models = {
 openai_api_key_env_variable = "OPENAI_API_KEY"
 azure_cognitive_services_speech_api_key = "AZURE_SPEECH_KEY"
 azure_cognitive_services_speech_region = "AZURE_SPEECH_REGION"
+
+# The SpaCy language model to use with the Persona class.
+spacy_model = "en_core_web_sm"
 
 # Maximum number of times to reattempt a request with the ChatCompletion or Completion APIs.
 retry_attempt_limit = 2
