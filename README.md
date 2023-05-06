@@ -46,6 +46,10 @@ For a randomly selected character, simply use:
 
 Once the interface is launched, type your messages in the input box, and GPTBot will generate responses in the output window. Additionally, you can listen to GPTBot's responses through synthesized speech.
 
+### Chat Logs
+
+Chats are saved in the `$HOME/Documents/GPTBot/Conversations/` directory in individual `.txt` files; these contain the initial prompt, as well as the timestamp and chat log.
+
 ### Available Command-Line Arguments
 
 The program accepts the following command-line arguments:
