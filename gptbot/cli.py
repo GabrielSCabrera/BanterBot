@@ -4,7 +4,7 @@ from gptbot.interface import Interface
 
 def run():
     parser = argparse.ArgumentParser(
-        prog="Persona Interface",
+        prog="GPTBot Command Line Interface",
         description=(
             "This program defines an interface for a text-based conversational agent based on the Persona class. The "
             "program uses the termighty library to create a graphical user interface for user interaction and handles "
