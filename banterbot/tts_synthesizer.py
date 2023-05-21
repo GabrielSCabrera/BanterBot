@@ -5,7 +5,7 @@ import time
 import threading
 from typing import Optional
 
-from gptbot import config
+from banterbot import config
 
 
 class TTSSynthesizer:

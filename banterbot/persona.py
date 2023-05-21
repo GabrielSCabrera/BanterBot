@@ -33,7 +33,7 @@ import spacy.cli
 import tiktoken
 
 import termighty
-from gptbot import config
+from banterbot import config
 
 
 class ParsedResponse(TypedDict):
@@ -802,7 +802,7 @@ class Persona:
                 # If the request fails due to rate limiting, append a rate limit message to the chat history
                 self._history_append(self._request_messages[i])
                 # Wait for a short period before retrying the request
-                time.sleep(5)
+                time.sleep(0.5)
 
         if not success:
             # If the request fails after all retries, append a force quit message to the chat history

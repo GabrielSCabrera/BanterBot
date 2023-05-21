@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 
 dependencies = ["openai", "tiktoken", "geocoder", "requests", "termighty", "azure-cognitiveservices-speech", "spacy"]
 
-url = "https://github.com/GabrielSCabrera/GPTBot"
+url = "https://github.com/GabrielSCabrera/BanterBot"
 
 with open("README.md", "r") as fs:
     long_description = fs.read()
 
 setup(
-    name="GPTBot",
+    name="BanterBot",
     packages=find_packages(),
     version="0.0.1",
     description="ChatGPT-Powered Interactive Assistant",
@@ -24,6 +24,6 @@ setup(
         "Programming Language :: Python :: 3.11",
     ],
     entry_points={
-        "console_scripts": ["gptbot=gptbot.cli:run"],
+        "console_scripts": ["banterbot=banterbot.cli:run"],
     },
 )

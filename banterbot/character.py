@@ -1,4 +1,4 @@
-from gptbot.persona import Persona
+from banterbot.persona import Persona
 
 
 class Character(Persona):

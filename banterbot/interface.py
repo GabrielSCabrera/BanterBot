@@ -27,11 +27,11 @@ from typing import Literal, Optional
 
 from termighty import Listener, System, Term, TextBox
 
-from gptbot import config
-from gptbot.input_box import InputBox
-from gptbot.output_box import OutputBox
-from gptbot.persona import Persona
-from gptbot.tts_synthesizer import TTSSynthesizer
+from banterbot import config
+from banterbot.input_box import InputBox
+from banterbot.output_box import OutputBox
+from banterbot.persona import Persona
+from banterbot.tts_synthesizer import TTSSynthesizer
 
 
 class Interface:
@@ -291,7 +291,7 @@ class Interface:
         output = [context, "", initialization_prompt, "", ""] + output
 
         # Creating a filename for the chat log.
-        path = directory / f"{self._persona.character_name}_{timestamp}.txt"
+        path = directory / f"{timestamp}_{self._persona.character_name}.txt"
 
         # Write the conversation to file.
         with open(path, "w+") as fs:

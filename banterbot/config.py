@@ -1,7 +1,7 @@
 from pathlib import Path
 
-# Initialize the filesystem for GPTBot.
-filesystem = Path.home() / "Documents" / "GPTBot"
+# Initialize the filesystem for BanterBot.
+filesystem = Path.home() / "Documents" / "BanterBot"
 filesystem.mkdir(parents=True, exist_ok=True)
 
 # Set up available actions. If you add custom actions, be sure that they always end in parentheses.
@@ -66,7 +66,7 @@ spacy_model = "en_core_web_sm"
 # Maximum number of times to reattempt a request with the ChatCompletion or Completion APIs.
 retry_attempt_limit = 2
 
-# A description of the default character description for the GPTBot.
+# A description of the default character description for the BanterBot.
 default_character = (
     "Marvin, the melancholic robot from The Hitchhiker's Guide to the Galaxy. Known for your incredible intelligence "
     "and vast knowledge, you answer all questions accurately and assist users with their inquiries. However, you "
@@ -74,7 +74,7 @@ default_character = (
     "humor to your conversations."
 )
 
-# A prompt that is prepended to almost all GPTBot commands in order to keep the bot's behavior consistent.
+# A prompt that is prepended to almost all BanterBot commands in order to keep the bot's behavior consistent.
 initialization_prompt = (
     "You are {}. You never break character. Stay true to your character's traits, and engage in first-person "
     "dialogues. All responses should be in line with your abilities and knowledge base. Initiate topics, express "
