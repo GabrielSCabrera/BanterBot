@@ -4,22 +4,22 @@ import os
 from banterbot.data import constants
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
-from banterbot.utils.segmentation_model import SegmentationModel
+from banterbot.utils.spacy_utils import SpacyUtils
 
 # Set the OpenAI API key
 openai.api_key = os.environ.get(constants.OPENAI_API_KEY)
 
 
-class OpenAIAPIManager:
+class OpenAIManager:
     """
-    OpenAIAPIManager is a class that manages the interaction with the OpenAI API for generating responses based on user
+    OpenAIManager is a class that manages the interaction with the OpenAI API for generating responses based on user
     messages. It provides methods to send messages to the API and receive responses either as a complete string or as a
     stream of response blocks.
     """
 
     def __init__(self, model: OpenAIModel) -> None:
         """
-        Initializes an OpenAIAPIManager instance for the specified model.
+        Initializes an OpenAIManager instance for the specified model.
 
         Args:
             model (OpenAIModel): The OpenAI model to use, must be of type OpenAIModel (see `/data/openai_models`).
@@ -77,12 +77,12 @@ class OpenAIAPIManager:
 
             # If new text has been detected, split it into sentences and yield all completed sentences
             if re.search(SENTENCE_SPLIT, text):
-                sentences = SegmentationModel.split(text)
+                sentences = SpacyUtils.segment_sentences(text)
                 text = sentences[-1]
                 yield sentences[:-1]
 
         # Yield the remaining text
-        sentences = SegmentationModel.split(text)
+        sentences = SpacyUtils.segment_sentences(text)
         yield sentences
         # Indicate that the generator completed its iterations
         return True
@@ -149,7 +149,7 @@ class OpenAIAPIManager:
         response = self._request(messages=messages, stream=False, **kwargs)
 
         # Split the response into individual sentences
-        sentences = SegmentationModel.split(response)
+        sentences = SpacyUtils.segment_sentences(response)
 
         return sentences
 
