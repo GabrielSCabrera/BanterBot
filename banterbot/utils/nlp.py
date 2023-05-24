@@ -3,7 +3,7 @@ import spacy
 from banterbot.data.constants import EN_CORE_WEB_SM, EN_CORE_WEB_MD
 
 
-class SpacyUtils:
+class NLP:
     """
     A comprehensive toolkit featuring a set of Natural Language Processing utilities, powered by the SpaCy package.
 
@@ -35,13 +35,13 @@ class SpacyUtils:
             model = spacy.load(name, **kwargs)
         except OSError:
             # If the model isn't downloaded, download it.
-            cls._download_model(name=name)
+            cls._download_model(name)
             # Reattempt initialization of the SpaCy model.
             model = spacy.load(name, **kwargs)
         return model
 
     @classmethod
-    def _download_model(cls, *, name: str) -> None:
+    def _download_model(cls, name: str) -> None:
         """
         Download the specified language model, and let the user know that the model is being downloaded.
         """

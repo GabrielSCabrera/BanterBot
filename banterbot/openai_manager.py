@@ -4,7 +4,7 @@ import os
 from banterbot.data import constants
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
-from banterbot.utils.spacy_utils import SpacyUtils
+from banterbot.utils.nlp import NLP
 
 # Set the OpenAI API key
 openai.api_key = os.environ.get(constants.OPENAI_API_KEY)
@@ -77,12 +77,12 @@ class OpenAIManager:
 
             # If new text has been detected, split it into sentences and yield all completed sentences
             if re.search(SENTENCE_SPLIT, text):
-                sentences = SpacyUtils.segment_sentences(text)
+                sentences = NLP.segment_sentences(text)
                 text = sentences[-1]
                 yield sentences[:-1]
 
         # Yield the remaining text
-        sentences = SpacyUtils.segment_sentences(text)
+        sentences = NLP.segment_sentences(text)
         yield sentences
         # Indicate that the generator completed its iterations
         return True
@@ -149,7 +149,7 @@ class OpenAIManager:
         response = self._request(messages=messages, stream=False, **kwargs)
 
         # Split the response into individual sentences
-        sentences = SpacyUtils.segment_sentences(response)
+        sentences = NLP.segment_sentences(response)
 
         return sentences
 

@@ -43,11 +43,11 @@ class TTSSynthesizer:
         self._output = []
         self._total_length = 0
 
-        # Initialize the speech synthesizer with the speech configuration
-        self._synthesizer = speechsdk.SpeechSynthesizer(speech_config=self._speech_config)
-
         # Set the speech synthesis output format to the specified output format
         self._speech_config.set_speech_synthesis_output_format(output_format)
+
+        # Initialize the speech synthesizer with the speech configuration
+        self._synthesizer = speechsdk.SpeechSynthesizer(speech_config=self._speech_config)
 
         # Connect the speech synthesizer events to their corresponding callbacks
         self._synthesizer_events_connect()
@@ -191,6 +191,37 @@ class TTSSynthesizer:
         self._synthesizer.synthesis_canceled.connect(self._callback_completed)
         self._synthesizer.synthesis_completed.connect(self._callback_completed)
 
+    def _elapsed_time_since(self, start_time: int) -> int:
+        """
+        Calculates the elapsed time since the given start time.
+
+        Args:
+            start_time (int): The start time in nanoseconds.
+
+        Returns:
+            int: The elapsed time in nanoseconds.
+        """
+        return time.perf_counter_ns() - start_time
+
+    def _process_boundary(self, boundary: dict, word_index: int):
+        """
+        Processes a synthesis boundary and updates the output and total length.
+
+        Args:
+            boundary (dict): The synthesis boundary to be processed.
+            word_index (int): The index of the current word.
+
+        Returns:
+            str: The processed word text.
+        """
+        word_text = boundary["text"]
+        if word_index > 0 and boundary["boundary_type"] == speechsdk.SpeechSynthesisBoundaryType.Word:
+            word_text = " " + word_text
+        self._output[-1].append(word_text)
+        self._total_length += 1
+
+        return word_text
+
     def _text_generator(self) -> None:
         """
         Monitors the synthesis progress and updates the output accordingly.
@@ -206,22 +237,11 @@ class TTSSynthesizer:
 
         # Continuously monitor the synthesis progress
         while not self._synthesis_completed and not self._interrupt:
-            # Compute the elapsed time since the start of the synthesis
-            elapsed_time = time.perf_counter_ns() - start_time
+            elapsed_time = self._elapsed_time_since(start_time)
 
-            # Process each boundary that hasn't been processed yet
-            for boundary in self._boundaries[word_index:]:
-                # If enough time has elapsed for the current boundary, add its text to the output
-                if elapsed_time >= boundary["t_word"]:
-                    word_text = boundary["text"]
-                    if word_index > 0 and boundary["boundary_type"] == speechsdk.SpeechSynthesisBoundaryType.Word:
-                        word_text = " " + word_text
-                    self._output[-1].append(word_text)
-                    self._total_length += 1
-                    word_index += 1
-                else:
-                    # If not enough time has elapsed for the current boundary, exit loop and wait for the next iteration
-                    break
+            while word_index < len(self._boundaries) and elapsed_time >= self._boundaries[word_index]["t_word"]:
+                self._process_boundary(self._boundaries[word_index], word_index)
+                word_index += 1
 
             # Wait for a short amount of time before checking the synthesis progress again
             time.sleep(0.005)
