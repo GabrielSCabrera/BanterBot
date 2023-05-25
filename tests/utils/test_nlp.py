@@ -35,12 +35,12 @@ class NLPTestCase(unittest.TestCase):
         self.assertEqual(keywords[0].text, expected_keyword)
         self.assertEqual(keywords[0].label_, expected_label)
 
-    # @patch('sys.stdout', new_callable=StringIO)
-    # def test_download_model(self, mock_stdout):
-    #     NLP._download_model("en_core_web_sm")
-    #     output = mock_stdout.getvalue()
-    #     self.assertIn('Downloading SpaCy language model: "en_core_web_sm".', output)
-    #     self.assertIn('Finished download of SpaCy language model: "en_core_web_sm".', output)
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_download_model(self, mock_stdout):
+        NLP._download_model("en_core_web_sm")
+        output = mock_stdout.getvalue()
+        self.assertIn('Downloading SpaCy language model: "en_core_web_sm".', output)
+        self.assertIn('Finished download of SpaCy language model: "en_core_web_sm".', output)
 
 
 if __name__ == "__main__":
