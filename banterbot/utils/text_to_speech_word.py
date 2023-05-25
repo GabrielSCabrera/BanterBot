@@ -1,5 +1,5 @@
-from dataclass import dataclass
 import datetime
+from dataclasses import dataclass
 
 import azure.cognitiveservices.speech as speechsdk
 

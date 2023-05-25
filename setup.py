@@ -1,4 +1,6 @@
-from setuptools import setup, find_packages
+import unittest
+
+from setuptools import find_packages, setup
 
 dependencies = ["openai", "tiktoken", "geocoder", "requests", "termighty", "azure-cognitiveservices-speech", "spacy"]
 
@@ -7,9 +9,19 @@ url = "https://github.com/GabrielSCabrera/BanterBot"
 with open("README.md", "r") as fs:
     long_description = fs.read()
 
+# For running tests: python -m unittest discover -s tests
+
+
+def run_tests():
+    test_loader = unittest.TestLoader()
+    test_suite = test_loader.discover("tests", pattern="test_*.py")
+    return test_suite
+
+
 setup(
     name="BanterBot",
     packages=find_packages(),
+    test_suite="setup.run_tests",
     version="0.0.1",
     description="ChatGPT-Powered Interactive Assistant",
     long_description=long_description,

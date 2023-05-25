@@ -1,13 +1,16 @@
-import openai
 import os
+import re
+from typing import Generator, Iterator, Union
 
-from banterbot.data import constants
+import openai
+
+from banterbot.data.constants import OPENAI_API_KEY, RETRY_LIMIT
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
 from banterbot.utils.nlp import NLP
 
 # Set the OpenAI API key
-openai.api_key = os.environ.get(constants.OPENAI_API_KEY)
+openai.api_key = os.environ.get(OPENAI_API_KEY)
 
 
 class OpenAIManager:
@@ -42,7 +45,7 @@ class OpenAIManager:
 
         # Count the number of tokens for each message in the input list
         for message in messages:
-            num_tokens += message.count_tokens()
+            num_tokens += message.count_tokens(self._model)
 
         return num_tokens
 
@@ -76,8 +79,7 @@ class OpenAIManager:
                 text += delta["content"]
 
             # If new text has been detected, split it into sentences and yield all completed sentences
-            if re.search(SENTENCE_SPLIT, text):
-                sentences = NLP.segment_sentences(text)
+            if len(sentences := NLP.segment_sentences(text)) > 1:
                 text = sentences[-1]
                 yield sentences[:-1]
 
@@ -110,7 +112,7 @@ class OpenAIManager:
         # Keep track of whether or not the request was successful
         success = False
         # Retry the request if it fails due to rate limiting
-        for i in range(config.retry_attempt_limit):
+        for i in range(RETRY_LIMIT):
             try:
                 # Send request to OpenAI API and retrieve response
                 response = openai.ChatCompletion.create(**kwargs)
@@ -132,6 +134,13 @@ class OpenAIManager:
         elif not stream:
             # Extract the generated response from the response object and strip whitespace
             return response.choices[0].message.content.strip()
+
+    def interrupt(self):
+        """
+        Sets the interrupt flag to True, indicating that the streaming response from the OpenAI API should be
+        interrupted.
+        """
+        self._interrupt = True
 
     def prompt(self, messages: list[Message], **kwargs) -> list[str, ...]:
         """

@@ -16,23 +16,23 @@ Overall, the Persona class provides a robust chatbot framework that can be custo
 applications.
 """
 
-from collections.abc import Iterator
 import datetime
 import json
 import os
 import re
 import string
 import threading
+from collections.abc import Iterator
 from typing import Any, Literal, Optional, TypedDict, Union
 
-import openai
 import geocoder
+import openai
 import requests
 import spacy
 import spacy.cli
+import termighty
 import tiktoken
 
-import termighty
 from banterbot import config
 
 

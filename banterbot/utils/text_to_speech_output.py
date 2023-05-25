@@ -96,7 +96,7 @@ class TextToSpeechOutput:
         self.is_active = True
         N = 0
         while self.is_active:
-            if self.__len__ > N:
+            if self.__len__() > N:
                 yield self.__getitem__(N)
                 N += 1
             time.sleep(0.005)

@@ -1,6 +1,8 @@
+import logging
+
 import spacy
 
-from banterbot.data.constants import EN_CORE_WEB_SM, EN_CORE_WEB_MD
+from banterbot.data.constants import EN_CORE_WEB_MD, EN_CORE_WEB_SM
 
 
 class NLP:
@@ -20,8 +22,8 @@ class NLP:
     def _init_models(cls):
         cls._models = {}
 
-        segmenter = cls._load_model(name=EN_CORE_WEB_SM, disable=["tagger", "attribute_ruler", "lemmatizer"])
-        segmenter.disable_pipe("parser")
+        segmenter_disable = ["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer", "ner"]
+        segmenter = cls._load_model(name=EN_CORE_WEB_SM, disable=segmenter_disable)
         segmenter.enable_pipe("senter")
 
         cls._models["segmenter"] = segmenter
@@ -46,7 +48,7 @@ class NLP:
         Download the specified language model, and let the user know that the model is being downloaded.
         """
         print(f'Downloading SpaCy language model: "{name}". This will only happen once.\n\n\n')
-        spacy.cli.download(EN_CORE_WEB_SM)
+        spacy.cli.download(name)
         print(f'\n\n\nFinished download of SpaCy language model: "{name}".')
 
     @classmethod
@@ -54,10 +56,10 @@ class NLP:
         """
         Returns the specified SpaCy model directly.
         """
-        return self._models[name]
+        return cls._models[name]
 
     @classmethod
-    def segment_sentences(cls, string: str) -> tuple[str, ...]:
+    def segment_sentences(cls, string: str) -> tuple[spacy.tokens.span.Span, ...]:
         """
         Split a string into a list of sentences using a specialized configuration of SpaCy's `en_core_web_sm` model that
         is lightweight and exclusively performs sentence segmentation.
@@ -75,8 +77,8 @@ class NLP:
         """
         Extracts a set of relevant keywords from a string of text.
         """
-        return cls._models[EN_CORE_WEB_MD](string).ents
+        return tuple(cls._models[EN_CORE_WEB_MD](string).ents)
 
 
-# SpacyUtils should initialize (and if need be, download) all models *once* on import
-SpacyUtils._init_models()
+# NLP should initialize (and if need be, download) all models *once* on import
+NLP._init_models()

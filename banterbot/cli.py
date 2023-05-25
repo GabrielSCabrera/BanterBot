@@ -1,4 +1,5 @@
 import argparse
+
 from banterbot.interface import Interface
 
 

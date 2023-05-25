@@ -1,9 +1,10 @@
+import os
+import threading
+import time
+from typing import Optional
+
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
-import os
-import time
-import threading
-from typing import Optional
 
 from banterbot import config
 

@@ -1,5 +1,5 @@
-from termighty.utils.listener import Listener
 from termighty.utils import KeyProcessor
+from termighty.utils.listener import Listener
 from termighty.widgets.text_editor import TextEditor
 
 

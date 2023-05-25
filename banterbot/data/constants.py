@@ -7,6 +7,7 @@ AZURE_SPEECH_REGION = "AZURE_SPEECH_REGION"
 ASSISTANT = "assistant"
 SYSTEM = "system"
 USER = "user"
+RETRY_LIMIT = 2
 
 # Azure Neural Voice parameters
 MALE = "male"

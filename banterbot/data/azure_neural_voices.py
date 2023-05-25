@@ -12,7 +12,7 @@ Attributes:
 from dataclasses import dataclass
 from typing import Literal
 
-from banterbot.data.constants import MALE, FEMALE
+from banterbot.data.constants import FEMALE, MALE
 
 
 @dataclass

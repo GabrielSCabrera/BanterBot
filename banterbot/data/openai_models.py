@@ -10,6 +10,7 @@ Attributes:
     tokenizer (tiktoken.core.Encoding): An instance of the tiktoken package's Encoding object (i.e., a tokenizer).
 """
 from dataclasses import dataclass
+
 import tiktoken
 
 

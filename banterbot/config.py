@@ -1,8 +1,11 @@
+import logging
 from pathlib import Path
 
 # Initialize the filesystem for BanterBot.
 filesystem = Path.home() / "Documents" / "BanterBot"
 filesystem.mkdir(parents=True, exist_ok=True)
+
+DEFAULT_LOG_LEVEL = logging.INFO
 
 # Set up available actions. If you add custom actions, be sure that they always end in parentheses.
 actions = (

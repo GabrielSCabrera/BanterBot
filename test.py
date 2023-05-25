@@ -1,5 +1,6 @@
-from banterbot.tts_synthesizer import TTSSynthesizer
 import asyncio
+
+from banterbot.tts_synthesizer import TTSSynthesizer
 
 TTS = TTSSynthesizer()
 
