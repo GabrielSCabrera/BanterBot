@@ -4,10 +4,8 @@ requests to the OpenAI API, sending prompts, and streaming responses. Mock objec
 the OpenAI API for testing purposes.
 """
 import os
-import time
 import unittest
 from dataclasses import dataclass
-from datetime import datetime
 from unittest.mock import patch
 
 import openai

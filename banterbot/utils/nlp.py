@@ -1,5 +1,3 @@
-import logging
-
 import spacy
 
 from banterbot.data.constants import EN_CORE_WEB_MD, EN_CORE_WEB_SM
@@ -7,23 +5,26 @@ from banterbot.data.constants import EN_CORE_WEB_MD, EN_CORE_WEB_SM
 
 class NLP:
     """
-    A comprehensive toolkit featuring a set of Natural Language Processing utilities, powered by the SpaCy package.
+    A comprehensive toolkit that provides a set of Natural Language Processing utilities. It leverages the capabilities
+    of the SpaCy package. The toolkit is designed to automatically download the necessary models if they are not
+    available.
 
-    The toolkit is designed to automatically download the necessary models, thus simplifying the initial setup for
-    users. A unique feature of this toolkit is its intelligent model selection algorithm. This algorithm is programmed
-    to automatically select the most lightweight and suitable model for each specific task, ensuring the perfect balance
-    between speed and efficiency.
-
-    With this automation, users are relieved from the task of manual model selection, allowing them to focus on
-    achieving optimal operational efficiency with their NLP tasks.
+    One of the main features of this toolkit is the intelligent model selection mechanism. It is designed to select the
+    most appropriate and lightweight model for each specific task, balancing between computational efficiency and task
+    performance.
     """
 
     @classmethod
     def _init_models(cls):
+        """
+        Initializes and configures the required SpaCy models for sentence segmentation and keyword extraction.
+        """
         cls._models = {}
 
+        # Define a set of pipeline components to disable for the sentence segmenter.
         segmenter_disable = ["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer", "ner"]
         segmenter = cls._load_model(name=EN_CORE_WEB_SM, disable=segmenter_disable)
+        # Enable the sentence segmentation pipeline component for the segmenter model.
         segmenter.enable_pipe("senter")
 
         cls._models["segmenter"] = segmenter
@@ -31,21 +32,30 @@ class NLP:
 
     @classmethod
     def _load_model(cls, *, name: str, **kwargs) -> spacy.language.Language:
-        # Initialize the SpaCy NLP sentence splitting model only once as a class attribute to conserve resources.
+        """
+        Loads a SpaCy model by its name. If the model is not available, it is downloaded automatically.
+
+        Args:
+            name (str): The name of the SpaCy model to load.
+            **kwargs: Additional keyword arguments for the spacy.load function.
+
+        Returns:
+            spacy.language.Language: The loaded SpaCy model.
+        """
         try:
-            # Initialize the SpaCy model for English.
             model = spacy.load(name, **kwargs)
         except OSError:
-            # If the model isn't downloaded, download it.
             cls._download_model(name)
-            # Reattempt initialization of the SpaCy model.
             model = spacy.load(name, **kwargs)
         return model
 
     @classmethod
     def _download_model(cls, name: str) -> None:
         """
-        Download the specified language model, and let the user know that the model is being downloaded.
+        Downloads a SpaCy model by its name. It also provides information about the download process to the user.
+
+        Args:
+            name (str): The name of the SpaCy model to download.
         """
         print(f'Downloading SpaCy language model: "{name}". This will only happen once.\n\n\n')
         spacy.cli.download(name)
@@ -54,31 +64,43 @@ class NLP:
     @classmethod
     def model(cls, name: str) -> spacy.language.Language:
         """
-        Returns the specified SpaCy model directly.
+        Returns the specified SpaCy model.
+
+        Args:
+            name (str): The name of the SpaCy model to return.
+
+        Returns:
+            spacy.language.Language: The requested SpaCy model.
         """
         return cls._models[name]
 
     @classmethod
     def segment_sentences(cls, string: str) -> tuple[spacy.tokens.span.Span, ...]:
         """
-        Split a string into a list of sentences using a specialized configuration of SpaCy's `en_core_web_sm` model that
-        is lightweight and exclusively performs sentence segmentation.
+        Splits a text string into individual sentences using a specialized SpaCy model. The model is a lightweight version
+        of `en_core_web_sm` designed specifically for sentence segmentation.
 
         Args:
-            string (str): The string of text to split.
+            string (str): The input text string.
 
-        Returns:
-            tuple[str, ...]: A list of individual sentences.
+        Yields:
+            tuple[spacy.tokens.span.Span, ...]: A tuple of individual sentences in the form of SpaCy Span objects.
         """
         return tuple([str(sentence) for sentence in cls._models["segmenter"](string).sents])
 
     @classmethod
     def extract_keywords(cls, string: str) -> tuple[str, ...]:
         """
-        Extracts a set of relevant keywords from a string of text.
+        Extracts keywords from a text string using the `en_core_web_md` SpaCy model.
+
+        Args:
+            string (str): The input text string.
+
+        Returns:
+            tuple[str, ...]: A tuple of extracted keywords as strings.
         """
-        return tuple(cls._models[EN_CORE_WEB_MD](string).ents)
+        return tuple([str(entity) for entity in cls._models[EN_CORE_WEB_MD](string).ents])
 
 
-# NLP should initialize (and if need be, download) all models *once* on import
+# Upon import, NLP initializes and downloads (if necessary) all models.
 NLP._init_models()

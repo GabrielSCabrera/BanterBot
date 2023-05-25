@@ -8,7 +8,7 @@ from banterbot.data.openai_models import OpenAIModel
 @dataclass
 class Message:
     """
-    Represents a message that can be sent to the OpenAI ChatCompletion or Completion API.
+    Represents a message that can be sent to the OpenAI ChatCompletion API.
 
     Attributes:
         role (Literal[ASSISTANT, SYSTEM, USER]): The role of the message sender.

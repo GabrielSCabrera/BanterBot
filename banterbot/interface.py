@@ -17,10 +17,8 @@ Overall, this program provides a framework for creating a text-based conversatio
 interface, using the Persona class for generating responses and the termighty library for handling input and output
 processing.
 """
-import argparse
 import datetime
 import re
-import sys
 import threading
 import time
 from typing import Literal, Optional

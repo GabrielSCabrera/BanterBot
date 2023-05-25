@@ -1,4 +1,3 @@
-import time
 from typing import Iterator
 
 from banterbot.utils.text_to_speech_word import TextToSpeechWord
@@ -6,35 +5,41 @@ from banterbot.utils.text_to_speech_word import TextToSpeechWord
 
 class TextToSpeechOutput:
     """
-    Represents the output of a text-to-speech conversion.
+    This class encapsulates the output of a text-to-speech conversion, providing
+    a convenient interface for working with and manipulating the converted data.
     """
 
     def __init__(self, input_string: str) -> None:
         """
-        Initializes the TextToSpeechOutput object.
+        Initializes a new TextToSpeechOutput instance, setting up the input string and preparing the words list for the
+        converted words.
 
         Args:
-            input_string: The input string to be converted to speech.
+            input_string (str): The input string that is to be converted into speech.
         """
         self.input_string = input_string
+
+        # A list to store the converted TextToSpeechWord objects
         self.words = []
+
+        # Tracks the active state of the TextToSpeechOutput object
         self.is_active = False
 
     def __getitem__(self, idx: int) -> TextToSpeechWord:
         """
-        Retrieves a TextToSpeechWord at the specified index.
+        Allows for indexing into the TextToSpeechOutput object to retrieve words at specific positions.
 
         Args:
-            idx: The index of the word to retrieve.
+            idx (int): The index of the word to retrieve.
 
         Returns:
-            The TextToSpeechWord at the specified index.
+            TextToSpeechWord: The word at the specified index.
         """
         return self.words[idx]
 
     def __iter__(self) -> Iterator[TextToSpeechWord]:
         """
-        Returns an iterator over the TextToSpeechWord objects in the output.
+        Provides an iterator to iterate over the TextToSpeechWord objects in the output.
 
         Yields:
             TextToSpeechWord: The next TextToSpeechWord object in the output.
@@ -44,59 +49,38 @@ class TextToSpeechOutput:
 
     def __len__(self) -> int:
         """
-        Returns the length of the word list.
+        Allows for the use of len() on a TextToSpeechOutput instance, returning
+        the number of words in the output.
 
         Returns:
-            The length of the word list as an integer.
+            int: The number of words in the output.
         """
         return len(self.words)
 
     def __setitem__(self, idx: int, value: TextToSpeechWord) -> None:
         """
-        Sets the value of a TextToSpeechWord at the specified index.
+        Allows for setting the value of a word at a specific index in the output.
 
         Args:
-            idx: The index of the word to set.
-            value: The new TextToSpeechWord value.
+            idx (int): The index of the word to be replaced.
+            value (TextToSpeechWord): The new word to be placed at the specified index.
         """
         self.words[idx] = value
 
     def __str__(self) -> str:
         """
-        Returns a string representation of the text-to-speech output.
+        Converts the TextToSpeechOutput instance into a string, concatenating all the words in the output.
 
         Returns:
-            The concatenated string of all the words in the output.
+            str: The string representation of the text-to-speech output.
         """
         return "".join([word.word for word in self.words])
 
     def append(self, entry: TextToSpeechWord) -> None:
         """
-        Appends a TextToSpeechWord to the output.
+        Appends a TextToSpeechWord object to the words list in the output.
 
         Args:
-            entry: The TextToSpeechWord object to append.
+            entry (TextToSpeechWord): The word to be appended to the output.
         """
         self.words.append(entry)
-
-    def stop(self) -> None:
-        """
-        Stops the TextToSpeechOutput process and indicates that it has ended. It is essential to call this method at the
-        end of the output process; otherwise, the `fetch` method will run indefinitely.
-        """
-        self.is_active = False
-
-    def stream(self) -> Iterator[TextToSpeechWord]:
-        """
-        Provides a stream of TextToSpeechWord objects from the output.
-
-        Yields:
-            TextToSpeechWord: The next TextToSpeechWord object in the output.
-        """
-        self.is_active = True
-        N = 0
-        while self.is_active:
-            if self.__len__() > N:
-                yield self.__getitem__(N)
-                N += 1
-            time.sleep(0.005)

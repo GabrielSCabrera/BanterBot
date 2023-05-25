@@ -7,42 +7,45 @@ import azure.cognitiveservices.speech as speechsdk
 @dataclass(frozen=True)
 class TextToSpeechWord:
     """
-    Represents a word in the text-to-speech output.
+    This class encapsulates a word in the output of a text-to-speech conversion. It includes
+    the word itself, the timestamp when the word was spoken, its index in the text, and its category
+    (e.g., word, punctuation), using Azure's Speech Synthesis Boundary Type.
     """
 
-    # The word itself
+    # The word that has been converted to speech
     word: str
-    # The timestamp when the word was spoken
+    # The datetime when the word was spoken
     timestamp: datetime.datetime
-    # The index of the word in the text
+    # The position of the word in the original text
     word_index: int
     # The category of the word (e.g., word, punctuation)
     category: speechsdk.SpeechSynthesisBoundaryType
 
     def __len__(self) -> int:
         """
-        Returns the length of the word.
+        Computes and returns the length of the word.
 
         Returns:
-            The length of the word as an integer.
+            int: The length of the word.
         """
         return len(self.word)
 
     def __str__(self) -> str:
         """
-        Returns a string representation of the instance attributes.
+        Provides a string representation of the instance, including the word and its timestamp.
 
         Returns:
-            The word as a string.
+            str: A string containing the word and its timestamp in ISO 8601 format.
         """
         description = f"<TextToSpeechWord '{self.word}' at {self.timestamp.isoformat()}>"
         return description
 
     def __repr__(self) -> str:
         """
-        Returns a string representation of the word.
+        Returns the word itself as its string representation. This simplifies the display of
+        the object in certain contexts.
 
         Returns:
-            The word as a string.
+            str: The word itself.
         """
         return self.word

@@ -17,13 +17,12 @@ applications.
 """
 
 import datetime
-import json
 import os
 import re
 import string
 import threading
 from collections.abc import Iterator
-from typing import Any, Literal, Optional, TypedDict, Union
+from typing import Literal, Optional, TypedDict, Union
 
 import geocoder
 import openai

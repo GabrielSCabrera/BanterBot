@@ -84,19 +84,6 @@ class TextToSpeechOutputTestCase(unittest.TestCase):
         self.assertEqual(len(self.output), 5)
         self.assertEqual(self.output[4].word, " Yup")
 
-    def test_stop(self):
-        self.output.stop()
-        self.assertFalse(self.output.is_active)
-
-    def test_stream(self):
-        stream = self.output.stream()
-        word = next(stream)
-        self.assertIsInstance(word, TextToSpeechWord)
-        self.assertEqual(word.word, "Hello")
-        self.output.stop()
-        with self.assertRaises(StopIteration):
-            next(stream)
-
 
 if __name__ == "__main__":
     unittest.main()
