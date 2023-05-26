@@ -7,7 +7,7 @@ from typing import Dict, Generator, List, Optional
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
-from banterbot import config
+from banterbot.data.constants import AZURE_SPEECH_KEY, AZURE_SPEECH_REGION
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
 from banterbot.utils.text_to_speech_word import TextToSpeechWord
 
@@ -18,7 +18,7 @@ class TextToSpeech:
     """
 
     # Create a lock that prevents race conditions when speaking
-    speech_lock = threading.Lock()
+    _speech_lock = threading.Lock()
 
     def __init__(
         self,
@@ -34,18 +34,18 @@ class TextToSpeech:
 
         # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
-            subscription=os.environ.get(config.azure_cognitive_services_speech_api_key),
-            region=os.environ.get(config.azure_cognitive_services_speech_region),
+            subscription=os.environ.get(AZURE_SPEECH_KEY),
+            region=os.environ.get(AZURE_SPEECH_REGION),
         )
 
         # Initialize the output and total length variables
         self._outputs: List[TextToSpeechOutput] = []
 
-        # Set the speech synthesis output format to the specified output format
-        self._speech_config.set_speech_synthesis_output_format(output_format)
-
         # Initialize the speech synthesizer with the speech configuration
         self._synthesizer = speechsdk.SpeechSynthesizer(speech_config=self._speech_config)
+
+        # Set the speech synthesis output format to the specified output format
+        self._speech_config.set_speech_synthesis_output_format(output_format)
 
         # Connect the speech synthesizer events to their corresponding callbacks
         self._synthesizer_events_connect()
@@ -195,7 +195,7 @@ class TextToSpeech:
         """
         text = boundary["text"]
         if word_index > 0 and boundary["boundary_type"] == speechsdk.SpeechSynthesisBoundaryType.Word:
-            text = text.insert(0, " ")
+            text = f" {text}"
         word = TextToSpeechWord(
             word=text, timestamp=timestamp, word_index=word_index, category=boundary["boundary_type"]
         )
@@ -247,6 +247,9 @@ class TextToSpeech:
         self._synthesizer.stop_speaking()
         return True
 
+    def _speak(self, ssml: str):
+        self._synthesizer.speak_ssml(ssml)
+
     def speak(self, input_string: str, voice_name: str, style: str) -> Generator[TextToSpeechWord, None, bool]:
         """
         Speaks the given text using the specified voice and style.
@@ -271,7 +274,7 @@ class TextToSpeech:
             self._reset()
 
             # Create a new thread to handle the speech synthesis, and start it
-            speech_thread = threading.Thread(target=self._synthesizer.speak_ssml, args=(ssml,), daemon=True)
+            speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
             speech_thread.start()
 
             # Continuously monitor the synthesis progress in the main thread

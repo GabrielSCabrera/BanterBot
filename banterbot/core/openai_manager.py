@@ -74,6 +74,8 @@ class OpenAIManager:
                 text = sentences[-1]
                 yield sentences[:-1]
 
+            time.sleep(0.005)
+
         sentences = NLP.segment_sentences(text)
         yield sentences
 
@@ -94,7 +96,7 @@ class OpenAIManager:
         kwargs["model"] = self._model.name
         kwargs["n"] = 1
         kwargs["stream"] = stream
-        kwargs["messages"] = messages
+        kwargs["messages"] = [message() for message in messages]
         kwargs["max_tokens"] = self._model.max_tokens - self._count_tokens(messages=messages)
 
         success = False

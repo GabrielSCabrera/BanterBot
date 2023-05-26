@@ -37,7 +37,7 @@ class TextToSpeechWord:
         Returns:
             str: A string containing the word and its timestamp in ISO 8601 format.
         """
-        description = f"<TextToSpeechWord '{self.word}' at {self.timestamp.isoformat()}>"
+        description = f"<TextToSpeechWord '{self.word}' at {self.timestamp}>"
         return description
 
     def __repr__(self) -> str:

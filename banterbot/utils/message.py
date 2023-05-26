@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Dict, Literal, Optional
 
 from banterbot.data.constants import ASSISTANT, SYSTEM, USER
 from banterbot.data.openai_models import OpenAIModel
@@ -41,3 +41,15 @@ class Message:
             num_tokens += len(model.tokenizer.encode(self.name))
 
         return num_tokens
+
+    def __call__(self) -> Dict[str, str]:
+        """
+        Creates and returns a dictionary that is compatible with the OpenAI ChatCompletion API.
+
+        Returns:
+            Dict[str, str]
+        """
+        output = {"role": self.role, "content": self.content}
+        if self.name is not None:
+            output["name"] = self.name
+        return output
