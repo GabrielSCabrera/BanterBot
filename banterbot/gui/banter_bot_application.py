@@ -14,19 +14,13 @@ MODEL = openai_models["gpt-3.5-turbo"]
 
 class BanterBotApplication(tk.Tk):
     """
-    This class is the main application for the Chatbot. It utilizes the OpenAI model
-    to interact with the user. The interactions occur through a graphical user interface
-    that displays the chat history and provides an entry box for user input.
+    This class is the main application for the Chatbot. It utilizes the OpenAI model to interact with the user. The
+    interactions occur through a graphical user interface that displays the chat history and provides an entry box for
+    user input.
     """
 
     def __init__(self) -> None:
         super().__init__()
-
-        # Basic tkinter setup for window title, background color, window size, and font
-        self.title("BanterBot")
-        self.configure(bg="#2C2C2C")
-        self.geometry("1024x768")
-        self._font = ("Cascadia Code", 16)
 
         # OpenAI and Text-to-Speech setup for managing AI interactions and text-to-speech functionalities
         self._openai_manager = OpenAIManager(model=MODEL)
@@ -35,13 +29,32 @@ class BanterBotApplication(tk.Tk):
         # Threading lock for synchronizing output operations in multithreading environment
         self._output_lock = threading.Lock()
 
+        # List for storing Message objects and threading setup for response handling
+        self._messages: List[Message] = []
+        self._response_thread = None
+
+        # Initialize the GUI
+        self._init_gui()
+
+    def _init_gui(self):
+        """
+        Initializes the TKinter GUI.
+        """
+        # Basic tkinter setup for window title, background color, window size, and font
+        self.title("BanterBot")
+        self.configure(bg="black")
+        self.geometry("1024x768")
+        self._font = ("Cascadia Code", 16)
+
         # GUI component setup to create frames, conversation area, scrollbar, message entry box, and send button
         self.style = ttk.Style()
-        self.style.configure(".", font=self._font)
+        self.style.theme_use("clam")
+        self.style.configure(".", font=self._font, bg="black", fg="white")
+        self.style.configure("Vertical.TScrollbar", background="black", bordercolor="black", arrowcolor="black")
 
         self.history_frame = ttk.Frame(self)
         self.conversation_area = tk.Text(
-            self.history_frame, wrap=tk.WORD, state=tk.DISABLED, bg="#1F1F1F", fg="#FFFFFF", font=self._font
+            self.history_frame, wrap=tk.WORD, state=tk.DISABLED, bg="black", fg="white", font=self._font
         )
         self.conversation_area.grid(row=0, column=0, ipadx=5, padx=5, pady=5, sticky="nsew")
         self.history_frame.rowconfigure(0, weight=1)
@@ -58,7 +71,7 @@ class BanterBotApplication(tk.Tk):
         self.entry_frame = ttk.Frame(self)
         self.entry_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
-        self.message_entry = tk.Entry(self.entry_frame, bg="#1F1F1F", fg="#FFFFFF", font=self._font)
+        self.message_entry = tk.Entry(self.entry_frame, bg="black", fg="white", font=self._font)
         self.message_entry.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.entry_frame.columnconfigure(0, weight=3)
 
@@ -68,15 +81,10 @@ class BanterBotApplication(tk.Tk):
 
         self.message_entry.bind("<Return>", lambda event: self.send_message())
 
-        # List for storing Message objects and threading setup for response handling
-        self._messages: List[Message] = []
-        self._lock = threading.Lock()
-        self._response_thread = None
-
     def update_conversation_area(self, word: TextToSpeechWord) -> None:
         """
-        Updates the conversation text area by adding a new word. The category of the word determines whether
-        a space should be added before the word or not.
+        Updates the conversation text area by adding a new word. The category of the word determines whether a space
+        should be added before the word or not.
 
         Args:
             word (TextToSpeechWord): The word to add to the conversation.
@@ -91,8 +99,8 @@ class BanterBotApplication(tk.Tk):
 
     def send_message(self) -> None:
         """
-        Sends a user message. The message is displayed in the GUI and triggers the process to get a response.
-        If a previous response is still being processed, it is interrupted before the new message is sent.
+        Sends a user message. The message is displayed in the GUI and triggers the process to get a response. If a
+        previous response is still being processed, it is interrupted before the new message is sent.
         """
         user_message = self.message_entry.get()
 
@@ -120,8 +128,8 @@ class BanterBotApplication(tk.Tk):
 
     def get_response(self) -> None:
         """
-        Gets a response from the chatbot. The response is then displayed in the GUI and spoken
-        by the text-to-speech system.
+        Gets a response from the chatbot. The response is then displayed in the GUI and spoken by the text-to-speech
+        system.
         """
         response_messages = self._openai_manager.prompt(messages=self._messages)
         response = " ".join(response_messages)
@@ -141,8 +149,8 @@ class BanterBotApplication(tk.Tk):
 
     def end_response(self) -> None:
         """
-        Ends the response. This method adds two newlines to the conversation area to visually separate
-        the response from the next message.
+        Ends the response. This method adds two newlines to the conversation area to visually separate the response from
+        the next message.
         """
         self.conversation_area["state"] = tk.NORMAL
         self.conversation_area.insert(tk.END, "\n\n")
@@ -151,8 +159,7 @@ class BanterBotApplication(tk.Tk):
 
     def run(self) -> None:
         """
-        Starts the tkinter main loop to run the application. This method must be called
-        for the application to start.
+        Starts the tkinter main loop to run the application. This method must be called for the application to start.
         """
         self.mainloop()
 
