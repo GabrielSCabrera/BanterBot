@@ -9,7 +9,7 @@
 import os
 import sys
 
-basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'banterbot'))
 sys.path.insert(0, basedir)
 
 project = "BanterBot"
