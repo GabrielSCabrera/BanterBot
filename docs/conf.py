@@ -9,7 +9,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("../banterbot"))
 
 project = "BanterBot"
 copyright = "2023, Gabriel S. Cabrera"
@@ -18,7 +18,7 @@ author = "Gabriel S. Cabrera"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx.ext.napoleon", "sphinx.ext.autosectionlabel"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx.ext.napoleon",]
 
 
 templates_path = ["_templates"]

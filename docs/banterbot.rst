@@ -11,11 +11,3 @@ Subpackages
    banterbot.data
    banterbot.gui
    banterbot.utils
-
-Module contents
----------------
-
-.. automodule:: banterbot
-   :members:
-   :undoc-members:
-   :show-inheritance:

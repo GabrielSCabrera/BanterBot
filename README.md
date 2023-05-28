@@ -49,6 +49,10 @@ python -m pip install .
 
 ## Usage
 
+### Launch with Command Line
+
+Start the BanterBot Command Line Interface (CLI) by executing the `banterbot` command. Use the `-g` or `--gpt4` flags to enable GPT-4; this only works if you have GPT-4 API access.
+
 ### Launch with a Python script
 
 To use BanterBot, just import the necessary components and create an instance of the BanterBotTK class:
@@ -65,10 +69,6 @@ style = "chat"
 app = BanterBotTK(model=model, voice=voice, style=style)
 app.run()
 ```
-
-### Launch with Command Line
-
-Start the BanterBot Command Line Interface (CLI) by executing the `banterbot` command. Use the `-g` or `--gpt4` flags to enable GPT-4; this only works if you have GPT-4 API access.
 
 ## Chat Logs
 

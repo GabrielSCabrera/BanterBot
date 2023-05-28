@@ -27,11 +27,3 @@ banterbot.gui.cli module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: banterbot.gui
-   :members:
-   :undoc-members:
-   :show-inheritance:

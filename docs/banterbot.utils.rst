@@ -43,11 +43,3 @@ banterbot.utils.thread\_queue module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: banterbot.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:

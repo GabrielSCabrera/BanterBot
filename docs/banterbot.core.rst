@@ -19,11 +19,3 @@ banterbot.core.text\_to\_speech module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: banterbot.core
-   :members:
-   :undoc-members:
-   :show-inheritance:

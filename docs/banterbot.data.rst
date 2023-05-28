@@ -27,11 +27,3 @@ banterbot.data.openai\_models module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: banterbot.data
-   :members:
-   :undoc-members:
-   :show-inheritance:
