@@ -28,22 +28,6 @@ banterbot.data.openai\_models module
    :undoc-members:
    :show-inheritance:
 
-banterbot.data.prompts module
------------------------------
-
-.. automodule:: banterbot.data.prompts
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-banterbot.data.regex\_patterns module
--------------------------------------
-
-.. automodule:: banterbot.data.regex_patterns
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

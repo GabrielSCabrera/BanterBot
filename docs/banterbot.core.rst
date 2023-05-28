@@ -12,14 +12,6 @@ banterbot.core.openai\_manager module
    :undoc-members:
    :show-inheritance:
 
-banterbot.core.persona module
------------------------------
-
-.. automodule:: banterbot.core.persona
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 banterbot.core.text\_to\_speech module
 --------------------------------------
 

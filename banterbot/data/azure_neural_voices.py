@@ -5,7 +5,7 @@ synthesis. The main components of the program are:
     1.  AzureNeuralVoice dataclass: Represents an Azure Neural Voice profile with attributes such as name, voice
         identifier, gender, pitch, and available styles (tones/emotions).
 
-    2.  neural_voices: A dictionary containing instances of AzureNeuralVoice for each available voice profile.
+    2.  _neural_voices: A dictionary containing instances of AzureNeuralVoice for each available voice profile.
 
     3.  Utility functions:>
             a.  get_voice_by_name(name: str) -> AzureNeuralVoice: Retrieves an AzureNeuralVoice instance by its name.
@@ -214,7 +214,7 @@ _neural_voice_data = {
 }
 
 # Create instances of AzureNeuralVoice for each voice in the dictionary
-neural_voices = {name: AzureNeuralVoice(name=name, **voice) for name, voice in _neural_voice_data.items()}
+_neural_voices = {name: AzureNeuralVoice(name=name, **voice) for name, voice in _neural_voice_data.items()}
 
 
 def get_voice_by_name(name: str) -> AzureNeuralVoice:
@@ -228,9 +228,9 @@ def get_voice_by_name(name: str) -> AzureNeuralVoice:
         AzureNeuralVoice: The corresponding AzureNeuralVoice instance.
 
     Raises:
-        KeyError: If the specified name is not found in the neural_voices dictionary.
+        KeyError: If the specified name is not found in the _neural_voices dictionary.
     """
-    return neural_voices[name]
+    return _neural_voices[name]
 
 
 def get_voices_by_gender(gender: Literal[MALE, FEMALE]) -> List[AzureNeuralVoice]:
@@ -243,4 +243,4 @@ def get_voices_by_gender(gender: Literal[MALE, FEMALE]) -> List[AzureNeuralVoice
     Returns:
         List[AzureNeuralVoice]: A list of AzureNeuralVoice instances with the specified gender.
     """
-    return [voice for voice in neural_voices.values() if voice.gender == gender]
+    return [voice for voice in _neural_voices.values() if voice.gender == gender]

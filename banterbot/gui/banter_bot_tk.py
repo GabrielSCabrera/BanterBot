@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
-from banterbot.data.openai_models import OpenAIModel, openai_models
+from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.gui.banter_bot_interface import BanterBotInterface
 
 
@@ -20,7 +20,7 @@ class BanterBotTK(tk.Tk, BanterBotInterface):
 
     def __init__(
         self,
-        model: OpenAIModel = openai_models["gpt-3.5-turbo"],
+        model: OpenAIModel = get_model_by_name("gpt-3.5-turbo"),
         voice: AzureNeuralVoice = get_voice_by_name("Aria"),
         style: str = "chat",
     ) -> None:

@@ -3,13 +3,16 @@ This module provides an overview of the GPT models offered by OpenAI as of May 2
 model entry is represented by an instance of the OpenAIModel class, which provides information about the model's name,
 maximum tokens, version, rank, and tokenizer.
 
+    1.  OpenAIModel dataclass: Represents an OpenAI ChatCompletion model with attributes such as name, max_tokens
+        version, rank, and a tokenizer.
+
+    2.  _openai_models: A dictionary containing instances of OpenAIModel for each available model.
+
+    3.  get_model_by_name(name: str) -> OpenAIModel: Retrieves an OpenAIModel instance by its name.
+
 The purpose of this module is to make it easy for users to access information about the available GPT models and their
 properties. This can be useful when selecting a model for a specific task or when working with the ChatCompletion API.
-
-Attributes:
-    openai_models (Dict[str, OpenAIModel]): A dictionary containing instances of OpenAIModel for each available model.
 """
-
 from dataclasses import dataclass
 from typing import Dict
 
@@ -46,7 +49,7 @@ class OpenAIModel:
 
 
 # Define the available OpenAI models
-openai_models_dict = {
+_openai_models_dict = {
     "gpt-3.5-turbo": {
         "max_tokens": 4095,
         "version": 3,
@@ -65,6 +68,22 @@ openai_models_dict = {
 }
 
 # Create instances of OpenAIModel for each model in the dictionary
-openai_models: Dict[str, OpenAIModel] = {
-    name: OpenAIModel(name=name, **model) for name, model in openai_models_dict.items()
+_openai_models: Dict[str, OpenAIModel] = {
+    name: OpenAIModel(name=name, **model) for name, model in _openai_models_dict.items()
 }
+
+
+def get_model_by_name(name: str) -> OpenAIModel:
+    """
+    Retrieve an OpenAIModel instance by its name.
+
+    Args:
+        name (str): The name of the OpenAI ChatCompletion model.
+
+    Returns:
+        OpenAIModel: The corresponding OpenAIModel instance.
+
+    Raises:
+        KeyError: If the specified name is not found in the _openai_models dictionary.
+    """
+    return _openai_models[name]

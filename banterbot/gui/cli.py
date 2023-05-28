@@ -1,6 +1,6 @@
 import argparse
 
-from banterbot.data.openai_models import openai_models
+from banterbot.data.openai_models import get_model_by_name
 from banterbot.gui.banter_bot_tk import BanterBotTK
 
 
@@ -34,10 +34,8 @@ def run() -> None:
         help="Enable GPT-4; only works if you have GPT-4 API access.",
     )
 
-    args = parser.parse_args()
-
     kwargs = {
-        "model": openai_models["gpt-4"] if args.gpt4 else openai_models["gpt-3.5-turbo"],
+        "model": get_model_by_name("gpt-4") if args.gpt4 else get_model_by_name("gpt-3.5-turbo"),
     }
 
     gui = BanterBotTK(**kwargs)
