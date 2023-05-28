@@ -1,78 +1,79 @@
 # BanterBot
-## A Conversational AI Chatbot
 
-BanterBot is an interactive command-line-based chatbot that utilizes the ChatGPT architecture to engage users in natural language conversations. The program is designed to provide an immersive and visually appealing experience by leveraging the `termighty` library to create a terminal interface with rich text formatting and colors. In addition to text-based interactions, BanterBot also supports text-to-speech synthesis, enabling the chatbot to speak its responses with a variety of voices and emotional styles.
-Features
+BanterBot is a user-friendly chatbot application that leverages OpenAI models for generating context-aware responses and Azure Neural Voices for text-to-speech synthesis. The package offers a comprehensive toolkit for building chatbot applications with an intuitive interface and a suite of utilities.
 
-* Interactive command-line interface with rich text formatting and colors using the termighty library
-* Text-based conversation with a chatbot powered by ChatGPT
-* Text-to-speech synthesis for spoken responses using Azure Speech TTS
-* Customizable chatbot character for personalized experiences
-* Real-time response display and updates
-* Input history tracking and conversation summarization
-* Threading for efficient and smooth operation
+## Features
+
+* Employs OpenAI models for generating context-sensitive responses
+* Utilizes Azure Neural Voices for high-quality text-to-speech synthesis
+* Supports a variety of output formats, voices, and speaking styles
+* Enables real-time monitoring of the chatbot's responses
+* Provides an abstract base class for crafting frontends for the BanterBot application
+* Includes a tkinter-based frontend implementation
 
 ## Requirements
 
-Requires three environment variables for full functionality:
+Three environment variables are required for full functionality:
 
-* `OPENAI_API_KEY`: A valid OpenAI API key,
-* `AZURE_SPEECH_KEY`: A valid Azure Cognitive Services Speech API key for TTS functionality,
-* `AZURE_SPEECH_REGION`: The region associated with your Azure Cognitive Services Speech API key.
+* `OPENAI_API_KEY`: A valid OpenAI API key
+* `AZURE_SPEECH_KEY`: A valid Azure Cognitive Services Speech API key for TTS functionality
+* `AZURE_SPEECH_REGION`: The region associated with your Azure Cognitive Services Speech API key
+
+## Components
+
+### OpenAIManager
+
+A class responsible for managing interactions with the OpenAI ChatCompletion API. It offers functionality to generate responses from the API based on input messages. It supports generating responses in their entirety or as a stream of response blocks.
+
+### TextToSpeech
+
+A class that handles text-to-speech synthesis using Azure's Cognitive Services. It supports a wide range of output formats, voices, and speaking styles. The synthesized speech can be interrupted, and the progress can be monitored in real-time.
+
+### BanterBotInterface
+
+An abstract base class for designing frontends for the BanterBot application. It provides a high-level interface for managing conversations with the bot, including sending messages, receiving responses, and updating the conversation area.
+
+### BanterBotTK
+
+A graphical user interface (GUI) for a chatbot application that employs OpenAI models for generating responses and Azure Neural Voices for text-to-speech. The class inherits from both tkinter.Tk and BanterBotInterface, offering a seamless integration of chatbot functionality with an intuitive interface.
+
+## Installation
+
+To install BanterBot, simply clone the repository and install the required dependencies:
+
+```bash
+git clone https://github.com/gabrielscabrera/banterbot.git
+cd banterbot
+python -m pip install .
+```
 
 ## Usage
 
-### Manual Installation
+### Launch with a Python script
 
-To install and initiate the BanterBot interface, follow these steps:
+To use BanterBot, just import the necessary components and create an instance of the BanterBotTK class:
 
-1. Clone the BanterBot repository and navigate to the cloned directory.
-2. Install the necessary package by running `python -m pip install .` in your terminal.
-3. Launch the BanterBot Command Line Interface (CLI) by executing the `banterbot` command.
+```python
+from banterbot import BanterBotTK
+from banterbot.data.azure_neural_voices import get_voice_by_name
+from banterbot.data.openai_models import openai_models
 
-### Basics
+model = openai_models["gpt-3.5-turbo"]
+voice = get_voice_by_name("Aria")
+style = "chat"
 
-For character customization, utilize the optional `--character` argument as follows:
+app = BanterBotTK(model=model, voice=voice, style=style)
+app.run()
+```
 
-`banterbot --character [character]`
+### Launch with Command Line
 
-Replace `[character]` with your desired chatbot character. It is advised to use second-person singular in the format "<name> from <context>, <additional details>". For example, "Marvin the Paranoid Android. You are a sad robot with a brain the size of a planet."
+Start the BanterBot Command Line Interface (CLI) by executing the `banterbot` command. Use the `-g` or `--gpt4` flags to enable GPT-4; this only works if you have GPT-4 API access.
 
-If no character is specified, `BanterBot` will default to Marvin the Paranoid Android.
+## Chat Logs
 
-For a randomly selected character, simply use:
+Chat logs are saved in the `$HOME/Documents/BanterBot/Conversations/` directory as individual `.txt` files.
 
-`banterbot --random`
+## Documentation
 
-Once the interface is launched, type your messages in the input box, and BanterBot will generate responses in the output window. Additionally, you can listen to BanterBot's responses through synthesized speech.
-
-### Chat Logs
-
-Chats are saved in the `$HOME/Documents/BanterBot/Conversations/` directory in individual `.txt` files; these contain the initial prompt, as well as the timestamp and chat log.
-
-### Available Command-Line Arguments
-
-The program accepts the following command-line arguments:
-
-* `-u` or `--username`: Specify the name of the program's user (one word, no spaces),
-* `-c` or `--character`: Provide a name and/or short description of the persona BanterBot should emulate. It is recommended to use second-person singular in the format "<name> from <context>, <additional details>",
-* `-m` or `--mode`: Select an OpenAI API mode, either "ChatCompletion" or "Completion"; defaults to "ChatCompletion",
-* `-r`, `--rand`, or `--random`: Override the "character" argument and select a random character.
-* `-n`, `--no-thread`: Disable multithreading on initialization of BanterBot (can help with "Too Many Requests" exceptions).
-* `-g`, `--gpt4`: Enable GPT-4; overrides --mode and --no-thread flag, and only works if you have GPT-4 API access.
-* `-t`, `--temp` or `--temperature`: Set the model temperature.
-
-## Dependencies
-1. `openai`: The OpenAI library is a Python package that provides a convenient and user-friendly way to interact with the OpenAI API. It allows developers to access various AI models, such as GPT-3, for tasks like natural language processing, translation, and text generation.
-
-2. `tiktoken`: Tiktoken is a lightweight Python library for tokenizing text data. It is particularly useful when working with APIs that have token-based usage limits, as it enables developers to count the number of tokens in a text string without making an actual API call.
-
-3. `geocoder`: Geocoder is a Python library that simplifies the process of geocoding and reverse geocoding. It allows developers to obtain geographic coordinates (latitude and longitude) for a given address or location, or retrieve the address for a given set of coordinates, by accessing various geocoding providers like Google Maps, OpenStreetMap, and more.
-
-4. `requests`: The Requests library is a popular Python package for making HTTP requests in a simple and user-friendly manner. It streamlines the process of sending and receiving data from web services, handling tasks like URL encoding, handling query parameters, and managing cookies.
-
-5. `termighty`: Termighty is a Python package that offers a toolkit for creating interactive terminal-based applications. It provides developers with functionalities like handling user input, managing terminal colors and styles, and organizing content on the screen.
-
-6. `azure-cognitiveservices-speech`: The Azure Cognitive Services Speech SDK is a Python package that enables developers to integrate Microsoft's speech recognition, text-to-speech, and speech translation services into their applications. It provides a simple interface for working with speech data and supports various languages and dialects.
-
-7. `spacy`: SpaCy is an efficient Python library for natural language processing (NLP) tasks, offering features like tokenization, part-of-speech tagging, named entity recognition, and dependency parsing. Its architecture is optimized for speed and scalability, suitable for various text processing applications. It supports pre-trained models for multiple languages and allows customization with custom datasets.
+For a complete set of documentation, please refer to the [BanterBot Documentation](https://github.com/GabrielSCabrera/BanterBot/wiki).

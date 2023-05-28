@@ -1,6 +1,8 @@
+from typing import Tuple
+
 import spacy
 
-from banterbot.data.constants import EN_CORE_WEB_MD, EN_CORE_WEB_SM
+from banterbot.data.config import EN_CORE_WEB_MD, EN_CORE_WEB_SM
 
 
 class NLP:
@@ -15,9 +17,10 @@ class NLP:
     """
 
     @classmethod
-    def _init_models(cls):
+    def _init_models(cls) -> None:
         """
         Initializes and configures the required SpaCy models for sentence segmentation and keyword extraction.
+        This method is called upon import to ensure that the necessary models are available and configured.
         """
         cls._models = {}
 
@@ -75,7 +78,7 @@ class NLP:
         return cls._models[name]
 
     @classmethod
-    def segment_sentences(cls, string: str) -> tuple[spacy.tokens.span.Span, ...]:
+    def segment_sentences(cls, string: str) -> Tuple[str, ...]:
         """
         Splits a text string into individual sentences using a specialized SpaCy model. The model is a lightweight version
         of `en_core_web_sm` designed specifically for sentence segmentation.
@@ -83,13 +86,13 @@ class NLP:
         Args:
             string (str): The input text string.
 
-        Yields:
-            tuple[spacy.tokens.span.Span, ...]: A tuple of individual sentences in the form of SpaCy Span objects.
+        Returns:
+            Tuple[str, ...]: A tuple of individual sentences as strings.
         """
         return tuple(sentence.text_with_ws for sentence in cls._models["segmenter"](string).sents)
 
     @classmethod
-    def extract_keywords(cls, string: str) -> tuple[str, ...]:
+    def extract_keywords(cls, string: str) -> Tuple[str, ...]:
         """
         Extracts keywords from a text string using the `en_core_web_md` SpaCy model.
 
@@ -97,7 +100,7 @@ class NLP:
             string (str): The input text string.
 
         Returns:
-            tuple[str, ...]: A tuple of extracted keywords as strings.
+            Tuple[str, ...]: A tuple of extracted keywords as strings.
         """
         return tuple([str(entity) for entity in cls._models[EN_CORE_WEB_MD](string).ents])
 

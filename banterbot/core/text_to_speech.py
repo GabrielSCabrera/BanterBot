@@ -7,7 +7,8 @@ from typing import Dict, Generator, List, Optional
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
-from banterbot.data.constants import AZURE_SPEECH_KEY, AZURE_SPEECH_REGION
+from banterbot.data.azure_neural_voices import AzureNeuralVoice
+from banterbot.data.config import AZURE_SPEECH_KEY, AZURE_SPEECH_REGION
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
 from banterbot.utils.text_to_speech_word import TextToSpeechWord
 
@@ -15,6 +16,10 @@ from banterbot.utils.text_to_speech_word import TextToSpeechWord
 class TextToSpeech:
     """
     A class to handle text-to-speech synthesis utilizing Azure's Cognitive Services.
+
+    This class provides an interface to convert text into speech using Azure's Cognitive Services.
+    It supports various output formats, voices, and speaking styles. The synthesized speech can be
+    interrupted, and the progress can be monitored in real-time.
     """
 
     # Create a lock that prevents race conditions when speaking
@@ -70,6 +75,8 @@ class TextToSpeech:
     def interrupt(self) -> None:
         """
         Interrupts an ongoing TTS process, if any.
+
+        This method sets the interrupt flag, which will cause the ongoing TTS process to stop.
         """
         self._interrupt = True
 
@@ -120,14 +127,14 @@ class TextToSpeech:
                 }
             )
 
-    def _create_ssml(self, text: str, voice_name: str, style: Optional[str] = None) -> str:
+    def _create_ssml(self, text: str, voice: str, style: Optional[str] = None) -> str:
         """
         Creates an SSML string from the given text, voice, and style.
 
         Args:
-            text (str): The text to be converted to SSML.
-            voice_name (str): The name of the voice to be used.
-            style (str, optional): The speaking style to be applied. Defaults to None.
+            text (str): The input string that is to be converted into speech.
+            voice (AzureNeuralVoice): The voice to be used.
+            style (str, optional): The speaking style to be applied. Default is None.
 
         Returns:
             str: The SSML string.
@@ -138,7 +145,7 @@ class TextToSpeech:
             'xmlns="http://www.w3.org/2001/10/synthesis" '
             'xmlns:mstts="https://www.w3.org/2001/mstts" '
             'xml:lang="en-US">'
-            f'<voice name="{voice_name}">'
+            f'<voice name="{voice.voice}">'
         )
 
         # If a speaking style is specified, add the express-as tag
@@ -155,6 +162,9 @@ class TextToSpeech:
     def _reset(self) -> None:
         """
         Resets the state variables of the TTS synthesizer.
+
+        This method resets the state variables, such as the list of boundaries, synthesis completed flag,
+        synthesis started flag, and interrupt flag.
         """
         # Reset the list of boundaries that have been processed
         self._boundaries: List[Dict[str, str]] = []
@@ -167,6 +177,9 @@ class TextToSpeech:
     def _synthesizer_events_connect(self) -> None:
         """
         Connects the TTS synthesizer events to their corresponding callbacks.
+
+        This method connects the synthesis_started, synthesis_word_boundary, synthesis_canceled,
+        and synthesis_completed events to their respective callback functions.
         """
         # Connect the synthesis_started event to the _callback_started method
         self._synthesizer.synthesis_started.connect(self._callback_started)
@@ -204,6 +217,9 @@ class TextToSpeech:
     def _process_callbacks(self, output: TextToSpeechOutput) -> Generator[TextToSpeechWord, None, bool]:
         """
         Monitors the synthesis progress and updates the output accordingly.
+
+        This method continuously checks the synthesis progress and processes the boundaries.
+        It updates the output object with the processed words and yields them one by one.
 
         Args:
             output (TextToSpeechOutput): The output object to which the processed words will be added.
@@ -255,23 +271,26 @@ class TextToSpeech:
     def _speak(self, ssml: str):
         self._synthesizer.speak_ssml(ssml)
 
-    def speak(self, input_string: str, voice_name: str, style: str) -> Generator[TextToSpeechWord, None, bool]:
+    def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[TextToSpeechWord, None, bool]:
         """
         Speaks the given text using the specified voice and style.
 
+        This method converts the input text into speech using the specified voice and style.
+        It yields the synthesized words one by one, along with their contextual information.
+
         Args:
-            input_string (str): The text to be spoken.
-            voice_name (str): The name of the voice to be used.
+            input_string (str): The input string that is to be converted into speech.
+            voice (AzureNeuralVoice): The voice to be used.
             style (str): The speaking style to be applied.
 
         Yields:
             TextToSpeechWord: A word with contextual information.
         """
         # Create SSML markup for the given input_string, voice, and style
-        ssml = self._create_ssml(input_string, voice_name, style)
+        ssml = self._create_ssml(input_string, voice, style)
 
         # Prepare an instance of TextToSpeechOutput while will yield values iteratively
-        output = TextToSpeechOutput(input_string=input_string)
+        output = TextToSpeechOutput(input_string=input_string, voice=voice, style=style)
 
         with self.__class__._speech_lock:
 

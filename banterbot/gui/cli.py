@@ -1,9 +1,16 @@
 import argparse
 
-from banterbot.interface import Interface
+from banterbot.data.openai_models import openai_models
+from banterbot.gui.banter_bot_tk import BanterBotTK
 
 
-def run():
+def run() -> None:
+    """
+    The main function to run the BanterBot Command Line Interface.
+
+    This function parses command line arguments, sets up the necessary configurations, and initializes the BanterBotTK
+    graphical user interface for user interaction.
+    """
     parser = argparse.ArgumentParser(
         prog="BanterBot Command Line Interface",
         description=(
@@ -39,61 +46,23 @@ def run():
     )
 
     parser.add_argument(
-        "-m",
-        "--mode",
-        choices=["ChatCompletion", "Completion"],
-        default="ChatCompletion",
-        type=str,
-        dest="mode",
-        help="OpenAI API Selection. ChatCompletion is cheaper, but often not as good unless you have GPT-4 access.",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--rand",
-        "--random",
-        action="store_true",
-        dest="random",
-        help='Override the "character" argument and have the program select a random character.',
-    )
-
-    parser.add_argument(
-        "-n",
-        "--no-thread",
-        action="store_false",
-        dest="nothread",
-        help='Disable multithreading on initialization of Persona (can help with "Too Many Requests" exceptions).',
-    )
-
-    parser.add_argument(
         "-g",
         "--gpt4",
         action="store_true",
         dest="gpt4",
-        help="Enable GPT-4; overrides --mode and --no-thread flag, and only works if you have GPT-4 API access.",
-    )
-
-    parser.add_argument(
-        "-t",
-        "--temp",
-        "--temperature",
-        type=float,
-        dest="temperature",
-        help="Set the model temperature.",
+        help="Enable GPT-4; only works if you have GPT-4 API access.",
     )
 
     args = parser.parse_args()
 
     kwargs = {
-        "username": args.username,
-        "character": args.character,
-        "mode": args.mode,
-        "random_character": args.random,
-        "thread_on_init": args.nothread,
-        "gpt4": args.gpt4,
-        "temperature": args.temperature,
+        # "username": args.username,
+        # "character": args.character,
+        "model": openai_models["gpt-4"]
+        if args.gpt4
+        else openai_models["gpt-3.5-turbo"],
     }
 
     print("Loading...")
-    interface = Interface(**kwargs)
-    interface.start()
+    gui = BanterBotTK(**kwargs)
+    gui.run()

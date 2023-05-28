@@ -1,31 +1,51 @@
 """
-An overview of Azure Neural Voice models for speech synthesis. Each voice profile is represented by an instance of the
-`AzureNeuralVoice` dataclass, which provides the following information:
+This program defines a dataclass and utility functions to represent and manage Azure Neural Voice profiles for speech
+synthesis. The main components of the program are:
 
-Attributes:
-    name (str): The name of the voice profile.
-    voice (str): The voice identifier.
-    gender (Literal[MALE, FEMALE]): The gender of the voice (either MALE or FEMALE).
-    pitch (int): The relative (by gender) pitch level of the voice, where a lower value indicates a lower pitch.
-    styles (List[str]): The available styles (i.e., tones/emotions) for the voice.
+    1.  AzureNeuralVoice dataclass: Represents an Azure Neural Voice profile with attributes such as name, voice
+        identifier, gender, pitch, and available styles (tones/emotions).
+
+    2.  neural_voices: A dictionary containing instances of AzureNeuralVoice for each available voice profile.
+
+    3.  Utility functions:>
+            a.  get_voice_by_name(name: str) -> AzureNeuralVoice: Retrieves an AzureNeuralVoice instance by its name.
+
+            b.  get_voices_by_gender(gender: Literal[MALE, FEMALE]) -> List[AzureNeuralVoice]: Retrieves a list of
+            AzureNeuralVoice instances with the specified gender.
+
+The purpose of this program is to provide an organized and easily accessible representation of Azure Neural Voice
+profiles for speech synthesis. Users can utilize the provided data and utility functions to easily retrieve voice
+profiles based on their requirements (e.g., gender, pitch, or available styles).
 """
-from dataclasses import dataclass
-from typing import Literal
 
-from banterbot.data.constants import FEMALE, MALE
+from dataclasses import dataclass
+from typing import List, Literal
+
+from banterbot.data.config import FEMALE, MALE
 
 
 @dataclass
 class AzureNeuralVoice:
+    """
+    A dataclass representing an Azure Neural Voice profile for speech synthesis.
+
+    Attributes:
+        name (str): The name of the voice profile.
+        voice (str): The voice identifier used by Azure Text-to-Speech API.
+        gender (Literal[MALE, FEMALE]): The gender of the voice (either MALE or FEMALE).
+        pitch (int): The relative (by gender) pitch level of the voice, where a lower value indicates a lower pitch.
+        styles (List[str]): The available styles (i.e., tones/emotions) for the voice.
+    """
+
     name: str
     voice: str
     gender: Literal[MALE, FEMALE]
     pitch: int
-    styles: list[str, ...]
+    styles: List[str]
 
 
-# Available voice profiles
-neural_voices = {
+# Dictionary containing voice profile data
+_neural_voice_data = {
     "Aria": {
         "gender": FEMALE,
         "pitch": 3,
@@ -194,4 +214,33 @@ neural_voices = {
 }
 
 # Create instances of AzureNeuralVoice for each voice in the dictionary
-neural_voices = {name: AzureNeuralVoice(name=name, **voice) for name, voice in neural_voices.items()}
+neural_voices = {name: AzureNeuralVoice(name=name, **voice) for name, voice in _neural_voice_data.items()}
+
+
+def get_voice_by_name(name: str) -> AzureNeuralVoice:
+    """
+    Retrieve an AzureNeuralVoice instance by its name.
+
+    Args:
+        name (str): The name of the voice profile.
+
+    Returns:
+        AzureNeuralVoice: The corresponding AzureNeuralVoice instance.
+
+    Raises:
+        KeyError: If the specified name is not found in the neural_voices dictionary.
+    """
+    return neural_voices[name]
+
+
+def get_voices_by_gender(gender: Literal[MALE, FEMALE]) -> List[AzureNeuralVoice]:
+    """
+    Retrieve a list of AzureNeuralVoice instances with the specified gender.
+
+    Args:
+        gender (Literal[MALE, FEMALE]): The gender of the voices to retrieve (either MALE or FEMALE).
+
+    Returns:
+        List[AzureNeuralVoice]: A list of AzureNeuralVoice instances with the specified gender.
+    """
+    return [voice for voice in neural_voices.values() if voice.gender == gender]

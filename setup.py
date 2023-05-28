@@ -2,7 +2,7 @@ import unittest
 
 from setuptools import find_packages, setup
 
-dependencies = ["openai", "tiktoken", "geocoder", "requests", "termighty", "azure-cognitiveservices-speech", "spacy"]
+dependencies = ["openai", "tiktoken", "requests", "azure-cognitiveservices-speech", "spacy"]
 
 url = "https://github.com/GabrielSCabrera/BanterBot"
 
@@ -23,19 +23,31 @@ setup(
     packages=find_packages(),
     test_suite="setup.run_tests",
     version="0.0.1",
-    description="ChatGPT-Powered Interactive Assistant",
+    description="ChatGPT-Powered Text-To-Speech Interaction",
     long_description=long_description,
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
     url=url,
     download_url=url + "archive/v0.0.1.tar.gz",
-    keywords=["terminal", "gpt", "gui", "windows", "linux", "chatgpt", "text-to-speech", "tts", "chatbot"],
+    keywords=[
+        "tkinter",
+        "tk",
+        "gpt",
+        "gui",
+        "windows",
+        "linux",
+        "cross-platform",
+        "chatgpt",
+        "text-to-speech",
+        "tts",
+        "chatbot",
+    ],
     install_requires=dependencies,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3.11",
     ],
     entry_points={
-        "console_scripts": ["banterbot=banterbot.cli:run"],
+        "console_scripts": ["banterbot=banterbot.gui.cli:run"],
     },
 )
