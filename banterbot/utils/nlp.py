@@ -86,7 +86,7 @@ class NLP:
         Yields:
             tuple[spacy.tokens.span.Span, ...]: A tuple of individual sentences in the form of SpaCy Span objects.
         """
-        return tuple([str(sentence) for sentence in cls._models["segmenter"](string).sents])
+        return tuple(sentence.text_with_ws for sentence in cls._models["segmenter"](string).sents)
 
     @classmethod
     def extract_keywords(cls, string: str) -> tuple[str, ...]:

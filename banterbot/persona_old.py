@@ -46,9 +46,12 @@ class ParsedResponse(TypedDict):
         actions (list[str, ...]): A list of strings to hold any actions specified in the response.
     """
 
-    text: str  # A string to hold the text of the response.
-    emotion: Literal[config.emotions]  # A string literal to specify the emotion of the response.
-    actions: list[str, ...]  # A list of strings to hold any actions specified in the response.
+    # A string to hold the text of the response.
+    text: str
+    # A string literal to specify the emotion of the response.
+    emotion: Literal[config.emotions]
+    # A list of strings to hold any actions specified in the response.
+    actions: list[str, ...]
 
 
 class MessageDict(TypedDict):
@@ -56,9 +59,9 @@ class MessageDict(TypedDict):
     A typed dictionary to represent a message in the conversation history.
 
     Attributes:
-    - role (Literal["system", "user", "assistant"]): The role of the message sender.
-    - content (str): The content of the message.
-    - name (Optional[str]): The name of the message sender.
+        role (Literal["system", "user", "assistant"]): The role of the message sender.
+        content (str): The content of the message.
+        name (Optional[str]): The name of the message sender.
     """
 
     role: Literal["system", "user", "assistant"]

@@ -74,7 +74,7 @@ class TextToSpeechOutput:
         Returns:
             str: The string representation of the text-to-speech output.
         """
-        return "".join([word.word for word in self.words])
+        return "".join(word.word for word in self.words)
 
     def append(self, entry: TextToSpeechWord) -> None:
         """

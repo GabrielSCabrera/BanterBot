@@ -218,6 +218,7 @@ class TextToSpeech:
         word_index = 0
         self._interrupt = False
         self._outputs.append(output)
+        status = False
 
         # Wait until the synthesis has started before proceeding
         self._start_synthesis.wait()
@@ -226,15 +227,16 @@ class TextToSpeech:
         start_time = time.perf_counter_ns()
 
         # Continuously monitor the synthesis progress
-        while not self._synthesis_completed or word_index < len(self._boundaries):
-
-            if self._interrupt:
-                return False
+        while not self._interrupt and (not self._synthesis_completed or word_index < len(self._boundaries)):
 
             current_time = time.perf_counter_ns()
             elapsed_time = current_time - start_time
 
-            while word_index < len(self._boundaries) and elapsed_time >= self._boundaries[word_index]["t_word"]:
+            while (
+                not self._interrupt
+                and word_index < len(self._boundaries)
+                and elapsed_time >= self._boundaries[word_index]["t_word"]
+            ):
                 word = self._process_boundary(self._boundaries[word_index], word_index, current_time, output)
                 output.append(word)
                 word_index += 1
@@ -243,9 +245,12 @@ class TextToSpeech:
             # Wait for a short amount of time before checking the synthesis progress again
             time.sleep(0.005)
 
+        if not self._interrupt:
+            status = True
+
         # Stop the synthesizer
         self._synthesizer.stop_speaking()
-        return True
+        return status
 
     def _speak(self, ssml: str):
         self._synthesizer.speak_ssml(ssml)
