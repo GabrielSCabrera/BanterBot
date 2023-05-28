@@ -76,4 +76,4 @@ Chat logs are saved in the `$HOME/Documents/BanterBot/Conversations/` directory 
 
 ## Documentation
 
-For a complete set of documentation, please refer to the [BanterBot Documentation](https://github.com/GabrielSCabrera/BanterBot/wiki).
+For a complete set of documentation, please refer to the [BanterBot Documentation](https://gabrielscabrera.github.io/BanterBot/).
