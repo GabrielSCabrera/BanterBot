@@ -94,6 +94,19 @@ functionality with an intuitive interface.
 Installation
 ------------
 
+Pip
+~~~
+
+BanterBot is installable using the Python Package Index (PyPi):
+
+.. code:: bash
+
+  python -m pip install banterbot
+
+
+Manual
+~~~~~~
+
 To install BanterBot, simply clone the repository and install the
 required dependencies:
 

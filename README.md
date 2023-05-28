@@ -39,6 +39,16 @@ A graphical user interface (GUI) for a chatbot application that employs OpenAI m
 
 ## Installation
 
+### Pip
+
+BanterBot is installable using the Python Package Index (PyPi):
+
+```bash
+python -m pip install banterbot
+```
+
+### Manual
+
 To install BanterBot, simply clone the repository and install the required dependencies:
 
 ```bash
