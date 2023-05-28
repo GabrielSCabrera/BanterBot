@@ -125,7 +125,7 @@ class BanterBotTK(tk.Tk, BanterBotInterface):
         Prompt the user for input and process the message.
         This method retrieves the user's name and message, and then calls the superclass's prompt method.
         """
-        user_name = self.name_entry.get()
+        user_name = self.name_entry.get().split(" ")[0].strip()
         user_message = self.message_entry.get()
         if not user_message:
             return

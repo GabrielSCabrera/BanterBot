@@ -27,25 +27,6 @@ def run() -> None:
     )
 
     parser.add_argument(
-        "-u",
-        "--username",
-        type=str,
-        dest="username",
-        help="The name of the program's user, only one word without spaces is allowed.",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--character",
-        type=str,
-        dest="character",
-        help=(
-            "A name and/or short description of the character Persona should emulate. For best results, use the "
-            'second-person singular to describe the character, in the form "<name> from <context>, <details>".'
-        ),
-    )
-
-    parser.add_argument(
         "-g",
         "--gpt4",
         action="store_true",
@@ -56,13 +37,8 @@ def run() -> None:
     args = parser.parse_args()
 
     kwargs = {
-        # "username": args.username,
-        # "character": args.character,
-        "model": openai_models["gpt-4"]
-        if args.gpt4
-        else openai_models["gpt-3.5-turbo"],
+        "model": openai_models["gpt-4"] if args.gpt4 else openai_models["gpt-3.5-turbo"],
     }
 
-    print("Loading...")
     gui = BanterBotTK(**kwargs)
     gui.run()

@@ -10,6 +10,7 @@ with open("README.md", "r") as fs:
     long_description = fs.read()
 
 # For running tests: python -m unittest discover -s tests
+# For building: python setup.py sdist bdist_wheel
 
 
 def run_tests():
@@ -25,6 +26,7 @@ setup(
     version="0.0.1",
     description="ChatGPT-Powered Text-To-Speech Interaction",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
     url=url,
