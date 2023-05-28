@@ -9,7 +9,8 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../banterbot"))
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, basedir)
 
 project = "BanterBot"
 copyright = "2023, Gabriel S. Cabrera"
