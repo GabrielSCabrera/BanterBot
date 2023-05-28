@@ -24,7 +24,7 @@ jobs:
     - name: Generate Documentation
       run: |
         cd docs  # assuming this is where your Sphinx config is
-        ./make html  # assuming you have a Makefile set up for Sphinx
+        make html  # assuming you have a Makefile set up for Sphinx
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
