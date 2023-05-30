@@ -1,6 +1,6 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
+from typing import Literal, Optional
 
 import azure.cognitiveservices.speech as speechsdk
 
