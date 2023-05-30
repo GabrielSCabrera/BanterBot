@@ -8,18 +8,18 @@ import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
-from banterbot.data.config import AZURE_SPEECH_KEY, AZURE_SPEECH_REGION
+from banterbot.data.constants import AZURE_SPEECH_KEY, AZURE_SPEECH_REGION, TTS
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
-from banterbot.utils.text_to_speech_word import TextToSpeechWord
+from banterbot.utils.word import Word
 
 
 class TextToSpeech:
     """
     A class to handle text-to-speech synthesis utilizing Azure's Cognitive Services.
 
-    This class provides an interface to convert text into speech using Azure's Cognitive Services.
-    It supports various output formats, voices, and speaking styles. The synthesized speech can be
-    interrupted, and the progress can be monitored in real-time.
+    This class provides an interface to convert text into speech using Azure's Cognitive Services. It supports various
+    output formats, voices, and speaking styles. The synthesized speech can be interrupted, and the progress can be
+    monitored in real-time.
     """
 
     # Create a lock that prevents race conditions when speaking
@@ -111,19 +111,11 @@ class TextToSpeech:
         # Check if the boundary is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
 
-            # Calculate the offset and duration of the boundary in nanoseconds
-            offset_ns = 100 * event.audio_offset
-            duration = 1e9 * event.duration.total_seconds()
-
             # Add the boundary information to the list of boundaries
             self._boundaries.append(
                 {
-                    "offset_ns": offset_ns,
-                    "text": event.text,
-                    "word_length": event.word_length,
-                    "duration": duration,
-                    "boundary_type": event.boundary_type,
-                    "t_word": offset_ns + duration / event.word_length,
+                    "event": event,
+                    "time": 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
                 }
             )
 
@@ -191,50 +183,50 @@ class TextToSpeech:
         self._synthesizer.synthesis_canceled.connect(self._callback_completed)
         self._synthesizer.synthesis_completed.connect(self._callback_completed)
 
-    def _process_boundary(
-        self, boundary: dict, word_index: int, timestamp: datetime.datetime, output: TextToSpeechOutput
-    ) -> TextToSpeechWord:
+    def _process_boundary(self, event: dict) -> Word:
         """
-        Processes a synthesis boundary and updates the output and total length.
+        Processes a synthesis boundary event and returns an instance of class Word.
 
         Args:
-            boundary (dict): The synthesis boundary to be processed.
-            word_index (int): The index of the current word.
-            timestamp (datetime.datetime): The timestamp of the current boundary.
-            output (TextToSpeechOutput): The output object to which the processed word will be added.
+            event (dict): The synthesis boundary event to be processed.
 
         Returns:
-            TextToSpeechWord: The processed word with contextual information.
+            Word: The processed word with contextual information.
         """
-        text = boundary["text"]
+        text = event.text
         if word_index > 0 and boundary["boundary_type"] == speechsdk.SpeechSynthesisBoundaryType.Word:
             text = f" {text}"
-        word = TextToSpeechWord(
-            word=text, timestamp=timestamp, word_index=word_index, category=boundary["boundary_type"]
+
+        word = Word(
+            word=text,
+            offset=datetime.timedelta(microseconds=event.audio_offset / 10),
+            duration=datetime.timedelta(microseconds=event.duration / 1000),
+            category=event.boundary_type,
+            source=TTS,
         )
         return word
 
-    def _process_callbacks(self, output: TextToSpeechOutput) -> Generator[TextToSpeechWord, None, bool]:
+    def _process_callbacks(self, output: TextToSpeechOutput) -> Generator[Word, None, bool]:
         """
         Monitors the synthesis progress and updates the output accordingly.
 
-        This method continuously checks the synthesis progress and processes the boundaries.
-        It updates the output object with the processed words and yields them one by one.
+        This method continuously checks the synthesis progress and processes the boundaries. It updates the output
+        object with the processed words and yields them one by one.
 
         Args:
             output (TextToSpeechOutput): The output object to which the processed words will be added.
 
         Yields:
-            TextToSpeechWord: A word with contextual information.
+            Word: A word with contextual information.
 
         Returns:
             bool: True if the process completed successfully, False otherwise.
         """
         # Initialize variables
         word_index = 0
+        success = False
         self._interrupt = False
         self._outputs.append(output)
-        status = False
 
         # Wait until the synthesis has started before proceeding
         self._start_synthesis.wait()
@@ -245,15 +237,14 @@ class TextToSpeech:
         # Continuously monitor the synthesis progress
         while not self._interrupt and (not self._synthesis_completed or word_index < len(self._boundaries)):
 
-            current_time = time.perf_counter_ns()
-            elapsed_time = current_time - start_time
+            dt = time.perf_counter_ns() - start_time
 
             while (
                 not self._interrupt
                 and word_index < len(self._boundaries)
-                and elapsed_time >= self._boundaries[word_index]["t_word"]
+                and dt >= self._boundaries[word_index]["time"]
             ):
-                word = self._process_boundary(self._boundaries[word_index], word_index, current_time, output)
+                word = self._process_boundary(event=self._boundaries[word_index]["event"])
                 output.append(word)
                 word_index += 1
                 yield word
@@ -262,21 +253,21 @@ class TextToSpeech:
             time.sleep(0.005)
 
         if not self._interrupt:
-            status = True
+            success = True
 
         # Stop the synthesizer
         self._synthesizer.stop_speaking()
-        return status
+        return success
 
-    def _speak(self, ssml: str):
+    def _speak(self, ssml: str) -> None:
         self._synthesizer.speak_ssml(ssml)
 
-    def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[TextToSpeechWord, None, bool]:
+    def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[Word, None, bool]:
         """
         Speaks the given text using the specified voice and style.
 
-        This method converts the input text into speech using the specified voice and style.
-        It yields the synthesized words one by one, along with their contextual information.
+        This method converts the input text into speech using the specified voice and style. It yields the synthesized
+        words one by one, along with their contextual information.
 
         Args:
             input_string (str): The input string that is to be converted into speech.
@@ -284,22 +275,26 @@ class TextToSpeech:
             style (str): The speaking style to be applied.
 
         Yields:
-            TextToSpeechWord: A word with contextual information.
+            Word: A word with contextual information.
         """
         # Create SSML markup for the given input_string, voice, and style
         ssml = self._create_ssml(input_string, voice, style)
-
-        # Prepare an instance of TextToSpeechOutput while will yield values iteratively
-        output = TextToSpeechOutput(input_string=input_string, voice=voice, style=style)
 
         with self.__class__._speech_lock:
 
             # Reset all state attributes
             self._reset()
 
-            # Create a new thread to handle the speech synthesis, and start it
+            # Create a new thread to handle the speech synthesis
             speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
+
+            # Starting the speech synthesizer
             speech_thread.start()
+
+            # Prepare an instance of TextToSpeechOutput while will receive values iteratively
+            output = TextToSpeechOutput(
+                input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
+            )
 
             # Continuously monitor the synthesis progress in the main thread
             for word in self._process_callbacks(output):

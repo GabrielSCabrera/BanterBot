@@ -4,7 +4,8 @@ from typing import Generator, Iterator, List, Union
 
 import openai
 
-from banterbot.data.config import OPENAI_API_KEY, RETRY_LIMIT
+from banterbot.data.config import RETRY_LIMIT
+from banterbot.data.constants import OPENAI_API_KEY
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
 from banterbot.utils.nlp import NLP

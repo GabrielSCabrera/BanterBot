@@ -31,7 +31,7 @@ banterbot.utils.text\_to\_speech\_output module
 banterbot.utils.text\_to\_speech\_word module
 ---------------------------------------------
 
-.. automodule:: banterbot.utils.text_to_speech_word
+.. automodule:: banterbot.utils.word
    :members:
    :undoc-members:
    :show-inheritance:

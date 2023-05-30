@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Literal, Optional
 
-from banterbot.data.config import ASSISTANT, SYSTEM, USER
+from banterbot.data.constants import ASSISTANT, SYSTEM, USER
 from banterbot.data.openai_models import OpenAIModel
 
 

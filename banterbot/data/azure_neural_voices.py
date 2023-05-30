@@ -21,7 +21,7 @@ profiles based on their requirements (e.g., gender, pitch, or available styles).
 from dataclasses import dataclass
 from typing import List, Literal
 
-from banterbot.data.config import FEMALE, MALE
+from banterbot.data.constants import FEMALE, MALE
 
 
 @dataclass

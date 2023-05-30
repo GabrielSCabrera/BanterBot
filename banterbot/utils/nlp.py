@@ -2,7 +2,7 @@ from typing import Tuple
 
 import spacy
 
-from banterbot.data.config import EN_CORE_WEB_MD, EN_CORE_WEB_SM
+from banterbot.data.constants import EN_CORE_WEB_MD, EN_CORE_WEB_SM
 
 
 class NLP:
@@ -24,13 +24,23 @@ class NLP:
         """
         cls._models = {}
 
-        # Define a set of pipeline components to disable for the sentence segmenter.
-        segmenter_disable = ["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer", "ner"]
-        segmenter = cls._load_model(name=EN_CORE_WEB_SM, disable=segmenter_disable)
-        # Enable the sentence segmentation pipeline component for the segmenter model.
-        segmenter.enable_pipe("senter")
+        # Define a set of pipeline components to disable for the sentence senter.
+        senter_disable = ["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer", "ner"]
+        senter = cls._load_model(name=EN_CORE_WEB_SM, disable=senter_disable)
+        # Enable the sentence segmentation pipeline component for the senter model.
+        senter.enable_pipe("senter")
 
-        cls._models["segmenter"] = segmenter
+        rules = {}
+        splitter = cls._load_model(name=EN_CORE_WEB_MD)
+        # Customize the tokenization rules for the word splitter in order to prevent splitting of contractions.
+        ignore = ("'", "’", "‘")
+        for key, value in splitter.tokenizer.rules.items():
+            if all(i not in key for i in ignore):
+                rules[key] = value
+        splitter.tokenizer.rules = rules
+
+        cls._models["senter"] = senter
+        cls._models["splitter"] = splitter
         cls._models[EN_CORE_WEB_MD] = cls._load_model(name=EN_CORE_WEB_MD)
 
     @classmethod
@@ -78,18 +88,42 @@ class NLP:
         return cls._models[name]
 
     @classmethod
-    def segment_sentences(cls, string: str) -> Tuple[str, ...]:
+    def segment_sentences(cls, string: str, whitespace: bool = True) -> Tuple[str, ...]:
         """
         Splits a text string into individual sentences using a specialized SpaCy model. The model is a lightweight version
         of `en_core_web_sm` designed specifically for sentence segmentation.
 
         Args:
             string (str): The input text string.
+            whitespace (str): If True, keep whitespace at the beginning/end of sentences; if False, strip it.
 
         Returns:
             Tuple[str, ...]: A tuple of individual sentences as strings.
         """
-        return tuple(sentence.text_with_ws for sentence in cls._models["segmenter"](string).sents)
+        return tuple(
+            sentence.text_with_ws if whitespace else sentence.text for sentence in cls._models["senter"](string).sents
+        )
+
+    @classmethod
+    def segment_words(cls, string: str, whitespace: bool = True) -> Tuple[str, ...]:
+        """
+        Splits a text string into individual words using a specialized SpaCy model. The model is customized version of
+        `en_core_web_md` in which words are not split on apostrophes, in order to preserve contractions.
+
+        Args:
+            string (str): The input text string.
+            whitespace (str): If True, include whitespace characters between words; if False, omit it.
+
+        Returns:
+            Tuple[str, ...]: A tuple of individual words as strings.
+        """
+        words = []
+        for word in cls._models["splitter"](string):
+            words.append(word.text)
+            if whitespace and word.whitespace_:
+                words.append(word.whitespace_)
+
+        return tuple(words)
 
     @classmethod
     def extract_keywords(cls, string: str) -> Tuple[str, ...]:
