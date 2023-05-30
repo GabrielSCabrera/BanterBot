@@ -1,6 +1,6 @@
 import os
 import threading
-from typing import List
+from typing import Generator, List
 
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
