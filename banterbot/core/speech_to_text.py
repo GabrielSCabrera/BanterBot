@@ -52,7 +52,7 @@ class SpeechToText:
         self._interrupt = True
 
     def _reset(self) -> None:
-        self._recognized: List[Word, ...] = []
+        self._recognized: List[Word] = []
         self._interrupt = False
 
     def _recognizer_events_connect(self) -> None:
@@ -66,7 +66,7 @@ class SpeechToText:
 
         self._recognized.append(event.text)
 
-    def _process_callbacks(self, output: List[str, ...]) -> Generator[Word, None, bool]:
+    def _process_callbacks(self, output: List[str]) -> Generator[Word, None, bool]:
         # Initialize variables
         word_index = 0
         self._interrupt = False

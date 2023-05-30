@@ -128,7 +128,7 @@ class OpenAIManager:
 
         return response if stream else response.choices[0].message.content.strip()
 
-    def interrupt(self):
+    def interrupt(self) -> None:
         """
         Sets the interruption flag to True, which will stop the streaming response. This can be used to manually
         interrupt the streaming response if needed, for example, if the user sends a new message before the current
@@ -148,8 +148,8 @@ class OpenAIManager:
             and frequency_penalty.
 
         Returns:
-            List[str]: A list of sentences forming the response from the OpenAI API. This can be used to display the
-            generated response to the user or for further processing.
+            List[str]: A list of sentences forming the response from the OpenAI API. This can be used to display
+            the generated response to the user or for further processing.
         """
         response = self._request(messages=messages, stream=False, **kwargs)
         return NLP.segment_sentences(response)
