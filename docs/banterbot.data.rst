@@ -1,9 +1,6 @@
 banterbot.data package
 ======================
 
-Submodules
-----------
-
 banterbot.data.azure\_neural\_voices module
 -------------------------------------------
 
@@ -23,7 +20,7 @@ banterbot.data.config module
 banterbot.data.constants module
 -------------------------------
 
-.. automodule:: banterbot.data.config
+.. automodule:: banterbot.data.constants
    :members:
    :undoc-members:
    :show-inheritance:

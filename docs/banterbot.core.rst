@@ -1,9 +1,6 @@
 banterbot.core package
 ======================
 
-Submodules
-----------
-
 banterbot.core.openai\_manager module
 -------------------------------------
 

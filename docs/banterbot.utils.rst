@@ -1,9 +1,6 @@
 banterbot.utils package
 =======================
 
-Submodules
-----------
-
 banterbot.utils.message module
 ------------------------------
 

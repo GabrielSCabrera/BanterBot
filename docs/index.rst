@@ -46,9 +46,10 @@ ChatCompletion API. It offers functionality to generate responses from
 the API based on input messages. It supports generating responses in
 their entirety or as a stream of response blocks.
 
-.. automodule:: banterbot.core.openai_manager
+.. autoclass:: banterbot.OpenAIManager
    :members:
    :undoc-members:
+   :special-members:
    :show-inheritance:
 
 TextToSpeech
@@ -59,9 +60,10 @@ Services. It supports a wide range of output formats, voices, and
 speaking styles. The synthesized speech can be interrupted, and the
 progress can be monitored in real-time.
 
-.. automodule:: banterbot.core.text_to_speech
+.. autoclass:: banterbot.TextToSpeech
    :members:
    :undoc-members:
+   :special-members:
    :show-inheritance:
 
 BanterBotInterface
@@ -72,9 +74,10 @@ application. It provides a high-level interface for managing
 conversations with the bot, including sending messages, receiving
 responses, and updating the conversation area.
 
-.. automodule:: banterbot.gui.banter_bot_interface
+.. autoclass:: banterbot.BanterBotInterface
    :members:
    :undoc-members:
+   :special-members:
    :show-inheritance:
 
 BanterBotTK
@@ -86,9 +89,10 @@ text-to-speech. The class inherits from both tkinter.Tk and
 BanterBotInterface, offering a seamless integration of chatbot
 functionality with an intuitive interface.
 
-.. automodule:: banterbot.gui.banter_bot_tk
+.. autoclass:: banterbot.BanterBotTK
    :members:
    :undoc-members:
+   :special-members:
    :show-inheritance:
 
 Installation
@@ -134,11 +138,9 @@ instance of the BanterBotTK class:
 
 .. code:: python
 
-   from banterbot import BanterBotTK
-   from banterbot.data.azure_neural_voices import get_voice_by_name
-   from banterbot.data.openai_models import openai_models
+   from banterbot import BanterBotTK, get_voice_by_name, get_model_by_name
 
-   model = openai_models["gpt-3.5-turbo"]
+   model = get_model_by_name("gpt-3.5-turbo")
    voice = get_voice_by_name("Aria")
    style = "chat"
 
@@ -155,7 +157,7 @@ Documentation
 =====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    modules

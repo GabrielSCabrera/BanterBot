@@ -1,9 +1,6 @@
 banterbot.gui package
 =====================
 
-Submodules
-----------
-
 banterbot.gui.banter\_bot\_interface module
 -------------------------------------------
 
