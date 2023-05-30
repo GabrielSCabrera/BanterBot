@@ -46,7 +46,7 @@ ChatCompletion API. It offers functionality to generate responses from
 the API based on input messages. It supports generating responses in
 their entirety or as a stream of response blocks.
 
-.. autoclass:: banterbot.OpenAIManager
+.. autoclass:: banterbot.core.openai_manager.OpenAIManager
    :members:
    :undoc-members:
    :special-members:
@@ -60,7 +60,16 @@ Services. It supports a wide range of output formats, voices, and
 speaking styles. The synthesized speech can be interrupted, and the
 progress can be monitored in real-time.
 
-.. autoclass:: banterbot.TextToSpeech
+.. autoclass:: banterbot.core.text_to_speech.TextToSpeech
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
+SpeechToText
+~~~~~~~~~~~~
+
+.. autoclass:: banterbot.core.speech_to_text.SpeechToText
    :members:
    :undoc-members:
    :special-members:
@@ -74,7 +83,7 @@ application. It provides a high-level interface for managing
 conversations with the bot, including sending messages, receiving
 responses, and updating the conversation area.
 
-.. autoclass:: banterbot.BanterBotInterface
+.. autoclass:: banterbot.gui.banter_bot_interface.BanterBotInterface
    :members:
    :undoc-members:
    :special-members:
@@ -89,7 +98,7 @@ text-to-speech. The class inherits from both tkinter.Tk and
 BanterBotInterface, offering a seamless integration of chatbot
 functionality with an intuitive interface.
 
-.. autoclass:: banterbot.BanterBotTK
+.. autoclass:: banterbot.gui.banter_bot_tk.BanterBotTK
    :members:
    :undoc-members:
    :special-members:
