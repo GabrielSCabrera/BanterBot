@@ -5,6 +5,8 @@ from typing import Generator, List
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
+from banterbot.utils.word import Word
+
 
 class SpeechToText:
 
@@ -22,9 +24,10 @@ class SpeechToText:
             region=os.environ.get(AZURE_SPEECH_REGION),
         )
 
-        # Allowing the speech configuration to recognize profane words.
+        # Allowing the speech configuration to recognize profane words
         self._speech_config.set_profanity(speechsdk.ProfanityOption.Raw)
 
+        # Activate the receipt of data pertaining to word timings
         self._speech_config.request_word_level_timestamps()
 
         # Initialize the output and total length variables
