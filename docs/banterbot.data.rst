@@ -20,6 +20,14 @@ banterbot.data.config module
    :undoc-members:
    :show-inheritance:
 
+banterbot.data.constants module
+-------------------------------
+
+.. automodule:: banterbot.data.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 banterbot.data.openai\_models module
 ------------------------------------
 

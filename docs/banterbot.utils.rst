@@ -28,7 +28,15 @@ banterbot.utils.text\_to\_speech\_output module
    :undoc-members:
    :show-inheritance:
 
-banterbot.utils.text\_to\_speech\_word module
+banterbot.utils.speech\_to\_text\_output module
+-----------------------------------------------
+
+.. automodule:: banterbot.utils.speech_to_text_output
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+banterbot.utils.word module
 ---------------------------------------------
 
 .. automodule:: banterbot.utils.word
