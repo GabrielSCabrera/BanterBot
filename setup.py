@@ -11,6 +11,7 @@ with open("README.md", "r") as fs:
 
 # For running tests: python -m unittest discover -s tests
 # For building: python setup.py sdist bdist_wheel
+# For formatting: autoflake -r -i . | isort . | black --line-length 120 .
 
 
 def run_tests():

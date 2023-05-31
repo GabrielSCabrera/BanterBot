@@ -1,4 +1,4 @@
-banterbot
+BanterBot
 =========
 
 .. toctree::

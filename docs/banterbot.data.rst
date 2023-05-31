@@ -17,10 +17,10 @@ banterbot.data.config module
    :undoc-members:
    :show-inheritance:
 
-banterbot.data.constants module
+banterbot.data.enums module
 -------------------------------
 
-.. automodule:: banterbot.data.constants
+.. automodule:: banterbot.data.enums
    :members:
    :undoc-members:
    :show-inheritance:

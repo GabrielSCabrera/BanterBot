@@ -5,13 +5,13 @@ from typing import Generator, Iterator, List, Union
 import openai
 
 from banterbot.data.config import RETRY_LIMIT
-from banterbot.data.constants import OPENAI_API_KEY
+from banterbot.data.enums import EnvVar
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
 from banterbot.utils.nlp import NLP
 
 # Set the OpenAI API key
-openai.api_key = os.environ.get(OPENAI_API_KEY)
+openai.api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
 
 
 class OpenAIManager:

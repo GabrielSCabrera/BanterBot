@@ -10,7 +10,7 @@ synthesis. The main components of the program are:
     3.  Utility functions:>
             a.  get_voice_by_name(name: str) -> AzureNeuralVoice: Retrieves an AzureNeuralVoice instance by its name.
 
-            b.  get_voices_by_gender(gender: Literal[MALE, FEMALE]) -> List[AzureNeuralVoice]: Retrieves a list of
+            b.  get_voices_by_gender(gender: AzureNeuralVoiceGender) -> List[AzureNeuralVoice]: Retrieves a list of
             AzureNeuralVoice instances with the specified gender.
 
 The purpose of this program is to provide an organized and easily accessible representation of Azure Neural Voice
@@ -19,9 +19,9 @@ profiles based on their requirements (e.g., gender, pitch, or available styles).
 """
 
 from dataclasses import dataclass
-from typing import List, Literal
+from typing import List
 
-from banterbot.data.constants import FEMALE, MALE
+from banterbot.data.enums import AzureNeuralVoiceGender
 
 
 @dataclass
@@ -32,14 +32,14 @@ class AzureNeuralVoice:
     Attributes:
         name (str): The name of the voice profile.
         voice (str): The voice identifier used by Azure Text-to-Speech API.
-        gender (Literal[MALE, FEMALE]): The gender of the voice (either MALE or FEMALE).
+        gender (AzureNeuralVoiceGender): The gender of the voice (either MALE or FEMALE).
         pitch (int): The relative (by gender) pitch level of the voice, where a lower value indicates a lower pitch.
         styles (List[str]): The available styles (i.e., tones/emotions) for the voice.
     """
 
     name: str
     voice: str
-    gender: Literal[MALE, FEMALE]
+    gender: AzureNeuralVoiceGender
     pitch: int
     styles: List[str]
 
@@ -47,7 +47,7 @@ class AzureNeuralVoice:
 # Dictionary containing voice profile data
 _neural_voice_data = {
     "Aria": {
-        "gender": FEMALE,
+        "gender": AzureNeuralVoiceGender.FEMALE,
         "pitch": 3,
         "voice": "en-US-AriaNeural",
         "styles": [
@@ -70,7 +70,7 @@ _neural_voice_data = {
         ],
     },
     "Davis": {
-        "gender": MALE,
+        "gender": AzureNeuralVoiceGender.MALE,
         "pitch": 0,
         "voice": "en-US-DavisNeural",
         "styles": [
@@ -88,7 +88,7 @@ _neural_voice_data = {
         ],
     },
     "Guy": {
-        "gender": MALE,
+        "gender": AzureNeuralVoiceGender.MALE,
         "pitch": 3,
         "voice": "en-US-GuyNeural",
         "styles": [
@@ -106,7 +106,7 @@ _neural_voice_data = {
         ],
     },
     "Jane": {
-        "gender": FEMALE,
+        "gender": AzureNeuralVoiceGender.FEMALE,
         "pitch": 4,
         "voice": "en-US-JaneNeural",
         "styles": [
@@ -123,7 +123,7 @@ _neural_voice_data = {
         ],
     },
     "Jason": {
-        "gender": MALE,
+        "gender": AzureNeuralVoiceGender.MALE,
         "pitch": 2,
         "voice": "en-US-JasonNeural",
         "styles": [
@@ -140,7 +140,7 @@ _neural_voice_data = {
         ],
     },
     "Jenny": {
-        "gender": FEMALE,
+        "gender": AzureNeuralVoiceGender.FEMALE,
         "pitch": 0,
         "voice": "en-US-JennyNeural",
         "styles": [
@@ -161,7 +161,7 @@ _neural_voice_data = {
         ],
     },
     "Nancy": {
-        "gender": FEMALE,
+        "gender": AzureNeuralVoiceGender.FEMALE,
         "pitch": 2,
         "voice": "en-US-NancyNeural",
         "styles": [
@@ -178,7 +178,7 @@ _neural_voice_data = {
         ],
     },
     "Sara": {
-        "gender": FEMALE,
+        "gender": AzureNeuralVoiceGender.FEMALE,
         "pitch": 1,
         "voice": "en-US-SaraNeural",
         "styles": [
@@ -195,7 +195,7 @@ _neural_voice_data = {
         ],
     },
     "Tony": {
-        "gender": MALE,
+        "gender": AzureNeuralVoiceGender.MALE,
         "pitch": 1,
         "voice": "en-US-TonyNeural",
         "styles": [
@@ -233,12 +233,12 @@ def get_voice_by_name(name: str) -> AzureNeuralVoice:
     return _neural_voices[name]
 
 
-def get_voices_by_gender(gender: Literal[MALE, FEMALE]) -> List[AzureNeuralVoice]:
+def get_voices_by_gender(gender: AzureNeuralVoiceGender) -> List[AzureNeuralVoice]:
     """
     Retrieve a list of AzureNeuralVoice instances with the specified gender.
 
     Args:
-        gender (Literal[MALE, FEMALE]): The gender of the voices to retrieve (either MALE or FEMALE).
+        gender (AzureNeuralVoiceGender): The gender of the voices to retrieve (either AzureNeuralVoiceGender.MALE or AzureNeuralVoiceGender.FEMALE).
 
     Returns:
         List[AzureNeuralVoice]: A list of AzureNeuralVoice instances with the specified gender.

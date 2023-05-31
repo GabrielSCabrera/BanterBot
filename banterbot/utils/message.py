@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Dict, Literal, Optional
+from typing import Dict, Optional
 
-from banterbot.data.constants import ASSISTANT, SYSTEM, USER
+from banterbot.data.enums import ChatCompletionRoles
 from banterbot.data.openai_models import OpenAIModel
 
 
@@ -15,7 +15,7 @@ class Message:
     ChatCompletion API to generate context-aware responses from an AI model.
 
     Attributes:
-        role (Literal[ASSISTANT, SYSTEM, USER]): The role of the message sender.
+        role (ChatCompletionRoles): The role of the message sender.
             - ASSISTANT: Represents a message sent by the AI assistant.
             - SYSTEM: Represents a message sent by the system, usually containing instructions or context.
             - USER: Represents a message sent by the user interacting with the AI assistant.
@@ -26,7 +26,7 @@ class Message:
         more personalized experience by addressing the sender by their name.
     """
 
-    role: Literal[ASSISTANT, SYSTEM, USER]
+    role: ChatCompletionRoles
     content: str
     name: Optional[str] = None
 

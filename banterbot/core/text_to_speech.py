@@ -2,15 +2,25 @@ import datetime
 import os
 import threading
 import time
-from typing import Dict, Generator, List, Optional
+from typing import Generator, List, Optional, TypedDict
 
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
-from banterbot.data.constants import AZURE_SPEECH_KEY, AZURE_SPEECH_REGION, TTS
+from banterbot.data.enums import EnvVar, SpeechProcessingType, WordCategory
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
 from banterbot.utils.word import Word
+
+
+class TimedEvent(TypedDict):
+    """
+    A specifically typed dictionary which is appended to the list of events in a TextToSpeech instance during speech
+    synthesis in a callback, containing the exact time at which the words in the event should be synthesized.
+    """
+
+    event: speechsdk.SessionEventArgs
+    time: int
 
 
 class TextToSpeech:
@@ -39,8 +49,8 @@ class TextToSpeech:
 
         # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
-            subscription=os.environ.get(AZURE_SPEECH_KEY),
-            region=os.environ.get(AZURE_SPEECH_REGION),
+            subscription=os.environ.get(EnvVar.AZURE_SPEECH_KEY.value),
+            region=os.environ.get(EnvVar.AZURE_SPEECH_REGION.value),
         )
 
         # Initialize the output and total length variables
@@ -59,7 +69,7 @@ class TextToSpeech:
         self._connection = speechsdk.Connection.from_speech_synthesizer(self._synthesizer)
         self._connection.open(True)
 
-        # Reset the state variables of the TTS synthesizer
+        # Reset the state variables of the text-to-speech synthesizer
         self._reset()
 
     @property
@@ -74,9 +84,9 @@ class TextToSpeech:
 
     def interrupt(self) -> None:
         """
-        Interrupts an ongoing TTS process, if any.
+        Interrupts an ongoing text-to-speech process, if any.
 
-        This method sets the interrupt flag, which will cause the ongoing TTS process to stop.
+        This method sets the interrupt flag, which will cause the ongoing text-to-speech process to stop.
         """
         self._interrupt = True
 
@@ -109,11 +119,11 @@ class TextToSpeech:
         Args:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the word boundary.
         """
-        # Check if the boundary is not a sentence boundary
+        # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
 
-            # Add the boundary information to the list of boundaries
-            self._boundaries.append(
+            # Add the event and timing information to the list of events
+            self._events.append(
                 {
                     "event": event,
                     "time": 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
@@ -154,26 +164,23 @@ class TextToSpeech:
 
     def _reset(self) -> None:
         """
-        Resets the state variables of the TTS synthesizer.
-
-        This method resets the state variables, such as the list of boundaries, synthesis completed flag,
-        synthesis timer, synthesis started flag, and interrupt flag.
+        Resets the state variables of the text-to-speech synthesizer, such as the list of events, synthesis timer,
+        synthesis started flag, and interrupt flag.
         """
         # Reset the list of boundaries that have been processed
-        self._boundaries: List[Dict[str, str]] = []
+        self._events: List[TimedEvent] = []
 
-        # Reset the synthesis completed, synthesis started, and interrupt flags
+        # Reset the synthesis threading.Event instance, the start timer to None, and set the interrupt flag to False
         self._interrupt = False
-        self._synthesis_completed = False
         self._start_timer = None
         self._start_synthesis = threading.Event()
 
     def _synthesizer_events_connect(self) -> None:
         """
-        Connects the TTS synthesizer events to their corresponding callbacks.
+        Connects the text-to-speech synthesizer events to their corresponding callbacks.
 
-        This method connects the synthesis_started, synthesis_word_boundary, synthesis_canceled,
-        and synthesis_completed events to their respective callback functions.
+        This method connects the synthesis_started, synthesis_word_boundary, synthesis_canceled, and synthesis_completed
+        events to their respective callback functions.
         """
         # Connect the synthesis_started event to the _callback_started method
         self._synthesizer.synthesis_started.connect(self._callback_started)
@@ -195,18 +202,21 @@ class TextToSpeech:
         Returns:
             Word: The processed word with contextual information.
         """
-        event = self._boundaries[word_index]["event"]
-        if word_index > 0 and event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
-            whitespace = " "
-        else:
-            whitespace = ""
+        event = self._events[word_index]["event"]
+        whitespace = ""
+        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
+            category = WordCategory.WORD
+            if word_index > 0:
+                whitespace = " "
+        elif event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation:
+            category = WordCategory.PUNCTUATION
 
         word = Word(
             word=whitespace + event.text,
             offset=datetime.timedelta(microseconds=event.audio_offset / 10),
             duration=event.duration,
-            category=event.boundary_type,
-            source=TTS,
+            category=category,
+            source=SpeechProcessingType.TTS,
         )
         return word
 
@@ -229,22 +239,16 @@ class TextToSpeech:
         # Initialize variables
         word_index = 0
         success = False
-        self._interrupt = False
-        self._outputs.append(output)
 
         # Wait until the synthesis has started before proceeding
         self._start_synthesis.wait()
 
         # Continuously monitor the synthesis progress
-        while not self._interrupt and (not self._synthesis_completed or word_index < len(self._boundaries)):
+        while not self._interrupt and (not self._synthesis_completed or word_index < len(self._events)):
 
             dt = time.perf_counter_ns() - self._start_timer
 
-            while (
-                not self._interrupt
-                and word_index < len(self._boundaries)
-                and dt >= self._boundaries[word_index]["time"]
-            ):
+            while not self._interrupt and word_index < len(self._events) and dt >= self._events[word_index]["time"]:
                 word = self._process_boundary(word_index=word_index)
                 output.append(word)
                 word_index += 1
@@ -283,11 +287,11 @@ class TextToSpeech:
 
         with self.__class__._speech_lock:
 
-            # Reset all state attributes
-            self._reset()
-
             # Create a new thread to handle the speech synthesis
             speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
+
+            # Reset all state attributes
+            self._reset()
 
             # Starting the speech synthesizer
             speech_thread.start()
@@ -296,7 +300,8 @@ class TextToSpeech:
             output = TextToSpeechOutput(
                 input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
             )
+            self._outputs.append(output)
 
-            # Continuously monitor the synthesis progress in the main thread
+            # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
             for word in self._process_callbacks(output):
                 yield word

@@ -2,7 +2,7 @@ from typing import Tuple
 
 import spacy
 
-from banterbot.data.constants import EN_CORE_WEB_MD, EN_CORE_WEB_SM
+from banterbot.data.enums import SpaCyLangModel
 
 
 class NLP:
@@ -26,12 +26,12 @@ class NLP:
 
         # Define a set of pipeline components to disable for the sentence senter.
         senter_disable = ["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer", "ner"]
-        senter = cls._load_model(name=EN_CORE_WEB_SM, disable=senter_disable)
+        senter = cls._load_model(name=SpaCyLangModel.EN_CORE_WEB_SM.value, disable=senter_disable)
         # Enable the sentence segmentation pipeline component for the senter model.
         senter.enable_pipe("senter")
 
         rules = {}
-        splitter = cls._load_model(name=EN_CORE_WEB_MD)
+        splitter = cls._load_model(name=SpaCyLangModel.EN_CORE_WEB_MD.value)
         # Customize the tokenization rules for the word splitter in order to prevent splitting of contractions.
         ignore = ("'", "’", "‘")
         for key, value in splitter.tokenizer.rules.items():
@@ -41,7 +41,7 @@ class NLP:
 
         cls._models["senter"] = senter
         cls._models["splitter"] = splitter
-        cls._models[EN_CORE_WEB_MD] = cls._load_model(name=EN_CORE_WEB_MD)
+        cls._models[SpaCyLangModel.EN_CORE_WEB_MD.value] = cls._load_model(name=SpaCyLangModel.EN_CORE_WEB_MD.value)
 
     @classmethod
     def _load_model(cls, *, name: str, **kwargs) -> spacy.language.Language:
@@ -90,8 +90,8 @@ class NLP:
     @classmethod
     def segment_sentences(cls, string: str, whitespace: bool = True) -> Tuple[str, ...]:
         """
-        Splits a text string into individual sentences using a specialized SpaCy model. The model is a lightweight version
-        of `en_core_web_sm` designed specifically for sentence segmentation.
+        Splits a text string into individual sentences using a specialized SpaCy model. The model is a lightweight
+        version of `en_core_web_sm` designed specifically for sentence segmentation.
 
         Args:
             string (str): The input text string.
@@ -136,7 +136,7 @@ class NLP:
         Returns:
             Tuple[str, ...]: A tuple of extracted keywords as strings.
         """
-        return tuple([str(entity) for entity in cls._models[EN_CORE_WEB_MD](string).ents])
+        return tuple([str(entity) for entity in cls._models[SpaCyLangModel.EN_CORE_WEB_MD.value](string).ents])
 
 
 # Upon import, NLP initializes and downloads (if necessary) all models.
