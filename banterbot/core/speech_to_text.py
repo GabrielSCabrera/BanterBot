@@ -1,3 +1,14 @@
+import os
+import threading
+from typing import Generator, List, Tuple
+
+import azure.cognitiveservices.speech as speechsdk
+
+from banterbot.data.enums import EnvVar
+from banterbot.utils.speech_to_text_output import SpeechToTextOutput
+from banterbot.utils.word import Word
+
+
 class SpeechToText:
     """
     The SpeechToText class provides an interface to convert spoken language into written text using Azure Cognitive
