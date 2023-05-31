@@ -27,8 +27,8 @@ class Word:
     offset: datetime.timedelta
     duration: datetime.datetime
     category: Optional[speechsdk.SpeechSynthesisBoundaryType]
-    confidence: Optional[float]
     source: Literal[TTS, STT]
+    confidence: Optional[float] = None
 
     def __len__(self) -> int:
         """

@@ -68,11 +68,9 @@ Start the BanterBot Command Line Interface (CLI) by executing the `banterbot` co
 To use BanterBot, just import the necessary components and create an instance of the BanterBotTK class:
 
 ```python
-from banterbot import BanterBotTK
-from banterbot.data.azure_neural_voices import get_voice_by_name
-from banterbot.data.openai_models import openai_models
+from banterbot import BanterBotTK, get_voice_by_name, get_model_by_name
 
-model = openai_models["gpt-3.5-turbo"]
+model = get_model_by_name("gpt-3.5-turbo")
 voice = get_voice_by_name("Aria")
 style = "chat"
 

@@ -69,13 +69,13 @@ class BanterBotTK(tk.Tk, BanterBotInterface):
         self.entry_frame = ttk.Frame(self)
         self.entry_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
-        self.name_entry = tk.Entry(self.entry_frame, bg="black", fg="white", font=self._font, width=12)
+        self.name_entry = tk.Entry(self.entry_frame, bg="black", fg="white", insertbackground="white", font=self._font, width=12)
         self.name_entry.grid(row=0, column=0, padx=(5, 0), pady=5, sticky="nsew")
         self.name_entry.insert(0, "User")
         self.name_entry.bind("<FocusIn>", self.select_all_on_focus)
         self._name_entry_focused = False
 
-        self.message_entry = tk.Entry(self.entry_frame, bg="black", fg="white", font=self._font)
+        self.message_entry = tk.Entry(self.entry_frame, bg="black", fg="white", insertbackground="white", font=self._font)
         self.message_entry.grid(row=0, column=1, padx=(5, 5), pady=5, sticky="nsew")
         self.message_entry.focus_set()
         self.entry_frame.columnconfigure(1, weight=1)

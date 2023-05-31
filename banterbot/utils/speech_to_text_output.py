@@ -8,11 +8,11 @@ from banterbot.utils.word import Word
 
 
 class SpeechToTextOutput:
-    def __init__(self, recognition_result: speechsdk.RecognitionResult) -> None:
+    def __init__(self, recognition_result: speechsdk.SpeechRecognitionResult) -> None:
 
-        self._data = json.loads(recognition_result)
+        self._data = json.loads(recognition_result.json)
 
-        self.words: List[Word] = self._data
+        self.words: List[Word] = self._data["NBest"]
 
     @property
     def recognition_status(self):

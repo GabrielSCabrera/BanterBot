@@ -105,7 +105,7 @@ class SpeechToText:
             status = True
 
         # Stop the synthesizer
-        self._synthesizer.stop_speaking()
+        self._recognizer.stop_continuous_recognition()
         return status
 
     def _listen(self):

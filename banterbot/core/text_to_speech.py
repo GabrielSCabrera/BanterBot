@@ -93,11 +93,12 @@ class TextToSpeech:
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
         """
         Callback function for synthesis started event.
-        Signals that the synthesis process has started.
+        Signals that the synthesis process has started, and initializes a timer.
 
         Args:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
         """
+        self._start_timer = time.perf_counter_ns()
         self._start_synthesis.set()
 
     def _callback_word_boundary(self, event: speechsdk.SessionEventArgs) -> None:
@@ -156,7 +157,7 @@ class TextToSpeech:
         Resets the state variables of the TTS synthesizer.
 
         This method resets the state variables, such as the list of boundaries, synthesis completed flag,
-        synthesis started flag, and interrupt flag.
+        synthesis timer, synthesis started flag, and interrupt flag.
         """
         # Reset the list of boundaries that have been processed
         self._boundaries: List[Dict[str, str]] = []
@@ -164,6 +165,7 @@ class TextToSpeech:
         # Reset the synthesis completed, synthesis started, and interrupt flags
         self._interrupt = False
         self._synthesis_completed = False
+        self._start_timer = None
         self._start_synthesis = threading.Event()
 
     def _synthesizer_events_connect(self) -> None:
@@ -183,24 +185,26 @@ class TextToSpeech:
         self._synthesizer.synthesis_canceled.connect(self._callback_completed)
         self._synthesizer.synthesis_completed.connect(self._callback_completed)
 
-    def _process_boundary(self, event: dict) -> Word:
+    def _process_boundary(self, word_index: int) -> Word:
         """
         Processes a synthesis boundary event and returns an instance of class Word.
 
         Args:
-            event (dict): The synthesis boundary event to be processed.
+            word_index (int): The index of the word relative to the full text.
 
         Returns:
             Word: The processed word with contextual information.
         """
-        text = event.text
-        if word_index > 0 and boundary["boundary_type"] == speechsdk.SpeechSynthesisBoundaryType.Word:
-            text = f" {text}"
+        event = self._boundaries[word_index]["event"]
+        if word_index > 0 and event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
+            whitespace = " "
+        else:
+            whitespace = ""
 
         word = Word(
-            word=text,
+            word=whitespace + event.text,
             offset=datetime.timedelta(microseconds=event.audio_offset / 10),
-            duration=datetime.timedelta(microseconds=event.duration / 1000),
+            duration=event.duration,
             category=event.boundary_type,
             source=TTS,
         )
@@ -231,20 +235,17 @@ class TextToSpeech:
         # Wait until the synthesis has started before proceeding
         self._start_synthesis.wait()
 
-        # Record the start time
-        start_time = time.perf_counter_ns()
-
         # Continuously monitor the synthesis progress
         while not self._interrupt and (not self._synthesis_completed or word_index < len(self._boundaries)):
 
-            dt = time.perf_counter_ns() - start_time
+            dt = time.perf_counter_ns() - self._start_timer
 
             while (
                 not self._interrupt
                 and word_index < len(self._boundaries)
                 and dt >= self._boundaries[word_index]["time"]
             ):
-                word = self._process_boundary(event=self._boundaries[word_index]["event"])
+                word = self._process_boundary(word_index=word_index)
                 output.append(word)
                 word_index += 1
                 yield word
