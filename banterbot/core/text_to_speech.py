@@ -65,8 +65,10 @@ class TextToSpeech:
         # Connect the speech synthesizer events to their corresponding callbacks
         self._synthesizer_events_connect()
 
-        # Preconnecting the speech synthesizer for reduced latency
+        # Creating a new instance of Connection class
         self._connection = speechsdk.Connection.from_speech_synthesizer(self._synthesizer)
+
+        # Preconnecting the speech synthesizer for reduced latency
         self._connection.open(True)
 
         # Reset the state variables of the text-to-speech synthesizer
@@ -102,13 +104,11 @@ class TextToSpeech:
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
         """
-        Callback function for synthesis started event.
-        Signals that the synthesis process has started, and initializes a timer.
+        Callback function for synthesis started event. Signals that the synthesis process has started.
 
         Args:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
         """
-        self._start_timer = time.perf_counter_ns()
         self._start_synthesis.set()
 
     def _callback_word_boundary(self, event: speechsdk.SessionEventArgs) -> None:
@@ -126,7 +126,7 @@ class TextToSpeech:
             self._events.append(
                 {
                     "event": event,
-                    "time": 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
+                    "time": 5E6 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
                 }
             )
 
@@ -165,14 +165,15 @@ class TextToSpeech:
     def _reset(self) -> None:
         """
         Resets the state variables of the text-to-speech synthesizer, such as the list of events, synthesis timer,
-        synthesis started flag, and interrupt flag.
+        synthesis started flag, synthesis completed flag, and interrupt flag.
         """
         # Reset the list of boundaries that have been processed
         self._events: List[TimedEvent] = []
 
-        # Reset the synthesis threading.Event instance, the start timer to None, and set the interrupt flag to False
+        # Reset the synthesis threading.Event, set the start timer to None, and reset the interrupt & completed flags
         self._interrupt = False
         self._start_timer = None
+        self._synthesis_completed = False
         self._start_synthesis = threading.Event()
 
     def _synthesizer_events_connect(self) -> None:
@@ -242,6 +243,7 @@ class TextToSpeech:
 
         # Wait until the synthesis has started before proceeding
         self._start_synthesis.wait()
+        self._start_timer = time.perf_counter_ns()
 
         # Continuously monitor the synthesis progress
         while not self._interrupt and (not self._synthesis_completed or word_index < len(self._events)):
@@ -285,22 +287,22 @@ class TextToSpeech:
         # Create SSML markup for the given input_string, voice, and style
         ssml = self._create_ssml(input_string, voice, style)
 
-        with self.__class__._speech_lock:
+        # Create a new thread to handle the speech synthesis
+        speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
 
-            # Create a new thread to handle the speech synthesis
-            speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
+        with self.__class__._speech_lock:
 
             # Reset all state attributes
             self._reset()
-
-            # Starting the speech synthesizer
-            speech_thread.start()
 
             # Prepare an instance of TextToSpeechOutput while will receive values iteratively
             output = TextToSpeechOutput(
                 input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
             )
             self._outputs.append(output)
+
+            # Starting the speech synthesizer
+            speech_thread.start()
 
             # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
             for word in self._process_callbacks(output):

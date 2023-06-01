@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import threading
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
@@ -15,7 +16,7 @@ class BanterBotTK(tk.Tk, BanterBotInterface):
     The GUI allows users to interact with the chatbot by entering their name and message, and it displays the
     conversation history in a scrollable text area. Users can send messages by pressing the "Send" button or the "Enter"
     key. The chatbot's responses are generated using the specified OpenAI model and can be played back using the
-    specified Azure Neural Voice.
+    specified Azure Neural Voice. Additionally, users can toggle speech-to-text input by pressing the "Listen" button.
     """
 
     def __init__(
@@ -34,6 +35,7 @@ class BanterBotTK(tk.Tk, BanterBotInterface):
         """
         tk.Tk.__init__(self)
         BanterBotInterface.__init__(self, model=model, voice=voice, style=style)
+        self._listening = False
 
     def _init_gui(self) -> None:
         """
@@ -87,6 +89,9 @@ class BanterBotTK(tk.Tk, BanterBotInterface):
         self.send_btn = ttk.Button(self.entry_frame, text="Send", command=self.prompt, width=7)
         self.send_btn.grid(row=0, column=2, padx=(0, 5), pady=5, sticky="nsew")
 
+        self.listen_btn = ttk.Button(self.entry_frame, text="Listen", command=self.toggle_listen, width=7)
+        self.listen_btn.grid(row=0, column=3, padx=(0, 5), pady=5, sticky="nsew")
+
         self.message_entry.bind("<Return>", lambda event: self.prompt())
 
     def update_conversation_area(self, word: str) -> None:
@@ -123,6 +128,18 @@ class BanterBotTK(tk.Tk, BanterBotInterface):
         Reset the focus state of the name entry field after sending a message.
         """
         self._name_entry_focused = False
+
+    def toggle_listen(self) -> None:
+        """
+        Toggle the speech-to-text functionality.
+        """
+        if self.listening:
+            self.listen_btn["text"] = "Listen"
+        else:
+            self.listen_btn["text"] = "Stop"
+
+        user_name = self.name_entry.get().split(" ")[0].strip()
+        super().toggle_listen(user_name)
 
     def prompt(self) -> None:
         """
