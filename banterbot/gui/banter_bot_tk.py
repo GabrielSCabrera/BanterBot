@@ -10,8 +10,9 @@ from banterbot.gui.banter_bot_interface import BanterBotInterface
 class BanterBotTK(tk.Tk, BanterBotInterface):
     """
     BanterBotTK is a graphical user interface (GUI) for a chatbot application that uses OpenAI models for generating
-    responses and Azure Neural Voices for text-to-speech. The class inherits from both tkinter.Tk and
-    BanterBotInterface, providing a seamless integration of the chatbot functionality with a user-friendly interface.
+    responses, Azure Neural Voices for text-to-speech, and Azure speech-to-text recognition. The class inherits from
+    both tkinter.Tk and BanterBotInterface, providing a seamless integration of the chatbot functionality with a
+    user-friendly interface.
 
     The GUI allows users to interact with the chatbot by entering their name and message, and it displays the
     conversation history in a scrollable text area. Users can send messages by pressing the "Send" button or the "Enter"
