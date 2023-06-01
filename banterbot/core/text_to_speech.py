@@ -126,7 +126,7 @@ class TextToSpeech:
             self._events.append(
                 {
                     "event": event,
-                    "time": 5E6 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
+                    "time": 5E8 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
                 }
             )
 
