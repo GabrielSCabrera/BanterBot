@@ -1,6 +1,6 @@
 import os
 import threading
-from typing import Generator, List, Tuple
+from typing import Generator, List
 
 import azure.cognitiveservices.speech as speechsdk
 

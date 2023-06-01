@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-import threading
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
