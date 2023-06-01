@@ -8,7 +8,7 @@ url = "https://github.com/GabrielSCabrera/BanterBot"
 
 description = (
     "BanterBot: An OpenAI ChatGPT-powered chatbot with Azure Neural Voices. Supports speech-to-text and text-to-speech "
-    "interactions. Features real-time monitoring and tkinter frontend."
+    "interactions. Features real-time monitoring and Tkinter frontend."
 )
 
 with open("README.md", "r") as fs:
@@ -24,19 +24,19 @@ def run_tests():
     test_suite = test_loader.discover("tests", pattern="test_*.py")
     return test_suite
 
-
+version = "0.0.3"
 setup(
     name="BanterBot",
     packages=find_packages(),
     test_suite="setup.run_tests",
-    version="0.0.2",
+    version=version,
     description=description,
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
     url=url,
-    download_url=url + f"/releases/download/v0.0.2-alpha/BanterBot-0.0.2.tar.gz",
+    download_url=url + f"/releases/download/v{version}-alpha/BanterBot-{version}.tar.gz",
     keywords=[
         "tkinter",
         "tk",

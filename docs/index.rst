@@ -87,8 +87,8 @@ BanterBotTK
 Installation
 ------------
 
-Pip
-~~~
+Pip (Recommended)
+~~~~~~~~~~~~~~~~~
 
 BanterBot is installable using the Python Package Index (PyPi):
 
