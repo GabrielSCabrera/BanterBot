@@ -63,7 +63,7 @@ class TextToSpeech:
         self._speech_config.set_speech_synthesis_output_format(output_format)
 
         # Connect the speech synthesizer events to their corresponding callbacks
-        self._synthesizer_events_connect()
+        self._callbacks_connect()
 
         # Creating a new instance of Connection class
         self._connection = speechsdk.Connection.from_speech_synthesizer(self._synthesizer)
@@ -84,6 +84,16 @@ class TextToSpeech:
         """
         return self._outputs
 
+    @property
+    def speaking(self) -> bool:
+        """
+        If the current instance of TextToSpeech is in the process of speaking, returns True. Otherwise, returns False.
+
+        Args:
+            bool: The speaking state of the current instance.
+        """
+        return self._speaking
+
     def interrupt(self) -> None:
         """
         Interrupts an ongoing text-to-speech process, if any.
@@ -91,6 +101,51 @@ class TextToSpeech:
         This method sets the interrupt flag, which will cause the ongoing text-to-speech process to stop.
         """
         self._interrupt = True
+
+    def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[Word, None, bool]:
+        """
+        Speaks the given text using the specified voice and style.
+
+        This method converts the input text into speech using the specified voice and style. It yields the synthesized
+        words one by one, along with their contextual information.
+
+        Args:
+            input_string (str): The input string that is to be converted into speech.
+            voice (AzureNeuralVoice): The voice to be used.
+            style (str): The speaking style to be applied.
+
+        Yields:
+            Word: A word with contextual information.
+        """
+        # Create SSML markup for the given input_string, voice, and style
+        ssml = self._create_ssml(input_string, voice, style)
+
+        # Create a new thread to handle the speech synthesis
+        speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
+
+        with self.__class__._speech_lock:
+
+            # Reset all state attributes
+            self._reset()
+
+            # Prepare an instance of TextToSpeechOutput while will receive values iteratively
+            output = TextToSpeechOutput(
+                input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
+            )
+            self._outputs.append(output)
+
+            # Starting the speech synthesizer
+            speech_thread.start()
+
+            # Set the speaking flag to True
+            self._speaking = True
+
+            # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
+            for word in self._callbacks_process(output):
+                yield word
+
+            # Set the speaking flag to False
+            self._speaking = False
 
     def _callback_completed(self, event: speechsdk.SessionEventArgs) -> None:
         """
@@ -130,53 +185,7 @@ class TextToSpeech:
                 }
             )
 
-    def _create_ssml(self, text: str, voice: str, style: Optional[str] = None) -> str:
-        """
-        Creates an SSML string from the given text, voice, and style.
-
-        Args:
-            text (str): The input string that is to be converted into speech.
-            voice (AzureNeuralVoice): The voice to be used.
-            style (str, optional): The speaking style to be applied. Default is None.
-
-        Returns:
-            str: The SSML string.
-        """
-        # Start the SSML string with the required header and voice tag
-        ssml = (
-            '<speak version="1.0" '
-            'xmlns="http://www.w3.org/2001/10/synthesis" '
-            'xmlns:mstts="https://www.w3.org/2001/mstts" '
-            'xml:lang="en-US">'
-            f'<voice name="{voice.voice}">'
-        )
-
-        # If a speaking style is specified, add the express-as tag
-        if style:
-            text = f'<mstts:express-as style="{style}">{text}</mstts:express-as>'
-
-        # Add the text to the SSML string
-        ssml += text
-
-        # Close the voice and speak tags and return the SSML string
-        ssml += "</voice></speak>"
-        return ssml
-
-    def _reset(self) -> None:
-        """
-        Resets the state variables of the text-to-speech synthesizer, such as the list of events, synthesis timer,
-        synthesis started flag, synthesis completed flag, and interrupt flag.
-        """
-        # Reset the list of boundaries that have been processed
-        self._events: List[TimedEvent] = []
-
-        # Reset the synthesis threading.Event, set the start timer to None, and reset the interrupt & completed flags
-        self._interrupt = False
-        self._start_timer = None
-        self._synthesis_completed = False
-        self._start_synthesis = threading.Event()
-
-    def _synthesizer_events_connect(self) -> None:
+    def _callbacks_connect(self) -> None:
         """
         Connects the text-to-speech synthesizer events to their corresponding callbacks.
 
@@ -193,35 +202,7 @@ class TextToSpeech:
         self._synthesizer.synthesis_canceled.connect(self._callback_completed)
         self._synthesizer.synthesis_completed.connect(self._callback_completed)
 
-    def _process_boundary(self, word_index: int) -> Word:
-        """
-        Processes a synthesis boundary event and returns an instance of class Word.
-
-        Args:
-            word_index (int): The index of the word relative to the full text.
-
-        Returns:
-            Word: The processed word with contextual information.
-        """
-        event = self._events[word_index]["event"]
-        whitespace = ""
-        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
-            category = WordCategory.WORD
-            if word_index > 0:
-                whitespace = " "
-        elif event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation:
-            category = WordCategory.PUNCTUATION
-
-        word = Word(
-            word=whitespace + event.text,
-            offset=datetime.timedelta(microseconds=event.audio_offset / 10),
-            duration=event.duration,
-            category=category,
-            source=SpeechProcessingType.TTS,
-        )
-        return word
-
-    def _process_callbacks(self, output: TextToSpeechOutput) -> Generator[Word, None, bool]:
+    def _callbacks_process(self, output: TextToSpeechOutput) -> Generator[Word, None, bool]:
         """
         Monitors the synthesis progress and updates the output accordingly.
 
@@ -266,44 +247,77 @@ class TextToSpeech:
         self._synthesizer.stop_speaking()
         return success
 
-    def _speak(self, ssml: str) -> None:
-        self._synthesizer.speak_ssml(ssml)
-
-    def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[Word, None, bool]:
+    def _create_ssml(self, text: str, voice: str, style: Optional[str] = None) -> str:
         """
-        Speaks the given text using the specified voice and style.
-
-        This method converts the input text into speech using the specified voice and style. It yields the synthesized
-        words one by one, along with their contextual information.
+        Creates an SSML string from the given text, voice, and style.
 
         Args:
-            input_string (str): The input string that is to be converted into speech.
+            text (str): The input string that is to be converted into speech.
             voice (AzureNeuralVoice): The voice to be used.
-            style (str): The speaking style to be applied.
+            style (str, optional): The speaking style to be applied. Default is None.
 
-        Yields:
-            Word: A word with contextual information.
+        Returns:
+            str: The SSML string.
         """
-        # Create SSML markup for the given input_string, voice, and style
-        ssml = self._create_ssml(input_string, voice, style)
+        # Start the SSML string with the required header and voice tag
+        ssml = (
+            '<speak version="1.0" '
+            'xmlns="http://www.w3.org/2001/10/synthesis" '
+            'xmlns:mstts="https://www.w3.org/2001/mstts" '
+            'xml:lang="en-US">'
+            f'<voice name="{voice.voice}">'
+        )
 
-        # Create a new thread to handle the speech synthesis
-        speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
+        # If a speaking style is specified, add the express-as tag
+        if style:
+            text = f'<mstts:express-as style="{style}">{text}</mstts:express-as>'
 
-        with self.__class__._speech_lock:
+        # Add the text to the SSML string
+        ssml += text
 
-            # Reset all state attributes
-            self._reset()
+        # Close the voice and speak tags and return the SSML string
+        ssml += "</voice></speak>"
+        return ssml
 
-            # Prepare an instance of TextToSpeechOutput while will receive values iteratively
-            output = TextToSpeechOutput(
-                input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
-            )
-            self._outputs.append(output)
+    def _process_boundary(self, word_index: int) -> Word:
+        """
+        Processes a synthesis boundary event and returns an instance of class Word.
 
-            # Starting the speech synthesizer
-            speech_thread.start()
+        Args:
+            word_index (int): The index of the word relative to the full text.
 
-            # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
-            for word in self._process_callbacks(output):
-                yield word
+        Returns:
+            Word: The processed word with contextual information.
+        """
+        event = self._events[word_index]["event"]
+        whitespace = ""
+        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
+            category = WordCategory.WORD
+            if word_index > 0:
+                whitespace = " "
+        elif event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation:
+            category = WordCategory.PUNCTUATION
+
+        word = Word(
+            word=whitespace + event.text,
+            offset=datetime.timedelta(microseconds=event.audio_offset / 10),
+            duration=event.duration,
+            category=category,
+            source=SpeechProcessingType.TTS,
+        )
+        return word
+
+    def _reset(self) -> None:
+        """
+        Resets the state variables of the text-to-speech synthesizer, such as the list of events, synthesis timer, the
+        interrupt flag, the speaking flag, the synthesis completed flag, and synthesis started flag.
+        """
+        self._events: List[TimedEvent] = []
+        self._start_timer = None
+        self._interrupt = False
+        self._speaking = False
+        self._synthesis_completed = False
+        self._start_synthesis = threading.Event()
+
+    def _speak(self, ssml: str) -> None:
+        self._synthesizer.speak_ssml(ssml)

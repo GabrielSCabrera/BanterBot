@@ -1,18 +1,18 @@
 banterbot.gui package
 =====================
 
-banterbot.gui.banter\_bot\_interface module
+banterbot.gui.interface module
 -------------------------------------------
 
-.. automodule:: banterbot.gui.banter_bot_interface
+.. automodule:: banterbot.gui.interface
    :members:
    :undoc-members:
    :show-inheritance:
 
-banterbot.gui.banter\_bot\_tk module
+banterbot.gui.tk\_interface module
 ------------------------------------
 
-.. automodule:: banterbot.gui.banter_bot_tk
+.. automodule:: banterbot.gui.tk_interface
    :members:
    :undoc-members:
    :show-inheritance:

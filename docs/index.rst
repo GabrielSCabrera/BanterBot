@@ -66,19 +66,19 @@ SpeechToText
    :special-members:
    :show-inheritance:
 
-BanterBotInterface
-~~~~~~~~~~~~~~~~~~
+Interface
+~~~~~~~~~
 
-.. autoclass:: banterbot.gui.banter_bot_interface.BanterBotInterface
+.. autoclass:: banterbot.gui.interface.Interface
    :members:
    :undoc-members:
    :special-members:
    :show-inheritance:
 
-BanterBotTK
+TKInterface
 ~~~~~~~~~~~
 
-.. autoclass:: banterbot.gui.banter_bot_tk.BanterBotTK
+.. autoclass:: banterbot.gui.tk_interface.TKInterface
    :members:
    :undoc-members:
    :special-members:
@@ -127,15 +127,15 @@ class and call the `run` method:
 
 .. code:: python
 
-   from banterbot import BanterBotTK, get_voice_by_name, get_model_by_name
+   from banterbot import TKInterface, get_voice_by_name, get_model_by_name
 
    model = get_model_by_name("gpt-3.5-turbo")
    voice = get_voice_by_name("Aria")
    style = "chat"
 
    # The three arguments `model`, `voice`, and `style` are optional.
-   BBTK = BanterBotTK(model=model, voice=voice, style=style)
-   BBTK.run()
+   interface = TKInterface(model=model, voice=voice, style=style)
+   interface.run()
 
 Chat Logs
 ---------

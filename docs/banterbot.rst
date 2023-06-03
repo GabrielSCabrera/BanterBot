@@ -31,19 +31,19 @@ SpeechToText
    :special-members:
    :show-inheritance:
 
-BanterBotInterface
-~~~~~~~~~~~~~~~~~~
+Interface
+~~~~~~~~~
 
-.. autoclass:: banterbot.gui.banter_bot_interface.BanterBotInterface
+.. autoclass:: banterbot.gui.interface.Interface
    :members:
    :undoc-members:
    :special-members:
    :show-inheritance:
 
-BanterBotTK
+TKInterface
 ~~~~~~~~~~~
 
-.. autoclass:: banterbot.gui.banter_bot_tk.BanterBotTK
+.. autoclass:: banterbot.gui.tk_interface.TKInterface
    :members:
    :undoc-members:
    :special-members:

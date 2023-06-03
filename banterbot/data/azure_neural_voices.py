@@ -230,6 +230,14 @@ def get_voice_by_name(name: str) -> AzureNeuralVoice:
     Raises:
         KeyError: If the specified name is not found in the _neural_voices dictionary.
     """
+    if name not in _neural_voices.keys():
+        available_voices = ", ".join(f"`{name}`" for name in _neural_voices.keys())
+        error_message = (
+            f"BanterBot was unable to load a Microsoft Azure neural voice model with the name `{name}`, available "
+            f"voices are: {available_voices}."
+        )
+        raise KeyError(error_message)
+
     return _neural_voices[name]
 
 

@@ -86,4 +86,12 @@ def get_model_by_name(name: str) -> OpenAIModel:
     Raises:
         KeyError: If the specified name is not found in the _openai_models dictionary.
     """
+    if name not in _openai_models.keys():
+        available_models = ", ".join(f"`{name}`" for name in _openai_models.keys())
+        error_message = (
+            f"BanterBot was unable to load an OpenAI ChatCompletion model with the name `{name}`, available models "
+            f"are: {available_models}."
+        )
+        raise KeyError(error_message)
+
     return _openai_models[name]

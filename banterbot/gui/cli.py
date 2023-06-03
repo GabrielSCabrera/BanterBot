@@ -1,7 +1,7 @@
 import argparse
 
 from banterbot.data.openai_models import get_model_by_name
-from banterbot.gui.banter_bot_tk import BanterBotTK
+from banterbot.gui.tk_interface import TKInterface
 
 
 def run() -> None:
@@ -43,5 +43,5 @@ def run() -> None:
         "model": get_model_by_name("gpt-4") if args.gpt4 else get_model_by_name("gpt-3.5-turbo"),
     }
 
-    gui = BanterBotTK(**kwargs)
+    gui = TKInterface(**kwargs)
     gui.run()

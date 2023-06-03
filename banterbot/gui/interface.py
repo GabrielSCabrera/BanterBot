@@ -13,11 +13,11 @@ from banterbot.utils.message import Message
 from banterbot.utils.thread_queue import ThreadQueue
 
 
-class BanterBotInterface(ABC):
+class Interface(ABC):
     """
-    BanterBotInterface is an abstract base class for creating frontends for the BanterBot application. It provides a
-    high-level interface for managing conversation with the bot, including sending messages, receiving responses, and
-    updating the conversation area. The interface supports both text and speech-to-text input for user messages.
+    Interface is an abstract base class for creating frontends for the BanterBot application. It provides a high-level
+    interface for managing conversation with the bot, including sending messages, receiving responses, and updating the
+    conversation area. The interface supports both text and speech-to-text input for user messages.
     """
 
     def __init__(self, model: OpenAIModel, voice: AzureNeuralVoice, style: str) -> None:
@@ -40,7 +40,7 @@ class BanterBotInterface(ABC):
         self._log_lock = threading.Lock()
         self._log_path = chat_logs / f"chat_{datetime.datetime.now().strftime('%Y%m%dT%H%M%S')}.txt"
         self._response_thread = None
-        self._listening = False
+        self._listening_toggle = False
 
         # Initialize thread management components
         self._thread_queue = ThreadQueue()
@@ -52,27 +52,35 @@ class BanterBotInterface(ABC):
         # Initialize the subclass GUI
         self._init_gui()
 
-    @abstractmethod
-    def _init_gui(self) -> None:
-        """
-        Initialize the graphical user interface for the frontend.
-        This method should be implemented by subclasses to create the specific GUI components.
-        """
-
-    @abstractmethod
-    def update_conversation_area(self, word: str) -> None:
-        """
-        Update the conversation area with the given word, and add the word to the chat log.
-        This method should be implemented by subclasses to handle updating the specific GUI components.
-
-        Args:
-            word (str): The word to add to the conversation area.
-        """
-        self._append_to_chat_log(word)
-
     @property
     def listening(self) -> bool:
-        return self._listening
+        """
+        If the current instance of SpeechToText is in the process of listening, returns True. Otherwise, returns False.
+
+        Args:
+            bool: The listening state of the current instance.
+        """
+        return self._speech_to_text._listening
+
+    @property
+    def speaking(self) -> bool:
+        """
+        If the current instance of TextToSpeech is in the process of speaking, returns True. Otherwise, returns False.
+
+        Args:
+            bool: The speaking state of the current instance.
+        """
+        return self._text_to_speech.speaking
+
+    @property
+    def streaming(self) -> bool:
+        """
+        If the current instance of OpenAIManager is in the process of streaming, returns True. Otherwise, returns False.
+
+        Args:
+            bool: The streaming state of the current instance.
+        """
+        return self._openai_manager.streaming
 
     def send_message(self, user_message: str, name: Optional[str] = None) -> None:
         """
@@ -95,22 +103,25 @@ class BanterBotInterface(ABC):
             user_message (str): The message content from the user.
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
-        if self._thread_queue.is_alive():
-            self._openai_manager.interrupt()
-            self._text_to_speech.interrupt()
+        # Do not send the message if it is empty.
+        if user_message.strip():
+            message_thread = threading.Thread(
+                target=self.send_message,
+                args=(
+                    user_message,
+                    name,
+                ),
+                daemon=True,
+            )
+            self._thread_queue.add_task(message_thread, unskippable=True)
 
-        message_thread = threading.Thread(
-            target=self.send_message,
-            args=(
-                user_message,
-                name,
-            ),
-            daemon=True,
-        )
-        self._thread_queue.add_task(message_thread, unskippable=True)
+            self._response_thread = threading.Thread(target=self.get_response, daemon=True)
+            self._thread_queue.add_task(self._response_thread)
 
-        self._response_thread = threading.Thread(target=self.get_response, daemon=True)
-        self._thread_queue.add_task(self._response_thread)
+            # Interrupt any currently active ChatCompletion or Text-to-Speech streams
+            if self._thread_queue.is_alive():
+                self._openai_manager.interrupt()
+                self._text_to_speech.interrupt()
 
     def toggle_listen(self, name: Optional[str] = None) -> None:
         """
@@ -121,55 +132,13 @@ class BanterBotInterface(ABC):
         Args:
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
-        if self._listening:
+        if self._listening_toggle:
             self._speech_to_text.interrupt()
         else:
             self._listen_thread = threading.Thread(target=self._listen, args=(name,), daemon=True)
             self._listen_thread.start()
 
-        self._listening = not self._listening
-
-    def _listen(self, name: Optional[str] = None) -> None:
-        """
-        Listen for user input using speech-to-text and prompt the bot with the transcribed message.
-
-        Args:
-            name (Optional[str]): The name of the user sending the message. Defaults to None.
-        """
-        # Listen for user input using speech-to-text
-        for sentence in self._speech_to_text.listen():
-
-            # Do not send the message if it is empty.
-            if sentence.strip():
-
-                if self._thread_queue.is_alive():
-                    self._openai_manager.interrupt()
-                    self._text_to_speech.interrupt()
-
-                # Send the transcribed message to the bot
-                message_thread = threading.Thread(
-                    target=self.send_message,
-                    args=(
-                        sentence,
-                        name,
-                    ),
-                    daemon=True,
-                )
-                self._thread_queue.add_task(message_thread, unskippable=True)
-
-                self._response_thread = threading.Thread(target=self.get_response, daemon=True)
-                self._thread_queue.add_task(self._response_thread)
-
-    def _append_to_chat_log(self, word: str) -> None:
-        """
-        Updates the chat log with the latest output.
-
-        Args:
-            word (str): The word to be added to the conversation area.
-        """
-        with self._log_lock:
-            with open(self._log_path, "a+") as fs:
-                fs.write(word)
+        self._listening_toggle = not self._listening_toggle
 
     def get_response(self) -> None:
         """
@@ -204,8 +173,69 @@ class BanterBotInterface(ABC):
         self.update_conversation_area("\n\n")
 
     @abstractmethod
+    def _init_gui(self) -> None:
+        """
+        Initialize the graphical user interface for the frontend.
+        This method should be implemented by subclasses to create the specific GUI components.
+        """
+
+    @abstractmethod
+    def update_conversation_area(self, word: str) -> None:
+        """
+        Update the conversation area with the given word, and add the word to the chat log.
+        This method should be implemented by subclasses to handle updating the specific GUI components.
+
+        Args:
+            word (str): The word to add to the conversation area.
+        """
+        self._append_to_chat_log(word)
+
+    @abstractmethod
     def run(self) -> None:
         """
         Run the frontend application.
         This method should be implemented by subclasses to handle the main event loop of the specific GUI framework.
         """
+
+    def _listen(self, name: Optional[str] = None) -> None:
+        """
+        Listen for user input using speech-to-text and prompt the bot with the transcribed message.
+
+        Args:
+            name (Optional[str]): The name of the user sending the message. Defaults to None.
+        """
+        # Listen for user input using speech-to-text
+        for sentence in self._speech_to_text.listen():
+
+            # Do not send the message if it is empty.
+            if sentence.strip():
+
+                # Send the transcribed message to the bot
+                message_thread = threading.Thread(
+                    target=self.send_message,
+                    args=(
+                        sentence,
+                        name,
+                    ),
+                    daemon=True,
+                )
+                self._thread_queue.add_task(message_thread, unskippable=True)
+
+                self._response_thread = threading.Thread(target=self.get_response, daemon=True)
+                self._thread_queue.add_task(self._response_thread)
+
+                # Interrupt any currently active ChatCompletion or Text-to-Speech streams
+                if self._thread_queue.is_alive():
+                    self._openai_manager.interrupt()
+                    self._text_to_speech.interrupt()
+
+    def _append_to_chat_log(self, word: str) -> None:
+        """
+        Updates the chat log with the latest output.
+
+        Args:
+            word (str): The word to be added to the conversation area.
+        """
+        with self._log_lock:
+            with open(self._log_path, "a+") as fs:
+                fs.write(word)

@@ -61,16 +61,53 @@ class SpeechToText:
         """
         self._interrupt = True
 
+    def listen(self) -> Generator[str, None, None]:
+        """
+        Starts the speech-to-text recognition process and yields sentences as they are recognized.
+
+        Yields:
+            Generator[str, None, None]: A generator that yields tuples of recognized sentences.
+        """
+        with self.__class__._listen_lock:
+
+            # Reset all state attributes
+            self._reset()
+
+            # Prepare a list which will contain all the recognized input words.
+            output = []
+            self._outputs.append(output)
+
+            # Starting the speech recognizer
+            self._recognizer.start_continuous_recognition()
+
+            # Set the listening flag to True
+            self._listening = True
+
+            # Continuously monitor the recognition progress in the main thread, yielding sentences as they are processed
+            for block in self._process_callbacks(output):
+                yield block
+
+            # Set the listening flag to False
+            self._listening = False
+
+    @property
+    def listening(self) -> bool:
+        """
+        If the current instance of SpeechToText is in the process of listening, returns True. Otherwise, returns False.
+
+        Args:
+            bool: The listening state of the current instance.
+        """
+        return self._listening
+
     def _reset(self) -> None:
         """
-        Resets the state variables of the speech-to-text recognizer, such as the list of events, recognition started
-        flag, and interrupt flag.
+        Resets the state variables of the speech-to-text recognizer, such as the list of events, the interrupt flag,
+        the listening flag, recognition started flag, and new events flag.
         """
-        # Reset the list of events that have been processed
         self._events: List[SpeechToTextOutput] = []
-
-        # Reset the recognition threading.Event instance and set the interrupt flag to False
         self._interrupt: bool = False
+        self._listening: bool = False
         self._start_recognition: threading.Event = threading.Event()
         self._new_events: threading.Event = threading.Event()
 
@@ -134,26 +171,3 @@ class SpeechToText:
 
         # Stop the recognizer
         self._recognizer.stop_continuous_recognition()
-
-    def listen(self) -> Generator[str, None, None]:
-        """
-        Starts the speech-to-text recognition process and yields sentences as they are recognized.
-
-        Yields:
-            Generator[str, None, None]: A generator that yields tuples of recognized sentences.
-        """
-        with self.__class__._listen_lock:
-
-            # Reset all state attributes
-            self._reset()
-
-            # Prepare a list which will contain all the recognized input words.
-            output = []
-            self._outputs.append(output)
-
-            # Starting the speech recognizer
-            self._recognizer.start_continuous_recognition()
-
-            # Continuously monitor the recognition progress in the main thread, yielding sentences as they are processed
-            for block in self._process_callbacks(output):
-                yield block
