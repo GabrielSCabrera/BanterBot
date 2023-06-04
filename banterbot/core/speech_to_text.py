@@ -1,5 +1,7 @@
+import logging
 import os
 import threading
+import time
 from typing import Generator, List
 
 import azure.cognitiveservices.speech as speechsdk
@@ -51,15 +53,22 @@ class SpeechToText:
         # Preconnecting the speech recognizer for reduced latency
         self._connection.open(True)
 
+        # Set the interruption flag to the current time: if interruptions are raised, this will be updated.
+        self._interrupt: int = time.perf_counter_ns()
+
         # Reset the state variables of the speech-to-text recognizer
         self._reset()
 
     def interrupt(self) -> None:
         """
-        Interrupts an ongoing speech-to-text process, if any. This method sets the interrupt flag, which will cause the
-        ongoing speech-to-text process to stop.
+        Interrupts an ongoing speech-to-text process, if any. This method sets the interrupt flag to the current time,
+        which will cause any speech-to-text processes activated prior to the current time to stop.
         """
-        self._interrupt = True
+        # Update the interruption time.
+        self._interrupt: int = time.perf_counter_ns()
+        # Release the threading.Event instance that the listener is waiting for.
+        self._new_events.set()
+        logging.debug("interrupted SpeechToText")
 
     def listen(self) -> Generator[str, None, None]:
         """
@@ -68,27 +77,31 @@ class SpeechToText:
         Yields:
             Generator[str, None, None]: A generator that yields tuples of recognized sentences.
         """
+        # Record the time at which the thread was initialized pre-lock, in order to account for future interruptions.
+        init_time = time.perf_counter_ns()
+
+        # Only allow one listener to be active at once.
         with self.__class__._listen_lock:
 
-            # Reset all state attributes
-            self._reset()
+            # Do not run the listener if an interruption was raised after `init_time`.
+            if self._interrupt < init_time:
 
-            # Prepare a list which will contain all the recognized input words.
-            output = []
-            self._outputs.append(output)
+                # Prepare a list which will contain all the recognized input words.
+                output = []
+                self._outputs.append(output)
 
-            # Starting the speech recognizer
-            self._recognizer.start_continuous_recognition()
+                # Set the listening flag to True
+                self._listening = True
 
-            # Set the listening flag to True
-            self._listening = True
+                # Starting the speech recognizer
+                self._recognizer.start_continuous_recognition()
 
-            # Continuously monitor the recognition progress in the main thread, yielding sentences as they are processed
-            for block in self._process_callbacks(output):
-                yield block
+                # Monitor the recognition progress in the main thread, yielding sentences as they are processed
+                for block in self._process_callbacks(output, init_time):
+                    yield block
 
-            # Set the listening flag to False
-            self._listening = False
+                # Reset all state attributes
+                self._reset()
 
     @property
     def listening(self) -> bool:
@@ -102,11 +115,10 @@ class SpeechToText:
 
     def _reset(self) -> None:
         """
-        Resets the state variables of the speech-to-text recognizer, such as the list of events, the interrupt flag,
-        the listening flag, recognition started flag, and new events flag.
+        Resets the state variables of the speech-to-text recognizer, such as the list of events, the listening flag,
+        recognition started flag, and new events flag.
         """
         self._events: List[SpeechToTextOutput] = []
-        self._interrupt: bool = False
         self._listening: bool = False
         self._start_recognition: threading.Event = threading.Event()
         self._new_events: threading.Event = threading.Event()
@@ -140,34 +152,38 @@ class SpeechToText:
         self._events.append(SpeechToTextOutput(event.result))
         self._new_events.set()
 
-    def _process_callbacks(self, output: List[SpeechToTextOutput]) -> Generator[str, None, None]:
+    def _process_callbacks(self, output: List[SpeechToTextOutput], init_time: int) -> Generator[str, None, None]:
         """
         Processes the recognized speech events and appends them to the output list. Yields sentences as they are
         processed.
 
         Args:
-            output (List[SpeechToTextOutput]): The list to store the recognized speech events.
+            output (List[SpeechToTextOutput]): The list in which to store the recognized speech events.
+            init_time (int): The time at which the listening was initialized.
 
         Yields:
             Generator[str, None, None]: A generator that yields sentences as they are processed.
         """
         # Initialize variables
-        word_index = 0
+        idx = 0
 
         # Wait until the recognition has started before proceeding
         self._start_recognition.wait()
 
+        logging.debug("listening started")
+
         # Continuously monitor the recognition progress
-        while not self._interrupt:
+        while self._interrupt < init_time:
 
             self._new_events.wait()
             self._new_events.clear()
 
-            while not self._interrupt and word_index < len(self._events):
-                event = self._events[word_index]
+            while self._interrupt < init_time and idx < len(self._events):
+                event = self._events[idx]
                 output.append(event)
-                word_index += 1
+                idx += 1
                 yield str(event)
 
         # Stop the recognizer
         self._recognizer.stop_continuous_recognition()
+        logging.debug("listening stopped")

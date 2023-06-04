@@ -40,10 +40,10 @@ Interface
    :special-members:
    :show-inheritance:
 
-TKInterface
+TKSimpleInterface
 ~~~~~~~~~~~
 
-.. autoclass:: banterbot.gui.tk_interface.TKInterface
+.. autoclass:: banterbot.gui.tk_simple_interface.TKSimpleInterface
    :members:
    :undoc-members:
    :special-members:

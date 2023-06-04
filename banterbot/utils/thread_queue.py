@@ -15,28 +15,6 @@ class ThreadQueue:
         self._lock = threading.Lock()
         self._event_queue: List[threading.Event] = []
 
-    def _thread_wrapper(self, thread: threading.Thread, index: int, unskippable: bool) -> None:
-        """
-        A wrapper function for executing threads in the queue.
-
-        This function is responsible for waiting for the previous task to complete before starting the current task, and
-        setting the event for the next task in the queue. If the current task is skippable and not the last task in the
-        queue, it will not be executed.
-
-        Args:
-            thread (threading.Thread): The thread to be executed.
-            index (int): The index of the thread in the event queue.
-            unskippable (bool): Whether the thread should be executed even if a new task is added to the queue.
-        """
-        if index > 0:
-            self._event_queue[index - 1].wait()
-
-        if unskippable or index == len(self._event_queue) - 1:
-            thread.start()
-            thread.join()
-
-        self._event_queue[index].set()
-
     def is_alive(self) -> bool:
         """
         Check if the last task in the queue is still running.
@@ -69,3 +47,25 @@ class ThreadQueue:
             target=self._thread_wrapper, args=(thread, index, unskippable), daemon=thread.daemon
         )
         wrapper_thread.start()
+
+    def _thread_wrapper(self, thread: threading.Thread, index: int, unskippable: bool) -> None:
+        """
+        A wrapper function for executing threads in the queue.
+
+        This function is responsible for waiting for the previous task to complete before starting the current task, and
+        setting the event for the next task in the queue. If the current task is skippable and not the last task in the
+        queue, it will not be executed.
+
+        Args:
+            thread (threading.Thread): The thread to be executed.
+            index (int): The index of the thread in the event queue.
+            unskippable (bool): Whether the thread should be executed even if a new task is added to the queue.
+        """
+        if index > 0:
+            self._event_queue[index - 1].wait()
+
+        if unskippable or index == len(self._event_queue) - 1:
+            thread.start()
+            thread.join()
+
+        self._event_queue[index].set()

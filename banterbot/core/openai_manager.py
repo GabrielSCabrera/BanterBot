@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from typing import Generator, Iterator, List, Union
@@ -33,8 +34,14 @@ class OpenAIManager:
             model (OpenAIModel): The OpenAI model to be used. This should be an instance of the OpenAIModel class, which
             contains information about the model, such as its name and maximum token limit.
         """
+        # The selected model that will be used in OpenAI ChatCompletion prompts.
         self._model = model
+
+        # Indicates whether the current instance of OpenAIManager is streaming.
         self._streaming = False
+
+        # Set the interruption flag to the current time: if interruptions are raised, this will be updated.
+        self._interrupt: int = time.perf_counter_ns()
 
     def prompt(self, messages: List[Message], **kwargs) -> List[str]:
         """
@@ -70,6 +77,9 @@ class OpenAIManager:
             block contains one or more sentences that form a part of the generated response. This can be used to display
             the response to the user in real-time or for further processing.
         """
+        # Record the time at which the request was made, in order to account for future interruptions.
+        init_time = time.perf_counter_ns()
+
         # Obtain a response from the OpenAI ChatCompletion API
         response = self._request(messages=messages, stream=True, **kwargs)
 
@@ -77,7 +87,7 @@ class OpenAIManager:
         self._streaming = True
 
         # Yield the responses as they are streamed
-        for block in self._response_parse_stream(response=response):
+        for block in self._response_parse_stream(response=response, init_time=init_time):
             yield block
 
         # Reset the streaming flag to False
@@ -85,11 +95,11 @@ class OpenAIManager:
 
     def interrupt(self) -> None:
         """
-        Sets the interruption flag to True, which will stop the streaming response. This can be used to manually
-        interrupt the streaming response if needed, for example, if the user sends a new message before the current
-        response is completed.
+        Interrupts any ongoing streaming processes. This method sets the interrupt flag to the current time, which will
+        cause any streaming processes activated prior to the current time to stop.
         """
-        self._interrupt = True
+        self._interrupt: int = time.perf_counter_ns()
+        logging.debug("interrupted OpenAIManager")
 
     @property
     def streaming(self) -> bool:
@@ -156,13 +166,13 @@ class OpenAIManager:
 
         return response if stream else response.choices[0].message.content.strip()
 
-    def _response_parse_stream(self, response: Iterator) -> Generator[List[str], None, bool]:
+    def _response_parse_stream(self, response: Iterator, init_time: int) -> Generator[List[str], None, bool]:
         """
         Parses a streaming response from the OpenAI API and yields blocks of text as they are received.
 
         Args:
-            response (Iterator): The streaming response object. This is the raw response received from the OpenAI API
-            when requesting a streaming response.
+            response (Iterator): A streaming response from the OpenAI ChatCompletion API.
+            init_time (int): The time at which the stream was initialized.
 
         Yields:
             Generator[List[str], None, bool]: Lists of sentences as blocks. Each block contains one or more sentences
@@ -171,13 +181,13 @@ class OpenAIManager:
         Returns:
             bool: True if the generator completed its iterations, False otherwise (due to interruption).
         """
-        self._interrupt = False
         text = ""
+        logging.debug("streaming started")
 
         for chunk in response:
             delta = chunk["choices"][0]["delta"]
 
-            if self._interrupt:
+            if self._interrupt >= init_time:
                 return False
 
             if "content" in delta.keys():
@@ -190,4 +200,5 @@ class OpenAIManager:
         sentences = NLP.segment_sentences(text)
         yield sentences
 
+        logging.debug("streaming stopped")
         return True

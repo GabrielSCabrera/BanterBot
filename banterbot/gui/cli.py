@@ -1,7 +1,7 @@
 import argparse
 
 from banterbot.data.openai_models import get_model_by_name
-from banterbot.gui.tk_interface import TKInterface
+from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
 
 
 def run() -> None:
@@ -30,6 +30,15 @@ def run() -> None:
     )
 
     parser.add_argument(
+        "-s",
+        "--system",
+        action="store",
+        type=str,
+        dest="system",
+        help="Adds a system message to the beginning of the conversation; can help to set the scene.",
+    )
+
+    parser.add_argument(
         "-g",
         "--gpt4",
         action="store_true",
@@ -37,11 +46,12 @@ def run() -> None:
         help="Enable GPT-4; only works if you have GPT-4 API access.",
     )
 
-    args=parser.parse_args()
+    args = parser.parse_args()
 
     kwargs = {
         "model": get_model_by_name("gpt-4") if args.gpt4 else get_model_by_name("gpt-3.5-turbo"),
+        "system": args.system,
     }
 
-    gui = TKInterface(**kwargs)
-    gui.run()
+    interface = TKMultiplayerInterface(**kwargs)
+    interface.run()

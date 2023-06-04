@@ -78,7 +78,7 @@ Interface
 TKInterface
 ~~~~~~~~~~~
 
-.. autoclass:: banterbot.gui.tk_interface.TKInterface
+.. autoclass:: banterbot.gui.tk_simple_interface.TKSimpleInterface
    :members:
    :undoc-members:
    :special-members:
@@ -122,19 +122,19 @@ GPT-4; this only works if you have GPT-4 API access.
 Launch with a Python script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use BanterBot in a script, create an instance of the `BanterBotTK`
+To use BanterBot in a script, create an instance of the `TKSimpleInterface`
 class and call the `run` method:
 
 .. code:: python
 
-   from banterbot import TKInterface, get_voice_by_name, get_model_by_name
+   from banterbot import TKSimpleInterface, get_voice_by_name, get_model_by_name
 
    model = get_model_by_name("gpt-3.5-turbo")
    voice = get_voice_by_name("Aria")
    style = "chat"
 
    # The three arguments `model`, `voice`, and `style` are optional.
-   interface = TKInterface(model=model, voice=voice, style=style)
+   interface = TKSimpleInterface(model=model, voice=voice, style=style)
    interface.run()
 
 Chat Logs

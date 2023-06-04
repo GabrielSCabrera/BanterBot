@@ -9,10 +9,10 @@ banterbot.gui.interface module
    :undoc-members:
    :show-inheritance:
 
-banterbot.gui.tk\_interface module
+banterbot.gui.tk\_simple\_interface module
 ------------------------------------
 
-.. automodule:: banterbot.gui.tk_interface
+.. automodule:: banterbot.gui.tk_simple_interface
    :members:
    :undoc-members:
    :show-inheritance:

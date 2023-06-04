@@ -1,4 +1,5 @@
 import datetime
+import logging
 import threading
 from abc import ABC, abstractmethod
 from typing import List, Optional
@@ -7,10 +8,12 @@ from banterbot.core.openai_manager import OpenAIManager
 from banterbot.core.speech_to_text import SpeechToText
 from banterbot.core.text_to_speech import TextToSpeech
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
-from banterbot.data.config import chat_logs
+from banterbot.data.config import chat_logs, logging_level
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
 from banterbot.utils.thread_queue import ThreadQueue
+
+logging.basicConfig(format="Interface %(asctime)s - %(message)s", level=logging_level)
 
 
 class Interface(ABC):
@@ -20,7 +23,7 @@ class Interface(ABC):
     conversation area. The interface supports both text and speech-to-text input for user messages.
     """
 
-    def __init__(self, model: OpenAIModel, voice: AzureNeuralVoice, style: str) -> None:
+    def __init__(self, model: OpenAIModel, voice: AzureNeuralVoice, style: str, system: Optional[str] = None) -> None:
         """
         Initialize the BanterBotInterface with the given model, voice, and style.
 
@@ -29,25 +32,30 @@ class Interface(ABC):
             voice (AzureNeuralVoice): The voice to use for text-to-speech synthesis.
             style (str): The speaking style to use for text-to-speech synthesis.
         """
-        # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure Text-to-Speech components
+        # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure text-to-speech components
         self._openai_manager = OpenAIManager(model=model)
         self._speech_to_text = SpeechToText()
         self._text_to_speech = TextToSpeech()
 
         # Initialize message handling and conversation attributes
         self._messages: List[Message] = []
-        self._output_lock = threading.Lock()
         self._log_lock = threading.Lock()
         self._log_path = chat_logs / f"chat_{datetime.datetime.now().strftime('%Y%m%dT%H%M%S')}.txt"
-        self._response_thread = None
         self._listening_toggle = False
 
         # Initialize thread management components
         self._thread_queue = ThreadQueue()
 
-        # Initialize voice and style attributes
+        # Initialize model, voice, and style attributes
+        self._model = model
         self._voice = voice
         self._style = style
+
+        # Initialize the system message, if provided
+        self._system = system
+        if self._system is not None:
+            message_instance = Message(role="system", content=system)
+            self._messages.append(message_instance)
 
         # Initialize the subclass GUI
         self._init_gui()
@@ -82,48 +90,49 @@ class Interface(ABC):
         """
         return self._openai_manager.streaming
 
-    def send_message(self, user_message: str, name: Optional[str] = None) -> None:
+    def send_message(self, message: str, role: str = "user", name: Optional[str] = None) -> None:
         """
         Send a message from the user to the conversation.
 
         Args:
-            user_message (str): The message content from the user.
+            message (str): The message content from the user.
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
-        message = Message(role="user", name=name, content=user_message)
-        text = f"{message.name.title() if message.name is not None else 'User'}: {user_message}\n\n"
-        self._messages.append(message)
+        message_instance = Message(role=role, name=name, content=message)
+        text = f"{message_instance.name.title() if message_instance.name is not None else 'User'}: {message}\n\n"
+        self._messages.append(message_instance)
         self.update_conversation_area(word=text)
 
-    def prompt(self, user_message: str, name: Optional[str] = None) -> None:
+    def prompt(self, message: str, name: Optional[str] = None) -> None:
         """
         Prompt the bot with the given user message.
 
         Args:
-            user_message (str): The message content from the user.
+            message (str): The message content from the user.
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
         # Do not send the message if it is empty.
-        if user_message.strip():
+        if message.strip():
+
+            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+            if self._thread_queue.is_alive():
+                self._openai_manager.interrupt()
+                self._text_to_speech.interrupt()
+                self._speech_to_text.interrupt()
+
             message_thread = threading.Thread(
                 target=self.send_message,
                 args=(
-                    user_message,
+                    message,
+                    "user",
                     name,
                 ),
                 daemon=True,
             )
             self._thread_queue.add_task(message_thread, unskippable=True)
+            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
 
-            self._response_thread = threading.Thread(target=self.get_response, daemon=True)
-            self._thread_queue.add_task(self._response_thread)
-
-            # Interrupt any currently active ChatCompletion or Text-to-Speech streams
-            if self._thread_queue.is_alive():
-                self._openai_manager.interrupt()
-                self._text_to_speech.interrupt()
-
-    def toggle_listen(self, name: Optional[str] = None) -> None:
+    def listener_toggle(self, name: Optional[str] = None) -> None:
         """
         Toggle the listening state of the bot. If the bot is currently listening, it will stop listening for user input
         using speech-to-text. If the bot is not currently listening, it will start listening for user input using
@@ -133,12 +142,29 @@ class Interface(ABC):
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
         if self._listening_toggle:
-            self._speech_to_text.interrupt()
+            self.listen_deactivate()
         else:
+            self.listen_activate(name=name)
+
+    def listener_activate(self, name: Optional[str] = None) -> None:
+        """
+        Activate the speech-to-text listener.
+
+        Args:
+            name (Optional[str]): The name of the user sending the message. Defaults to None.
+        """
+        if not self._listening_toggle:
+            self._listening_toggle = True
             self._listen_thread = threading.Thread(target=self._listen, args=(name,), daemon=True)
             self._listen_thread.start()
 
-        self._listening_toggle = not self._listening_toggle
+    def listener_deactivate(self) -> None:
+        """
+        Deactivate the speech-to-text listener.
+        """
+        if self._listening_toggle:
+            self._listening_toggle = False
+            self._speech_to_text.interrupt()
 
     def get_response(self) -> None:
         """
@@ -204,30 +230,37 @@ class Interface(ABC):
         Args:
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
+        # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+        self._speech_to_text.interrupt()
+        self._text_to_speech.interrupt()
+        self._openai_manager.interrupt()
+
+        # Flag is set to True if a new user input is detected.
+        input_detected = False
+
         # Listen for user input using speech-to-text
         for sentence in self._speech_to_text.listen():
 
             # Do not send the message if it is empty.
             if sentence.strip():
 
+                # Set the flag to True since a new user input was detected.
+                input_detected = True
+
                 # Send the transcribed message to the bot
                 message_thread = threading.Thread(
                     target=self.send_message,
                     args=(
-                        sentence,
+                        sentence.strip(),
+                        "user",
                         name,
                     ),
                     daemon=True,
                 )
                 self._thread_queue.add_task(message_thread, unskippable=True)
 
-                self._response_thread = threading.Thread(target=self.get_response, daemon=True)
-                self._thread_queue.add_task(self._response_thread)
-
-                # Interrupt any currently active ChatCompletion or Text-to-Speech streams
-                if self._thread_queue.is_alive():
-                    self._openai_manager.interrupt()
-                    self._text_to_speech.interrupt()
+        if input_detected:
+            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
 
     def _append_to_chat_log(self, word: str) -> None:
         """

@@ -1,7 +1,7 @@
 from banterbot.gui.interface import Interface
-from banterbot.gui.tk_interface import TKInterface
+from banterbot.gui.tk_simple_interface import TKSimpleInterface
 
 __all__ = [
     "Interface",
-    "TKInterface",
+    "TKSimpleInterface",
 ]

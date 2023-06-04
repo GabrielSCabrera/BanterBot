@@ -24,7 +24,8 @@ def run_tests():
     test_suite = test_loader.discover("tests", pattern="test_*.py")
     return test_suite
 
-version = "0.0.3"
+
+version = "0.0.4"
 setup(
     name="BanterBot",
     packages=find_packages(),

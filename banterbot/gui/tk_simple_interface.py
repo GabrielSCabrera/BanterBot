@@ -1,14 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
+from typing import Optional
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.gui.interface import Interface
 
 
-class TKInterface(tk.Tk, Interface):
+class TKSimpleInterface(tk.Tk, Interface):
     """
-    TKInterface is a graphical user interface (GUI) for the BanterBot package that uses OpenAI models for generating
+    TKSimpleInterface is a graphical user interface (GUI) for the BanterBot package that uses OpenAI models for generating
     responses, Azure Neural Voices for text-to-speech, and Azure speech-to-text recognition. The class inherits from
     both tkinter.Tk and Interface, providing a seamless integration of the chatbot functionality with a user-friendly
     interface.
@@ -24,21 +25,18 @@ class TKInterface(tk.Tk, Interface):
         model: OpenAIModel = get_model_by_name("gpt-3.5-turbo"),
         voice: AzureNeuralVoice = get_voice_by_name("Aria"),
         style: str = "chat",
+        system: Optional[str] = None,
     ) -> None:
         """
-        Initialize the TKInterface class, which inherits from both tkinter.Tk and Interface.
+        Initialize the TKSimpleInterface class, which inherits from both tkinter.Tk and Interface.
 
         Args:
             model (OpenAIModel, optional): The OpenAI model to be used for generating responses.
             voice (AzureNeuralVoice, optional): The Azure Neural Voice to be used for text-to-speech.
             style (str, optional): The style of the conversation (e.g., "cheerful", "sad", "chat").
         """
-        self._model = model
-        self._voice = voice
-        self._style = style
-
         tk.Tk.__init__(self)
-        Interface.__init__(self, model=self._model, voice=self._voice, style=self._style)
+        Interface.__init__(self, model=model, voice=voice, style=style, system=system)
         self._listening = False
 
     def update_conversation_area(self, word: str) -> None:
@@ -83,7 +81,7 @@ class TKInterface(tk.Tk, Interface):
             super().prompt(user_message, user_name)
             self.message_entry.delete(0, tk.END)
 
-    def toggle_listen(self) -> None:
+    def listener_toggle(self) -> None:
         """
         Toggle the speech-to-text functionality.
         """
@@ -93,7 +91,7 @@ class TKInterface(tk.Tk, Interface):
             self.listen_btn["text"] = "Stop"
 
         user_name = self.name_entry.get().split(" ")[0].strip()
-        super().toggle_listen(user_name)
+        super().listener_toggle(user_name)
 
     def run(self) -> None:
         """
@@ -154,7 +152,7 @@ class TKInterface(tk.Tk, Interface):
         self.send_btn = ttk.Button(self.entry_frame, text="Send", command=self.prompt, width=7)
         self.send_btn.grid(row=0, column=2, padx=(0, 5), pady=5, sticky="nsew")
 
-        self.listen_btn = ttk.Button(self.entry_frame, text="Listen", command=self.toggle_listen, width=7)
+        self.listen_btn = ttk.Button(self.entry_frame, text="Listen", command=self.listener_toggle, width=7)
         self.listen_btn.grid(row=0, column=3, padx=(0, 5), pady=5, sticky="nsew")
 
         self.message_entry.bind("<Return>", lambda event: self.prompt())

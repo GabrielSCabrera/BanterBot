@@ -33,13 +33,13 @@ A class that handles text-to-speech synthesis using Azure's Cognitive Services. 
 ### SpeechToText
 A class that provides an interface to convert spoken language into written text using Azure Cognitive Services. It allows continuous speech recognition and provides real-time results as sentences are recognized.
 
-### BanterBotInterface
+### Interface
 
 An abstract base class for designing frontends for the BanterBot application. It provides a high-level interface for managing conversations with the bot, including sending messages, receiving responses, and updating the conversation area. Accepts both keyboard inputs and microphone voice inputs.
 
-### BanterBotTK
+### TKSimpleInterface
 
-A graphical user interface (GUI) for a chatbot application that employs OpenAI models for generating responses, Azure Neural Voices for text-to-speech, and Azure speech-to-text. The class inherits from both tkinter.Tk and BanterBotInterface, offering a seamless integration of chatbot functionality with an intuitive interface.
+A graphical user interface (GUI) for a chatbot application that employs OpenAI models for generating responses, Azure Neural Voices for text-to-speech, and Azure speech-to-text. The class inherits from both tkinter.Tk and Interface, offering a seamless integration of chatbot functionality with an intuitive interface.
 
 ## Installation
 
@@ -69,7 +69,7 @@ Start BanterBot by running the `banterbot` command in your terminal. Add the `-g
 
 ### Launch with a Python script
 
-To use BanterBot in a script, create an instance of the `BanterBotTK` class and call the `run` method:
+To use BanterBot in a script, create an instance of the `TKSimpleInterface` class and call the `run` method:
 
 ```python
 from banterbot import TKInterface, get_voice_by_name, get_model_by_name
@@ -79,7 +79,7 @@ voice = get_voice_by_name("Aria")
 style = "chat"
 
 # The three arguments `model`, `voice`, and `style` are optional.
-interface = TKInterface(model=model, voice=voice, style=style)
+interface = TKSimpleInterface(model=model, voice=voice, style=style)
 interface.run()
 ```
 

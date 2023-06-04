@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import threading
 import time
@@ -71,6 +72,9 @@ class TextToSpeech:
         # Preconnecting the speech synthesizer for reduced latency
         self._connection.open(True)
 
+        # Set the interruption flag to the current time: if interruptions are raised, this will be updated.
+        self._interrupt: int = time.perf_counter_ns()
+
         # Reset the state variables of the text-to-speech synthesizer
         self._reset()
 
@@ -96,11 +100,11 @@ class TextToSpeech:
 
     def interrupt(self) -> None:
         """
-        Interrupts an ongoing text-to-speech process, if any.
-
-        This method sets the interrupt flag, which will cause the ongoing text-to-speech process to stop.
+        Interrupts an ongoing text-to-speech process, if any. This method sets the interrupt flag to the current time,
+        which will cause any text-to-speech processes activated prior to the current time to stop.
         """
-        self._interrupt = True
+        self._interrupt: int = time.perf_counter_ns()
+        logging.debug("interrupted TextToSpeech")
 
     def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[Word, None, bool]:
         """
@@ -117,6 +121,9 @@ class TextToSpeech:
         Yields:
             Word: A word with contextual information.
         """
+        # Record the time at which the thread was initialized pre-lock, in order to account for future interruptions.
+        init_time = time.perf_counter_ns()
+
         # Create SSML markup for the given input_string, voice, and style
         ssml = self._create_ssml(input_string, voice, style)
 
@@ -125,27 +132,27 @@ class TextToSpeech:
 
         with self.__class__._speech_lock:
 
-            # Reset all state attributes
-            self._reset()
+            # Do not run the listener if an interruption was raised after `init_time`.
+            if self._interrupt < init_time:
 
-            # Prepare an instance of TextToSpeechOutput while will receive values iteratively
-            output = TextToSpeechOutput(
-                input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
-            )
-            self._outputs.append(output)
+                # Prepare an instance of TextToSpeechOutput while will receive values iteratively
+                output = TextToSpeechOutput(
+                    input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
+                )
+                self._outputs.append(output)
 
-            # Starting the speech synthesizer
-            speech_thread.start()
+                # Starting the speech synthesizer
+                speech_thread.start()
 
-            # Set the speaking flag to True
-            self._speaking = True
+                # Set the speaking flag to True
+                self._speaking = True
 
-            # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
-            for word in self._callbacks_process(output):
-                yield word
+                # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
+                for word in self._callbacks_process(output, init_time):
+                    yield word
 
-            # Set the speaking flag to False
-            self._speaking = False
+                # Reset all state attributes
+                self._reset()
 
     def _callback_completed(self, event: speechsdk.SessionEventArgs) -> None:
         """
@@ -202,7 +209,7 @@ class TextToSpeech:
         self._synthesizer.synthesis_canceled.connect(self._callback_completed)
         self._synthesizer.synthesis_completed.connect(self._callback_completed)
 
-    def _callbacks_process(self, output: TextToSpeechOutput) -> Generator[Word, None, bool]:
+    def _callbacks_process(self, output: TextToSpeechOutput, init_time: int) -> Generator[Word, None, bool]:
         """
         Monitors the synthesis progress and updates the output accordingly.
 
@@ -211,6 +218,7 @@ class TextToSpeech:
 
         Args:
             output (TextToSpeechOutput): The output object to which the processed words will be added.
+            init_time (int): The time at which the speech was initialized.
 
         Yields:
             Word: A word with contextual information.
@@ -219,32 +227,35 @@ class TextToSpeech:
             bool: True if the process completed successfully, False otherwise.
         """
         # Initialize variables
-        word_index = 0
+        idx = 0
         success = False
 
         # Wait until the synthesis has started before proceeding
         self._start_synthesis.wait()
-        self._start_timer = time.perf_counter_ns()
+        start_timer = time.perf_counter_ns()
+
+        logging.debug("speech started")
 
         # Continuously monitor the synthesis progress
-        while not self._interrupt and (not self._synthesis_completed or word_index < len(self._events)):
+        while self._interrupt < init_time and (not self._synthesis_completed or idx < len(self._events)):
 
-            dt = time.perf_counter_ns() - self._start_timer
+            dt = time.perf_counter_ns() - start_timer
 
-            while not self._interrupt and word_index < len(self._events) and dt >= self._events[word_index]["time"]:
-                word = self._process_boundary(word_index=word_index)
+            while self._interrupt < init_time and idx < len(self._events) and dt >= self._events[idx]["time"]:
+                word = self._process_boundary(idx=idx)
                 output.append(word)
-                word_index += 1
+                idx += 1
                 yield word
 
             # Wait for a short amount of time before checking the synthesis progress again
             time.sleep(0.005)
 
-        if not self._interrupt:
+        if self._interrupt >= init_time:
             success = True
 
         # Stop the synthesizer
         self._synthesizer.stop_speaking()
+        logging.debug("speech stopped")
         return success
 
     def _create_ssml(self, text: str, voice: str, style: Optional[str] = None) -> str:
@@ -279,21 +290,21 @@ class TextToSpeech:
         ssml += "</voice></speak>"
         return ssml
 
-    def _process_boundary(self, word_index: int) -> Word:
+    def _process_boundary(self, idx: int) -> Word:
         """
         Processes a synthesis boundary event and returns an instance of class Word.
 
         Args:
-            word_index (int): The index of the word relative to the full text.
+            idx (int): The index of the word relative to the full text.
 
         Returns:
             Word: The processed word with contextual information.
         """
-        event = self._events[word_index]["event"]
+        event = self._events[idx]["event"]
         whitespace = ""
         if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
             category = WordCategory.WORD
-            if word_index > 0:
+            if idx > 0:
                 whitespace = " "
         elif event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation:
             category = WordCategory.PUNCTUATION
@@ -313,8 +324,6 @@ class TextToSpeech:
         interrupt flag, the speaking flag, the synthesis completed flag, and synthesis started flag.
         """
         self._events: List[TimedEvent] = []
-        self._start_timer = None
-        self._interrupt = False
         self._speaking = False
         self._synthesis_completed = False
         self._start_synthesis = threading.Event()

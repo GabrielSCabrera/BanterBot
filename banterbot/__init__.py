@@ -4,7 +4,7 @@ from banterbot.core.text_to_speech import TextToSpeech
 from banterbot.data.azure_neural_voices import get_voice_by_name
 from banterbot.data.openai_models import get_model_by_name
 from banterbot.gui.interface import Interface
-from banterbot.gui.tk_interface import TKInterface
+from banterbot.gui.tk_simple_interface import TKSimpleInterface
 from banterbot.utils.nlp import NLP
 
 __all__ = [
@@ -12,7 +12,7 @@ __all__ = [
     "TextToSpeech",
     "SpeechToText",
     "Interface",
-    "TKInterface",
+    "TKSimpleInterface",
     "get_voice_by_name",
     "get_model_by_name",
     "NLP",
