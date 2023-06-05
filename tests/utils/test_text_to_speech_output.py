@@ -8,7 +8,6 @@ import unittest
 from typing import List
 
 import azure.cognitiveservices.speech as speechsdk
-
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
 from banterbot.utils.text_to_speech_word import TextToSpeechWord
 

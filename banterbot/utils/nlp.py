@@ -1,7 +1,6 @@
 from typing import Tuple
 
 import spacy
-
 from banterbot.data.enums import SpaCyLangModel
 
 

@@ -3,7 +3,6 @@ import json
 from typing import Iterator, List, TypedDict
 
 import azure.cognitiveservices.speech as speechsdk
-
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.enums import SpeechProcessingType, WordCategory
 from banterbot.utils.nlp import NLP

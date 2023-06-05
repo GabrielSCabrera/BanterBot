@@ -4,7 +4,6 @@ import time
 from typing import Generator, Iterator, List, Union
 
 import openai
-
 from banterbot.data.config import RETRY_LIMIT
 from banterbot.data.enums import EnvVar
 from banterbot.data.openai_models import OpenAIModel

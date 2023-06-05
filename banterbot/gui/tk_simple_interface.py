@@ -34,10 +34,13 @@ class TKSimpleInterface(tk.Tk, Interface):
             model (OpenAIModel, optional): The OpenAI model to be used for generating responses.
             voice (AzureNeuralVoice, optional): The Azure Neural Voice to be used for text-to-speech.
             style (str, optional): The style of the conversation (e.g., "cheerful", "sad", "chat").
+            system (Optional[str]): An initialization prompt that can be used to set the scene.
         """
         tk.Tk.__init__(self)
         Interface.__init__(self, model=model, voice=voice, style=style, system=system)
-        self._listening = False
+
+        # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.
+        self.protocol("WM_DELETE_WINDOW", self._quit)
 
     def update_conversation_area(self, word: str) -> None:
         """
@@ -100,12 +103,22 @@ class TKSimpleInterface(tk.Tk, Interface):
         """
         self.mainloop()
 
+    def _quit(self) -> None:
+        """
+        This method is called on exit, and interrupts any currently running activity.
+        """
+        self._openai_manager.interrupt()
+        self._text_to_speech.interrupt()
+        self._speech_to_text.interrupt()
+        self.quit()
+        self.destroy()
+
     def _init_gui(self) -> None:
         """
         Initialize the graphical user interface for the BanterBot application.
         This method sets up the main window, conversation area, input fields, and buttons.
         """
-        self.title("BanterBot")
+        self.title(f"BanterBot {self._model.name}")
         self.configure(bg="black")
         self.geometry("1024x768")
         self._font = ("Cascadia Code", 16)

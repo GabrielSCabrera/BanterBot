@@ -31,6 +31,7 @@ class Interface(ABC):
             model (OpenAIModel): The OpenAI model to use for generating responses.
             voice (AzureNeuralVoice): The voice to use for text-to-speech synthesis.
             style (str): The speaking style to use for text-to-speech synthesis.
+            system (Optional[str]): An initialization prompt that can be used to set the scene.
         """
         # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure text-to-speech components
         self._openai_manager = OpenAIManager(model=model)

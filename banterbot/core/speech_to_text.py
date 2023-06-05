@@ -5,7 +5,6 @@ import time
 from typing import Generator, List
 
 import azure.cognitiveservices.speech as speechsdk
-
 from banterbot.data.enums import EnvVar
 from banterbot.utils.speech_to_text_output import SpeechToTextOutput
 from banterbot.utils.word import Word

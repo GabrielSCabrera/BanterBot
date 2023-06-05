@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from azure.cognitiveservices.speech import SpeechSynthesisBoundaryType, SpeechSynthesisOutputFormat, SpeechSynthesizer
-
 from banterbot.core.text_to_speech import TextToSpeech
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
 

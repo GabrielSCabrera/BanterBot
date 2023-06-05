@@ -9,6 +9,15 @@ from banterbot.gui.interface import Interface
 
 
 class TKMultiplayerInterface(tk.Tk, Interface):
+    """
+    A graphical user interface (GUI) class that enables interaction with the BanterBot chatbot in a multiplayer mode.
+    It supports functionalities such as text input, text-to-speech and speech-to-text capabilities for up to 9 users
+    simultaneously, based on OpenAI and Azure services.
+
+    This class inherits from tkinter's Tk class and a custom Interface class, allowing it to be displayed as a
+    standalone window and follow a specific chatbot interaction protocol respectively.
+    """
+
     def __init__(
         self,
         model: OpenAIModel = get_model_by_name("gpt-3.5-turbo"),
@@ -16,8 +25,20 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         style: str = "chat",
         system: Optional[str] = None,
     ) -> None:
+        """
+        Initialize the TKMultiplayerInterface class, which inherits from both tkinter.Tk and Interface.
+
+        Args:
+            model (OpenAIModel, optional): The OpenAI model to be used for generating responses.
+            voice (AzureNeuralVoice, optional): The Azure Neural Voice to be used for text-to-speech.
+            style (str, optional): The style of the conversation (e.g., "cheerful", "sad", "chat").
+            system (Optional[str]): An initialization prompt that can be used to set the scene.
+        """
         tk.Tk.__init__(self)
         Interface.__init__(self, model=model, voice=voice, style=style, system=system)
+
+        # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.
+        self.protocol("WM_DELETE_WINDOW", self._quit)
 
     def update_conversation_area(self, word: str) -> None:
         super().update_conversation_area(word)
@@ -45,6 +66,16 @@ class TKMultiplayerInterface(tk.Tk, Interface):
 
     def run(self) -> None:
         self.mainloop()
+
+    def _quit(self) -> None:
+        """
+        This method is called on exit, and interrupts any currently running activity.
+        """
+        self._openai_manager.interrupt()
+        self._text_to_speech.interrupt()
+        self._speech_to_text.interrupt()
+        self.quit()
+        self.destroy()
 
     def _init_gui(self) -> None:
         self.title(f"BanterBot {self._model.name}")

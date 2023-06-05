@@ -7,7 +7,6 @@ from typing import Generator, List, Optional, TypedDict
 
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
-
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.enums import EnvVar, SpeechProcessingType, WordCategory
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
