@@ -82,10 +82,10 @@ TKSimpleInterface
    :members:
    :undoc-members:
    :special-members:
-   :show-inheritance:'
+   :show-inheritance:
 
 TKMultiplayerInterface
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: banterbot.gui.tk_multiplayer_interface.TKMultiplayerInterface
    :members:
