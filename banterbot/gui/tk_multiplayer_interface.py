@@ -1,3 +1,4 @@
+import threading
 import tkinter as tk
 from tkinter import ttk
 from typing import Optional
@@ -95,10 +96,16 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             self.bind(f"<KeyPress-{i+1}>", lambda event, i=i: self.listener_activate(i))
             self.bind(f"<KeyRelease-{i+1}>", lambda event: self.listener_deactivate())
 
-        self.request_btn = ttk.Button(self.panel_frame, text="Request", command=self.request_response, width=7)
+        self.request_btn = ttk.Button(self.panel_frame, text="Respond", width=7)
         self.request_btn.grid(row=9, column=0, padx=(5, 0), pady=5, sticky="nsew")
 
+        self.request_btn.bind(f"<ButtonRelease-1>", lambda event: self.request_response())
         self.bind("<Return>", lambda event: self.request_response())
 
     def request_response(self) -> None:
-        pass
+        if self._messages:
+            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+            self._speech_to_text.interrupt()
+            self._text_to_speech.interrupt()
+            self._openai_manager.interrupt()
+            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))

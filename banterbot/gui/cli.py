@@ -2,6 +2,7 @@ import argparse
 
 from banterbot.data.openai_models import get_model_by_name
 from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
+from banterbot.gui.tk_simple_interface import TKSimpleInterface
 
 
 def run() -> None:
@@ -46,6 +47,14 @@ def run() -> None:
         help="Enable GPT-4; only works if you have GPT-4 API access.",
     )
 
+    parser.add_argument(
+        "-m",
+        "--multiplayer",
+        action="store_true",
+        dest="mp",
+        help="Enables the pre-release multiplayer interface; multiplayer is not fully implemented and may be buggy.",
+    )
+
     args = parser.parse_args()
 
     kwargs = {
@@ -53,5 +62,9 @@ def run() -> None:
         "system": args.system,
     }
 
-    interface = TKMultiplayerInterface(**kwargs)
+    if args.mp:
+        interface = TKMultiplayerInterface(**kwargs)
+    else:
+        interface = TKSimpleInterface(**kwargs)
+
     interface.run()

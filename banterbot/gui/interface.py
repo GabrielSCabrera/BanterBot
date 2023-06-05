@@ -142,9 +142,9 @@ class Interface(ABC):
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
         if self._listening_toggle:
-            self.listen_deactivate()
+            self.listener_deactivate()
         else:
-            self.listen_activate(name=name)
+            self.listener_activate(name=name)
 
     def listener_activate(self, name: Optional[str] = None) -> None:
         """

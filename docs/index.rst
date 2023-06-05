@@ -75,10 +75,19 @@ Interface
    :special-members:
    :show-inheritance:
 
-TKInterface
-~~~~~~~~~~~
+TKSimpleInterface
+~~~~~~~~~~~~~~~~~
 
 .. autoclass:: banterbot.gui.tk_simple_interface.TKSimpleInterface
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:'
+
+TKMultiplayerInterface
+~~~~~~~~~~~
+
+.. autoclass:: banterbot.gui.tk_multiplayer_interface.TKMultiplayerInterface
    :members:
    :undoc-members:
    :special-members:
@@ -116,8 +125,17 @@ Launch with Command Line
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Start the BanterBot Command Line Interface (CLI) by executing the
-``banterbot`` command. Use the ``-g`` or ``--gpt4`` flags to enable
-GPT-4; this only works if you have GPT-4 API access.
+``banterbot`` command.
+
+Add the ``-g`` flag to enable GPT-4 for better quality conversations;
+note that this will only work if you have GPT-4 API access, and is both
+significantly more costly and slower than the default GPT-3.5-Turbo.
+
+Add the ``-s`` flag followed by a string in quotes to set up a custom
+character prior to initialization (e.g., ``-s "You are Grendel the Quiz
+Troll, a charismatic troll who loves to host quiz shows."``).
+
+Add the ``-m`` flag to activate the multiplayer interface.
 
 Launch with a Python script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,9 +151,30 @@ class and call the `run` method:
    voice = get_voice_by_name("Aria")
    style = "chat"
 
-   # The three arguments `model`, `voice`, and `style` are optional.
-   interface = TKSimpleInterface(model=model, voice=voice, style=style)
+   # Optional system prompt to set up a custom character prior to initializing BanterBot.
+   system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."
+
+   # The four arguments `model`, `voice`, `style`, and `system` are optional.
+   interface = TKSimpleInterface(model=model, voice=voice, style=style, system=system)
    interface.run()
+
+
+For multiplayer, you can modify the above code slightly:
+
+.. code:: python
+
+    from banterbot import TKMultiplayerInterface, get_voice_by_name, get_model_by_name
+
+    model = get_model_by_name("gpt-3.5-turbo")
+    voice = get_voice_by_name("Aria")
+    style = "chat"
+
+    # Optional system prompt to set up a custom character prior to initializing BanterBot.
+    system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."
+
+    # The four arguments `model`, `voice`, `style`, and `system` are optional.
+    interface = TKMultiplayerInterface(model=model, voice=voice, style=style, system=system)
+    interface.run()
 
 Chat Logs
 ---------
