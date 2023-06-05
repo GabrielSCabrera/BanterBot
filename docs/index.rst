@@ -36,63 +36,6 @@ Three environment variables are required for full functionality:
 -  ``AZURE_SPEECH_REGION``: The region associated with your Azure
    Cognitive Services Speech API key
 
-Components
-----------
-
-OpenAIManager
-~~~~~~~~~~~~~
-
-.. autoclass:: banterbot.core.openai_manager.OpenAIManager
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
-TextToSpeech
-~~~~~~~~~~~~
-
-.. autoclass:: banterbot.core.text_to_speech.TextToSpeech
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
-SpeechToText
-~~~~~~~~~~~~
-
-.. autoclass:: banterbot.core.speech_to_text.SpeechToText
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
-Interface
-~~~~~~~~~
-
-.. autoclass:: banterbot.gui.interface.Interface
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
-TKSimpleInterface
-~~~~~~~~~~~~~~~~~
-
-.. autoclass:: banterbot.gui.tk_simple_interface.TKSimpleInterface
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
-TKMultiplayerInterface
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: banterbot.gui.tk_multiplayer_interface.TKMultiplayerInterface
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
 Installation
 ------------
 
@@ -181,6 +124,63 @@ Chat Logs
 
 Chat logs are saved in the ``$HOME/Documents/BanterBot/Conversations/``
 directory as individual ``.txt`` files.
+
+Components
+----------
+
+OpenAIManager
+~~~~~~~~~~~~~
+
+.. autoclass:: banterbot.core.openai_manager.OpenAIManager
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
+TextToSpeech
+~~~~~~~~~~~~
+
+.. autoclass:: banterbot.core.text_to_speech.TextToSpeech
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
+SpeechToText
+~~~~~~~~~~~~
+
+.. autoclass:: banterbot.core.speech_to_text.SpeechToText
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
+Interface
+~~~~~~~~~
+
+.. autoclass:: banterbot.gui.interface.Interface
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
+TKSimpleInterface
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: banterbot.gui.tk_simple_interface.TKSimpleInterface
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
+TKMultiplayerInterface
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: banterbot.gui.tk_multiplayer_interface.TKMultiplayerInterface
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
 
 Documentation
 =====================================
