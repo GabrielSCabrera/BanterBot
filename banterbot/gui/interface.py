@@ -4,11 +4,11 @@ import threading
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
+from banterbot.config import chat_logs, logging_level
 from banterbot.core.openai_manager import OpenAIManager
 from banterbot.core.speech_to_text import SpeechToText
 from banterbot.core.text_to_speech import TextToSpeech
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
-from banterbot.data.config import chat_logs, logging_level
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
 from banterbot.utils.thread_queue import ThreadQueue

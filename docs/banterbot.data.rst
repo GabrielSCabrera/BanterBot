@@ -9,14 +9,6 @@ banterbot.data.azure\_neural\_voices module
    :undoc-members:
    :show-inheritance:
 
-banterbot.data.config module
-----------------------------
-
-.. automodule:: banterbot.data.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 banterbot.data.enums module
 -------------------------------
 
@@ -24,6 +16,14 @@ banterbot.data.enums module
    :members:
    :undoc-members:
    :show-inheritance:
+
+banterbot.data.prompts module
+-------------------------------
+
+.. automodule:: banterbot.data.prompts
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 banterbot.data.openai\_models module
 ------------------------------------

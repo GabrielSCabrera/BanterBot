@@ -2,7 +2,7 @@ import unittest
 
 from setuptools import find_packages, setup
 
-dependencies = ["openai", "tiktoken", "requests", "azure-cognitiveservices-speech", "spacy"]
+dependencies = ["openai", "tiktoken", "requests", "azure-cognitiveservices-speech", "spacy", "numpy"]
 
 url = "https://github.com/GabrielSCabrera/BanterBot"
 

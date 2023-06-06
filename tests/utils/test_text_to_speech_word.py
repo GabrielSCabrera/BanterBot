@@ -7,6 +7,7 @@ import unittest
 from dataclasses import dataclass
 
 import azure.cognitiveservices.speech as speechsdk
+
 from banterbot.utils.text_to_speech_word import TextToSpeechWord
 
 

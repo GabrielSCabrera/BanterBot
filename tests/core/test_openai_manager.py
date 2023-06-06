@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from unittest.mock import patch
 
 import openai
+
 from banterbot.core.openai_manager import OpenAIManager
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
+
 from banterbot.data.enums import SpeechProcessingType, WordCategory
 
 

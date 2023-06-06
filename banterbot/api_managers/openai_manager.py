@@ -4,7 +4,8 @@ import time
 from typing import Generator, Iterator, List, Union
 
 import openai
-from banterbot.data.config import RETRY_LIMIT
+
+from banterbot.config import RETRY_LIMIT
 from banterbot.data.enums import EnvVar
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
@@ -42,7 +43,7 @@ class OpenAIManager:
         # Set the interruption flag to the current time: if interruptions are raised, this will be updated.
         self._interrupt: int = time.perf_counter_ns()
 
-    def prompt(self, messages: List[Message], **kwargs) -> List[str]:
+    def prompt(self, messages: List[Message], split: bool = True, **kwargs) -> Union[List[str], str]:
         """
         Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.
 
@@ -50,15 +51,17 @@ class OpenAIManager:
             messages (List[Message]): A list of messages. Each message should be an instance of the Message class, which
             contains the content and role (user or assistant) of the message.
 
+            split (bool): Whether the response should be split into sentences.
+
             **kwargs: Additional parameters for the API request. These can include settings such as temperature, top_p,
             and frequency_penalty.
 
         Returns:
-            List[str]: A list of sentences forming the response from the OpenAI API. This can be used to display
-            the generated response to the user or for further processing.
+            Union[List[str], str]: A list of sentences forming the response from the OpenAI API. This can be used to
+            display the generated response to the user or for further processing. If `split` is False, returns a string.
         """
         response = self._request(messages=messages, stream=False, **kwargs)
-        return NLP.segment_sentences(response)
+        return NLP.segment_sentences(response) if split else response
 
     def prompt_stream(self, messages: List[Message], **kwargs) -> Generator[List[str], None, None]:
         """
