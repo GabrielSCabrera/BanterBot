@@ -4,13 +4,14 @@ BanterBot is a user-friendly chatbot application that leverages OpenAI models fo
 
 ## Features
 
-* Employs OpenAI models for generating context-sensitive responses
-* Utilizes Azure Neural Voices for high-quality text-to-speech synthesis
-* Supports a variety of output formats, voices, and speaking styles
-* Enables real-time monitoring of the chatbot's responses
-* Features asynchronous speech-to-text microphone input
-* Provides an abstract base class for crafting frontends for the BanterBot application
-* Includes a tkinter-based frontend implementation
+* Utilizes OpenAI models to generate context-aware responses
+* Leverages Azure Neural Voices for premium text-to-speech synthesis
+* Offers a wide range of output formats, voices, and speaking styles
+* Allows real-time monitoring of the chatbot's responses
+* Supports asynchronous speech-to-text microphone input
+* Includes an abstract base class for creating custom frontends for the BanterBot application
+* Features a tkinter-based frontend implementation
+* Automatically selects an appropriate emotion or tone based on the conversation context
 
 ## Requirements
 
@@ -71,11 +72,17 @@ python -m pip install .
 
 Start BanterBot by running the `banterbot` command in your terminal.
 
-Add the `-g` flag to enable GPT-4 for better quality conversations; note that this will only work if you have GPT-4 API access, and is both significantly more costly and slower than the default GPT-3.5-Turbo.
+- Add the `-g` flag to enable GPT-4 for enhanced conversation quality. Please note that GPT-4 API access is required, and using GPT-4 is more costly and slower than the default GPT-3.5-Turbo.
 
-Add the `-s` flag followed by a string in quotes to set up a custom character prior to initialization (e.g., `-s "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."`).
+- Use the `-p` flag followed by a string in quotes to set up a custom character prior to initialization (e.g., `-p "You are Grendel the Quiz Troll, a charismatic troll who loves hosting quiz shows."`).
 
-Add the `-m` flag to activate the multiplayer interface.
+- Include the `-m` flag to activate the multiplayer interface.
+
+- Apply the `-e` flag to enable emotional tone evaluation before the bot generates its responses.
+
+- To select a Microsoft Azure Cognitive Services text-to-speech voice, use the `-v` flag followed by one of the available voice options (e.g., `-v jenny`).
+
+- Select a Microsoft Azure Cognitive Services text-to-speech voice style by using the `-s` flag followed by one of the available style options (e.g., `-s friendly`).
 
 ### Launch with a Python script
 
@@ -85,33 +92,20 @@ To use BanterBot in a script, create an instance of the `TKSimpleInterface` clas
 from banterbot import TKInterface, get_voice_by_name, get_model_by_name
 
 model = get_model_by_name("gpt-3.5-turbo")
-voice = get_voice_by_name("Aria")
+voice = get_voice_by_name("Davis")
 
-style = "chat"
+style = "excited"
 # Optional system prompt to set up a custom character prior to initializing BanterBot.
 system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."
 
-# The four arguments `model`, `voice`, `style`, and `system` are optional.
-interface = TKSimpleInterface(model=model, voice=voice, style=style, system=system)
+# The four arguments `model`, `voice`, `style`, `system`, and `tone` are optional.
+# Setting `tone` to True enables voice tones and emotions.
+interface = TKSimpleInterface(model=model, voice=voice, style=style, system=system, tone=True)
 interface.run()
 ```
 
-For multiplayer, you can modify the above code slightly:
+For multiplayer, you can swap out TKSimpleInterface in the above code with TKMultiplayerInterface.
 
-```python
-from banterbot import TKMultiplayerInterface, get_voice_by_name, get_model_by_name
-
-model = get_model_by_name("gpt-3.5-turbo")
-voice = get_voice_by_name("Aria")
-style = "chat"
-
-# Optional system prompt to set up a custom character prior to initializing BanterBot.
-system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."
-
-# The four arguments `model`, `voice`, `style`, and `system` are optional.
-interface = TKMultiplayerInterface(model=model, voice=voice, style=style, system=system)
-interface.run()
-```
 
 ## Chat Logs
 
