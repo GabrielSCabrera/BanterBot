@@ -34,7 +34,7 @@ banterbot.utils.speech\_to\_text\_output module
    :show-inheritance:
 
 banterbot.utils.word module
----------------------------------------------
+---------------------------
 
 .. automodule:: banterbot.utils.word
    :members:

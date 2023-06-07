@@ -183,7 +183,7 @@ TKMultiplayerInterface
    :show-inheritance:
 
 Documentation
-=====================================
+=============
 
 .. toctree::
    :maxdepth: 3

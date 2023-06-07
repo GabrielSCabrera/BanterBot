@@ -1,8 +1,8 @@
 banterbot.api_managers package
-======================
+==============================
 
 banterbot.api\_managers.openai\_manager module
--------------------------------------
+----------------------------------------------
 
 .. automodule:: banterbot.api_managers.openai_manager
    :members:
@@ -10,7 +10,7 @@ banterbot.api\_managers.openai\_manager module
    :show-inheritance:
 
 banterbot.api\_managers.text\_to\_speech module
---------------------------------------
+-----------------------------------------------
 
 .. automodule:: banterbot.api_managers.text_to_speech
    :members:
@@ -18,7 +18,7 @@ banterbot.api\_managers.text\_to\_speech module
    :show-inheritance:
 
 banterbot.api\_managers.speech\_to\_text module
---------------------------------------
+-----------------------------------------------
 
 .. automodule:: banterbot.api_managers.speech_to_text
    :members:

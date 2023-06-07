@@ -23,6 +23,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         model: OpenAIModel = get_model_by_name("gpt-3.5-turbo"),
         voice: AzureNeuralVoice = get_voice_by_name("Aria"),
         style: str = "chat",
+        tone: bool = False,
         system: Optional[str] = None,
     ) -> None:
         """
@@ -33,9 +34,10 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             voice (AzureNeuralVoice, optional): The Azure Neural Voice to be used for text-to-speech.
             style (str, optional): The style of the conversation (e.g., "cheerful", "sad", "chat").
             system (Optional[str]): An initialization prompt that can be used to set the scene.
+            tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
         """
         tk.Tk.__init__(self)
-        Interface.__init__(self, model=model, voice=voice, style=style, system=system)
+        Interface.__init__(self, model=model, voice=voice, style=style, system=system, tone=tone)
 
         # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.
         self.protocol("WM_DELETE_WINDOW", self._quit)

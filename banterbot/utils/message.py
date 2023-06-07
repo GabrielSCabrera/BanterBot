@@ -53,7 +53,7 @@ class Message:
         num_tokens += len(model.tokenizer.encode(self.content))
         # Count the number of tokens in the name string, if a name is provided
         if self.name is not None:
-            num_tokens += len(model.tokenizer.encode(self.name))
+            num_tokens += len(model.tokenizer.encode(self.name)) - 1
 
         return num_tokens
 

@@ -4,12 +4,14 @@ import threading
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from banterbot.config import chat_logs, logging_level
 from banterbot.api_managers.openai_manager import OpenAIManager
 from banterbot.api_managers.speech_to_text import SpeechToText
 from banterbot.api_managers.text_to_speech import TextToSpeech
+from banterbot.config import chat_logs, logging_level
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
-from banterbot.data.openai_models import OpenAIModel
+from banterbot.data.openai_models import OpenAIModel, get_model_by_name
+from banterbot.data.prompts import ToneSelection
+from banterbot.openai_extensions.option_selector import OptionSelector
 from banterbot.utils.message import Message
 from banterbot.utils.thread_queue import ThreadQueue
 
@@ -23,7 +25,14 @@ class Interface(ABC):
     conversation area. The interface supports both text and speech-to-text input for user messages.
     """
 
-    def __init__(self, model: OpenAIModel, voice: AzureNeuralVoice, style: str, system: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        model: OpenAIModel,
+        voice: AzureNeuralVoice,
+        style: str,
+        system: Optional[str] = None,
+        tone: bool = False,
+    ) -> None:
         """
         Initialize the BanterBotInterface with the given model, voice, and style.
 
@@ -32,6 +41,7 @@ class Interface(ABC):
             voice (AzureNeuralVoice): The voice to use for text-to-speech synthesis.
             style (str): The speaking style to use for text-to-speech synthesis.
             system (Optional[str]): An initialization prompt that can be used to set the scene.
+            tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
         """
         # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure text-to-speech components
         self._openai_manager = OpenAIManager(model=model)
@@ -51,6 +61,15 @@ class Interface(ABC):
         self._model = model
         self._voice = voice
         self._style = style
+
+        # Initialize the OptionSelector for tone selection
+        self._tone = tone
+        self._tone_selector = OptionSelector(
+            model=get_model_by_name("gpt-3.5-turbo"),
+            options=self._voice.styles,
+            system=ToneSelection.SYSTEM.value,
+            prompt=ToneSelection.PROMPT.value.format(self._style),
+        )
 
         # Initialize the system message, if provided
         self._system = system
@@ -175,13 +194,23 @@ class Interface(ABC):
         """
         prefixed = False
         content = []
-        for block in self._openai_manager.prompt_stream(messages=self._messages):
+        style = self._style
+
+        # Prepare the generator for asynchronous yielding of sentence blocks
+        response = self._openai_manager.prompt_stream(messages=self._messages)
+
+        # If the tone is to be evaluated, evaluate it once before yielding the blocks
+        if self._tone:
+            style = self._get_next_tone()
+
+        for block in response:
+
             if not prefixed:
                 self.update_conversation_area("Assistant: ")
                 prefixed = True
 
             sentences = " ".join(block)
-            for word in self._text_to_speech.speak(sentences, voice=self._voice, style=self._style):
+            for word in self._text_to_speech.speak(sentences, voice=self._voice, style=style):
                 self.update_conversation_area(word.word)
                 content.append(word.word)
 
@@ -273,3 +302,14 @@ class Interface(ABC):
         with self._log_lock:
             with open(self._log_path, "a+") as fs:
                 fs.write(word)
+
+    def _get_next_tone(self):
+        """
+        Sends the message history as an input to the tone selector to semi-randomly select a fitting tone for the
+        assistant's next response. If the tone selection fails, returns the default style.
+
+        Returns:
+            str: A voice tone compatible with the active AzureNeuralVoice instance.
+        """
+        tone = self._tone_selector.select(self._messages)
+        return tone if tone is not None else self._style

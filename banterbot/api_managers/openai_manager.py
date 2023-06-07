@@ -125,7 +125,7 @@ class OpenAIManager:
             int: The total number of tokens in the messages. This is used to ensure that the generated response does not
             exceed the model's maximum token limit.
         """
-        num_tokens = 3
+        num_tokens = 2
 
         for message in messages:
             num_tokens += message.count_tokens(self._model)
@@ -152,7 +152,7 @@ class OpenAIManager:
         kwargs["n"] = 1
         kwargs["stream"] = stream
         kwargs["messages"] = [message() for message in messages]
-        kwargs["max_tokens"] = self._model.max_tokens - self._count_tokens(messages=messages)
+        # kwargs["max_tokens"] = self._model.max_tokens - self._count_tokens(messages=messages)
 
         success = False
         for i in range(RETRY_LIMIT):

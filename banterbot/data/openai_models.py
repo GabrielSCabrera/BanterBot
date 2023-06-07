@@ -51,7 +51,7 @@ class OpenAIModel:
 # Define the available OpenAI models
 _openai_models_dict = {
     "gpt-3.5-turbo": {
-        "max_tokens": 4095,
+        "max_tokens": 4097,
         "version": 3,
         "rank": 2,
     },

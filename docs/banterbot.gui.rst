@@ -18,7 +18,7 @@ banterbot.gui.tk\_simple\_interface module
    :show-inheritance:
 
 banterbot.gui.tk\_multiplayer\_interface module
-------------------------------------------
+-----------------------------------------------
 
 .. autoclass:: banterbot.gui.tk_multiplayer_interface
    :members:

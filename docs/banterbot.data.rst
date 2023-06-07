@@ -10,7 +10,7 @@ banterbot.data.azure\_neural\_voices module
    :show-inheritance:
 
 banterbot.data.enums module
--------------------------------
+---------------------------
 
 .. automodule:: banterbot.data.enums
    :members:
@@ -18,7 +18,7 @@ banterbot.data.enums module
    :show-inheritance:
 
 banterbot.data.prompts module
--------------------------------
+-----------------------------
 
 .. automodule:: banterbot.data.prompts
     :members:

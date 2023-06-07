@@ -214,7 +214,7 @@ _neural_voice_data = {
 }
 
 # Create instances of AzureNeuralVoice for each voice in the dictionary
-_neural_voices = {name: AzureNeuralVoice(name=name, **voice) for name, voice in _neural_voice_data.items()}
+_neural_voices = {name.lower(): AzureNeuralVoice(name=name, **voice) for name, voice in _neural_voice_data.items()}
 
 
 def get_voice_by_name(name: str) -> AzureNeuralVoice:
@@ -230,7 +230,7 @@ def get_voice_by_name(name: str) -> AzureNeuralVoice:
     Raises:
         KeyError: If the specified name is not found in the _neural_voices dictionary.
     """
-    if name not in _neural_voices.keys():
+    if name.lower() not in _neural_voices.keys():
         available_voices = ", ".join(f"`{name}`" for name in _neural_voices.keys())
         error_message = (
             f"BanterBot was unable to load a Microsoft Azure neural voice model with the name `{name}`, available "
@@ -238,7 +238,7 @@ def get_voice_by_name(name: str) -> AzureNeuralVoice:
         )
         raise KeyError(error_message)
 
-    return _neural_voices[name]
+    return _neural_voices[name.lower()]
 
 
 def get_voices_by_gender(gender: AzureNeuralVoiceGender) -> List[AzureNeuralVoice]:
