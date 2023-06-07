@@ -153,7 +153,7 @@ To use BanterBot in a script, create an instance of the
 
 .. code:: python
 
-   from banterbot import TKInterface, get_voice_by_name, get_model_by_name
+   from banterbot import TKSimpleInterface, get_voice_by_name, get_model_by_name
 
    model = get_model_by_name("gpt-3.5-turbo")
    voice = get_voice_by_name("Davis")
