@@ -33,7 +33,7 @@ class Message:
     content: str
     name: Optional[str] = None
 
-    def to_protobuf(self) -> message_pb2.Message:
+    def to_protobuf(self) -> memory_pb2.Message:
         """
         Converts this Message instance into a protobuf object.
 
@@ -41,21 +41,21 @@ class Message:
             self: The instance of the Message class.
 
         Returns:
-            message_pb2.Message: The protobuf object equivalent of the Message instance.
+            memory_pb2.Message: The protobuf object equivalent of the Message instance.
         """
-        return message_pb2.Message(
+        return memory_pb2.Message(
             role=str(self.role),
             content=self.content,
             name=self.name if self.name else "",
         )
 
     @classmethod
-    def from_protobuf(cls, message_proto: message_pb2.Message) -> "Message":
+    def from_protobuf(cls, message_proto: memory_pb2.Message) -> "Message":
         """
         Constructs a Message instance from a protobuf object.
 
         Args:
-            message_proto (message_pb2.Message): The protobuf object to convert.
+            message_proto (memory_pb2.Message): The protobuf object to convert.
 
         Returns:
             Message: The constructed Message instance.
