@@ -9,6 +9,15 @@ banterbot.utils.message module
    :undoc-members:
    :show-inheritance:
 
+banterbot.utils.memory module
+-----------------------------
+
+.. automodule:: banterbot.utils.memory
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 banterbot.utils.nlp module
 --------------------------
 

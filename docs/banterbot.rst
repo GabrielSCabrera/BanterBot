@@ -63,8 +63,8 @@ banterbot.config module
 .. toctree::
    :maxdepth: 4
 
-   banterbot.managers
-   banterbot.extensions
    banterbot.data
+   banterbot.extensions
    banterbot.gui
+   banterbot.managers
    banterbot.utils

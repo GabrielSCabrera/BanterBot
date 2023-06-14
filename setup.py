@@ -39,7 +39,7 @@ version = "0.0.5"
 setup(
     name="BanterBot",
     packages=find_packages(),
-    package_data={'banterbot.protos': ['*.py']},
+    package_data={"banterbot.protos": ["*.py"]},
     test_suite="setup.run_tests",
     version=version,
     description=description,
