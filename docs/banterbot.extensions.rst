@@ -1,26 +1,26 @@
-banterbot.openai_extensions package
-===================================
+banterbot.extensions package
+============================
 
-banterbot.gui.interface module
-------------------------------
+banterbot.extensions.interface module
+-------------------------------------
 
-.. automodule:: banterbot.gui.interface
+.. automodule:: banterbot.extensions.interface
    :members:
    :undoc-members:
    :show-inheritance:
 
 banterbot.extensions.option\_predictor module
------------------------------------------------------
+---------------------------------------------
 
-.. automodule:: banterbot.openai_extensions.option_predictor
+.. automodule:: banterbot.extensions.option_predictor
    :members:
    :undoc-members:
    :show-inheritance:
 
 banterbot.extensions.option\_selector module
------------------------------------------------------
+--------------------------------------------
 
-.. automodule:: banterbot.openai_extensions.option_selector
+.. automodule:: banterbot.extensions.option_selector
     :members:
     :undoc-members:
     :show-inheritance:
