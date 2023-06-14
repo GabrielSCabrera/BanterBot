@@ -34,7 +34,7 @@ SpeechToText
 Interface
 ~~~~~~~~~
 
-.. autoclass:: banterbot.gui.interface.Interface
+.. autoclass:: banterbot.extensions.interface.Interface
    :members:
    :undoc-members:
    :special-members:
