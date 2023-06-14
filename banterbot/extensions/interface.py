@@ -4,14 +4,14 @@ import threading
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from banterbot.api_managers.openai_manager import OpenAIManager
-from banterbot.api_managers.speech_to_text import SpeechToText
-from banterbot.api_managers.text_to_speech import TextToSpeech
 from banterbot.config import chat_logs, logging_level
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import ToneSelection
-from banterbot.openai_extensions.option_selector import OptionSelector
+from banterbot.extensions.option_selector import OptionSelector
+from banterbot.managers.openai_manager import OpenAIManager
+from banterbot.managers.speech_to_text import SpeechToText
+from banterbot.managers.text_to_speech import TextToSpeech
 from banterbot.utils.message import Message
 from banterbot.utils.thread_queue import ThreadQueue
 
@@ -21,7 +21,7 @@ logging.basicConfig(format="Interface %(asctime)s - %(message)s", level=logging_
 class Interface(ABC):
     """
     Interface is an abstract base class for creating frontends for the BanterBot application. It provides a high-level
-    interface for managing conversation with the bot, including sending messages, receiving responses, and updating the
+    interface for managing conversation with the bot, including sending messages, receiving responses, and updating a
     conversation area. The interface supports both text and speech-to-text input for user messages.
     """
 

@@ -11,9 +11,13 @@ SEED = 1337
 filesystem = Path.home() / "Documents" / "BanterBot"
 filesystem.mkdir(parents=True, exist_ok=True)
 
-# Initialize the chat log directory for BanterBot
+# Initialize the chat log directory
 chat_logs = filesystem / "Conversations"
 chat_logs.mkdir(parents=True, exist_ok=True)
+
+# Initialize the personae memory and personality storage
+personae = filesystem / "Personae"
+personae.mkdir(parents=True, exist_ok=True)
 
 # Set the log settings
 logging_level = logging.INFO

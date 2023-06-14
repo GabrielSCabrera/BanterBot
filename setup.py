@@ -2,7 +2,16 @@ import unittest
 
 from setuptools import find_packages, setup
 
-dependencies = ["openai", "tiktoken", "requests", "azure-cognitiveservices-speech", "spacy", "numpy"]
+dependencies = [
+    "openai",
+    "tiktoken",
+    "requests",
+    "azure-cognitiveservices-speech",
+    "spacy",
+    "numpy",
+    "uuid6",
+    "protobuf",
+]
 
 url = "https://github.com/GabrielSCabrera/BanterBot"
 
@@ -17,6 +26,7 @@ with open("README.md", "r") as fs:
 # For running tests: python -m unittest discover -s tests
 # For building: python setup.py sdist bdist_wheel
 # For formatting: autoflake -r -i . | isort . | black --line-length 120 .
+# For compiling protos: protoc --python_out=. memory.proto
 
 
 def run_tests():
@@ -29,6 +39,7 @@ version = "0.0.5"
 setup(
     name="BanterBot",
     packages=find_packages(),
+    package_data={'banterbot.protos': ['*.py']},
     test_suite="setup.run_tests",
     version=version,
     description=description,

@@ -5,7 +5,7 @@ from typing import Optional
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
-from banterbot.gui.interface import Interface
+from banterbot.extensions.interface import Interface
 
 
 class TKMultiplayerInterface(tk.Tk, Interface):

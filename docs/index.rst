@@ -182,7 +182,7 @@ Components
 OpenAIManager
 ~~~~~~~~~~~~~
 
-.. autoclass:: banterbot.api_managers.openai_manager.OpenAIManager
+.. autoclass:: banterbot.managers.openai_manager.OpenAIManager
    :members:
    :undoc-members:
    :special-members:
@@ -191,7 +191,7 @@ OpenAIManager
 TextToSpeech
 ~~~~~~~~~~~~
 
-.. autoclass:: banterbot.api_managers.text_to_speech.TextToSpeech
+.. autoclass:: banterbot.managers.text_to_speech.TextToSpeech
    :members:
    :undoc-members:
    :special-members:
@@ -200,7 +200,7 @@ TextToSpeech
 SpeechToText
 ~~~~~~~~~~~~
 
-.. autoclass:: banterbot.api_managers.speech_to_text.SpeechToText
+.. autoclass:: banterbot.managers.speech_to_text.SpeechToText
    :members:
    :undoc-members:
    :special-members:
@@ -209,7 +209,7 @@ SpeechToText
 Interface
 ~~~~~~~~~
 
-.. autoclass:: banterbot.gui.interface.Interface
+.. autoclass:: banterbot.extensions.interface.Interface
    :members:
    :undoc-members:
    :special-members:

@@ -4,15 +4,15 @@ from typing import Optional
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
-from banterbot.gui.interface import Interface
+from banterbot.extensions.interface import Interface
 
 
 class TKSimpleInterface(tk.Tk, Interface):
     """
-    TKSimpleInterface is a graphical user interface (GUI) for the BanterBot package that uses OpenAI models for generating
-    responses, Azure Neural Voices for text-to-speech, and Azure speech-to-text recognition. The class inherits from
-    both tkinter.Tk and Interface, providing a seamless integration of the chatbot functionality with a user-friendly
-    interface.
+    TKSimpleInterface is a graphical user interface (GUI) for the BanterBot package that uses OpenAI models for
+    generating responses, Azure Neural Voices for text-to-speech, and Azure speech-to-text recognition. The class
+    inherits from both tkinter.Tk and Interface, providing a seamless integration of the chatbot functionality with a
+    user-friendly interface.
 
     The GUI allows users to interact with the chatbot by entering their name and message, and it displays the
     conversation history in a scrollable text area. Users can send messages by pressing the "Send" button or the "Enter"

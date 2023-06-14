@@ -1,7 +1,15 @@
 banterbot.openai_extensions package
 ===================================
 
-banterbot.openai\_extensions.option\_predictor module
+banterbot.gui.interface module
+------------------------------
+
+.. automodule:: banterbot.gui.interface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+banterbot.extensions.option\_predictor module
 -----------------------------------------------------
 
 .. automodule:: banterbot.openai_extensions.option_predictor
@@ -9,7 +17,7 @@ banterbot.openai\_extensions.option\_predictor module
    :undoc-members:
    :show-inheritance:
 
-banterbot.openai\_extensions.option\_selector module
+banterbot.extensions.option\_selector module
 -----------------------------------------------------
 
 .. automodule:: banterbot.openai_extensions.option_selector

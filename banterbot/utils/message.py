@@ -4,6 +4,9 @@ from typing import Dict, Optional
 from banterbot.data.enums import ChatCompletionRoles
 from banterbot.data.openai_models import OpenAIModel
 
+# File `memory_pb2.py` is automatically generated from protoc
+from banterbot.protos import memory_pb2
+
 
 @dataclass
 class Message:
@@ -30,6 +33,41 @@ class Message:
     content: str
     name: Optional[str] = None
 
+    def to_protobuf(self) -> message_pb2.Message:
+        """
+        Converts this Message instance into a protobuf object.
+
+        Args:
+            self: The instance of the Message class.
+
+        Returns:
+            message_pb2.Message: The protobuf object equivalent of the Message instance.
+        """
+        return message_pb2.Message(
+            role=str(self.role),
+            content=self.content,
+            name=self.name if self.name else "",
+        )
+
+    @classmethod
+    def from_protobuf(cls, message_proto: message_pb2.Message) -> "Message":
+        """
+        Constructs a Message instance from a protobuf object.
+
+        Args:
+            message_proto (message_pb2.Message): The protobuf object to convert.
+
+        Returns:
+            Message: The constructed Message instance.
+        """
+        # The Message instance is created with the same attributes as the protobuf object.
+        # Note: The name is set to None if it's an empty string in the protobuf object.
+        return cls(
+            role=ChatCompletionRoles[message_proto.role],
+            content=message_proto.content,
+            name=message_proto.name or None,
+        )
+
     def count_tokens(self, model: OpenAIModel) -> int:
         """
         Counts the number of tokens in the current message.
@@ -43,12 +81,13 @@ class Message:
             OpenAIModel class, which contains the tokenizer and other model-specific information.
 
         Returns:
-            int: The number of tokens in the given messages.
+            int: The number of tokens in the given messages. Please note that this count includes tokens for message
+            metadata and may vary based on the specific tokenizer used by the model.
         """
         # Add 4 tokens to account for message metadata
         num_tokens = 4
-        # Count the number of tokens in the role string
-        num_tokens += len(model.tokenizer.encode(self.role))
+        # Count the number of tokens in the role string, ensuring role is converted to a string
+        num_tokens += len(model.tokenizer.encode(str(self.role)))
         # Count the number of tokens in the content string
         num_tokens += len(model.tokenizer.encode(self.content))
         # Count the number of tokens in the name string, if a name is provided
@@ -61,13 +100,14 @@ class Message:
         """
         Creates and returns a dictionary that is compatible with the OpenAI ChatCompletion API.
 
-        This method is called when an instance of the Message class is used as a function. It converts the Message
-        object into a dictionary format that can be used as input for the OpenAI ChatCompletion API.
+        Converts the Message object into a dictionary format that can be used as input for the OpenAI ChatCompletion
+        API.
 
         Returns:
-            Dict[str, str]: A dictionary containing the role, content, and optionally the name of the message sender.
+            Dict[str, str]: A dictionary containing the role (converted to string), content, and optionally the name of
+            the message sender.
         """
-        output = {"role": self.role, "content": self.content}
+        output = {"role": str(self.role), "content": self.content}
         if self.name is not None:
             output["name"] = self.name
         return output
