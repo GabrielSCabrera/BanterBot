@@ -3,7 +3,7 @@ from typing import List
 
 # File `memory_pb2.py` is automatically generated from protoc
 from banterbot.protos import memory_pb2
-from banterbot.utils import Message
+from banterbot.utils.message import Message
 
 
 @dataclass
