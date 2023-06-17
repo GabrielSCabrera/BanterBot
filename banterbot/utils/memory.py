@@ -1,5 +1,8 @@
+import datetime
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
+
+from banterbot import config
 
 # File `memory_pb2.py` is automatically generated from protoc
 from banterbot.protos import memory_pb2
@@ -24,8 +27,10 @@ class Memory:
     keywords: List[str]
     summary: str
     impact: float
-    timestamp: str
+    timestamp: datetime.datetime
     messages: List[Message]
+    # Initializes a UUID for the current instance if one is not provided.
+    uuid: Optional[str] = config.generate_uuid().hex
 
     def to_protobuf(self) -> memory_pb2.Memory:
         """
@@ -36,14 +41,16 @@ class Memory:
         Returns:
             memory_pb2.Memory: The protobuf object equivalent of the Memory instance.
         """
-        # The protobuf object is generated with the same attributes as the Memory instance.
-        return memory_pb2.Memory(
-            keywords=self.keywords,
-            summary=self.summary,
-            impact=self.impact,
-            timestamp=self.timestamp,
-            messages=[message.to_protobuf() for message in self.messages],
-        )
+        memory = memory_pb2.Memory()
+
+        memory.keywords.extend(self.keywords)
+        memory.summary = self.summary
+        memory.impact = self.impact
+        memory.timestamp = self.timestamp.timestamp()
+        memory.messages.extend([message.to_protobuf() for message in self.messages])
+        memory.uuid = self.uuid
+
+        return memory
 
     @classmethod
     def from_protobuf(cls, memory: memory_pb2.Memory) -> "Memory":
@@ -61,6 +68,7 @@ class Memory:
             keywords=memory.keywords,
             summary=memory.summary,
             impact=memory.impact,
-            timestamp=memory.timestamp,
+            timestamp=datetime.datetime.fromtimestamp(memory.timestamp),
             messages=[Message.from_protobuf(message_proto) for message_proto in memory.messages],
+            uuid=memory.uuid,
         )

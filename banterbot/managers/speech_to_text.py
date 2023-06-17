@@ -25,6 +25,7 @@ class SpeechToText:
         Initializes the SpeechToText instance by setting up the Azure Cognitive Services speech configuration and
         recognizer.
         """
+        logging.debug(f"SpeechToText initialized")
 
         # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
@@ -68,7 +69,7 @@ class SpeechToText:
         self._interrupt: int = time.perf_counter_ns()
         # Release the threading.Event instance that the listener is waiting for.
         self._new_events.set()
-        logging.debug("interrupted SpeechToText")
+        logging.debug("SpeechToText listener interrupted")
 
     def listen(self) -> Generator[str, None, None]:
         """
@@ -98,6 +99,7 @@ class SpeechToText:
 
                 # Monitor the recognition progress in the main thread, yielding sentences as they are processed
                 for block in self._process_callbacks(output, init_time):
+                    logging.debug(f"SpeechToText listener processed block: `{block}`")
                     yield block
 
                 # Reset all state attributes
@@ -170,7 +172,7 @@ class SpeechToText:
         # Wait until the recognition has started before proceeding
         self._start_recognition.wait()
 
-        logging.debug("listening started")
+        logging.debug("SpeechToText listener started")
 
         # Continuously monitor the recognition progress
         while self._interrupt < init_time:
@@ -186,4 +188,4 @@ class SpeechToText:
 
         # Stop the recognizer
         self._recognizer.stop_continuous_recognition()
-        logging.debug("listening stopped")
+        logging.debug("SpeechToText listener stopped")

@@ -1,8 +1,7 @@
-import bisect
-import os
+import logging
 from typing import List
 
-from banterbot.config import personae
+from banterbot import config
 from banterbot.protos import memory_pb2
 from banterbot.utils.memory import Memory
 from banterbot.utils.message import Message
@@ -15,77 +14,31 @@ class MemoryManager:
     based on keywords.
     """
 
-    def __init__(self, uuid: str, memories: List[Memory] = None):
+    @classmethod
+    def new(cls) -> "MemoryManager":
         """
-        Represents a manager for handling arrays of memories using Protocol Buffers.
-
-        Args:
-            uuid (str): A string-typed UUID with which the current set of memories is associated.
-            memories (List[Memory], optional): List of Memory instances representing the memories. Defaults to None.
-        """
-        self.uuid = uuid
-        self.memories = memories if memories is not None else []
-        self.index = self._build_index()
-
-    def append(self, memory: Memory, build_index: bool = True) -> None:
-        """
-        Appends a new memory to the list of memories.
-
-        Args:
-            memory (Memory): A Memory instance to be appended.
-            build_index (bool): If True, rebuilds the memory index.
-        """
-        self.memories.append(memory)
-        if build_index:
-            self.index = self._build_index()
-
-    def extend(self, memories: List[Memory], build_index: bool = True) -> None:
-        """
-        Adds a list of new memories to the list of memories.
-
-        Args:
-            memories (List[Memory], optional): List of Memory instances to be appended.
-            build_index (bool): If True, rebuilds the memory index.
-        """
-        self.memories.extend(memories)
-        if build_index:
-            self.index = self._build_index()
-
-    def save(self) -> None:
-        """
-        Saves the memories to a binary file using Protocol Buffers serialization.
-        """
-        memory_list_proto = memory_pb2.MemoryList()
-
-        for memory in self.memories:
-            memory_proto = memory.to_protobuf()
-            memory_list_proto.memories.append(memory_proto)
-
-        serialized_memory_list = memory_list_proto.SerializeToString()
-
-        os.makedirs(self.uuid, exist_ok=True)
-        with open(personae / self.uuid / "memories.bin", "wb") as f:
-            f.write(serialized_memory_list)
-
-    def _build_index(self) -> dict:
-        """
-        Builds an index of keywords to memory indices for efficient memory retrieval.
+        Generates a new empty set of memories and associated UUID.
 
         Returns:
-            dict: The index mapping keywords to memory indices.
+            MemoryManager: A MemoryManager instance with the loaded memories.
         """
-        index = {}
-        for i, memory in enumerate(self.memories):
-            for keyword in memory.keywords:
-                if keyword not in index:
-                    index[keyword] = []
-                bisect.insort(index[keyword], i)
-        return index
+        uuid = config.generate_uuid().hex
+
+        directory = config.personae / uuid / config.memories
+        directory.mkdir(exist_ok=True, parents=True)
+
+        memory_index = memory_pb2.MemoryIndex()
+        with open(config.personae / uuid / config.memory_index, "wb+") as fs:
+            fs.write(memory_index.SerializeToString())
+
+        logging.debug(f"MemoryManager created new UUID: `{uuid}`")
+        return cls(uuid=uuid, memory_index={})
 
     @classmethod
     def load(cls, uuid: str) -> "MemoryManager":
         """
-        Loads the memories from a binary file using Protocol Buffers deserialization and creates a MemoryManager instance.
+        Loads the memories from a binary file using Protocol Buffers deserialization and creates a MemoryManager
+        instance.
 
         Args:
             uuid (str): A string-typed UUID with which the current set of memories is associated.
@@ -93,27 +46,72 @@ class MemoryManager:
         Returns:
             MemoryManager: A MemoryManager instance with the loaded memories.
         """
-        memory_list_proto = memory_pb2.MemoryList()
+        logging.debug(f"MemoryManager loading UUID: `{uuid}`")
+        memory_index_object = memory_pb2.MemoryIndex()
 
-        with open(personae / self.uuid / "memories.bin", "rb") as f:
-            memory_list_proto.ParseFromString(f.read())
+        with open(config.personae / uuid / config.memory_index, "rb") as fs:
+            memory_index_object.ParseFromString(fs.read())
 
-        memories = [Memory.from_protobuf(memory_proto) for memory_proto in memory_list_proto.memories]
-        return cls(uuid, memories)
+        memory_index = {entry.keyword: list(entry.memory_uuids) for entry in memory_index_object.entries}
 
-    def retrieve(self, keywords: List[str]) -> List[Memory]:
+        return cls(uuid, memory_index)
+
+    def __init__(self, uuid: str, memory_index: List[Memory]) -> None:
         """
-        Retrieves memories associated with the given keywords.
+        Represents a manager for handling arrays of memories using Protocol Buffers.
 
         Args:
-            keywords (List[str]): List of keywords.
-
-        Returns:
-            List[Memory]: List of retrieved Memory instances associated with the given keywords.
+            uuid (str): A string-typed UUID with which the current set of memories is associated.
+            memory_index (Dict[str, List[str]]): Index of keywords and the names of the files
         """
-        result = []
+        logging.debug(f"MemoryManager initialized with UUID: `{uuid}`")
+        self.uuid = uuid
+        self._memory_index = memory_index
+        self._find_memories()
+
+    def append(self, memory: Memory) -> None:
+        """
+        Appends a new memory to the list of memories.
+
+        Args:
+            memory (Memory): A Memory instance to be appended.
+        """
+        self._memories[memory.uuid] = memory
+        self._update_index(memory=memory)
+
+    def extend(self, memories: List[Memory]) -> None:
+        """
+        Adds a list of new memories to the list of memories.
+
+        Args:
+            memories (List[Memory]): List of Memory instances to be appended.
+        """
+        for memory in memories:
+            self.append(memory=memory)
+
+    def _find_memories(self) -> None:
+        directory = config.personae / self.uuid / config.memories
+        self._memories = {path.stem: None for path in directory.glob("*" + config.protobuf_extension)}
+
+    def _update_index(self, memory: Memory) -> None:
+        for keyword in memory.keywords:
+            if keyword not in self._memory_index.keys():
+                self._memory_index[keyword] = [memory.uuid]
+            else:
+                self._memory_index[keyword].append(memory.uuid)
+
+    def _load_memory(self, memory_uuid: str) -> None:
+        memory_object = memory_pb2.Memory()
+        with open(config.personae / self.uuid / config.memories / memory_uuid + config.protobuf_extension, "rb") as fs:
+            memory_object.ParseFromString(fs.read())
+        self._memories[memory_uuid] = Memory.from_protobuf(memory=memory_object)
+
+    def keyword_lookup(self, keywords: List[str]) -> List[Memory]:
+        memories = []
         for keyword in keywords:
-            if keyword in self.index:
-                for i in self.index[keyword]:
-                    result.append(self.memories[i])
-        return result
+            for memory_uuid in self._memory_index[keyword]:
+                if self._memories[memory_uuid] is None:
+                    self._load_memory(memory_uuid=memory_uuid)
+                if self._memories[memory_uuid] not in memories:
+                    memories.append(self._memories[memory_uuid])
+        return memories

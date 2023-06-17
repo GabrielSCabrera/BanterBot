@@ -4,21 +4,28 @@ package chat;
 
 // Message structure used in the chat system.
 message Message {
-    enum Role {
-        SYSTEM = 0;
-        USER = 1;
-        ASSISTANT = 2;
-    }
-    Role role = 1;       // Role of the sender.
-    string content = 2;  // Content of the message.
-    string name = 3;     // Optional name of the sender.
+    string role = 1;                        // Role of the sender.
+    string content = 2;                     // Content of the message.
+    string name = 3;                        // Optional name of the sender.
 }
 
 // Memory structure used for storing conversations.
 message Memory {
-    repeated string keywords = 1;    // Keywords associated with the memory.
-    string summary = 2;              // Summary of the memory.
-    double impact = 3;         // Impact score of the memory.
-    string timestamp = 4;            // Timestamp when the memory occurred.
-    repeated Message messages = 5;   // Messages associated with the memory.
+    repeated string keywords = 1;           // Keywords associated with the memory.
+    string summary = 2;                     // Summary of the memory.
+    float impact = 3;                       // Impact score of the memory.
+    float timestamp = 4;                    // Timestamp when the memory occurred.
+    repeated Message messages = 5;          // Messages associated with the memory.
+    string uuid = 6;                        // UUID assigned to a memory.
+}
+
+// Memory indexing entry structure for linking keywords to memories.
+message MemoryIndexEntry {
+    string keyword = 1;                     // A single keyword associated with one or more memories.
+    repeated string memory_uuids = 2;       // UUIDs of the memories associated with the given keyword.
+}
+
+// Memory indexing structure for linking keywords to memories.
+message MemoryIndex {
+    repeated MemoryIndexEntry entries = 1;  // A set of MemoryIndexEntries of indeterminate length.
 }

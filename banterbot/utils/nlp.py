@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple
 
 import spacy
@@ -70,9 +71,9 @@ class NLP:
         Args:
             name (str): The name of the SpaCy model to download.
         """
-        print(f'Downloading SpaCy language model: "{name}". This will only happen once.\n\n\n')
+        logging.info(f"Downloading SpaCy language model: `{name}`. This will only happen once.")
         spacy.cli.download(name)
-        print(f'\n\n\nFinished download of SpaCy language model: "{name}".')
+        logging.info(f"Finished download of SpaCy language model: `{name}`.")
 
     @classmethod
     def model(cls, name: str) -> spacy.language.Language:

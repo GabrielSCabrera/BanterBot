@@ -47,6 +47,7 @@ class TextToSpeech:
             output_format (SpeechSynthesisOutputFormat, optional): The desired output format for the synthesized speech.
                 Default is Audio16Khz32KBitRateMonoMp3.
         """
+        logging.debug(f"TextToSpeech initialized")
 
         # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
@@ -104,7 +105,7 @@ class TextToSpeech:
         which will cause any text-to-speech processes activated prior to the current time to stop.
         """
         self._interrupt: int = time.perf_counter_ns()
-        logging.debug("interrupted TextToSpeech")
+        logging.debug("TextToSpeech synthesizer interrupted")
 
     def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[Word, None, bool]:
         """
@@ -149,6 +150,7 @@ class TextToSpeech:
 
                 # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
                 for word in self._callbacks_process(output, init_time):
+                    logging.debug(f"TextToSpeech synthesizer processed word: `{word}`")
                     yield word
 
                 # Reset all state attributes
@@ -234,7 +236,7 @@ class TextToSpeech:
         self._start_synthesis.wait()
         start_timer = time.perf_counter_ns()
 
-        logging.debug("speech started")
+        logging.debug("TextToSpeech synthesizer started")
 
         # Continuously monitor the synthesis progress
         while self._interrupt < init_time and (not self._synthesis_completed or idx < len(self._events)):
@@ -255,7 +257,7 @@ class TextToSpeech:
 
         # Stop the synthesizer
         self._synthesizer.stop_speaking()
-        logging.debug("speech stopped")
+        logging.debug("TextToSpeech synthesizer stopped")
         return success
 
     def _create_ssml(self, text: str, voice: str, style: Optional[str] = None) -> str:

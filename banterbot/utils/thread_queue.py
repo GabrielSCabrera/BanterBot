@@ -1,3 +1,4 @@
+import logging
 import threading
 from typing import List
 
@@ -12,6 +13,7 @@ class ThreadQueue:
     """
 
     def __init__(self):
+        logging.debug(f"ThreadQueue initialized")
         self._lock = threading.Lock()
         self._event_queue: List[threading.Event] = []
 
@@ -65,7 +67,10 @@ class ThreadQueue:
             self._event_queue[index - 1].wait()
 
         if unskippable or index == len(self._event_queue) - 1:
+            logging.debug(f"ThreadQueue thread {index} started")
             thread.start()
             thread.join()
+        else:
+            logging.debug(f"ThreadQueue thread {index} skipped")
 
         self._event_queue[index].set()

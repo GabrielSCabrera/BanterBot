@@ -4,8 +4,9 @@ import threading
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from banterbot.config import chat_logs, logging_level
+from banterbot.config import chat_logs
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
+from banterbot.data.enums import ChatCompletionRoles
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import ToneSelection
 from banterbot.extensions.option_selector import OptionSelector
@@ -14,8 +15,6 @@ from banterbot.managers.speech_to_text import SpeechToText
 from banterbot.managers.text_to_speech import TextToSpeech
 from banterbot.utils.message import Message
 from banterbot.utils.thread_queue import ThreadQueue
-
-logging.basicConfig(format="Interface %(asctime)s - %(message)s", level=logging_level)
 
 
 class Interface(ABC):
@@ -43,6 +42,8 @@ class Interface(ABC):
             system (Optional[str]): An initialization prompt that can be used to set the scene.
             tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
         """
+        logging.debug(f"Interface initialized")
+
         # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure text-to-speech components
         self._openai_manager = OpenAIManager(model=model)
         self._speech_to_text = SpeechToText()
@@ -74,7 +75,7 @@ class Interface(ABC):
         # Initialize the system message, if provided
         self._system = system
         if self._system is not None:
-            message_instance = Message(role="system", content=system)
+            message_instance = Message(role=ChatCompletionRoles.SYSTEM, content=system)
             self._messages.append(message_instance)
 
         # Initialize the subclass GUI
@@ -110,7 +111,9 @@ class Interface(ABC):
         """
         return self._openai_manager.streaming
 
-    def send_message(self, message: str, role: str = "user", name: Optional[str] = None) -> None:
+    def send_message(
+        self, content: str, role: ChatCompletionRoles = ChatCompletionRoles.USER, name: Optional[str] = None
+    ) -> None:
         """
         Send a message from the user to the conversation.
 
@@ -118,9 +121,10 @@ class Interface(ABC):
             message (str): The message content from the user.
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
-        message_instance = Message(role=role, name=name, content=message)
-        text = f"{message_instance.name.title() if message_instance.name is not None else 'User'}: {message}\n\n"
-        self._messages.append(message_instance)
+        message = Message(role=role, name=name, content=content)
+        name = message.name.title() if message.name is not None else ChatCompletionRoles.USER.value.title()
+        text = f"{name}: {content}\n\n"
+        self._messages.append(message)
         self.update_conversation_area(word=text)
 
     def prompt(self, message: str, name: Optional[str] = None) -> None:
@@ -144,7 +148,7 @@ class Interface(ABC):
                 target=self.send_message,
                 args=(
                     message,
-                    "user",
+                    ChatCompletionRoles.USER,
                     name,
                 ),
                 daemon=True,
@@ -196,17 +200,18 @@ class Interface(ABC):
         content = []
         style = self._style
 
-        # Prepare the generator for asynchronous yielding of sentence blocks
-        response = self._openai_manager.prompt_stream(messages=self._messages)
-
         # If the tone is to be evaluated, evaluate it once before yielding the blocks
         if self._tone:
             style = self._get_next_tone()
+            tone_content = f"Tone: {style}\n"
+            # Add an intermediate message (not visualized in the conversation area) noting the assistant's tone.
+            self._append_to_chat_log(tone_content)
+            self._messages.append(Message(role=ChatCompletionRoles.ASSISTANT, content=tone_content))
 
-        for block in response:
-
+        # Initialize the generator for asynchronous yielding of sentence blocks
+        for block in self._openai_manager.prompt_stream(messages=self._messages):
             if not prefixed:
-                self.update_conversation_area("Assistant: ")
+                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
                 prefixed = True
 
             sentences = " ".join(block)
@@ -218,7 +223,7 @@ class Interface(ABC):
             content.append(" ")
 
         content = "".join(content)
-        self._messages.append(Message(role="assistant", content=content.strip()))
+        self._messages.append(Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip()))
         self.end_response()
 
     def end_response(self) -> None:
@@ -282,7 +287,7 @@ class Interface(ABC):
                     target=self.send_message,
                     args=(
                         sentence.strip(),
-                        "user",
+                        ChatCompletionRoles.USER,
                         name,
                     ),
                     daemon=True,
@@ -300,6 +305,7 @@ class Interface(ABC):
             word (str): The word to be added to the conversation area.
         """
         with self._log_lock:
+            logging.debug(f"Interface appended new data to the chat log")
             with open(self._log_path, "a+") as fs:
                 fs.write(word)
 

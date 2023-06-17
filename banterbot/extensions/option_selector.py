@@ -1,7 +1,9 @@
+import logging
 from typing import List
 
 import numpy as np
 
+from banterbot.data.enums import ChatCompletionRoles
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import OptionSelectorPrompts
 from banterbot.managers.openai_manager import OpenAIManager
@@ -45,6 +47,7 @@ class OptionSelector:
             system (str): The initial system message that sets the context for the OptionSelector's task.
             prompt (str): The prompt that provides a guideline for the evaluation.
         """
+        logging.debug(f"OptionSelector initialized")
         self._options = options
         self._system = system
         self._prompt = prompt
@@ -71,6 +74,7 @@ class OptionSelector:
         except:
             selection = None
 
+        logging.debug(f"OptionSelector selected option: `{selection}`")
         return selection
 
     def _init_system_prompt(self) -> str:
@@ -95,8 +99,8 @@ class OptionSelector:
         Returns:
             List[Message]: The enhanced list of messages.
         """
-        prefix = Message(role="system", content=self._system_processed)
-        suffix = Message(role="user", content=self._prompt)
-        dummy_message = Message(role="assistant", content=OptionSelectorPrompts.DUMMY.value)
+        prefix = Message(role=ChatCompletionRoles.SYSTEM, content=self._system_processed)
+        suffix = Message(role=ChatCompletionRoles.USER, content=self._prompt)
+        dummy_message = Message(role=ChatCompletionRoles.ASSISTANT, content=OptionSelectorPrompts.DUMMY.value)
         messages = [prefix] + messages + [suffix, dummy_message]
         return messages

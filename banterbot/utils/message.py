@@ -44,9 +44,9 @@ class Message:
             memory_pb2.Message: The protobuf object equivalent of the Message instance.
         """
         return memory_pb2.Message(
-            role=str(self.role),
+            role=self.role.name,
             content=self.content,
-            name=self.name if self.name else "",
+            name=self.name,
         )
 
     @classmethod
@@ -65,7 +65,7 @@ class Message:
         return cls(
             role=ChatCompletionRoles[message_proto.role],
             content=message_proto.content,
-            name=message_proto.name or None,
+            name=message_proto.name,
         )
 
     def count_tokens(self, model: OpenAIModel) -> int:
@@ -87,7 +87,7 @@ class Message:
         # Add 4 tokens to account for message metadata
         num_tokens = 4
         # Count the number of tokens in the role string, ensuring role is converted to a string
-        num_tokens += len(model.tokenizer.encode(str(self.role)))
+        num_tokens += len(model.tokenizer.encode(self.role.value))
         # Count the number of tokens in the content string
         num_tokens += len(model.tokenizer.encode(self.content))
         # Count the number of tokens in the name string, if a name is provided
@@ -107,7 +107,7 @@ class Message:
             Dict[str, str]: A dictionary containing the role (converted to string), content, and optionally the name of
             the message sender.
         """
-        output = {"role": str(self.role), "content": self.content}
+        output = {"role": self.role.value, "content": self.content}
         if self.name is not None:
             output["name"] = self.name
         return output

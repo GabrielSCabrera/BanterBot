@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 from banterbot.data.azure_neural_voices import _neural_voices, get_voice_by_name
 from banterbot.data.openai_models import get_model_by_name
@@ -88,6 +89,7 @@ def run() -> None:
         "whispering",
     ]
     universal_styles = ", ".join(f"`{style}`" for style in universal_styles)
+
     parser.add_argument(
         "-s",
         "--style",
@@ -101,6 +103,15 @@ def run() -> None:
             "`/banterbot/data/azure_neural_voices.py` for more information."
         ),
     )
+
+    parser.add_argument(
+        "-d",
+        "--debug",
+        action="store_true",
+        dest="debug",
+        help="Enable debug mode, which will echo a number of hidden processes to the terminal.",
+    )
+
     args = parser.parse_args()
 
     kwargs = {
@@ -110,6 +121,9 @@ def run() -> None:
         "system": args.prompt,
         "tone": args.tone,
     }
+
+    if args.debug:
+        logging.getLogger().setLevel(logging.DEBUG)
 
     if args.multiplayer:
         interface = TKMultiplayerInterface(**kwargs)

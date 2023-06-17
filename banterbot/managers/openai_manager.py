@@ -34,6 +34,8 @@ class OpenAIManager:
             model (OpenAIModel): The OpenAI model to be used. This should be an instance of the OpenAIModel class, which
             contains information about the model, such as its name and maximum token limit.
         """
+        logging.debug(f"OpenAIManager initialized")
+
         # The selected model that will be used in OpenAI ChatCompletion prompts.
         self._model = model
 
@@ -61,7 +63,9 @@ class OpenAIManager:
             display the generated response to the user or for further processing. If `split` is False, returns a string.
         """
         response = self._request(messages=messages, stream=False, **kwargs)
-        return NLP.segment_sentences(response) if split else response
+        logging.debug(f"OpenAIManager stream processed block: `{response}`")
+        sentences = NLP.segment_sentences(response) if split else response
+        return sentences
 
     def prompt_stream(self, messages: List[Message], **kwargs) -> Generator[List[str], None, None]:
         """
@@ -101,7 +105,7 @@ class OpenAIManager:
         cause any streaming processes activated prior to the current time to stop.
         """
         self._interrupt: int = time.perf_counter_ns()
-        logging.debug("interrupted OpenAIManager")
+        logging.debug("OpenAIManager stream interrupted")
 
     @property
     def streaming(self) -> bool:
@@ -184,7 +188,7 @@ class OpenAIManager:
             bool: True if the generator completed its iterations, False otherwise (due to interruption).
         """
         text = ""
-        logging.debug("streaming started")
+        logging.debug("OpenAIManager stream started")
 
         for chunk in response:
             delta = chunk["choices"][0]["delta"]
@@ -202,5 +206,5 @@ class OpenAIManager:
         sentences = NLP.segment_sentences(text)
         yield sentences
 
-        logging.debug("streaming stopped")
+        logging.debug("OpenAIManager stream stopped")
         return True

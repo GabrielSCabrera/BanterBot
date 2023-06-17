@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+from banterbot.data.enums import ChatCompletionRoles
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import OptionPredictorPrompts
 from banterbot.managers.openai_manager import OpenAIManager
@@ -168,9 +169,9 @@ class OptionPredictor:
         Returns:
             List[Message]: The enhanced list of messages.
         """
-        prefix = Message(role="system", content=self._system_processed)
-        suffix = Message(role="user", content=self._prompt)
-        dummy_message = Message(role="assistant", content=OptionPredictorPrompts.DUMMY.value)
+        prefix = Message(role=ChatCompletionRoles.SYSTEM, content=self._system_processed)
+        suffix = Message(role=ChatCompletionRoles.USER, content=self._prompt)
+        dummy_message = Message(role=ChatCompletionRoles.ASSISTANT, content=OptionPredictorPrompts.DUMMY.value)
         messages = [prefix] + messages + [suffix, dummy_message]
         return messages
 
@@ -183,4 +184,4 @@ class OptionPredictor:
             Message: An instance of class `Message` with an example of a response at maximum expected length.
         """
         options = self._options_list(variable="100")
-        return Message(role="assistant", content=options)
+        return Message(role=ChatCompletionRoles.ASSISTANT, content=options)

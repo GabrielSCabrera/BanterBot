@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 from tkinter import ttk
 from typing import Optional
@@ -38,6 +39,8 @@ class TKSimpleInterface(tk.Tk, Interface):
             system (Optional[str]): An initialization prompt that can be used to set the scene.
             tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
         """
+        logging.debug(f"TKMultiplayerInterface initialized")
+
         tk.Tk.__init__(self)
         Interface.__init__(self, model=model, voice=voice, style=style, system=system, tone=tone)
 
