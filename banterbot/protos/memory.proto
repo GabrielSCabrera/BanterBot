@@ -13,8 +13,8 @@ message Message {
 message Memory {
     repeated string keywords = 1;           // Keywords associated with the memory.
     string summary = 2;                     // Summary of the memory.
-    float impact = 3;                       // Impact score of the memory.
-    float timestamp = 4;                    // Timestamp when the memory occurred.
+    int64 impact = 3;                       // Impact score of the memory.
+    int64 timestamp = 4;                    // Timestamp when the memory occurred.
     repeated Message messages = 5;          // Messages associated with the memory.
     string uuid = 6;                        // UUID assigned to a memory.
 }

@@ -19,24 +19,43 @@ class Memory:
     Args:
         keywords (List[str]): The list of keywords that summarize the memory.
         summary (str): A brief summary of the memory.
-        impact (float): A score to indicate the impact of the memory on the persona.
-        timestamp (str): The time when the memory occurred.
+        impact (float): A score to indicate the impact of the memory on the persona (accepts values 1 to 100).
+        timestamp (datetime.datetime): The time when the memory occurred.
         messages (List[Message]): The list of messages associated with the memory.
     """
 
     keywords: List[str]
     summary: str
-    impact: float
+    impact: int
     timestamp: datetime.datetime
     messages: List[Message]
     uuid: Optional[str] = None
 
     def __post_init__(self):
         """
-        Initializes a UUID for the current instance if one is not provided.
+        Initializes a UUID for the current instance if one is not provided andtruncates microseconds from the provided
+        timestamp.
         """
         if self.uuid is None:
             self.uuid = config.generate_uuid().hex
+        self.timestamp = self.timestamp.replace(microsecond=0)
+
+    def __eq__(self, memory: "Memory"):
+        """
+        Equality magic method, to allow equality checks between different instances of class Memory with the same
+        contents.
+
+        Args:
+            memory (Memory): An instance of class Memory.
+        """
+        return (
+            self.keywords == memory.keywords
+            and self.summary == memory.summary
+            and self.impact == memory.impact
+            and self.timestamp == memory.timestamp
+            and self.messages == memory.messages
+            and self.uuid == memory.uuid
+        )
 
     def to_protobuf(self) -> memory_pb2.Memory:
         """
@@ -48,15 +67,35 @@ class Memory:
             memory_pb2.Memory: The protobuf object equivalent of the Memory instance.
         """
         memory = memory_pb2.Memory()
-
         memory.keywords.extend(self.keywords)
         memory.summary = self.summary
         memory.impact = self.impact
-        memory.timestamp = self.timestamp.timestamp()
+        memory.timestamp = int(self.timestamp.timestamp())
         memory.messages.extend([message.to_protobuf() for message in self.messages])
         memory.uuid = self.uuid
 
         return memory
+
+    def serialize(self) -> str:
+        """
+        Returns a serialized bytes string version of the current Memory instance.
+
+        Returns:
+            str: A string containing binary bytes.
+        """
+        return self.to_protobuf().SerializeToString()
+
+    @classmethod
+    def deserialize(cls, data: str) -> "Memory":
+        """
+        Constructs a Memory instance from a serialized string of binary bytes.
+
+        Returns:
+            Memory: The constructed Memory instance.
+        """
+        memory = memory_pb2.Memory()
+        memory.ParseFromString(data)
+        return cls.from_protobuf(memory=memory)
 
     @classmethod
     def from_protobuf(cls, memory: memory_pb2.Memory) -> "Memory":

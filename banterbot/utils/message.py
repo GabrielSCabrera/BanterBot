@@ -65,8 +65,18 @@ class Message:
         return cls(
             role=ChatCompletionRoles[message_proto.role],
             content=message_proto.content,
-            name=message_proto.name,
+            name=message_proto.name if len(message_proto.name) > 0 else None,
         )
+
+    def __eq__(self, message: "Message"):
+        """
+        Equality magic method, to allow equality checks between different instances of class Message with the same
+        contents.
+
+        Args:
+            message (Message): An instance of class Message.
+        """
+        return self.role == message.role and self.content == message.content and self.name == message.name
 
     def count_tokens(self, model: OpenAIModel) -> int:
         """

@@ -78,31 +78,38 @@ class MemoryChain:
         self.uuid = uuid
         self._index_cache = memory_index
         self._memories = {}
-        self._token_cache = {}
         self._similarity_cache = {}
+        self._token_cache = {}
+        self._update_token_cache(self._index_cache.keys())
         self._find_memories()
 
     def append(self, memory: Memory) -> None:
         """
         Append a memory to the current set of memories. This method is used to add a single memory to the MemoryChain,
-        allowing for the storage of new information.
+        allowing for the storage of new information. All changes are saved to file as soon as they are made.
 
         Args:
             memory (Memory): The memory to append.
         """
         self._memories[memory.uuid] = memory
+        self._save_memory(memory=memory)
         self._update_index(memory=memory)
+        self._save_index()
 
     def extend(self, memories: List[Memory]) -> None:
         """
         Extend the current set of memories with a list of memories. This method is used to add multiple memories to the
-        MemoryChain at once, allowing for the storage of new information in bulk.
+        MemoryChain at once, allowing for the storage of new information in bulk. All changes are saved to file as soon
+        as they are made.
 
         Args:
             memories (List[Memory]): The list of memories to append.
         """
         for memory in memories:
-            self.append(memory=memory)
+            self._memories[memory.uuid] = memory
+            self._save_memory(memory=memory)
+            self._update_index(memory=memory)
+        self._save_index()
 
     def search(self, keywords: List[str], fuzzy_threshold: Optional[float] = None) -> List[Memory]:
         """
@@ -148,6 +155,28 @@ class MemoryChain:
 
         return memories
 
+    def _save_memory(self, memory: Memory) -> None:
+        """
+        Save an instance of class Memory to file using protocol buffers.
+        """
+        filename = memory.uuid + config.protobuf_extension
+        with open(config.personae / self.uuid / config.memories / filename, "wb+") as fs:
+            fs.write(memory.serialize())
+
+    def _save_index(self) -> None:
+        """
+        Save the current state of the memory index to file.
+        """
+        memory_index = memory_pb2.MemoryIndex()
+        for keyword, memory_uuids in self._index_cache.items():
+            memory_index_entry = memory_pb2.MemoryIndexEntry()
+            memory_index_entry.keyword = keyword
+            memory_index_entry.memory_uuids.extend(memory_uuids)
+            memory_index.entries.append(memory_index_entry)
+
+        with open(config.personae / self.uuid / config.memory_index, "wb+") as fs:
+            fs.write(memory_index.SerializeToString())
+
     def _find_memories(self) -> None:
         """
         Find all memory files associated with this UUID and store them in _memories dictionary. This method is used to
@@ -167,9 +196,8 @@ class MemoryChain:
         """
         for keyword in memory.keywords:
             if keyword not in self._index_cache.keys():
-                self._index_cache[keyword] = [memory.uuid]
-            else:
-                self._index_cache[keyword].append(memory.uuid)
+                self._index_cache[keyword] = set()
+            self._index_cache[keyword].add(memory.uuid)
         self._update_token_cache(memory.keywords)
 
     def _load_memory(self, memory_uuid: str) -> None:
@@ -180,10 +208,9 @@ class MemoryChain:
         Args:
             memory_uuid (str): The UUID of the memory to load.
         """
-        memory_object = memory_pb2.Memory()
-        with open(config.personae / self.uuid / config.memories / memory_uuid + config.protobuf_extension, "rb") as fs:
-            memory_object.ParseFromString(fs.read())
-        self._memories[memory_uuid] = Memory.from_protobuf(memory=memory_object)
+        filename = memory_uuid + config.protobuf_extension
+        with open(config.personae / self.uuid / config.memories / filename, "rb") as fs:
+            self._memories[memory_uuid] = Memory.deserialize(fs.read())
 
     def _update_token_cache(self, keywords: List[str]) -> None:
         """
@@ -194,7 +221,7 @@ class MemoryChain:
         Args:
             keywords (List[str]): The new keywords to update the cache with.
         """
-        new_keywords = [keyword for keyword in keywords if keyword not in self._token_cache]
+        new_keywords = [keyword for keyword in keywords if keyword not in self._token_cache.keys()]
         for keyword, token in zip(new_keywords, NLP.tokenize(strings=new_keywords)):
             self._token_cache[keyword] = token
 
