@@ -26,6 +26,7 @@ class AzureNeuralVoiceGender(Enum):
 class SpaCyLangModel(Enum):
     EN_CORE_WEB_SM = "en_core_web_sm"
     EN_CORE_WEB_MD = "en_core_web_md"
+    EN_CORE_WEB_LG = "en_core_web_lg"
 
 
 class SpeechProcessingType(Enum):

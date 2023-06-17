@@ -28,7 +28,7 @@ banterbot.managers.speech\_to\_text module
 banterbot.managers.memory\_manager
 -----------------------------------------------
 
-.. automodule:: banterbot.managers.memory_manager
+.. automodule:: banterbot.managers.memory_chain
     :members:
     :undoc-members:
     :show-inheritance:

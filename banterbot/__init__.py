@@ -4,7 +4,7 @@ from banterbot.extensions.interface import Interface
 from banterbot.extensions.persona import Persona
 from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
 from banterbot.gui.tk_simple_interface import TKSimpleInterface
-from banterbot.managers.memory_manager import MemoryManager
+from banterbot.managers.memory_chain import MemoryChain
 from banterbot.managers.openai_manager import OpenAIManager
 from banterbot.managers.speech_to_text import SpeechToText
 from banterbot.managers.text_to_speech import TextToSpeech
@@ -17,7 +17,7 @@ __all__ = [
     "Persona",
     "TKMultiplayerInterface",
     "TKSimpleInterface",
-    "MemoryManager",
+    "MemoryChain",
     "OpenAIManager",
     "SpeechToText",
     "TextToSpeech",

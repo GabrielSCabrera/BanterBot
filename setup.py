@@ -2,15 +2,21 @@ import unittest
 
 from setuptools import find_packages, setup
 
+spacy_version = "3.5.0"
+spacy_models = ["en_core_web_lg", "en_core_web_md", "en_core_web_sm"]
+URL = "https://github.com/explosion/spacy-models/releases/download/"
+spacy_dependencies = [f"{model}@{URL}{model}-{spacy_version}/{model}-{spacy_version}.tar.gz" for model in spacy_models]
+
 dependencies = [
     "openai",
     "tiktoken",
     "requests",
     "azure-cognitiveservices-speech",
-    "spacy",
     "numpy",
     "uuid6",
     "protobuf",
+    "nltk" f"spacy=={spacy_version}",
+    *spacy_dependencies,
 ]
 
 url = "https://github.com/GabrielSCabrera/BanterBot"
@@ -35,7 +41,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.5"
+version = "0.0.6"
 setup(
     name="BanterBot",
     packages=find_packages(),

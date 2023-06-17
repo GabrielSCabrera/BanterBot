@@ -29,8 +29,14 @@ class Memory:
     impact: float
     timestamp: datetime.datetime
     messages: List[Message]
-    # Initializes a UUID for the current instance if one is not provided.
-    uuid: Optional[str] = config.generate_uuid().hex
+    uuid: Optional[str] = None
+
+    def __post_init__(self):
+        """
+        Initializes a UUID for the current instance if one is not provided.
+        """
+        if self.uuid is None:
+            self.uuid = config.generate_uuid().hex
 
     def to_protobuf(self) -> memory_pb2.Memory:
         """

@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple
+from typing import Generator, List, Tuple
 
 import spacy
 
@@ -40,14 +40,19 @@ class NLP:
                 rules[key] = value
         splitter.tokenizer.rules = rules
 
+        logging.debug("NLP initializing model: `senter`")
         cls._models["senter"] = senter
+        logging.debug("NLP initializing model: `splitter`")
         cls._models["splitter"] = splitter
+        logging.debug(f"NLP initializing model: `{SpaCyLangModel.EN_CORE_WEB_MD.value}`")
         cls._models[SpaCyLangModel.EN_CORE_WEB_MD.value] = cls._load_model(name=SpaCyLangModel.EN_CORE_WEB_MD.value)
+        logging.debug(f"NLP initializing model: `{SpaCyLangModel.EN_CORE_WEB_LG.value}`")
+        cls._models[SpaCyLangModel.EN_CORE_WEB_LG.value] = cls._load_model(name=SpaCyLangModel.EN_CORE_WEB_LG.value)
 
     @classmethod
     def _load_model(cls, *, name: str, **kwargs) -> spacy.language.Language:
         """
-        Loads a SpaCy model by its name. If the model is not available, it is downloaded automatically.
+        Loads a SpaCy model by its name.
 
         Args:
             name (str): The name of the SpaCy model to load.
@@ -56,24 +61,8 @@ class NLP:
         Returns:
             spacy.language.Language: The loaded SpaCy model.
         """
-        try:
-            model = spacy.load(name, **kwargs)
-        except OSError:
-            cls._download_model(name)
-            model = spacy.load(name, **kwargs)
+        model = spacy.load(name, **kwargs)
         return model
-
-    @classmethod
-    def _download_model(cls, name: str) -> None:
-        """
-        Downloads a SpaCy model by its name. It also provides information about the download process to the user.
-
-        Args:
-            name (str): The name of the SpaCy model to download.
-        """
-        logging.info(f"Downloading SpaCy language model: `{name}`. This will only happen once.")
-        spacy.cli.download(name)
-        logging.info(f"Finished download of SpaCy language model: `{name}`.")
 
     @classmethod
     def model(cls, name: str) -> spacy.language.Language:
@@ -139,6 +128,18 @@ class NLP:
         """
         return tuple([str(entity) for entity in cls._models[SpaCyLangModel.EN_CORE_WEB_MD.value](string).ents])
 
+    @classmethod
+    def tokenize(cls, strings: List[str]) -> Generator[spacy.tokens.doc.Doc, None, None]:
+        """
+        Given a string or list of strings, returns tokenized versions of the strings as a generator.
 
-# Upon import, NLP initializes and downloads (if necessary) all models.
+        Args:
+            strings (List[str]): A list of strings.
+
+        Returns:
+            Generator[spacy.tokens.doc.Doc, None, None]: A stream of `spacy.tokens.doc.Doc` instances.
+        """
+        return cls._models[SpaCyLangModel.EN_CORE_WEB_LG.value].pipe(strings)
+
+
 NLP._init_models()
