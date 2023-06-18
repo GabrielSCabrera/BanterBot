@@ -58,7 +58,7 @@ class Word:
             f"word: `{self.word}` "
             f"| offset: {self.offset.seconds}s "
             f"| duration: {self.duration.seconds}s "
-            f"| source: {self.source}"
+            f"| source: {self.source.name}"
             ">"
         )
         return description

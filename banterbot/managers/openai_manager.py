@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-from typing import Generator, Iterator, List, Union
+from typing import Generator, Iterator, List, Tuple, Union
 
 import openai
 
@@ -45,7 +45,7 @@ class OpenAIManager:
         # Set the interruption flag to the current time: if interruptions are raised, this will be updated.
         self._interrupt: int = time.perf_counter_ns()
 
-    def prompt(self, messages: List[Message], split: bool = True, **kwargs) -> Union[List[str], str]:
+    def prompt(self, messages: List[Message], split: bool = True, **kwargs) -> Union[Tuple[str], str]:
         """
         Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.
 
@@ -67,7 +67,7 @@ class OpenAIManager:
         sentences = NLP.segment_sentences(response) if split else response
         return sentences
 
-    def prompt_stream(self, messages: List[Message], **kwargs) -> Generator[List[str], None, None]:
+    def prompt_stream(self, messages: List[Message], **kwargs) -> Generator[Tuple[str], None, None]:
         """
         Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.
 

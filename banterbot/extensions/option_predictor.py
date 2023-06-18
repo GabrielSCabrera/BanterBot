@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import OpenAIModel, get_model_by_name
+from banterbot.data.openai_models import OpenAIModel
 from banterbot.data.prompts import OptionPredictorPrompts
 from banterbot.managers.openai_manager import OpenAIManager
 from banterbot.utils.message import Message

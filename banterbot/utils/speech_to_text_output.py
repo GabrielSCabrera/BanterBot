@@ -9,6 +9,8 @@ from banterbot.data.enums import SpeechProcessingType, WordCategory
 from banterbot.utils.nlp import NLP
 from banterbot.utils.word import Word
 
+NLP.load_all_models()
+
 
 class WordJSON(TypedDict):
     """
@@ -86,7 +88,7 @@ class SpeechToTextOutput:
 
         """
         if self._words is None:
-            self._words = self._extract_words(words_raw=self._data["NBest"][0].words)
+            self._words = self._extract_words(words_raw=self._data["NBest"][0]["Words"])
         return self._words
 
     @property

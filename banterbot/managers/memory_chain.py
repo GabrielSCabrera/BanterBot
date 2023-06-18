@@ -1,4 +1,5 @@
 import logging
+import shutil
 from typing import Dict, List, Optional
 
 from banterbot import config
@@ -64,6 +65,17 @@ class MemoryChain:
 
         return cls(uuid, memory_index)
 
+    @classmethod
+    def delete(cls, uuid: str) -> None:
+        """
+        Delete the directory associated with a MemoryChain instance. This method is used to clean up the file system
+        by removing the directory and all its contents, including memory files and the memory index file.
+
+        Args:
+            uuid (str): The UUID associated with this set of memories.
+        """
+        shutil.rmtree(config.personae / uuid)
+
     def __init__(self, uuid: str, memory_index: Dict[str, List[str]]) -> None:
         """
         Initialize a new instance of MemoryChain.
@@ -76,6 +88,7 @@ class MemoryChain:
         """
         logging.debug(f"MemoryChain initialized with UUID: `{uuid}`")
         self.uuid = uuid
+        self._directory = config.personae / self.uuid / config.memories
         self._index_cache = memory_index
         self._memories = {}
         self._similarity_cache = {}
@@ -160,7 +173,7 @@ class MemoryChain:
         Save an instance of class Memory to file using protocol buffers.
         """
         filename = memory.uuid + config.protobuf_extension
-        with open(config.personae / self.uuid / config.memories / filename, "wb+") as fs:
+        with open(self._directory / filename, "wb+") as fs:
             fs.write(memory.serialize())
 
     def _save_index(self) -> None:
@@ -183,7 +196,7 @@ class MemoryChain:
         locate all memory files that belong to the current MemoryChain instance, allowing for the efficient loading and
         retrieval of memories when needed.
         """
-        directory = config.personae / self.uuid / config.memories
+        directory = self._directory
         self._memories = {path.stem: None for path in directory.glob("*" + config.protobuf_extension)}
 
     def _update_index(self, memory: Memory) -> None:
@@ -209,7 +222,7 @@ class MemoryChain:
             memory_uuid (str): The UUID of the memory to load.
         """
         filename = memory_uuid + config.protobuf_extension
-        with open(config.personae / self.uuid / config.memories / filename, "rb") as fs:
+        with open(self._directory / filename, "rb") as fs:
             self._memories[memory_uuid] = Memory.deserialize(fs.read())
 
     def _update_token_cache(self, keywords: List[str]) -> None:

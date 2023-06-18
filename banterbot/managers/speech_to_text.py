@@ -98,7 +98,7 @@ class SpeechToText:
                 self._recognizer.start_continuous_recognition()
 
                 # Monitor the recognition progress in the main thread, yielding sentences as they are processed
-                for block in self._process_callbacks(output, init_time):
+                for block in self._callbacks_process(output, init_time):
                     logging.debug(f"SpeechToText listener processed block: `{block}`")
                     yield block
 
@@ -144,17 +144,7 @@ class SpeechToText:
         """
         self._start_recognition.set()
 
-    def _process_recognized(self, event: speechsdk.SpeechRecognitionEventArgs) -> None:
-        """
-        Processes the recognized speech event by appending it to the list of events and setting the new_events flag.
-
-        Args:
-            event (speechsdk.SpeechRecognitionEventArgs): The recognized speech event.
-        """
-        self._events.append(SpeechToTextOutput(event.result))
-        self._new_events.set()
-
-    def _process_callbacks(self, output: List[SpeechToTextOutput], init_time: int) -> Generator[str, None, None]:
+    def _callbacks_process(self, output: List[SpeechToTextOutput], init_time: int) -> Generator[str, None, None]:
         """
         Processes the recognized speech events and appends them to the output list. Yields sentences as they are
         processed.
@@ -189,3 +179,13 @@ class SpeechToText:
         # Stop the recognizer
         self._recognizer.stop_continuous_recognition()
         logging.debug("SpeechToText listener stopped")
+
+    def _process_recognized(self, event: speechsdk.SpeechRecognitionEventArgs) -> None:
+        """
+        Processes the recognized speech event by appending it to the list of events and setting the new_events flag.
+
+        Args:
+            event (speechsdk.SpeechRecognitionEventArgs): The recognized speech event.
+        """
+        self._events.append(SpeechToTextOutput(event.result))
+        self._new_events.set()
