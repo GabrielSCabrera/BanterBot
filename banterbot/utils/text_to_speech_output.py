@@ -92,3 +92,14 @@ class TextToSpeechOutput:
             represents a single word in the text-to-speech output along with its associated metadata.
         """
         self.words.append(entry)
+
+    def extend(self, entries: List[Word]) -> None:
+        """
+        Extends a list of Word objects to the words list in the output.
+
+        Args:
+            entries (List[Word]): The list of words to be appended to the output. This should be a list containing
+            instances of the Word class, which represents a single word in the text-to-speech output along with its
+            associated metadata.
+        """
+        self.words.extend(entries)

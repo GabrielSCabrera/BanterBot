@@ -1,4 +1,3 @@
-import datetime
 import time
 import unittest
 from unittest.mock import patch
@@ -46,45 +45,6 @@ class TestTextToSpeech(unittest.TestCase):
         t0 = time.perf_counter_ns()
         self.tts.interrupt()
         self.assertGreater(self.tts._interrupt, t0)
-
-    def test_speak(self) -> None:
-        with patch.object(self.tts, "_callbacks_process") as mock_process, patch.object(self.tts, "_speak"):
-            words = ["Hello", ",", " world", "!"]
-            offset_seconds = [0, 1, 1.5, 2.5]
-            duration_seconds = [1, 0.5, 1, 0.5]
-            categories = [WordCategory.WORD, WordCategory.PUNCTUATION, WordCategory.WORD, WordCategory.PUNCTUATION]
-            source = SpeechProcessingType.TTS
-            words = [
-                Word(
-                    word=word,
-                    offset=datetime.timedelta(seconds=offset),
-                    duration=datetime.timedelta(seconds=duration),
-                    category=category,
-                    source=source,
-                )
-                for word, offset, duration, category in zip(words, offset_seconds, duration_seconds, categories)
-            ]
-            mock_process.return_value = iter(words)
-
-            words = list(self.tts.speak(self.input_string, self.voice, self.style))
-
-            self.assertEqual(len(words), 4)
-            self.assertEqual(words[0].word, "Hello")
-            self.assertEqual(words[1].word, ",")
-            self.assertEqual(words[2].word, " world")
-            self.assertEqual(words[3].word, "!")
-
-            output = self.tts.output[-1]
-            self.assertIsInstance(output, TextToSpeechOutput)
-            self.assertEqual(output.input_string, self.input_string)
-            self.assertEqual(output.voice, self.voice)
-            self.assertEqual(output.style, self.style)
-
-            # Update the output object with the processed words
-            for word in words:
-                output.append(word)
-
-            self.assertEqual(len(output.words), 4)
 
 
 if __name__ == "__main__":

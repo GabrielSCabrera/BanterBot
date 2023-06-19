@@ -249,9 +249,6 @@ class TextToSpeech:
                 idx += 1
                 yield word
 
-            # Wait for a short amount of time before checking the synthesis progress again
-            time.sleep(0.005)
-
         if self._interrupt >= init_time:
             success = True
 
