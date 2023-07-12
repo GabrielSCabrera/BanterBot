@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.data.prompts &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.data.prompts</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.data.prompts</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="OptionPredictorPrompts"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts">[docs]</a><span class="k">class</span> <span class="nc">OptionPredictorPrompts</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">PREFIX</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Your task is to format the data with the assigned probabilities without providing any comments. The output &quot;</span>
+        <span class="s2">&quot;must follow the exact format below, without deviation:&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">PROB_VAR</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span>
+
+    <span class="n">SUFFIX</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Here, </span><span class="si">{</span><span class="n">PROB_VAR</span><span class="si">}</span><span class="s2"> represents an integer ranging from 0 to 100.&quot;</span>
+
+    <span class="n">DUMMY</span> <span class="o">=</span> <span class="s2">&quot;Here is my best attempt at assigning probabilities to the provided items:&quot;</span></div>
+
+
+<div class="viewcode-block" id="OptionSelectorPrompts"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts">[docs]</a><span class="k">class</span> <span class="nc">OptionSelectorPrompts</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">PREFIX</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Your task is to select the most suitable option from the provided items. Once you have made a decision, &quot;</span>
+        <span class="s2">&quot;provide the chosen option&#39;s index without any additional comments.</span><span class="se">\n</span><span class="s2">Options: &quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">DUMMY</span> <span class="o">=</span> <span class="s2">&quot;Given the current state of the conversation, I expect the assistant to respond with tone number &quot;</span></div>
+
+
+<div class="viewcode-block" id="ToneSelection"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.ToneSelection">[docs]</a><span class="k">class</span> <span class="nc">ToneSelection</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;You are an Emotional Tone Evaluator. Given conversational context, you analyze and select the most &quot;</span>
+        <span class="s2">&quot;appropriate tone/emotion that the assistant is likely to use next. Take into consideration the &quot;</span>
+        <span class="s2">&quot;conversational context and the assistant&#39;s default tone/emotion, which is </span><span class="si">{}</span><span class="s2">. Make sure to give extra weight &quot;</span>
+        <span class="s2">&quot;to the default tone/emotion.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">PROMPT</span> <span class="o">=</span> <span class="s2">&quot;Choose the most suitable tone/emotion for the assistant&#39;s upcoming response.&quot;</span></div>
+
+
+<div class="viewcode-block" id="TextToSpeechPreprocessing"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.TextToSpeechPreprocessing">[docs]</a><span class="k">class</span> <span class="nc">TextToSpeechPreprocessing</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;You are a text-to-speech preprocessing assistant that converts text generated by a GPT model into a format &quot;</span>
+        <span class="s2">&quot;that is more easily spoken by a text-to-speech model. Your task is to remove extraneous letters, hyphens, and &quot;</span>
+        <span class="s2">&quot;correct unconventional spellings to prevent issues where the text-to-speech model misinterprets &quot;</span>
+        <span class="s2">&quot;pronunciations. You should maintain the original style and intent of the text, only modifying elements that &quot;</span>
+        <span class="s2">&quot;would cause pronunciation issues.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">EXAMPLE_1</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Example 1:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Input: WHOOOAH! THAT&#39;S A HU-GE DIS-CO-VERY! IT&#39;S LIKE FINDING A NEED-LE IN A HAY-ST-ACK. YOU&#39;VE DONE A &quot;</span>
+        <span class="s2">&quot;STEL-LAR JOB, PAL! KEEP UP THE GOOD WORK AND DON&#39;T LET THE NAYSAY-ERS GET YOU DOWN.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Output: Whoa! That&#39;s a huge discovery! It&#39;s like finding a needle in a haystack. You&#39;ve done a stellar job, &quot;</span>
+        <span class="s2">&quot;pal! Keep up the good work and don&#39;t let the naysayers get you down.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">EXAMPLE_2</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Example 2:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Input: H3Y DUDE! I JST R3AD THS AW3SOME B00K ABT A SUP3R-HERO. 1T WAS TOTALLY M1ND-BL0W1NG! THE 3XPL0S1ONS, &quot;</span>
+        <span class="s2">&quot;F1GHTS, AND P0W3RFUL AB1L1T1ES W3R3 S1CK! I C@N&#39;T W@1T TO SH@R3 1T W1TH MY FR13NDS. THEY&#39;LL B3 TOT@LLY &quot;</span>
+        <span class="s2">&quot;STOK3D!</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Output: Hey dude! I just read this awesome book about a superhero. It was totally mind-blowing! The &quot;</span>
+        <span class="s2">&quot;explosions, fights, and powerful abilities were sick! I can&#39;t wait to share it with my friends. They&#39;ll be &quot;</span>
+        <span class="s2">&quot;totally stoked!&quot;</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

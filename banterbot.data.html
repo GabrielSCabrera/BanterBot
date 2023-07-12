@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.data package &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="banterbot.extensions package" href="banterbot.extensions.html" />
+    <link rel="prev" title="BanterBot Package" href="banterbot.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">BanterBot</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="banterbot.html">BanterBot Package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="banterbot.html#module-banterbot.config">banterbot.config module</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">banterbot.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html">banterbot.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">BanterBot</a></li>
+          <li class="breadcrumb-item"><a href="banterbot.html">BanterBot Package</a></li>
+      <li class="breadcrumb-item active">banterbot.data package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/banterbot.data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="banterbot-data-package">
+<h1>banterbot.data package<a class="headerlink" href="#banterbot-data-package" title="Permalink to this heading"></a></h1>
+<section id="module-banterbot.data.azure_neural_voices">
+<span id="banterbot-data-azure-neural-voices-module"></span><h2>banterbot.data.azure_neural_voices module<a class="headerlink" href="#module-banterbot.data.azure_neural_voices" title="Permalink to this heading"></a></h2>
+<p>This program defines a dataclass and utility functions to represent and manage Azure Neural Voice profiles for speech
+synthesis. The main components of the program are:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>AzureNeuralVoice dataclass: Represents an Azure Neural Voice profile with attributes such as name, voice
+identifier, gender, pitch, and available styles (tones/emotions).</p></li>
+<li><p>_neural_voices: A dictionary containing instances of AzureNeuralVoice for each available voice profile.</p></li>
+<li><dl>
+<dt>Utility functions:&gt;</dt><dd><ol class="loweralpha simple">
+<li><p>get_voice_by_name(name: str) -&gt; AzureNeuralVoice: Retrieves an AzureNeuralVoice instance by its name.</p></li>
+</ol>
+<p>b.  get_voices_by_gender(gender: AzureNeuralVoiceGender) -&gt; List[AzureNeuralVoice]: Retrieves a list of
+AzureNeuralVoice instances with the specified gender.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p>The purpose of this program is to provide an organized and easily accessible representation of Azure Neural Voice
+profiles for speech synthesis. Users can utilize the provided data and utility functions to easily retrieve voice
+profiles based on their requirements (e.g., gender, pitch, or available styles).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.AzureNeuralVoice">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.azure_neural_voices.</span></span><span class="sig-name descname"><span class="pre">AzureNeuralVoice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#banterbot.data.enums.AzureNeuralVoiceGender" title="banterbot.data.enums.AzureNeuralVoiceGender"><span class="pre">AzureNeuralVoiceGender</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">styles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/azure_neural_voices.html#AzureNeuralVoice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A dataclass representing an Azure Neural Voice profile for speech synthesis.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.AzureNeuralVoice.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice.name" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the voice profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.AzureNeuralVoice.voice">
+<span class="sig-name descname"><span class="pre">voice</span></span><a class="headerlink" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice.voice" title="Permalink to this definition"></a></dt>
+<dd><p>The voice identifier used by Azure Text-to-Speech API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.AzureNeuralVoice.gender">
+<span class="sig-name descname"><span class="pre">gender</span></span><a class="headerlink" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice.gender" title="Permalink to this definition"></a></dt>
+<dd><p>The gender of the voice (either MALE or FEMALE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#banterbot.data.enums.AzureNeuralVoiceGender" title="banterbot.data.enums.AzureNeuralVoiceGender">AzureNeuralVoiceGender</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.AzureNeuralVoice.pitch">
+<span class="sig-name descname"><span class="pre">pitch</span></span><a class="headerlink" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice.pitch" title="Permalink to this definition"></a></dt>
+<dd><p>The relative (by gender) pitch level of the voice, where a lower value indicates a lower pitch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.AzureNeuralVoice.styles">
+<span class="sig-name descname"><span class="pre">styles</span></span><a class="headerlink" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice.styles" title="Permalink to this definition"></a></dt>
+<dd><p>The available styles (i.e., tones/emotions) for the voice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">gender</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#banterbot.data.enums.AzureNeuralVoiceGender" title="banterbot.data.enums.AzureNeuralVoiceGender"><span class="pre">AzureNeuralVoiceGender</span></a></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">pitch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">styles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">voice</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.get_voice_by_name">
+<span class="sig-prename descclassname"><span class="pre">banterbot.data.azure_neural_voices.</span></span><span class="sig-name descname"><span class="pre">get_voice_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice" title="banterbot.data.azure_neural_voices.AzureNeuralVoice"><span class="pre">AzureNeuralVoice</span></a></span></span><a class="reference internal" href="_modules/banterbot/data/azure_neural_voices.html#get_voice_by_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.azure_neural_voices.get_voice_by_name" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve an AzureNeuralVoice instance by its name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the voice profile.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The corresponding AzureNeuralVoice instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice" title="banterbot.data.azure_neural_voices.AzureNeuralVoice">AzureNeuralVoice</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If the specified name is not found in the _neural_voices dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="banterbot.data.azure_neural_voices.get_voices_by_gender">
+<span class="sig-prename descclassname"><span class="pre">banterbot.data.azure_neural_voices.</span></span><span class="sig-name descname"><span class="pre">get_voices_by_gender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#banterbot.data.enums.AzureNeuralVoiceGender" title="banterbot.data.enums.AzureNeuralVoiceGender"><span class="pre">AzureNeuralVoiceGender</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice" title="banterbot.data.azure_neural_voices.AzureNeuralVoice"><span class="pre">AzureNeuralVoice</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/data/azure_neural_voices.html#get_voices_by_gender"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.azure_neural_voices.get_voices_by_gender" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve a list of AzureNeuralVoice instances with the specified gender.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gender</strong> (<a class="reference internal" href="#banterbot.data.enums.AzureNeuralVoiceGender" title="banterbot.data.enums.AzureNeuralVoiceGender"><em>AzureNeuralVoiceGender</em></a>) – The gender of the voices to retrieve (either AzureNeuralVoiceGender.MALE or AzureNeuralVoiceGender.FEMALE).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of AzureNeuralVoice instances with the specified gender.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#banterbot.data.azure_neural_voices.AzureNeuralVoice" title="banterbot.data.azure_neural_voices.AzureNeuralVoice">AzureNeuralVoice</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-banterbot.data.enums">
+<span id="banterbot-data-enums-module"></span><h2>banterbot.data.enums module<a class="headerlink" href="#module-banterbot.data.enums" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.enums.AzureNeuralVoiceGender">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.enums.</span></span><span class="sig-name descname"><span class="pre">AzureNeuralVoiceGender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/enums.html#AzureNeuralVoiceGender"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.enums.AzureNeuralVoiceGender" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.AzureNeuralVoiceGender.FEMALE">
+<span class="sig-name descname"><span class="pre">FEMALE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'female'</span></em><a class="headerlink" href="#banterbot.data.enums.AzureNeuralVoiceGender.FEMALE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.AzureNeuralVoiceGender.MALE">
+<span class="sig-name descname"><span class="pre">MALE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'male'</span></em><a class="headerlink" href="#banterbot.data.enums.AzureNeuralVoiceGender.MALE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.enums.ChatCompletionRoles">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.enums.</span></span><span class="sig-name descname"><span class="pre">ChatCompletionRoles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/enums.html#ChatCompletionRoles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.enums.ChatCompletionRoles" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.ChatCompletionRoles.ASSISTANT">
+<span class="sig-name descname"><span class="pre">ASSISTANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'assistant'</span></em><a class="headerlink" href="#banterbot.data.enums.ChatCompletionRoles.ASSISTANT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.ChatCompletionRoles.SYSTEM">
+<span class="sig-name descname"><span class="pre">SYSTEM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system'</span></em><a class="headerlink" href="#banterbot.data.enums.ChatCompletionRoles.SYSTEM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.ChatCompletionRoles.USER">
+<span class="sig-name descname"><span class="pre">USER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user'</span></em><a class="headerlink" href="#banterbot.data.enums.ChatCompletionRoles.USER" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.enums.EnvVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.enums.</span></span><span class="sig-name descname"><span class="pre">EnvVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/enums.html#EnvVar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.enums.EnvVar" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.EnvVar.AZURE_SPEECH_KEY">
+<span class="sig-name descname"><span class="pre">AZURE_SPEECH_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'AZURE_SPEECH_KEY'</span></em><a class="headerlink" href="#banterbot.data.enums.EnvVar.AZURE_SPEECH_KEY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.EnvVar.AZURE_SPEECH_REGION">
+<span class="sig-name descname"><span class="pre">AZURE_SPEECH_REGION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'AZURE_SPEECH_REGION'</span></em><a class="headerlink" href="#banterbot.data.enums.EnvVar.AZURE_SPEECH_REGION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.EnvVar.OPENAI_API_KEY">
+<span class="sig-name descname"><span class="pre">OPENAI_API_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'OPENAI_API_KEY'</span></em><a class="headerlink" href="#banterbot.data.enums.EnvVar.OPENAI_API_KEY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.enums.SpaCyLangModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.enums.</span></span><span class="sig-name descname"><span class="pre">SpaCyLangModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/enums.html#SpaCyLangModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.enums.SpaCyLangModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_LG">
+<span class="sig-name descname"><span class="pre">EN_CORE_WEB_LG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'en_core_web_lg'</span></em><a class="headerlink" href="#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_LG" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_MD">
+<span class="sig-name descname"><span class="pre">EN_CORE_WEB_MD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'en_core_web_md'</span></em><a class="headerlink" href="#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_MD" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_SM">
+<span class="sig-name descname"><span class="pre">EN_CORE_WEB_SM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'en_core_web_sm'</span></em><a class="headerlink" href="#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_SM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.enums.SpeechProcessingType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.enums.</span></span><span class="sig-name descname"><span class="pre">SpeechProcessingType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/enums.html#SpeechProcessingType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.enums.SpeechProcessingType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.SpeechProcessingType.STT">
+<span class="sig-name descname"><span class="pre">STT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'speech-to-text'</span></em><a class="headerlink" href="#banterbot.data.enums.SpeechProcessingType.STT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.SpeechProcessingType.TTS">
+<span class="sig-name descname"><span class="pre">TTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'text-to-speech'</span></em><a class="headerlink" href="#banterbot.data.enums.SpeechProcessingType.TTS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.enums.WordCategory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.enums.</span></span><span class="sig-name descname"><span class="pre">WordCategory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/enums.html#WordCategory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.enums.WordCategory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.WordCategory.PUNCTUATION">
+<span class="sig-name descname"><span class="pre">PUNCTUATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'punctuation'</span></em><a class="headerlink" href="#banterbot.data.enums.WordCategory.PUNCTUATION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.enums.WordCategory.WORD">
+<span class="sig-name descname"><span class="pre">WORD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'word'</span></em><a class="headerlink" href="#banterbot.data.enums.WordCategory.WORD" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.data.prompts">
+<span id="banterbot-data-prompts-module"></span><h2>banterbot.data.prompts module<a class="headerlink" href="#module-banterbot.data.prompts" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionPredictorPrompts">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.prompts.</span></span><span class="sig-name descname"><span class="pre">OptionPredictorPrompts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/prompts.html#OptionPredictorPrompts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.prompts.OptionPredictorPrompts" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionPredictorPrompts.DUMMY">
+<span class="sig-name descname"><span class="pre">DUMMY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Here</span> <span class="pre">is</span> <span class="pre">my</span> <span class="pre">best</span> <span class="pre">attempt</span> <span class="pre">at</span> <span class="pre">assigning</span> <span class="pre">probabilities</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">provided</span> <span class="pre">items:'</span></em><a class="headerlink" href="#banterbot.data.prompts.OptionPredictorPrompts.DUMMY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionPredictorPrompts.PREFIX">
+<span class="sig-name descname"><span class="pre">PREFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Your</span> <span class="pre">task</span> <span class="pre">is</span> <span class="pre">to</span> <span class="pre">format</span> <span class="pre">the</span> <span class="pre">data</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">assigned</span> <span class="pre">probabilities</span> <span class="pre">without</span> <span class="pre">providing</span> <span class="pre">any</span> <span class="pre">comments.</span> <span class="pre">The</span> <span class="pre">output</span> <span class="pre">must</span> <span class="pre">follow</span> <span class="pre">the</span> <span class="pre">exact</span> <span class="pre">format</span> <span class="pre">below,</span> <span class="pre">without</span> <span class="pre">deviation:'</span></em><a class="headerlink" href="#banterbot.data.prompts.OptionPredictorPrompts.PREFIX" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionPredictorPrompts.PROB_VAR">
+<span class="sig-name descname"><span class="pre">PROB_VAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'N'</span></em><a class="headerlink" href="#banterbot.data.prompts.OptionPredictorPrompts.PROB_VAR" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionPredictorPrompts.SUFFIX">
+<span class="sig-name descname"><span class="pre">SUFFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Here,</span> <span class="pre">N</span> <span class="pre">represents</span> <span class="pre">an</span> <span class="pre">integer</span> <span class="pre">ranging</span> <span class="pre">from</span> <span class="pre">0</span> <span class="pre">to</span> <span class="pre">100.'</span></em><a class="headerlink" href="#banterbot.data.prompts.OptionPredictorPrompts.SUFFIX" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionSelectorPrompts">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.prompts.</span></span><span class="sig-name descname"><span class="pre">OptionSelectorPrompts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/prompts.html#OptionSelectorPrompts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.prompts.OptionSelectorPrompts" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionSelectorPrompts.DUMMY">
+<span class="sig-name descname"><span class="pre">DUMMY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Given</span> <span class="pre">the</span> <span class="pre">current</span> <span class="pre">state</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">conversation,</span> <span class="pre">I</span> <span class="pre">expect</span> <span class="pre">the</span> <span class="pre">assistant</span> <span class="pre">to</span> <span class="pre">respond</span> <span class="pre">with</span> <span class="pre">tone</span> <span class="pre">number</span> <span class="pre">'</span></em><a class="headerlink" href="#banterbot.data.prompts.OptionSelectorPrompts.DUMMY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.OptionSelectorPrompts.PREFIX">
+<span class="sig-name descname"><span class="pre">PREFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;Your</span> <span class="pre">task</span> <span class="pre">is</span> <span class="pre">to</span> <span class="pre">select</span> <span class="pre">the</span> <span class="pre">most</span> <span class="pre">suitable</span> <span class="pre">option</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">provided</span> <span class="pre">items.</span> <span class="pre">Once</span> <span class="pre">you</span> <span class="pre">have</span> <span class="pre">made</span> <span class="pre">a</span> <span class="pre">decision,</span> <span class="pre">provide</span> <span class="pre">the</span> <span class="pre">chosen</span> <span class="pre">option's</span> <span class="pre">index</span> <span class="pre">without</span> <span class="pre">any</span> <span class="pre">additional</span> <span class="pre">comments.\nOptions:</span> <span class="pre">&quot;</span></em><a class="headerlink" href="#banterbot.data.prompts.OptionSelectorPrompts.PREFIX" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.prompts.TextToSpeechPreprocessing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.prompts.</span></span><span class="sig-name descname"><span class="pre">TextToSpeechPreprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/prompts.html#TextToSpeechPreprocessing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.prompts.TextToSpeechPreprocessing" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.TextToSpeechPreprocessing.EXAMPLE_1">
+<span class="sig-name descname"><span class="pre">EXAMPLE_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;Example</span> <span class="pre">1:\nInput:</span> <span class="pre">WHOOOAH!</span> <span class="pre">THAT'S</span> <span class="pre">A</span> <span class="pre">HU-GE</span> <span class="pre">DIS-CO-VERY!</span> <span class="pre">IT'S</span> <span class="pre">LIKE</span> <span class="pre">FINDING</span> <span class="pre">A</span> <span class="pre">NEED-LE</span> <span class="pre">IN</span> <span class="pre">A</span> <span class="pre">HAY-ST-ACK.</span> <span class="pre">YOU'VE</span> <span class="pre">DONE</span> <span class="pre">A</span> <span class="pre">STEL-LAR</span> <span class="pre">JOB,</span> <span class="pre">PAL!</span> <span class="pre">KEEP</span> <span class="pre">UP</span> <span class="pre">THE</span> <span class="pre">GOOD</span> <span class="pre">WORK</span> <span class="pre">AND</span> <span class="pre">DON'T</span> <span class="pre">LET</span> <span class="pre">THE</span> <span class="pre">NAYSAY-ERS</span> <span class="pre">GET</span> <span class="pre">YOU</span> <span class="pre">DOWN.\nOutput:</span> <span class="pre">Whoa!</span> <span class="pre">That's</span> <span class="pre">a</span> <span class="pre">huge</span> <span class="pre">discovery!</span> <span class="pre">It's</span> <span class="pre">like</span> <span class="pre">finding</span> <span class="pre">a</span> <span class="pre">needle</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">haystack.</span> <span class="pre">You've</span> <span class="pre">done</span> <span class="pre">a</span> <span class="pre">stellar</span> <span class="pre">job,</span> <span class="pre">pal!</span> <span class="pre">Keep</span> <span class="pre">up</span> <span class="pre">the</span> <span class="pre">good</span> <span class="pre">work</span> <span class="pre">and</span> <span class="pre">don't</span> <span class="pre">let</span> <span class="pre">the</span> <span class="pre">naysayers</span> <span class="pre">get</span> <span class="pre">you</span> <span class="pre">down.&quot;</span></em><a class="headerlink" href="#banterbot.data.prompts.TextToSpeechPreprocessing.EXAMPLE_1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.TextToSpeechPreprocessing.EXAMPLE_2">
+<span class="sig-name descname"><span class="pre">EXAMPLE_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;Example</span> <span class="pre">2:\nInput:</span> <span class="pre">H3Y</span> <span class="pre">DUDE!</span> <span class="pre">I</span> <span class="pre">JST</span> <span class="pre">R3AD</span> <span class="pre">THS</span> <span class="pre">AW3SOME</span> <span class="pre">B00K</span> <span class="pre">ABT</span> <span class="pre">A</span> <span class="pre">SUP3R-HERO.</span> <span class="pre">1T</span> <span class="pre">WAS</span> <span class="pre">TOTALLY</span> <span class="pre">M1ND-BL0W1NG!</span> <span class="pre">THE</span> <span class="pre">3XPL0S1ONS,</span> <span class="pre">F1GHTS,</span> <span class="pre">AND</span> <span class="pre">P0W3RFUL</span> <span class="pre">AB1L1T1ES</span> <span class="pre">W3R3</span> <span class="pre">S1CK!</span> <span class="pre">I</span> <span class="pre">C&#64;N'T</span> <span class="pre">W&#64;1T</span> <span class="pre">TO</span> <span class="pre">SH&#64;R3</span> <span class="pre">1T</span> <span class="pre">W1TH</span> <span class="pre">MY</span> <span class="pre">FR13NDS.</span> <span class="pre">THEY'LL</span> <span class="pre">B3</span> <span class="pre">TOT&#64;LLY</span> <span class="pre">STOK3D!\nOutput:</span> <span class="pre">Hey</span> <span class="pre">dude!</span> <span class="pre">I</span> <span class="pre">just</span> <span class="pre">read</span> <span class="pre">this</span> <span class="pre">awesome</span> <span class="pre">book</span> <span class="pre">about</span> <span class="pre">a</span> <span class="pre">superhero.</span> <span class="pre">It</span> <span class="pre">was</span> <span class="pre">totally</span> <span class="pre">mind-blowing!</span> <span class="pre">The</span> <span class="pre">explosions,</span> <span class="pre">fights,</span> <span class="pre">and</span> <span class="pre">powerful</span> <span class="pre">abilities</span> <span class="pre">were</span> <span class="pre">sick!</span> <span class="pre">I</span> <span class="pre">can't</span> <span class="pre">wait</span> <span class="pre">to</span> <span class="pre">share</span> <span class="pre">it</span> <span class="pre">with</span> <span class="pre">my</span> <span class="pre">friends.</span> <span class="pre">They'll</span> <span class="pre">be</span> <span class="pre">totally</span> <span class="pre">stoked!&quot;</span></em><a class="headerlink" href="#banterbot.data.prompts.TextToSpeechPreprocessing.EXAMPLE_2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.TextToSpeechPreprocessing.SYSTEM">
+<span class="sig-name descname"><span class="pre">SYSTEM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'You</span> <span class="pre">are</span> <span class="pre">a</span> <span class="pre">text-to-speech</span> <span class="pre">preprocessing</span> <span class="pre">assistant</span> <span class="pre">that</span> <span class="pre">converts</span> <span class="pre">text</span> <span class="pre">generated</span> <span class="pre">by</span> <span class="pre">a</span> <span class="pre">GPT</span> <span class="pre">model</span> <span class="pre">into</span> <span class="pre">a</span> <span class="pre">format</span> <span class="pre">that</span> <span class="pre">is</span> <span class="pre">more</span> <span class="pre">easily</span> <span class="pre">spoken</span> <span class="pre">by</span> <span class="pre">a</span> <span class="pre">text-to-speech</span> <span class="pre">model.</span> <span class="pre">Your</span> <span class="pre">task</span> <span class="pre">is</span> <span class="pre">to</span> <span class="pre">remove</span> <span class="pre">extraneous</span> <span class="pre">letters,</span> <span class="pre">hyphens,</span> <span class="pre">and</span> <span class="pre">correct</span> <span class="pre">unconventional</span> <span class="pre">spellings</span> <span class="pre">to</span> <span class="pre">prevent</span> <span class="pre">issues</span> <span class="pre">where</span> <span class="pre">the</span> <span class="pre">text-to-speech</span> <span class="pre">model</span> <span class="pre">misinterprets</span> <span class="pre">pronunciations.</span> <span class="pre">You</span> <span class="pre">should</span> <span class="pre">maintain</span> <span class="pre">the</span> <span class="pre">original</span> <span class="pre">style</span> <span class="pre">and</span> <span class="pre">intent</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">text,</span> <span class="pre">only</span> <span class="pre">modifying</span> <span class="pre">elements</span> <span class="pre">that</span> <span class="pre">would</span> <span class="pre">cause</span> <span class="pre">pronunciation</span> <span class="pre">issues.'</span></em><a class="headerlink" href="#banterbot.data.prompts.TextToSpeechPreprocessing.SYSTEM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.prompts.ToneSelection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.prompts.</span></span><span class="sig-name descname"><span class="pre">ToneSelection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/prompts.html#ToneSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.prompts.ToneSelection" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.ToneSelection.PROMPT">
+<span class="sig-name descname"><span class="pre">PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;Choose</span> <span class="pre">the</span> <span class="pre">most</span> <span class="pre">suitable</span> <span class="pre">tone/emotion</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">assistant's</span> <span class="pre">upcoming</span> <span class="pre">response.&quot;</span></em><a class="headerlink" href="#banterbot.data.prompts.ToneSelection.PROMPT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.prompts.ToneSelection.SYSTEM">
+<span class="sig-name descname"><span class="pre">SYSTEM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;You</span> <span class="pre">are</span> <span class="pre">an</span> <span class="pre">Emotional</span> <span class="pre">Tone</span> <span class="pre">Evaluator.</span> <span class="pre">Given</span> <span class="pre">conversational</span> <span class="pre">context,</span> <span class="pre">you</span> <span class="pre">analyze</span> <span class="pre">and</span> <span class="pre">select</span> <span class="pre">the</span> <span class="pre">most</span> <span class="pre">appropriate</span> <span class="pre">tone/emotion</span> <span class="pre">that</span> <span class="pre">the</span> <span class="pre">assistant</span> <span class="pre">is</span> <span class="pre">likely</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">next.</span> <span class="pre">Take</span> <span class="pre">into</span> <span class="pre">consideration</span> <span class="pre">the</span> <span class="pre">conversational</span> <span class="pre">context</span> <span class="pre">and</span> <span class="pre">the</span> <span class="pre">assistant's</span> <span class="pre">default</span> <span class="pre">tone/emotion,</span> <span class="pre">which</span> <span class="pre">is</span> <span class="pre">{}.</span> <span class="pre">Make</span> <span class="pre">sure</span> <span class="pre">to</span> <span class="pre">give</span> <span class="pre">extra</span> <span class="pre">weight</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">default</span> <span class="pre">tone/emotion.&quot;</span></em><a class="headerlink" href="#banterbot.data.prompts.ToneSelection.SYSTEM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.data.openai_models">
+<span id="banterbot-data-openai-models-module"></span><h2>banterbot.data.openai_models module<a class="headerlink" href="#module-banterbot.data.openai_models" title="Permalink to this heading"></a></h2>
+<p>This module provides an overview of the GPT models offered by OpenAI as of May 2023 for the ChatCompletion API. Each
+model entry is represented by an instance of the OpenAIModel class, which provides information about the model’s name,
+maximum tokens, version, rank, and tokenizer.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>OpenAIModel dataclass: Represents an OpenAI ChatCompletion model with attributes such as name, max_tokens
+version, rank, and a tokenizer.</p></li>
+<li><p>_openai_models: A dictionary containing instances of OpenAIModel for each available model.</p></li>
+<li><p>get_model_by_name(name: str) -&gt; OpenAIModel: Retrieves an OpenAIModel instance by its name.</p></li>
+</ol>
+</div></blockquote>
+<p>The purpose of this module is to make it easy for users to access information about the available GPT models and their
+properties. This can be useful when selecting a model for a specific task or when working with the ChatCompletion API.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.data.openai_models.OpenAIModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.data.openai_models.</span></span><span class="sig-name descname"><span class="pre">OpenAIModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/data/openai_models.html#OpenAIModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.openai_models.OpenAIModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class representing an OpenAI GPT model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.openai_models.OpenAIModel.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#banterbot.data.openai_models.OpenAIModel.name" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.openai_models.OpenAIModel.max_tokens">
+<span class="sig-name descname"><span class="pre">max_tokens</span></span><a class="headerlink" href="#banterbot.data.openai_models.OpenAIModel.max_tokens" title="Permalink to this definition"></a></dt>
+<dd><p>The maximum number of tokens supported by the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.openai_models.OpenAIModel.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#banterbot.data.openai_models.OpenAIModel.version" title="Permalink to this definition"></a></dt>
+<dd><p>The version number of the model (e.g., GPT-3.5=3 and GPT-4=4).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.openai_models.OpenAIModel.rank">
+<span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#banterbot.data.openai_models.OpenAIModel.rank" title="Permalink to this definition"></a></dt>
+<dd><p>The model quality rank; lower values indicate higher quality responses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.data.openai_models.OpenAIModel.tokenizer">
+<span class="sig-name descname"><span class="pre">tokenizer</span></span><a class="headerlink" href="#banterbot.data.openai_models.OpenAIModel.tokenizer" title="Permalink to this definition"></a></dt>
+<dd><p>An instance of the tiktoken package’s Encoding object (i.e., a tokenizer).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Encoding</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">max_tokens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">rank</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="banterbot.data.openai_models.get_model_by_name">
+<span class="sig-prename descclassname"><span class="pre">banterbot.data.openai_models.</span></span><span class="sig-name descname"><span class="pre">get_model_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#banterbot.data.openai_models.OpenAIModel" title="banterbot.data.openai_models.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></span><a class="reference internal" href="_modules/banterbot/data/openai_models.html#get_model_by_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.data.openai_models.get_model_by_name" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve an OpenAIModel instance by its name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the OpenAI ChatCompletion model.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The corresponding OpenAIModel instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#banterbot.data.openai_models.OpenAIModel" title="banterbot.data.openai_models.OpenAIModel">OpenAIModel</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If the specified name is not found in the _openai_models dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="banterbot.html" class="btn btn-neutral float-left" title="BanterBot Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="banterbot.extensions.html" class="btn btn-neutral float-right" title="banterbot.extensions package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

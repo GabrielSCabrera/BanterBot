@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to BanterBot’s documentation! &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="BanterBot" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to BanterBot’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-banterbot-s-documentation">
+<h1>Welcome to BanterBot’s documentation!<a class="headerlink" href="#welcome-to-banterbot-s-documentation" title="Permalink to this heading"></a></h1>
+<p>BanterBot is a user-friendly chatbot application that leverages OpenAI
+models for generating context-aware responses, Azure Neural Voices for
+text-to-speech synthesis, and Azure speech-to-text recognition. The
+package offers a comprehensive toolkit for building chatbot applications
+with an intuitive interface and a suite of utilities.</p>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Utilizes OpenAI models to generate context-aware responses</p></li>
+<li><p>Leverages Azure Neural Voices for premium text-to-speech
+synthesis</p></li>
+<li><p>Offers a wide range of output formats, voices, and speaking
+styles</p></li>
+<li><p>Allows real-time monitoring of the chatbot’s responses</p></li>
+<li><p>Supports asynchronous speech-to-text microphone input</p></li>
+<li><p>Includes an abstract base class for creating custom frontends
+for the BanterBot application</p></li>
+<li><p>Features a tkinter-based frontend implementation</p></li>
+<li><p>Automatically selects an appropriate emotion or tone based on
+the conversation context</p></li>
+</ul>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<p>Three environment variables are required for full functionality:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code>: A valid OpenAI API key</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AZURE_SPEECH_KEY</span></code>: A valid Azure Cognitive Services Speech API key
+for text-to-speech and speech-to-text functionality</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AZURE_SPEECH_REGION</span></code>: The region associated with your Azure
+Cognitive Services Speech API key</p></li>
+</ul>
+</section>
+<section id="components">
+<h2>Components<a class="headerlink" href="#components" title="Permalink to this heading"></a></h2>
+<section id="openaimanager">
+<h3>OpenAIManager<a class="headerlink" href="#openaimanager" title="Permalink to this heading"></a></h3>
+<p>A class responsible for managing interactions with the OpenAI
+ChatCompletion API. It offers functionality to generate responses from
+the API based on input messages. It supports generating responses in
+their entirety or as a stream of response blocks.</p>
+</section>
+<section id="texttospeech">
+<h3>TextToSpeech<a class="headerlink" href="#texttospeech" title="Permalink to this heading"></a></h3>
+<p>A class that handles text-to-speech synthesis using Azure’s Cognitive
+Services. It supports a wide range of output formats, voices, and
+speaking styles. The synthesized speech can be interrupted, and the
+progress can be monitored in real-time.</p>
+</section>
+<section id="speechtotext">
+<h3>SpeechToText<a class="headerlink" href="#speechtotext" title="Permalink to this heading"></a></h3>
+<p>A class that provides an interface to convert spoken language into
+written text using Azure Cognitive Services. It allows continuous speech
+recognition and provides real-time results as sentences are recognized.</p>
+</section>
+<section id="interface">
+<h3>Interface<a class="headerlink" href="#interface" title="Permalink to this heading"></a></h3>
+<p>An abstract base class for designing frontends for the BanterBot
+application. It provides a high-level interface for managing
+conversations with the bot, including sending messages, receiving
+responses, and updating the conversation area. Accepts both keyboard
+inputs and microphone voice inputs.</p>
+</section>
+<section id="tksimpleinterface">
+<h3>TKSimpleInterface<a class="headerlink" href="#tksimpleinterface" title="Permalink to this heading"></a></h3>
+<p>A graphical user interface (GUI) for a chatbot application that employs
+OpenAI models for generating responses, Azure Neural Voices for
+text-to-speech, and Azure speech-to-text. The class inherits from both
+tkinter.Tk and Interface, offering a seamless integration of chatbot
+functionality with an intuitive interface.</p>
+</section>
+<section id="tkmultiplayerinterface-in-development">
+<h3>TKMultiplayerInterface (In Development)<a class="headerlink" href="#tkmultiplayerinterface-in-development" title="Permalink to this heading"></a></h3>
+<p>This GUI establishes a multiplayer conversation environment where up to
+nine users can interact with the chatbot simultaneously. The GUI
+includes a conversation history area and user panels with ‘Listen’
+buttons to process user input. It also supports key bindings for user
+convenience.</p>
+</section>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<section id="pip-recommended">
+<h3>Pip (Recommended)<a class="headerlink" href="#pip-recommended" title="Permalink to this heading"></a></h3>
+<p>BanterBot is installable using the Python Package Index (PyPi):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>banterbot
+</pre></div>
+</div>
+</section>
+<section id="manual">
+<h3>Manual<a class="headerlink" href="#manual" title="Permalink to this heading"></a></h3>
+<p>To install BanterBot, simply clone the repository and install the
+required dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/gabrielscabrera/banterbot.git
+<span class="nb">cd</span><span class="w"> </span>banterbot
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<section id="launch-with-command-line">
+<h3>Launch with Command Line<a class="headerlink" href="#launch-with-command-line" title="Permalink to this heading"></a></h3>
+<p>Start BanterBot by running the <code class="docutils literal notranslate"><span class="pre">banterbot</span></code> command in your terminal.</p>
+<ul class="simple">
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">-g</span></code> flag to enable GPT-4 for enhanced conversation
+quality. Please note that GPT-4 API access is required, and using
+GPT-4 is more costly and slower than the default GPT-3.5-Turbo.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">-p</span></code> flag followed by a string in quotes to set up a custom
+character prior to initialization (e.g.,
+<code class="docutils literal notranslate"><span class="pre">-p</span> <span class="pre">&quot;You</span> <span class="pre">are</span> <span class="pre">Grendel</span> <span class="pre">the</span> <span class="pre">Quiz</span> <span class="pre">Troll,</span> <span class="pre">a</span> <span class="pre">charismatic</span> <span class="pre">troll</span> <span class="pre">who</span> <span class="pre">loves</span> <span class="pre">hosting</span> <span class="pre">quiz</span> <span class="pre">shows.&quot;</span></code>).</p></li>
+<li><p>Include the <code class="docutils literal notranslate"><span class="pre">-m</span></code> flag to activate the multiplayer interface.</p></li>
+<li><p>Apply the <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag to enable emotional tone evaluation before the
+bot generates its responses.</p></li>
+<li><p>To select a Microsoft Azure Cognitive Services text-to-speech voice,
+use the <code class="docutils literal notranslate"><span class="pre">-v</span></code> flag followed by one of the available voice options
+(e.g., <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">jenny</span></code>).</p></li>
+<li><p>Select a Microsoft Azure Cognitive Services text-to-speech voice
+style by using the <code class="docutils literal notranslate"><span class="pre">-s</span></code> flag followed by one of the available style
+options (e.g., <code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">friendly</span></code>).</p></li>
+</ul>
+</section>
+<section id="launch-with-a-python-script">
+<h3>Launch with a Python script<a class="headerlink" href="#launch-with-a-python-script" title="Permalink to this heading"></a></h3>
+<p>To use BanterBot in a script, create an instance of the
+<code class="docutils literal notranslate"><span class="pre">TKSimpleInterface</span></code> class and call the <code class="docutils literal notranslate"><span class="pre">run</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">banterbot</span> <span class="kn">import</span> <span class="n">TKSimpleInterface</span><span class="p">,</span> <span class="n">get_voice_by_name</span><span class="p">,</span> <span class="n">get_model_by_name</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">get_model_by_name</span><span class="p">(</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">)</span>
+<span class="n">voice</span> <span class="o">=</span> <span class="n">get_voice_by_name</span><span class="p">(</span><span class="s2">&quot;Davis&quot;</span><span class="p">)</span>
+
+<span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;excited&quot;</span>
+<span class="c1"># Optional system prompt to set up a custom character prior to initializing BanterBot.</span>
+<span class="n">system</span> <span class="o">=</span> <span class="s2">&quot;You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows.&quot;</span>
+
+<span class="c1"># The four arguments `model`, `voice`, `style`, `system`, and `tone` are optional.</span>
+<span class="c1"># Setting `tone` to True enables voice tones and emotions.</span>
+<span class="n">interface</span> <span class="o">=</span> <span class="n">TKSimpleInterface</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="n">voice</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span> <span class="n">tone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">interface</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For multiplayer, you can swap out TKSimpleInterface in the above code
+with TKMultiplayerInterface.</p>
+</section>
+</section>
+<section id="chat-logs">
+<h2>Chat Logs<a class="headerlink" href="#chat-logs" title="Permalink to this heading"></a></h2>
+<p>Chat logs are saved in the <code class="docutils literal notranslate"><span class="pre">$HOME/Documents/BanterBot/Conversations/</span></code>
+directory as individual <code class="docutils literal notranslate"><span class="pre">.txt</span></code> files.</p>
+</section>
+<section id="id1">
+<h2>Components<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<section id="id2">
+<h3>OpenAIManager<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.managers.openai_manager.</span></span><span class="sig-name descname"><span class="pre">OpenAIManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.data.html#banterbot.data.openai_models.OpenAIModel" title="banterbot.data.openai_models.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that handles the interaction with the OpenAI ChatCompletion API. It provides functionality to generate
+responses from the API based on the input messages. It supports generating responses as a whole or as a stream of
+response blocks.</p>
+<p>The main purpose of this class is to facilitate the communication with the OpenAI API and manage the responses
+generated by the API. It can be used to create chatbots or other applications that require natural language
+processing and generation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.__dict__">
+<span class="sig-name descname"><span class="pre">__dict__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">mappingproxy({'__module__':</span> <span class="pre">'banterbot.managers.openai_manager',</span> <span class="pre">'__doc__':</span> <span class="pre">'\n</span>&#160;&#160;&#160; <span class="pre">A</span> <span class="pre">class</span> <span class="pre">that</span> <span class="pre">handles</span> <span class="pre">the</span> <span class="pre">interaction</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">OpenAI</span> <span class="pre">ChatCompletion</span> <span class="pre">API.</span> <span class="pre">It</span> <span class="pre">provides</span> <span class="pre">functionality</span> <span class="pre">to</span> <span class="pre">generate\n</span>&#160;&#160;&#160; <span class="pre">responses</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">API</span> <span class="pre">based</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">input</span> <span class="pre">messages.</span> <span class="pre">It</span> <span class="pre">supports</span> <span class="pre">generating</span> <span class="pre">responses</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">whole</span> <span class="pre">or</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">stream</span> <span class="pre">of\n</span>&#160;&#160;&#160; <span class="pre">response</span> <span class="pre">blocks.\n\n</span>&#160;&#160;&#160; <span class="pre">The</span> <span class="pre">main</span> <span class="pre">purpose</span> <span class="pre">of</span> <span class="pre">this</span> <span class="pre">class</span> <span class="pre">is</span> <span class="pre">to</span> <span class="pre">facilitate</span> <span class="pre">the</span> <span class="pre">communication</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">OpenAI</span> <span class="pre">API</span> <span class="pre">and</span> <span class="pre">manage</span> <span class="pre">the</span> <span class="pre">responses\n</span>&#160;&#160;&#160; <span class="pre">generated</span> <span class="pre">by</span> <span class="pre">the</span> <span class="pre">API.</span> <span class="pre">It</span> <span class="pre">can</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">chatbots</span> <span class="pre">or</span> <span class="pre">other</span> <span class="pre">applications</span> <span class="pre">that</span> <span class="pre">require</span> <span class="pre">natural</span> <span class="pre">language\n</span>&#160;&#160;&#160; <span class="pre">processing</span> <span class="pre">and</span> <span class="pre">generation.\n</span>&#160;&#160;&#160; <span class="pre">',</span> <span class="pre">'__init__':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIManager.__init__&gt;,</span> <span class="pre">'prompt':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIManager.prompt&gt;,</span> <span class="pre">'prompt_stream':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIManager.prompt_stream&gt;,</span> <span class="pre">'interrupt':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIManager.interrupt&gt;,</span> <span class="pre">'streaming':</span> <span class="pre">&lt;property</span> <span class="pre">object&gt;,</span> <span class="pre">'_count_tokens':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIManager._count_tokens&gt;,</span> <span class="pre">'_request':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIManager._request&gt;,</span> <span class="pre">'_response_parse_stream':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIManager._response_parse_stream&gt;,</span> <span class="pre">'__dict__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__dict__'</span> <span class="pre">of</span> <span class="pre">'OpenAIManager'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__weakref__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__weakref__'</span> <span class="pre">of</span> <span class="pre">'OpenAIManager'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__annotations__':</span> <span class="pre">{'_interrupt':</span> <span class="pre">'int'}})</span></em><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.__dict__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.data.html#banterbot.data.openai_models.OpenAIModel" title="banterbot.data.openai_models.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes an OpenAIManager instance for a specific model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>contains information about the</em>) – The OpenAI model to be used. This should be an instance of the OpenAIModel class, which</p></li>
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>limit.</strong> (<em>such as its name and maximum token</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'banterbot.managers.openai_manager'</span></em><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.__weakref__" title="Permalink to this definition"></a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.interrupt" title="Permalink to this definition"></a></dt>
+<dd><p>Interrupts any ongoing streaming processes. This method sets the interrupt flag to the current time, which will
+cause any streaming processes activated prior to the current time to stop.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager.prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.prompt" title="Permalink to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>List</em><em>[</em><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the Message class, which</p></li>
+<li><p><strong>role</strong> (<em>contains the content and</em>) – </p></li>
+<li><p><strong>split</strong> (<em>bool</em>) – Whether the response should be split into sentences.</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of sentences forming the response from the OpenAI API. This can be used to
+display the generated response to the user or for further processing. If <cite>split</cite> is False, returns a string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[List[str], str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.prompt_stream">
+<span class="sig-name descname"><span class="pre">prompt_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager.prompt_stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.prompt_stream" title="Permalink to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>List</em><em>[</em><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the Message class, which</p></li>
+<li><p><strong>role</strong> (<em>contains the content and</em>) – </p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Generator[List[str], None, None]</em> – A stream of blocks of sentences as the response from the OpenAI API. Each
+block contains one or more sentences that form a part of the generated response. This can be used to display
+the response to the user in real-time or for further processing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.streaming">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">streaming</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.streaming" title="Permalink to this definition"></a></dt>
+<dd><p>If the current instance of OpenAIManager is in the process of streaming, returns True. Otherwise, returns False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bool</strong> – The streaming state of the current instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="id3">
+<h3>TextToSpeech<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+</section>
+<section id="id4">
+<h3>SpeechToText<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+</section>
+<section id="id5">
+<h3>Interface<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+</section>
+<section id="id6">
+<h3>TKSimpleInterface<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+</section>
+<section id="tkmultiplayerinterface">
+<h3>TKMultiplayerInterface<a class="headerlink" href="#tkmultiplayerinterface" title="Permalink to this heading"></a></h3>
+</section>
+</section>
+</section>
+<section id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">BanterBot</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.html">BanterBot Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#module-banterbot.config">banterbot.config module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-right" title="BanterBot" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

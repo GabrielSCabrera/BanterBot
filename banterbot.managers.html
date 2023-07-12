@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.managers package &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="banterbot.utils package" href="banterbot.utils.html" />
+    <link rel="prev" title="banterbot.gui package" href="banterbot.gui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">BanterBot</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="banterbot.html">BanterBot Package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="banterbot.html#module-banterbot.config">banterbot.config module</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">banterbot.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">BanterBot</a></li>
+          <li class="breadcrumb-item"><a href="banterbot.html">BanterBot Package</a></li>
+      <li class="breadcrumb-item active">banterbot.managers package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/banterbot.managers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="banterbot-managers-package">
+<h1>banterbot.managers package<a class="headerlink" href="#banterbot-managers-package" title="Permalink to this heading"></a></h1>
+<section id="module-banterbot.managers.openai_manager">
+<span id="banterbot-managers-openai-manager-module"></span><h2>banterbot.managers.openai_manager module<a class="headerlink" href="#module-banterbot.managers.openai_manager" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.managers.openai_manager.</span></span><span class="sig-name descname"><span class="pre">OpenAIManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.data.html#banterbot.data.openai_models.OpenAIModel" title="banterbot.data.openai_models.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that handles the interaction with the OpenAI ChatCompletion API. It provides functionality to generate
+responses from the API based on the input messages. It supports generating responses as a whole or as a stream of
+response blocks.</p>
+<p>The main purpose of this class is to facilitate the communication with the OpenAI API and manage the responses
+generated by the API. It can be used to create chatbots or other applications that require natural language
+processing and generation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.interrupt" title="Permalink to this definition"></a></dt>
+<dd><p>Interrupts any ongoing streaming processes. This method sets the interrupt flag to the current time, which will
+cause any streaming processes activated prior to the current time to stop.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager.prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.prompt" title="Permalink to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>List</em><em>[</em><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the Message class, which</p></li>
+<li><p><strong>role</strong> (<em>contains the content and</em>) – </p></li>
+<li><p><strong>split</strong> (<em>bool</em>) – Whether the response should be split into sentences.</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of sentences forming the response from the OpenAI API. This can be used to
+display the generated response to the user or for further processing. If <cite>split</cite> is False, returns a string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[List[str], str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.prompt_stream">
+<span class="sig-name descname"><span class="pre">prompt_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_manager.html#OpenAIManager.prompt_stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.prompt_stream" title="Permalink to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>List</em><em>[</em><a class="reference internal" href="banterbot.utils.html#banterbot.utils.message.Message" title="banterbot.utils.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the Message class, which</p></li>
+<li><p><strong>role</strong> (<em>contains the content and</em>) – </p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Generator[List[str], None, None]</em> – A stream of blocks of sentences as the response from the OpenAI API. Each
+block contains one or more sentences that form a part of the generated response. This can be used to display
+the response to the user in real-time or for further processing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="banterbot.managers.openai_manager.OpenAIManager.streaming">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">streaming</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#banterbot.managers.openai_manager.OpenAIManager.streaming" title="Permalink to this definition"></a></dt>
+<dd><p>If the current instance of OpenAIManager is in the process of streaming, returns True. Otherwise, returns False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bool</strong> – The streaming state of the current instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="banterbot-managers-text-to-speech-module">
+<h2>banterbot.managers.text_to_speech module<a class="headerlink" href="#banterbot-managers-text-to-speech-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="banterbot-managers-speech-to-text-module">
+<h2>banterbot.managers.speech_to_text module<a class="headerlink" href="#banterbot-managers-speech-to-text-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-banterbot.managers.memory_chain">
+<span id="banterbot-managers-memory-manager"></span><h2>banterbot.managers.memory_manager<a class="headerlink" href="#module-banterbot.managers.memory_chain" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.managers.memory_chain.</span></span><span class="sig-name descname"><span class="pre">MemoryChain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MemoryChain is a class responsible for managing and handling arrays of memories using Protocol Buffers. It provides
+functionality to save memories to a binary file, load memories from a binary file, and retrieve memories based on
+keywords. The MemoryChain class is designed to efficiently store and retrieve memories based on keywords, allowing
+for quick access to relevant information.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">memory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.memory.Memory" title="banterbot.utils.memory.Memory"><span class="pre">Memory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.append" title="Permalink to this definition"></a></dt>
+<dd><p>Append a memory to the current set of memories. This method is used to add a single memory to the MemoryChain,
+allowing for the storage of new information. All changes are saved to file as soon as they are made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>memory</strong> (<a class="reference internal" href="banterbot.utils.html#banterbot.utils.memory.Memory" title="banterbot.utils.memory.Memory"><em>Memory</em></a>) – The memory to append.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#banterbot.managers.memory_chain.MemoryChain" title="banterbot.managers.memory_chain.MemoryChain"><span class="pre">MemoryChain</span></a></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.create" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a new empty set of memories and associated UUID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new instance of MemoryChain with an empty set of memories and a unique UUID.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#banterbot.managers.memory_chain.MemoryChain" title="banterbot.managers.memory_chain.MemoryChain">MemoryChain</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.delete">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.delete" title="Permalink to this definition"></a></dt>
+<dd><p>Delete the directory associated with a MemoryChain instance. This method is used to clean up the file system
+by removing the directory and all its contents, including memory files and the memory index file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uuid</strong> (<em>str</em>) – The UUID associated with this set of memories.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.extend">
+<span class="sig-name descname"><span class="pre">extend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">memories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.utils.html#banterbot.utils.memory.Memory" title="banterbot.utils.memory.Memory"><span class="pre">Memory</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.extend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.extend" title="Permalink to this definition"></a></dt>
+<dd><p>Extend the current set of memories with a list of memories. This method is used to add multiple memories to the
+MemoryChain at once, allowing for the storage of new information in bulk. All changes are saved to file as soon
+as they are made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>memories</strong> (<em>List</em><em>[</em><a class="reference internal" href="banterbot.utils.html#banterbot.utils.memory.Memory" title="banterbot.utils.memory.Memory"><em>Memory</em></a><em>]</em>) – The list of memories to append.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#banterbot.managers.memory_chain.MemoryChain" title="banterbot.managers.memory_chain.MemoryChain"><span class="pre">MemoryChain</span></a></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load the memories from a binary file using Protocol Buffers deserialization and creates a MemoryChain instance.
+This method is used to load an existing set of memories from a file, allowing for the continuation of a previous
+session or the sharing of memories between different instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uuid</strong> (<em>str</em>) – The UUID of the memory files to load.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new instance of MemoryChain with loaded memories.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#banterbot.managers.memory_chain.MemoryChain" title="banterbot.managers.memory_chain.MemoryChain">MemoryChain</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keywords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuzzy_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.utils.html#banterbot.utils.memory.Memory" title="banterbot.utils.memory.Memory"><span class="pre">Memory</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.search" title="Permalink to this definition"></a></dt>
+<dd><p>Look up memories based on keywords. This method is used to retrieve memories that are relevant to the given
+keywords. It can also perform fuzzy matching, allowing for the retrieval of memories that are similar to the
+given keywords based on a similarity threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keywords</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – The list of keywords to look up.</p></li>
+<li><p><strong>fuzzy_threshold</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – The threshold for fuzzy matching. If None, only returns exact matches. If</p></li>
+<li><p><strong>provided</strong> (<em>a value is</em>) – </p></li>
+<li><p><strong>the</strong> (<em>memories with keywords that have a similarity score greater than</em><em> or </em><em>equal to</em>) – </p></li>
+<li><p><strong>returned.</strong> (<em>threshold will also be</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of matching memories.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="banterbot.utils.html#banterbot.utils.memory.Memory" title="banterbot.utils.memory.Memory">Memory</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="banterbot.gui.html" class="btn btn-neutral float-left" title="banterbot.gui package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="banterbot.utils.html" class="btn btn-neutral float-right" title="banterbot.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

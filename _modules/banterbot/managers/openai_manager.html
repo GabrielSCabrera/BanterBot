@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.managers.openai_manager &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.managers.openai_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.managers.openai_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">openai</span>
+
+<span class="kn">from</span> <span class="nn">banterbot.config</span> <span class="kn">import</span> <span class="n">RETRY_LIMIT</span><span class="p">,</span> <span class="n">RETRY_TIME</span>
+<span class="kn">from</span> <span class="nn">banterbot.data.enums</span> <span class="kn">import</span> <span class="n">EnvVar</span>
+<span class="kn">from</span> <span class="nn">banterbot.data.openai_models</span> <span class="kn">import</span> <span class="n">OpenAIModel</span>
+<span class="kn">from</span> <span class="nn">banterbot.utils.message</span> <span class="kn">import</span> <span class="n">Message</span>
+<span class="kn">from</span> <span class="nn">banterbot.utils.nlp</span> <span class="kn">import</span> <span class="n">NLP</span>
+
+<span class="c1"># Set the OpenAI API key</span>
+<span class="n">openai</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EnvVar</span><span class="o">.</span><span class="n">OPENAI_API_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OpenAIManager"><a class="viewcode-back" href="../../../index.html#banterbot.managers.openai_manager.OpenAIManager">[docs]</a><span class="k">class</span> <span class="nc">OpenAIManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that handles the interaction with the OpenAI ChatCompletion API. It provides functionality to generate</span>
+<span class="sd">    responses from the API based on the input messages. It supports generating responses as a whole or as a stream of</span>
+<span class="sd">    response blocks.</span>
+
+<span class="sd">    The main purpose of this class is to facilitate the communication with the OpenAI API and manage the responses</span>
+<span class="sd">    generated by the API. It can be used to create chatbots or other applications that require natural language</span>
+<span class="sd">    processing and generation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OpenAIManager.__init__"><a class="viewcode-back" href="../../../index.html#banterbot.managers.openai_manager.OpenAIManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">OpenAIModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes an OpenAIManager instance for a specific model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model (OpenAIModel): The OpenAI model to be used. This should be an instance of the OpenAIModel class, which</span>
+<span class="sd">            contains information about the model, such as its name and maximum token limit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OpenAIManager initialized&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The selected model that will be used in OpenAI ChatCompletion prompts.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+
+        <span class="c1"># Indicates whether the current instance of OpenAIManager is streaming.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Set the interruption flag to the current time: if interruptions are raised, this will be updated.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OpenAIManager.prompt"><a class="viewcode-back" href="../../../index.html#banterbot.managers.openai_manager.OpenAIManager.prompt">[docs]</a>    <span class="k">def</span> <span class="nf">prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Message</span><span class="p">],</span> <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            messages (List[Message]): A list of messages. Each message should be an instance of the Message class, which</span>
+<span class="sd">            contains the content and role (user or assistant) of the message.</span>
+
+<span class="sd">            split (bool): Whether the response should be split into sentences.</span>
+
+<span class="sd">            **kwargs: Additional parameters for the API request. These can include settings such as temperature, top_p,</span>
+<span class="sd">            and frequency_penalty.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[List[str], str]: A list of sentences forming the response from the OpenAI API. This can be used to</span>
+<span class="sd">            display the generated response to the user or for further processing. If `split` is False, returns a string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OpenAIManager stream processed block: `</span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+        <span class="n">sentences</span> <span class="o">=</span> <span class="n">NLP</span><span class="o">.</span><span class="n">segment_sentences</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="k">if</span> <span class="n">split</span> <span class="k">else</span> <span class="n">response</span>
+        <span class="k">return</span> <span class="n">sentences</span></div>
+
+<div class="viewcode-block" id="OpenAIManager.prompt_stream"><a class="viewcode-back" href="../../../index.html#banterbot.managers.openai_manager.OpenAIManager.prompt_stream">[docs]</a>    <span class="k">def</span> <span class="nf">prompt_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Message</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            messages (List[Message]): A list of messages. Each message should be an instance of the Message class, which</span>
+<span class="sd">            contains the content and role (user or assistant) of the message.</span>
+
+<span class="sd">            **kwargs: Additional parameters for the API request. These can include settings such as temperature, top_p,</span>
+<span class="sd">            and frequency_penalty.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Generator[List[str], None, None]: A stream of blocks of sentences as the response from the OpenAI API. Each</span>
+<span class="sd">            block contains one or more sentences that form a part of the generated response. This can be used to display</span>
+<span class="sd">            the response to the user in real-time or for further processing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Record the time at which the request was made, in order to account for future interruptions.</span>
+        <span class="n">init_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span>
+
+        <span class="c1"># Obtain a response from the OpenAI ChatCompletion API</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Set the streaming flag to True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Yield the responses as they are streamed</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response_parse_stream</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">init_time</span><span class="o">=</span><span class="n">init_time</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">block</span>
+
+        <span class="c1"># Reset the streaming flag to False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="OpenAIManager.interrupt"><a class="viewcode-back" href="../../../index.html#banterbot.managers.openai_manager.OpenAIManager.interrupt">[docs]</a>    <span class="k">def</span> <span class="nf">interrupt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Interrupts any ongoing streaming processes. This method sets the interrupt flag to the current time, which will</span>
+<span class="sd">        cause any streaming processes activated prior to the current time to stop.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;OpenAIManager stream interrupted&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">streaming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the current instance of OpenAIManager is in the process of streaming, returns True. Otherwise, returns False.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bool: The streaming state of the current instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span>
+
+    <span class="k">def</span> <span class="nf">_count_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Message</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the total number of tokens in the given messages.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            messages (List[Message]): A list of messages. Each message should be an instance of the Message class, which</span>
+<span class="sd">            contains the content and role (user or assistant) of the message.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The total number of tokens in the messages. This is used to ensure that the generated response does not</span>
+<span class="sd">            exceed the model&#39;s maximum token limit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_tokens</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="n">num_tokens</span> <span class="o">+=</span> <span class="n">message</span><span class="o">.</span><span class="n">count_tokens</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">num_tokens</span>
+
+    <span class="k">def</span> <span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Message</span><span class="p">],</span> <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterator</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a request to the OpenAI API and generates a response based on the given parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            messages (List[Message]): A list of messages. Each message should be an instance of the Message class, which</span>
+<span class="sd">            contains the content and role (user or assistant) of the message.</span>
+
+<span class="sd">            stream (bool): Whether the response should be returned as an iterable stream or a complete text.</span>
+
+<span class="sd">            **kwargs: Additional parameters for the API request. These can include settings such as temperature, top_p,</span>
+<span class="sd">            and frequency_penalty.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[Iterator, str]: The response from the OpenAI API, either as a stream (Iterator) or text (str).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stream&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stream</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">message</span><span class="p">()</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">]</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">RETRY_LIMIT</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+
+            <span class="k">except</span> <span class="n">openai</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">APIError</span><span class="p">:</span>
+                <span class="n">retry_time</span> <span class="o">=</span> <span class="mf">0.5</span>
+                <span class="n">retry_timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">retry_time</span><span class="p">)</span>
+                <span class="n">retry_timestamp</span> <span class="o">=</span> <span class="n">retry_timestamp</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)</span>
+                <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;OpenAIManager encountered an OpenAI API Error - Attempt </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">RETRY_LIMIT</span><span class="si">}</span><span class="s2">. Waiting &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">retry_time</span><span class="si">}</span><span class="s2"> seconds until </span><span class="si">{</span><span class="n">retry_timestamp</span><span class="si">}</span><span class="s2"> to retry.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">retry_time</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">openai</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RateLimitError</span><span class="p">:</span>
+                <span class="n">retry_timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">RETRY_TIME</span><span class="p">)</span>
+                <span class="n">retry_timestamp</span> <span class="o">=</span> <span class="n">retry_timestamp</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)</span>
+                <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;OpenAIManager encountered an OpenAI Rate Limiting Error - Attempt </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">RETRY_LIMIT</span><span class="si">}</span><span class="s2">. Waiting &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RETRY_TIME</span><span class="si">}</span><span class="s2"> seconds until </span><span class="si">{</span><span class="n">retry_timestamp</span><span class="si">}</span><span class="s2"> to retry.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">RETRY_TIME</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OpenAIManager encountered too many OpenAI Errors - exiting program.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">openai</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">APIError</span>
+
+        <span class="k">return</span> <span class="n">response</span> <span class="k">if</span> <span class="n">stream</span> <span class="k">else</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_response_parse_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">init_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses a streaming response from the OpenAI API and yields blocks of text as they are received.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            response (Iterator): A streaming response from the OpenAI ChatCompletion API.</span>
+<span class="sd">            init_time (int): The time at which the stream was initialized.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Generator[List[str], None, bool]: Lists of sentences as blocks. Each block contains one or more sentences</span>
+<span class="sd">            that form a part of the generated response.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the generator completed its iterations, False otherwise (due to interruption).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;OpenAIManager stream started&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;delta&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span> <span class="o">&gt;=</span> <span class="n">init_time</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="s2">&quot;content&quot;</span> <span class="ow">in</span> <span class="n">delta</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span> <span class="o">:=</span> <span class="n">NLP</span><span class="o">.</span><span class="n">segment_sentences</span><span class="p">(</span><span class="n">text</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">sentences</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">yield</span> <span class="n">sentences</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">sentences</span> <span class="o">=</span> <span class="n">NLP</span><span class="o">.</span><span class="n">segment_sentences</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">sentences</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;OpenAIManager stream stopped&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

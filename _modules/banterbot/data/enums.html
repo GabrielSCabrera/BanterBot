@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.data.enums &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.data.enums</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.data.enums</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="EnvVar"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.enums.EnvVar">[docs]</a><span class="k">class</span> <span class="nc">EnvVar</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">OPENAI_API_KEY</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span>
+    <span class="n">AZURE_SPEECH_KEY</span> <span class="o">=</span> <span class="s2">&quot;AZURE_SPEECH_KEY&quot;</span>
+    <span class="n">AZURE_SPEECH_REGION</span> <span class="o">=</span> <span class="s2">&quot;AZURE_SPEECH_REGION&quot;</span></div>
+
+
+<div class="viewcode-block" id="ChatCompletionRoles"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.enums.ChatCompletionRoles">[docs]</a><span class="k">class</span> <span class="nc">ChatCompletionRoles</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ASSISTANT</span> <span class="o">=</span> <span class="s2">&quot;assistant&quot;</span>
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="s2">&quot;system&quot;</span>
+    <span class="n">USER</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span></div>
+
+
+<div class="viewcode-block" id="WordCategory"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.enums.WordCategory">[docs]</a><span class="k">class</span> <span class="nc">WordCategory</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">WORD</span> <span class="o">=</span> <span class="s2">&quot;word&quot;</span>
+    <span class="n">PUNCTUATION</span> <span class="o">=</span> <span class="s2">&quot;punctuation&quot;</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceGender"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.enums.AzureNeuralVoiceGender">[docs]</a><span class="k">class</span> <span class="nc">AzureNeuralVoiceGender</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">MALE</span> <span class="o">=</span> <span class="s2">&quot;male&quot;</span>
+    <span class="n">FEMALE</span> <span class="o">=</span> <span class="s2">&quot;female&quot;</span></div>
+
+
+<div class="viewcode-block" id="SpaCyLangModel"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.enums.SpaCyLangModel">[docs]</a><span class="k">class</span> <span class="nc">SpaCyLangModel</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">EN_CORE_WEB_SM</span> <span class="o">=</span> <span class="s2">&quot;en_core_web_sm&quot;</span>
+    <span class="n">EN_CORE_WEB_MD</span> <span class="o">=</span> <span class="s2">&quot;en_core_web_md&quot;</span>
+    <span class="n">EN_CORE_WEB_LG</span> <span class="o">=</span> <span class="s2">&quot;en_core_web_lg&quot;</span></div>
+
+
+<div class="viewcode-block" id="SpeechProcessingType"><a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.enums.SpeechProcessingType">[docs]</a><span class="k">class</span> <span class="nc">SpeechProcessingType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">TTS</span> <span class="o">=</span> <span class="s2">&quot;text-to-speech&quot;</span>
+    <span class="n">STT</span> <span class="o">=</span> <span class="s2">&quot;speech-to-text&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
