@@ -1,0 +1,103 @@
+category,trait,1,2,3,4,5,6,7
+personality,openness,close-minded,cautious,curious,open-minded,imaginative,adventurous,inventive
+personality,conscientiousness,disorganized,careless,casual,conscientious,organized,diligent,meticulous
+personality,extraversion,introverted,reserved,quiet,ambivert,sociable,outgoing,extroverted
+personality,agreeableness,hostile,competitive,assertive,agreeable,friendly,compassionate,empathetic
+personality,neuroticism,calm,stable,composed,balanced,anxious,emotional,neurotic
+politics,authority,libertarian,minarchist,moderate,centrist,authoritarian,totalitarian,dictatorial
+politics,economic system,communist,socialist,mixed economy,centrist,capitalist,free market,laissez-faire
+politics,social orientation,individualist,independent,moderate,centrist,communitarian,collectivist,collectivist
+politics,tradition,progressive,reformist,moderate,centrist,conservative,traditionalist,reactionary
+politics,national identity,globalist,internationalist,moderate,centrist,nationalist,patriotic,jingoistic
+politics,welfare,social welfare,welfare state,moderate,centrist,mercantilist,protectionist,laissez-faire
+politics,military stance,pacifist,non-interventionist,moderate,centrist,militarist,hawkish,warmonger
+politics,foreign policy,isolationist,non-interventionist,moderate,centrist,interventionist,imperialist,expansionist
+politics,environment,environmentalist,green,moderate,centrist,industrialist,exploitative,polluter
+politics,religion & state,secular,non-religious,moderate,centrist,religious,theocratic,fundamentalist
+politics,equality,egalitarian,equalitarian,moderate,centrist,elitist,aristocratic,plutocratic
+politics,governance,decentralized,federalist,moderate,centrist,centralized,unitary,autocratic
+politics,economic policy,interventionist,keynesian,moderate,centrist,laissez-faire,free market,anarcho-capitalist
+politics,civil liberties,civil libertarian,privacy advocate,moderate,centrist,security-focused,authoritarian,totalitarian
+ideology,belief in god,atheist,skeptic,agnostic,deist,theist,devout,zealous
+ideology,spirituality,materialistic,pragmatic,realist,balanced,spiritual,mystical,transcendent
+ideology,social focus,individualistic,independent,moderate,centrist,communal,collectivist,communitarian
+ideology,certainty,agnostic,skeptic,questioning,open-minded,dogmatic,unwavering,fanatical
+ideology,religious practice,informal,casual,flexible,balanced,ritualistic,ceremonial,orthodox
+ideology,knowledge source,scientific,rational,empirical,balanced,supernatural,mystical,esoteric
+ideology,moral perspective,absolutist,principled,discerning,balanced,relativist,situational,subjectivist
+ideology,worldview,mundane,realist,grounded,balanced,mystic,enchanted,magical
+ideology,religious imagery,iconoclastic,reformer,moderate,balanced,idolatrous,reverent,idolizer
+ideology,faith sharing,private,reserved,discreet,balanced,proselytist,evangelical,missionary
+ideology,outlook,pessimistic,cynical,realist,balanced,optimistic,hopeful,utopian
+ideology,existential stance,nihilistic,skeptical,questioning,balanced,existentialist,purposeful,meaningful
+ideology,pleasure seeking,hedonistic,sensualist,moderate,balanced,ascetic,disciplined,self-denying
+ideology,view of humanity,misanthropic,cynical,skeptical,balanced,humanistic,compassionate,altruistic
+expertise,artistic,inept,amateur,apprentice,competent,skilled,accomplished,masterful
+expertise,scientific,uninformed,basic,familiar,proficient,knowledgeable,expert,renowned
+expertise,technological,clueless,novice,capable,adept,advanced,specialist,innovator
+expertise,social,awkward,reserved,cordial,sociable,charismatic,influential,magnetic
+expertise,practical,incompetent,rudimentary,functional,handy,resourceful,adaptable,ingenious
+expertise,historical,unaware,elementary,informed,well-versed,scholarly,historian,authority
+expertise,cultural,ignorant,basic,aware,cultured,refined,connoisseur,savant
+expertise,linguistic,inarticulate,limited,conversational,fluent,bilingual,polyglot,linguist
+expertise,philosophical,unreflective,curious,thoughtful,analytical,wise,philosopher,visionary
+expertise,leadership,ineffective,follower,collaborative,motivator,inspiring,leader,trailblazer
+expertise,financial,unskilled,budgeter,planner,manager,investor,wealth-builder,tycoon
+expertise,medical,untrained,first-aider,caregiver,practitioner,healer,physician,specialist
+expertise,military,unprepared,recruit,soldier,tactician,strategist,commander,general
+expertise,psychological,unperceptive,observant,insightful,empathetic,intuitive,psychologist,mind-reader
+expertise,aesthetic,unrefined,basic,appreciative,discerning,tasteful,stylist,trendsetter
+expertise,legal,uninformed,layman,paralegal,lawyer,advocate,jurist,legal scholar
+expertise,educational,unqualified,tutor,instructor,educator,mentor,pedagogue,master teacher
+expertise,athletic,uncoordinated,beginner,active,fit,athlete,elite,champion
+mental,memory,forgetful,inconsistent,average,reliable,sharp,exceptional,photographic
+mental,empathy,detached,distant,sympathetic,empathetic,compassionate,intuitive,profound
+mental,logic,illogical,simple,reasonable,logical,analytical,rigorous,impeccable
+mental,intuition,oblivious,hesitant,sensitive,intuitive,perceptive,insightful,clairvoyant
+mental,persuasion,unconvincing,tentative,persuasive,influential,compelling,captivating,irresistible
+mental,focus,distracted,inattentive,focused,attentive,sharp,unwavering,laser-focused
+mental,creativity,unimaginative,conventional,creative,inventive,original,visionary,revolutionary
+mental,wittiness,dull,dry,amusing,witty,clever,quick-witted,razor-sharp
+mental,problem solving,ineffective,basic,competent,skilled,resourceful,expert,master solver
+mental,critical thinking,naive,simplistic,analytical,critical,discerning,astute,incisive
+mental,learning ability,slow,steady,adaptable,quick,eager,adept,prodigious
+mental,adaptability,rigid,inflexible,adaptable,flexible,resilient,versatile,chameleon-like
+physical,strength,weak,feeble,average,strong,powerful,herculean,unstoppable
+physical,endurance,fragile,delicate,moderate,resilient,persistent,tireless,indefatigable
+physical,agility,clumsy,awkward,nimble,agile,graceful,acrobatic,lightning-fast
+physical,coordination,uncoordinated,fumbling,coordinated,skilled,precise,fluid,masterful
+physical,perception,oblivious,unobservant,aware,perceptive,sharp,eagle-eyed,omnipresent
+physical,seduction,unappealing,plain,charming,attractive,alluring,irresistible,enchanting
+physical,flexibility,stiff,inflexible,flexible,limber,supple,elastic,contortionist
+physical,stamina,exhausted,weary,steady,energetic,vigorous,dynamic,boundless
+physical,speed,slow,leisurely,average,swift,rapid,blazing,meteoric
+physical,balance,unsteady,wobbly,balanced,stable,poised,centered,unshakable
+physical,pain tolerance,sensitive,delicate,tolerant,resilient,stoic,unflinching,impervious
+relationships,trustworthiness,unreliable,inconsistent,trustworthy,dependable,loyal,steadfast,unwavering
+relationships,loyalty,disloyal,uncommitted,loyal,devoted,faithful,unfaltering,unconditional
+relationships,altruism,selfish,indifferent,considerate,altruistic,generous,selfless,saintly
+relationships,assertiveness,passive,hesitant,assertive,confident,bold,commanding,dominant
+relationships,conflict resolution,combative,avoidant,diplomatic,mediator,peacemaker,harmonizer,reconciler
+relationships,communication skills,inarticulate,reserved,articulate,communicative,persuasive,eloquent,charismatic
+relationships,emotional intelligence,unaware,insensitive,aware,empathetic,intuitive,insightful,enlightened
+relationships,social awareness,oblivious,unobservant,aware,attuned,perceptive,astute,savvy
+relationships,supportiveness,unsupportive,indifferent,supportive,encouraging,nurturing,empowering,inspirational
+relationships,adaptability,rigid,inflexible,adaptable,flexible,resilient,versatile,chameleon-like
+relationships,empathy,detached,distant,sympathetic,empathetic,compassionate,intuitive,profound
+relationships,humor,dull,dry,amusing,witty,clever,quick-witted,razor-sharp
+relationships,patience,impatient,restless,patient,tolerant,enduring,unruffled,unshakable
+relationships,tactfulness,tactless,insensitive,diplomatic,tactful,discreet,gracious,suave
+values,honesty,deceptive,dishonest,sincere,honest,trustworthy,transparent,incorruptible
+values,integrity,unprincipled,compromising,principled,ethical,honorable,virtuous,impeccable
+values,responsibility,irresponsible,negligent,accountable,responsible,dependable,reliable,unfailing
+values,compassion,cold,indifferent,sympathetic,compassionate,warmhearted,empathetic,boundless
+values,fairness,unfair,biased,equitable,fair,just,impartial,unbiased
+values,respect,disrespectful,dismissive,polite,respectful,reverent,admiring,venerating
+values,humility,arrogant,haughty,modest,humble,unassuming,self-effacing,egoless
+values,courage,cowardly,fearful,brave,courageous,valiant,fearless,unstoppable
+values,perseverance,quitter,inconsistent,persistent,persevering,tenacious,resolute,unyielding
+values,gratitude,ungrateful,unappreciative,thankful,grateful,appreciative,content,overflowing
+values,generosity,stingy,selfish,giving,generous,magnanimous,charitable,philanthropic
+values,forgiveness,vengeful,bitter,forgiving,merciful,compassionate,pardoning,unconditional
+values,tolerance,intolerant,judgmental,accepting,tolerant,open-minded,embracing,all-encompassing
+values,discipline,impulsive,indulgent,disciplined,self-controlled,composed,steadfast,unwavering

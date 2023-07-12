@@ -5,7 +5,7 @@ from typing import Generator, Iterator, List, Tuple, Union
 
 import openai
 
-from banterbot.config import RETRY_LIMIT
+from banterbot.config import RETRY_LIMIT, RETRY_TIME
 from banterbot.data.enums import EnvVar
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.utils.message import Message
@@ -156,7 +156,6 @@ class OpenAIManager:
         kwargs["n"] = 1
         kwargs["stream"] = stream
         kwargs["messages"] = [message() for message in messages]
-        # kwargs["max_tokens"] = self._model.max_tokens - self._count_tokens(messages=messages)
 
         success = False
         for i in range(RETRY_LIMIT):
@@ -164,10 +163,30 @@ class OpenAIManager:
                 response = openai.ChatCompletion.create(**kwargs)
                 success = True
                 break
-            except (openai.error.RateLimitError, openai.error.APIError):
-                time.sleep(0.25)
+
+            except openai.error.APIError:
+                retry_time = 0.5
+                retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=retry_time)
+                retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
+                error_message = (
+                    f"OpenAIManager encountered an OpenAI API Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
+                    f"{retry_time} seconds until {retry_timestamp} to retry."
+                )
+                logging.info(error_message)
+                time.sleep(retry_time)
+
+            except openai.error.RateLimitError:
+                retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
+                retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
+                error_message = (
+                    f"OpenAIManager encountered an OpenAI Rate Limiting Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
+                    f"{RETRY_TIME} seconds until {retry_timestamp} to retry."
+                )
+                logging.info(error_message)
+                time.sleep(RETRY_TIME)
 
         if not success:
+            logging.info(f"OpenAIManager encountered too many OpenAI Errors - exiting program.")
             raise openai.error.APIError
 
         return response if stream else response.choices[0].message.content.strip()
