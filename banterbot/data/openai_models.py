@@ -53,12 +53,17 @@ _openai_models_dict = {
     "gpt-3.5-turbo": {
         "max_tokens": 4097,
         "version": 3,
-        "rank": 2,
+        "rank": 4,
+    },
+    "gpt-3.5-turbo-16k": {
+        "max_tokens": 16383,
+        "version": 3,
+        "rank": 3,
     },
     "gpt-4": {
         "max_tokens": 8191,
         "version": 4,
-        "rank": 1,
+        "rank": 2,
     },
     "gpt-4-32k": {
         "max_tokens": 32767,
