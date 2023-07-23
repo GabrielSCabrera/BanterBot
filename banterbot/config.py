@@ -12,6 +12,9 @@ RETRY_TIME = 60
 # The default seed to use in all random generation
 SEED = 1337
 
+# The default language used in speech-to-text recognition
+DEFAULT_LANGUAGE = "en-US"
+
 # Initialize the filesystem for BanterBot
 filesystem = Path.home() / "Documents" / "BanterBot"
 filesystem.mkdir(parents=True, exist_ok=True)

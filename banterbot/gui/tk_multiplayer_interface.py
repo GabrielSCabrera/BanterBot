@@ -2,7 +2,7 @@ import logging
 import threading
 import tkinter as tk
 from tkinter import ttk
-from typing import Optional
+from typing import Optional, Union
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
@@ -24,8 +24,10 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         model: OpenAIModel = get_model_by_name("gpt-3.5-turbo"),
         voice: AzureNeuralVoice = get_voice_by_name("Aria"),
         style: str = "chat",
+        languages: Optional[Union[str, list[str]]] = None,
         tone: bool = False,
         system: Optional[str] = None,
+        phrase_list: Optional[list[str]] = None,
     ) -> None:
         """
         Initialize the TKMultiplayerInterface class, which inherits from both tkinter.Tk and Interface.
@@ -34,13 +36,24 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             model (OpenAIModel, optional): The OpenAI model to be used for generating responses.
             voice (AzureNeuralVoice, optional): The Azure Neural Voice to be used for text-to-speech.
             style (str, optional): The style of the conversation (e.g., "cheerful", "sad", "chat").
+            languages (Optional[Union[str, list[str]]]): The languages supported by the speech-to-text recognizer.
             system (Optional[str]): An initialization prompt that can be used to set the scene.
             tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
+            phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
         """
         logging.debug(f"TKMultiplayerInterface initialized")
 
         tk.Tk.__init__(self)
-        Interface.__init__(self, model=model, voice=voice, style=style, system=system, tone=tone)
+        Interface.__init__(
+            self,
+            model=model,
+            voice=voice,
+            style=style,
+            languages=languages,
+            system=system,
+            tone=tone,
+            phrase_list=phrase_list,
+        )
 
         # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.
         self.protocol("WM_DELETE_WINDOW", self._quit)

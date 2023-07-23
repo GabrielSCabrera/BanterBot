@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Iterator, List, TypedDict
+from typing import Iterator, List, Optional, TypedDict
 
 import azure.cognitiveservices.speech as speechsdk
 
@@ -8,8 +8,6 @@ from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.enums import SpeechProcessingType, WordCategory
 from banterbot.utils.nlp import NLP
 from banterbot.utils.word import Word
-
-NLP.load_all_models()
 
 
 class WordJSON(TypedDict):
@@ -33,12 +31,9 @@ class WordJSON(TypedDict):
 class SpeechToTextOutput:
     """
     A class that encapsulates the speech-to-text output data.
-
-    Attributes:
-        recognition_result (speechsdk.SpeechRecognitionResult): The speech recognition result.
     """
 
-    def __init__(self, recognition_result: speechsdk.SpeechRecognitionResult) -> None:
+    def __init__(self, recognition_result: speechsdk.SpeechRecognitionResult, language: Optional[str] = None) -> None:
         """
         Constructor for the SpeechToTextOutput class. Designed to create lightweight instances with most attributes
         initially set to None. Computation-intensive operations are performed on-demand when respective properties are
@@ -46,12 +41,15 @@ class SpeechToTextOutput:
 
         Args:
             recognition_result (speechsdk.SpeechRecognitionResult): The result from a speech recognition event.
+            language (str, optional): The language used during the speech-to-text recognition, if not auto-detected.
         """
-        self._data = json.loads(recognition_result.json)
+        self._result = recognition_result
+        self._data = json.loads(self._result.json)
         self._offset = None
         self._duration = None
         self._sents = None
         self._words = None
+        self._language = language if language is not None else self._extract_language()
 
     def _extract_words(self, words_raw: List[WordJSON]) -> List[Word]:
         """
@@ -76,6 +74,20 @@ class SpeechToTextOutput:
                 )
             )
         return words
+
+    def _extract_language(self) -> Optional[str]:
+        """
+        If the language is not provided (as it should be if auto-detection is disabled) then extract the auto-detected
+        language as a string. Return None if the process fails.
+
+        Returns:
+            str, optional: The auto-detected language from the speech-to-text output.
+        """
+        language_key = speechsdk.PropertyId.SpeechServiceConnection_AutoDetectSourceLanguageResult
+        language = None
+        if language_key in self._result.properties.keys():
+            language = self._result.properties[language_key]
+        return language
 
     @property
     def words(self) -> List[Word]:

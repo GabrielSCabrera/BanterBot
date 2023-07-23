@@ -2,7 +2,7 @@ import datetime
 import logging
 import threading
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from banterbot.config import chat_logs
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
@@ -29,8 +29,10 @@ class Interface(ABC):
         model: OpenAIModel,
         voice: AzureNeuralVoice,
         style: str,
+        languages: Optional[Union[str, list[str]]] = None,
         system: Optional[str] = None,
         tone: bool = False,
+        phrase_list: Optional[list[str]] = None,
     ) -> None:
         """
         Initialize the BanterBotInterface with the given model, voice, and style.
@@ -39,14 +41,16 @@ class Interface(ABC):
             model (OpenAIModel): The OpenAI model to use for generating responses.
             voice (AzureNeuralVoice): The voice to use for text-to-speech synthesis.
             style (str): The speaking style to use for text-to-speech synthesis.
+            languages (Optional[Union[str, list[str]]]): The languages supported by the speech-to-text recognizer.
             system (Optional[str]): An initialization prompt that can be used to set the scene.
             tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
+            phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
         """
         logging.debug(f"Interface initialized")
 
         # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure text-to-speech components
         self._openai_manager = OpenAIManager(model=model)
-        self._speech_to_text = SpeechToText()
+        self._speech_to_text = SpeechToText(languages=languages, phrase_list=phrase_list)
         self._text_to_speech = TextToSpeech()
 
         # Initialize message handling and conversation attributes

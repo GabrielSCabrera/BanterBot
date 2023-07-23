@@ -3,7 +3,8 @@ import unittest
 from setuptools import find_packages, setup
 
 spacy_version = "3.5.0"
-spacy_models = ["en_core_web_lg", "en_core_web_md", "en_core_web_sm"]
+spacy_models = ["en_core_web_md", "en_core_web_sm"]
+# spacy_models = ["en_core_web_lg", "en_core_web_md", "en_core_web_sm"]
 URL = "https://github.com/explosion/spacy-models/releases/download/"
 spacy_dependencies = [f"{model}@{URL}{model}-{spacy_version}/{model}-{spacy_version}.tar.gz" for model in spacy_models]
 
@@ -14,8 +15,9 @@ dependencies = [
     "azure-cognitiveservices-speech",
     "numpy",
     "uuid6",
-    "protobuf",
-    "nltk" f"spacy=={spacy_version}",
+    "protobuf==3.20",
+    "nltk",
+    f"spacy=={spacy_version}",
     *spacy_dependencies,
 ]
 
