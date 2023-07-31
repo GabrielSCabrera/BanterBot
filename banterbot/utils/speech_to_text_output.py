@@ -96,8 +96,7 @@ class SpeechToTextOutput:
         computation.
 
         Returns:
-            List[str]: A list of sentences.
-
+            List[str]: A list of words.
         """
         if self._words is None:
             self._words = self._extract_words(words_raw=self._data["NBest"][0]["Words"])

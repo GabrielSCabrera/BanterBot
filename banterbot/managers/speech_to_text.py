@@ -78,11 +78,17 @@ class SpeechToText:
         # Reset the state variables of the speech-to-text recognizer
         self._reset()
 
-    def interrupt(self) -> None:
+    def interrupt(self, soft: bool = False) -> None:
         """
         Interrupts an ongoing speech-to-text process, if any. This method sets the interrupt flag to the current time,
         which will stop any speech-to-text processes activated prior to the current time.
+
+        Args:
+            soft (bool): If True, allows a final sentence to be yielded if its recognition began prior to interruption.
         """
+        # Wait for any buffering words to be completely recognized.
+        if soft:
+            self._buffering.wait()
         # Update the interruption time.
         self._interrupt: int = time.perf_counter_ns()
         # Release the threading.Event instance that the listener is waiting for.
@@ -172,6 +178,10 @@ class SpeechToText:
             dict: A dictionary of keywords arguments for the Speech Recognizer.
         """
         if self._auto_detection:
+            self._speech_config.set_property(
+                property_id=speechsdk.PropertyId.SpeechServiceConnection_LanguageIdMode,
+                value="Continuous",
+            )
             config = speechsdk.AutoDetectSourceLanguageConfig(languages=self._languages)
             kwargs = {"auto_detect_source_language_config": config}
         else:
@@ -187,8 +197,11 @@ class SpeechToText:
         """
         self._events: List[SpeechToTextOutput] = []
         self._listening: bool = False
+        self._buffering: threading.Event = threading.Event()
         self._start_recognition: threading.Event = threading.Event()
         self._new_events: threading.Event = threading.Event()
+
+        self._buffering.set()
 
     def _recognizer_events_connect(self) -> None:
         """
@@ -197,8 +210,11 @@ class SpeechToText:
         # Connect the session_started event to the _callback_started method
         self._recognizer.session_started.connect(self._callback_started)
 
-        # Connect the recognized event to the _callback_word_boundary method
+        # Connect the recognized event to the _process_recognized method
         self._recognizer.recognized.connect(self._process_recognized)
+
+        # Connect the recognized event to the _process_recognized method
+        self._recognizer.recognizing.connect(self._callback_recognizing)
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
         """
@@ -208,6 +224,15 @@ class SpeechToText:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the recognition started.
         """
         self._start_recognition.set()
+
+    def _callback_recognizing(self, event: speechsdk.SessionEventArgs) -> None:
+        """
+        Callback function for recognizing in progress event. Signals that recognition is in progress.
+
+        Args:
+            event (speechsdk.SessionEventArgs): Event arguments containing information about the latest recognized word.
+        """
+        self._buffering.clear()
 
     def _callbacks_process(self, output: List[SpeechToTextOutput], init_time: int) -> Generator[str, None, None]:
         """
@@ -252,5 +277,6 @@ class SpeechToText:
         Args:
             event (speechsdk.SpeechRecognitionEventArgs): The recognized speech event.
         """
+        self._buffering.set()
         self._events.append(SpeechToTextOutput(event.result, self._languages if not self._auto_detection else None))
         self._new_events.set()

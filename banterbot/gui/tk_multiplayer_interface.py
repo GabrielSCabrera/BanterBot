@@ -79,8 +79,8 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         user_name = self.name_entries[idx].get().split(" ")[0].strip()
         super().listener_activate(user_name)
 
-    def listener_deactivate(self) -> None:
-        super().listener_deactivate()
+    def listener_deactivate(self, soft: bool = True) -> None:
+        super().listener_deactivate(soft=soft)
 
     def run(self) -> None:
         self.mainloop()

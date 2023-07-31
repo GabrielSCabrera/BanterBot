@@ -186,13 +186,13 @@ class Interface(ABC):
             self._listen_thread = threading.Thread(target=self._listen, args=(name,), daemon=True)
             self._listen_thread.start()
 
-    def listener_deactivate(self) -> None:
+    def listener_deactivate(self, soft: bool = True) -> None:
         """
         Deactivate the speech-to-text listener.
         """
         if self._listening_toggle:
             self._listening_toggle = False
-            self._speech_to_text.interrupt()
+            self._speech_to_text.interrupt(soft=soft)
 
     def get_response(self) -> None:
         """
