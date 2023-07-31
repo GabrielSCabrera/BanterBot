@@ -30,14 +30,14 @@ class AzureNeuralVoice:
         voice (str): The voice identifier used by Azure Text-to-Speech API.
         gender (AzureNeuralVoiceGender): The gender of the voice (either MALE or FEMALE).
         pitch (int): The relative (by gender) pitch level of the voice, where a lower value indicates a lower pitch.
-        styles (List[str]): The available styles (i.e., tones/emotions) for the voice.
+        styles (List[str], optional): The available styles (i.e., tones/emotions) for the voice.
     """
 
     name: str
     voice: str
     gender: AzureNeuralVoiceGender
     pitch: int
-    styles: List[str]
+    styles: Optional[List[str]]
 
 
 # Dictionary containing voice profile data
@@ -46,7 +46,7 @@ _neural_voice_data = {
         "gender": AzureNeuralVoiceGender.MALE,
         "pitch": 2,
         "voice": "sv-SE-MattiasNeural",
-        "styles": ["chat"],
+        "styles": None,
     },
     "Aria": {
         "gender": AzureNeuralVoiceGender.FEMALE,
