@@ -44,14 +44,14 @@ class ProsodySelection(Enum):
     rates = ["x-slow", "slow", "default", "fast", "x-fast"]
     emphases = ["reduced", "none", "moderate", "strong"]
 
-    style_degrees = "\n".join([f"{n+1} {i}" for n, i in enumerate(style_degrees)])
-    pitches = "\n".join([f"{n+1} {i}" for n, i in enumerate(pitches)])
-    rates = "\n".join([f"{n+1} {i}" for n, i in enumerate(rates)])
-    emphases = "\n".join([f"{n+1} {i}" for n, i in enumerate(emphases)])
+    # style_degrees = "\n".join([f"{n+1} {i}" for n, i in enumerate(style_degrees)])
+    # pitches = "\n".join([f"{n+1} {i}" for n, i in enumerate(pitches)])
+    # rates = "\n".join([f"{n+1} {i}" for n, i in enumerate(rates)])
+    # emphases = "\n".join([f"{n+1} {i}" for n, i in enumerate(emphases)])
 
     SYSTEM = (
-        "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each word in "
-        "the text for a text-to-speech engine that is attempting to mimic human speech patterns. The parameters are "
+        "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each sentence "
+        "in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The parameters are "
         "style, style-degree, pitch, rate, and emphasis:\n"
         '1. "Style": Represents the emotion or tone of the word, reflecting the speaker\'s feelings or attitude. '
         "Chosen based on the conversation's context and intended emotion (this value should change once in a while). "
@@ -73,7 +73,7 @@ class ProsodySelection(Enum):
         "15 unfriendly\n"
         "16 whispering\n"
         '2. "Style Degree": Indicates the intensity of the style, showing how strongly the speaker feels the emotion:\n'
-        "1 extra weak\n"
+        f"1 extra weak\n"
         "2 weak\n"
         "3 medium\n"
         "4 default\n"
@@ -93,7 +93,7 @@ class ProsodySelection(Enum):
         "4 default\n"
         "5 fast\n"
         "6 extra fast\n"
-        '5. "Emphasis": Assigns relative emphasis to a word, highlighting important words. Higher values should be '
+        '5. "Emphasis": Assigns relative emphasis to a sentence, highlighting important words. Higher values should be '
         "assigned to the more important words in each sentence (this value should change very often):\n"
         "1 low\n"
         "2 normal\n"

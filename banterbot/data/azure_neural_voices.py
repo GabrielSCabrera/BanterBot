@@ -15,7 +15,7 @@ profiles based on their requirements (e.g., gender, pitch, or available styles).
 """
 
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from banterbot.data.enums import AzureNeuralVoiceGender
 
