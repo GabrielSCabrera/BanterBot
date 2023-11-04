@@ -3,10 +3,12 @@ import threading
 import tkinter as tk
 from tkinter import ttk
 from typing import Optional, Union
+import time
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.extensions.interface import Interface
+from banterbot.data.prompts import Greetings
 
 
 class TKMultiplayerInterface(tk.Tk, Interface):
@@ -82,7 +84,15 @@ class TKMultiplayerInterface(tk.Tk, Interface):
     def listener_deactivate(self, soft: bool = True) -> None:
         super().listener_deactivate(soft=soft)
 
-    def run(self) -> None:
+    def run(self, greet:bool = False) -> None:
+        """
+        Run the BanterBot application. This method starts the main event loop of the tkinter application.
+
+        Args:
+            greet (bool): If True, greets the user unprompted on initialization.
+        """
+        if greet:
+            self.system_prompt(Greetings.UNPROMPTED_GREETING.value)
         self.mainloop()
 
     def _quit(self) -> None:

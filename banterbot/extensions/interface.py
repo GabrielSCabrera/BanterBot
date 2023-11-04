@@ -116,20 +116,52 @@ class Interface(ABC):
         return self._openai_manager.streaming
 
     def send_message(
-        self, content: str, role: ChatCompletionRoles = ChatCompletionRoles.USER, name: Optional[str] = None
+        self, content: str, role: ChatCompletionRoles = ChatCompletionRoles.USER, name: Optional[str] = None, hidden:bool = False
     ) -> None:
         """
         Send a message from the user to the conversation.
 
         Args:
             message (str): The message content from the user.
+            role (ChatCompletionRoles): The role (USER, ASSISTANT, SYSTEM) associated with the content.
             name (Optional[str]): The name of the user sending the message. Defaults to None.
+            hidden (bool): If True, does not display the message in the interface.
         """
         message = Message(role=role, name=name, content=content)
         name = message.name.title() if message.name is not None else ChatCompletionRoles.USER.value.title()
         text = f"{name}: {content}\n\n"
         self._messages.append(message)
-        self.update_conversation_area(word=text)
+        if not hidden:
+            self.update_conversation_area(word=text)
+
+    def system_prompt(self, message: str, name: Optional[str] = None) -> None:
+        """
+        Prompt the bot with the given message, issuing a command which is not displayed in the conversation area.
+
+        Args:
+            message (str): The message content from the user.
+        """
+        # Do not send the message if it is empty.
+        if message.strip():
+
+            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+            if self._thread_queue.is_alive():
+                self._openai_manager.interrupt()
+                self._text_to_speech.interrupt()
+                self._speech_to_text.interrupt()
+
+            message_thread = threading.Thread(
+                target=self.send_message,
+                args=(
+                    message,
+                    ChatCompletionRoles.SYSTEM,
+                    None,
+                    True,
+                ),
+                daemon=True,
+            )
+            self._thread_queue.add_task(message_thread, unskippable=True)
+            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
 
     def prompt(self, message: str, name: Optional[str] = None) -> None:
         """

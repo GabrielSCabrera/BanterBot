@@ -1,5 +1,10 @@
 from enum import Enum
 
+from banterbot.data import azure_neural_voices
+
+class Greetings(Enum):
+
+    UNPROMPTED_GREETING = "Briefly greet the user or users, according to the parameters provided."
 
 class OptionPredictorPrompts(Enum):
 
@@ -39,104 +44,83 @@ class ToneSelection(Enum):
 
 class ProsodySelection(Enum):
 
+    styles_smallest_set = [
+        "angry",
+        "cheerful",
+        "excited",
+        "friendly",
+        "hopeful",
+        "sad",
+        "shouting",
+        "terrified",
+        "unfriendly",
+        "whispering",
+    ]
     style_degrees = ["x-weak", "weak", "default", "strong", "x-strong"]
     pitches = ["x-low", "low", "default", "high", "x-high"]
     rates = ["x-slow", "slow", "default", "fast", "x-fast"]
     emphases = ["reduced", "none", "moderate", "strong"]
 
-    # style_degrees = "\n".join([f"{n+1} {i}" for n, i in enumerate(style_degrees)])
-    # pitches = "\n".join([f"{n+1} {i}" for n, i in enumerate(pitches)])
-    # rates = "\n".join([f"{n+1} {i}" for n, i in enumerate(rates)])
-    # emphases = "\n".join([f"{n+1} {i}" for n, i in enumerate(emphases)])
+    styles_smallest_set_str = "\n".join([f"{n+1:02d} {i}" for n, i in enumerate(styles_smallest_set)])
+    style_degrees_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(style_degrees)])
+    pitches_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(pitches)])
+    rates_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(rates)])
+    emphases_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(emphases)])
 
-    SYSTEM = (
-        "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each sentence "
-        "in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The parameters are "
-        "style, style-degree, pitch, rate, and emphasis:\n"
-        '1. "Style": Represents the emotion or tone of the word, reflecting the speaker\'s feelings or attitude. '
-        "Chosen based on the conversation's context and intended emotion (this value should change once in a while). "
-        "Available styles are:\n"
-        "01 angry\n"
-        "02 chat\n"
-        "03 cheerful\n"
-        "04 customerservice\n"
-        "05 empathetic\n"
-        "06 excited\n"
-        "07 friendly\n"
-        "08 hopeful\n"
-        "09 narration-professional\n"
-        "10 newscast-casual\n"
-        "11 newscast-formal\n"
-        "12 sad\n"
-        "13 shouting\n"
-        "14 terrified\n"
-        "15 unfriendly\n"
-        "16 whispering\n"
+    prefix = (
+        "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each sub-"
+        "sentence in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The "
+        "parameters are style, style-degree, pitch, rate, and emphasis:"
+    )
+
+    style_prompt = (
+        '1. "Style": Represents the emotion or tone of the sub-sentence, reflecting the speaker\'s feelings or '
+        "attitude. Chosen based on the conversation's context and intended emotion (this value should change once in "
+        f"a while). Available styles are:\n{styles_smallest_set_str}"
+    )
+
+    style_degrees_prompt = (
         '2. "Style Degree": Indicates the intensity of the style, showing how strongly the speaker feels the emotion:\n'
-        f"1 extra weak\n"
-        "2 weak\n"
-        "3 medium\n"
-        "4 default\n"
-        "5 strong\n"
-        "6 extra strong\n"
-        '3. "Pitch": Sets the voice pitch for a word:\n'
-        "1 extra low\n"
-        "2 low\n"
-        "3 medium\n"
-        "4 default\n"
-        "5 high\n"
-        "6 extra high\n"
-        '4. "Rate": Controls the speech speed:\n'
-        "1 extra slow\n"
-        "2 slow\n"
-        "3 medium\n"
-        "4 default\n"
-        "5 fast\n"
-        "6 extra fast\n"
-        '5. "Emphasis": Assigns relative emphasis to a sentence, highlighting important words. Higher values should be '
-        "assigned to the more important words in each sentence (this value should change very often):\n"
-        "1 low\n"
-        "2 normal\n"
-        "3 strong\n"
-        "4 extra strong\n"
+        f"{style_degrees_str}"
+    )
+
+    pitches_prompt = f'3. "Pitch": Sets the voice pitch for a sub-sentence:\n{pitches_str}'
+    rates_prompt = f'4. "Rate": Controls the speech speed:\n{rates_str}'
+
+    emphases_prompt = (
+        '5. "Emphasis": Assigns relative emphasis to a sub-sentence, highlighting importance. Higher values should be '
+        f"assigned to the more important parts of each input (this value should change very often):{emphases_str}"
+    )
+
+    suffix = (
         "Your task is to use the conversational context to select the most appropriate combination of these parameters "
-        "for each word in order to mimic the speech patterns of actual people.\n"
-        "Make sure each word has an individually tailored array, meaning there should be a lot of variation across the "
-        "entirety of the output.\n"
+        "for each word in order to mimic the speech patterns of actual people. "
+        "Make sure each sub-sentence has an individually tailored array, meaning there should be some variation across "
+        "the entirety of the output. "
         "The output should be in the following format for each word (there are no spaces between the numbers):\n"
-        "[style style-degree pitch rate emphasis] word\n"
+        "[style style-degree pitch rate emphasis] sub-sentence"
+    )
+
+    example = (
         "Example:\n"
-        "Input: \"Oh my gosh, I can't believe it! I won the lottery! But, what if people start asking me for money? "
-        "I'm terrified.\"\n"
+        "Input:\n"
+        "Oh my gosh,\n"
+        "I can't believe it!\n"
+        "I won the lottery!\n"
+        "But,\n"
+        "what if people start asking me for money?\n"
+        "I'm terrified.\n"
         "Output:\n"
-        "052221 Oh\n"
-        "052222 my\n"
-        "065614 gosh\n"
-        "065614 ,\n"
-        "064552 I\n"
-        "064552 can't\n"
-        "065554 believe\n"
-        "064552 it\n"
-        "064552 !\n"
-        "064552 I\n"
-        "064552 won\n"
-        "064554 the\n"
-        "065554 lottery\n"
-        "064552 !\n"
-        "032221 But\n"
-        "032221 ,\n"
-        "032221 what\n"
-        "032321 if\n"
-        "032321 people\n"
-        "031322 start\n"
-        "121323 asking\n"
-        "122321 me\n"
-        "123322 for\n"
-        "124423 money\n"
-        "144423 ?\n"
-        "143554 I'm\n"
-        "144654 terrified\n"
-        "143341 .\n"
+        "034663 Oh my gosh,\n"
+        "035454 I can't believe it!\n"
+        "035664 I won the lottery!\n"
+        "092321 But,\n"
+        "092224 what if people start asking me for money?\n"
+        "082123 I'm terrified.\n"
+    )
+
+    SYSTEM = "\n".join(
+        [prefix, style_prompt, style_degrees_prompt, pitches_prompt, rates_prompt, emphases_prompt, suffix, example]
     )
 
 
