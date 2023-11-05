@@ -1,4 +1,4 @@
-from banterbot import TKMultiplayerInterface, get_model_by_name, get_voice_by_name
+from banterbot import TKMultiplayerInterface, ToneMode, get_model_by_name, get_voice_by_name
 
 model = get_model_by_name("gpt-4")
 voice = get_voice_by_name("Aria")
@@ -23,7 +23,7 @@ interface = TKMultiplayerInterface(
     voice=voice,
     style=style,
     system=system,
-    tone=True,
+    tone_mode=ToneMode.ADVANCED,
     languages="en-US",
     phrase_list=["Boyardine", "Chef Boyardine"],
 )

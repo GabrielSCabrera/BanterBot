@@ -5,6 +5,7 @@ from tkinter import ttk
 from typing import Optional, Union
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
+from banterbot.data.enums import ToneMode
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
@@ -26,7 +27,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         voice: AzureNeuralVoice = get_voice_by_name("Aria"),
         style: str = "chat",
         languages: Optional[Union[str, list[str]]] = None,
-        tone: bool = False,
+        tone_mode: Optional[ToneMode] = None,
         system: Optional[str] = None,
         phrase_list: Optional[list[str]] = None,
     ) -> None:
@@ -39,7 +40,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             style (str, optional): The style of the conversation (e.g., "cheerful", "sad", "chat").
             languages (Optional[Union[str, list[str]]]): The languages supported by the speech-to-text recognizer.
             system (Optional[str]): An initialization prompt that can be used to set the scene.
-            tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
+            tone_mode (bool): Which tone evaluation mode to use.
             phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
         """
         logging.debug(f"TKMultiplayerInterface initialized")
@@ -52,7 +53,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             style=style,
             languages=languages,
             system=system,
-            tone=tone,
+            tone_mode=tone_mode,
             phrase_list=phrase_list,
         )
 

@@ -45,58 +45,57 @@ class ToneSelection(Enum):
 class ProsodySelection(Enum):
 
     PREFIX = (
-        "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each sub-"
-        "sentence in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The "
-        "parameters are style, style-degree, pitch, rate, and emphasis:"
+        "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each "
+        "sub-sentence in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The "
+        "parameters are style, styledegree, pitch, rate, and emphasis:"
     )
 
     STYLE = (
-        '1. "Style": Represents the emotion or tone of the sub-sentence, reflecting the speaker\'s feelings or '
-        "attitude. Chosen based on the conversation's context and intended emotion (this value should change once in "
-        f"a while). Available styles are:"
+        "Style represents the emotion or tone, reflecting the speaker's feelings or attitude. Chosen based on the "
+        "conversation's context and intended emotion:"
     )
 
     STYLEDEGREE = (
-        '2. "Style Degree": Indicates the intensity of the style, showing how strongly the speaker feels the emotion:'
+        "Styledegree indicates the intensity of the style, showing how strongly the speaker feels the emotion:"
     )
 
-    PITCH = f'3. "Pitch": Sets the voice pitch for a sub-sentence:'
-    RATE = f'4. "Rate": Controls the speech speed:'
+    PITCH = "Pitch sets the voice pitch:"
+    RATE = "Rate controls the speed:"
 
     EMPHASIS = (
-        '5. "Emphasis": Assigns relative emphasis to a sub-sentence, highlighting importance. Higher values should be '
-        f"assigned to the more important parts of each input (this value should change very often):"
+        "Higher values of emphasis highlight importance. Higher values should be assigned to the more important parts "
+        "of each input:"
     )
 
     SUFFIX = (
-        "Your task is to use the conversational context to select the most appropriate combination of these parameters "
-        "for each word in order to mimic the speech patterns of actual people. "
-        "Make sure each sub-sentence has an individually tailored array, meaning there should be some variation across "
-        "the entirety of the output. "
-        "The output should be in the following format for each word (there are no spaces between the numbers):\n"
-        "[style style-degree pitch rate emphasis] sub-sentence"
+        "Use the conversational context to select the most appropriate combination of parameters in order to mimic "
+        "the speech patterns of actual people. Make sure each sub-sentence has an individually tailored array, meaning "
+        "there should be some variation across the output. The output should be in the following format (omit the "
+        "spaces between the numbers):\n"
+        "style style-degree pitch rate emphasis"
     )
 
     EXAMPLE = (
-        "Example:\n" "Generate 6 prosody arrays, one for each of the following sub-sentences, by ID:"
-        "1 Oh my gosh,\n"
-        "2 I can't believe it!\n"
-        "3 I won the lottery!\n"
-        "4 But,\n"
-        "5 what if people start asking me for money?\n"
-        "6 I'm terrified.\n"
-        "Here are the 6 arrays and sub-sentence IDs:\n"
-        "034663 1\n"
-        "035454 2\n"
-        "035664 3\n"
-        "092321 4\n"
-        "092224 5\n"
-        "082123 6\n"
+        "Example:\n"
+        "Generate 6 six-digit prosody arrays, one for each of the following sub-sentences:\n"
+        "Oh my gosh,\n"
+        "I can't believe it!\n"
+        "I won the lottery!\n"
+        "But,\n"
+        "what if people start asking me for money?\n"
+        "I'm terrified.\n"
+        "Here are the 6 six-digit arrays, without any extra text:\n"
+        "034532\n"
+        "035443\n"
+        "035543\n"
+        "042321\n"
+        "064233\n"
+        "085123"
     )
 
-    PROMPT = "Generate {} prosody arrays, one for each of the following sub-sentences, by ID:\n{}"
+    PROMPT = "Generate {} six-digit arrays prosody arrays, one for each of the following sub-sentences:\n{}"
 
-    DUMMY = "Here are the {} arrays and sub-sentence IDs:\n"
+    DUMMY = "Here are the {} six-digit arrays, without any extra text:"
 
 
 class TextToSpeechPreprocessing(Enum):

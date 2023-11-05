@@ -6,10 +6,11 @@ from typing import List, Optional, Union
 
 from banterbot.config import chat_logs
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
-from banterbot.data.enums import ChatCompletionRoles
+from banterbot.data.enums import ChatCompletionRoles, ToneMode
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import ToneSelection
 from banterbot.extensions.option_selector import OptionSelector
+from banterbot.extensions.prosody_selector import ProsodySelector
 from banterbot.managers.openai_manager import OpenAIManager
 from banterbot.managers.speech_to_text import SpeechToText
 from banterbot.managers.text_to_speech import TextToSpeech
@@ -31,7 +32,7 @@ class Interface(ABC):
         style: str,
         languages: Optional[Union[str, list[str]]] = None,
         system: Optional[str] = None,
-        tone: bool = False,
+        tone_mode: Optional[ToneMode] = None,
         phrase_list: Optional[list[str]] = None,
     ) -> None:
         """
@@ -43,7 +44,7 @@ class Interface(ABC):
             style (str): The speaking style to use for text-to-speech synthesis.
             languages (Optional[Union[str, list[str]]]): The languages supported by the speech-to-text recognizer.
             system (Optional[str]): An initialization prompt that can be used to set the scene.
-            tone (bool): Whether an OptionSelector should evaluate emotional responses between prompts.
+            tone_mode (bool): Which tone evaluation mode to use.
             phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
         """
         logging.debug(f"Interface initialized")
@@ -55,6 +56,7 @@ class Interface(ABC):
 
         # Initialize message handling and conversation attributes
         self._messages: List[Message] = []
+        self._messages_token_count: List[int] = []
         self._log_lock = threading.Lock()
         self._log_path = chat_logs / f"chat_{datetime.datetime.now().strftime('%Y%m%dT%H%M%S')}.txt"
         self._listening_toggle = False
@@ -68,19 +70,21 @@ class Interface(ABC):
         self._style = style
 
         # Initialize the OptionSelector for tone selection
-        self._tone = tone
+        self._tone = tone_mode
         self._tone_selector = OptionSelector(
             model=get_model_by_name("gpt-3.5-turbo"),
             options=self._voice.styles,
             system=ToneSelection.SYSTEM.value,
             prompt=ToneSelection.PROMPT.value.format(self._style),
         )
+        self._prosody_selector = ProsodySelector(model=get_model_by_name("gpt-4"), voice=self._voice)
 
         # Initialize the system message, if provided
         self._system = system
         if self._system is not None:
-            message_instance = Message(role=ChatCompletionRoles.SYSTEM, content=system)
-            self._messages.append(message_instance)
+            message = Message(role=ChatCompletionRoles.SYSTEM, content=system)
+            self._messages.append(message)
+            self._messages_token_count.append(message.count_tokens(model=self._model))
 
         # Initialize the subclass GUI
         self._init_gui()
@@ -135,6 +139,7 @@ class Interface(ABC):
         name = message.name.title() if message.name is not None else ChatCompletionRoles.USER.value.title()
         text = f"{name}: {content}\n\n"
         self._messages.append(message)
+        self._messages_token_count.append(message.count_tokens(model=self._model))
         if not hidden:
             self.update_conversation_area(word=text)
 
@@ -236,17 +241,69 @@ class Interface(ABC):
         the bot's response using the OpenAIManager and updating the conversation area with the response text using
         text-to-speech synthesis.
         """
+        if self._tone is None:
+            self._get_response_no_tone()
+        elif self._tone == ToneMode.BASIC:
+            self._get_response_basic_tone()
+        elif self._tone == ToneMode.ADVANCED:
+            self._get_response_advanced_tone()
+
+    def _get_response_advanced_tone(self) -> None:
+        """
+        Get a response from the bot and update the conversation area with the response. This method handles generating
+        the bot's response using the OpenAIManager and updating the conversation area with the response text using
+        text-to-speech synthesis.
+        """
         prefixed = False
         content = []
-        style = self._style
 
-        # If the tone is to be evaluated, evaluate it once before yielding the blocks
-        if self._tone:
-            style = self._get_next_tone()
-            tone_content = f"Tone: {style}\n"
-            # Add an intermediate message (not visualized in the conversation area) noting the assistant's tone.
-            self._append_to_chat_log(tone_content)
-            self._messages.append(Message(role=ChatCompletionRoles.ASSISTANT, content=tone_content))
+        # Initialize the generator for asynchronous yielding of sentence blocks
+        for block in self._openai_manager.prompt_stream(messages=self._messages):
+            if not prefixed:
+                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
+                prefixed = True
+
+            messages = self._messages
+            messages_token_count = self._messages_token_count
+            system = ""
+
+            if self._system:
+                messages = messages[1:]
+                messages_token_count = messages_token_count[1:]
+                system = self._system
+
+            phrases = self._prosody_selector.select(block, messages, messages_token_count, content, system)
+
+            for word in self._text_to_speech.speak_phrases(phrases):
+                self.update_conversation_area(word.word)
+                content.append(word.word)
+
+            self.update_conversation_area(" ")
+            content.append(" ")
+
+        content = "".join(content)
+        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
+        self._messages.append(message)
+        self._messages_token_count.append(message.count_tokens(model=self._model))
+
+        self.end_response()
+
+    def _get_response_basic_tone(self) -> None:
+        """
+        Get a response from the bot and update the conversation area with the response. This method handles generating
+        the bot's response using the OpenAIManager and updating the conversation area with the response text using
+        text-to-speech synthesis.
+        """
+        prefixed = False
+        content = []
+
+        style = self._get_next_tone()
+        tone_content = f"Tone: {style}\n"
+        # Add an intermediate message (not visualized in the conversation area) noting the assistant's tone.
+        self._append_to_chat_log(tone_content)
+        message = Message(role=ChatCompletionRoles.ASSISTANT, content=tone_content)
+        self._messages.append(message)
+        self._messages_token_count.append(message.count_tokens(model=self._model))
 
         # Initialize the generator for asynchronous yielding of sentence blocks
         for block in self._openai_manager.prompt_stream(messages=self._messages):
@@ -263,8 +320,80 @@ class Interface(ABC):
             content.append(" ")
 
         content = "".join(content)
-        self._messages.append(Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip()))
+        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
+        self._messages.append(message)
+        self._messages_token_count.append(message.count_tokens(model=self._model))
         self.end_response()
+
+    def _get_response_no_tone(self) -> None:
+        """
+        Get a response from the bot and update the conversation area with the response. This method handles generating
+        the bot's response using the OpenAIManager and updating the conversation area with the response text using
+        text-to-speech synthesis.
+        """
+        prefixed = False
+        content = []
+
+        # Initialize the generator for asynchronous yielding of sentence blocks
+        for block in self._openai_manager.prompt_stream(messages=self._messages):
+            if not prefixed:
+                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
+                prefixed = True
+
+            sentences = " ".join(block)
+            for word in self._text_to_speech.speak(sentences, voice=self._voice, style=self._style):
+                self.update_conversation_area(word.word)
+                content.append(word.word)
+
+            self.update_conversation_area(" ")
+            content.append(" ")
+
+        content = "".join(content)
+        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
+        self._messages.append(message)
+        self._messages_token_count.append(message.count_tokens(model=self._model))
+        self.end_response()
+
+    def get_response_advanced(self) -> None:
+        """
+        Get a response from the bot and update the conversation area with the response. This method handles generating
+        the bot's response using the OpenAIManager and updating the conversation area with the response text using
+        text-to-speech synthesis.
+        """
+        prefixed = False
+        content = []
+        style = self._style
+
+        # If the tone is to be evaluated, evaluate it once before yielding the blocks
+        if self._tone:
+            style = self._get_next_tone()
+            tone_content = f"Tone: {style}\n"
+            # Add an intermediate message (not visualized in the conversation area) noting the assistant's tone.
+            self._append_to_chat_log(tone_content)
+            message = Message(role=ChatCompletionRoles.ASSISTANT, content=tone_content)
+            self._messages.append(message)
+            self._messages_token_count.append(message.count_tokens(model=self._model))
+
+        # Initialize the generator for asynchronous yielding of sentence blocks
+        for block in self._openai_manager.prompt_stream(messages=self._messages):
+            if not prefixed:
+                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
+                prefixed = True
+
+            sentences = " ".join(block)
+            for word in self._text_to_speech.speak(sentences, voice=self._voice, style=style):
+                self.update_conversation_area(word.word)
+                content.append(word.word)
+
+            self.update_conversation_area(" ")
+            content.append(" ")
+
+        content = "".join(content)
+        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
+        self._messages.append(message)
+        self._messages_token_count.append(message.count_tokens(model=self._model))
+        self.end_response()
+        speak_phrases
 
     def end_response(self) -> None:
         """

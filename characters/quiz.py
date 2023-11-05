@@ -1,4 +1,4 @@
-from banterbot import TKMultiplayerInterface, get_model_by_name, get_voice_by_name
+from banterbot import TKMultiplayerInterface, ToneMode, get_model_by_name, get_voice_by_name
 
 model = get_model_by_name("gpt-4")
 voice = get_voice_by_name("Davis")
@@ -20,6 +20,12 @@ system = (
 # The four arguments `model`, `voice`, `style`, `system`, and `tone` are optional.
 # Setting `tone` to True enables voice tones and emotions.
 interface = TKMultiplayerInterface(
-    model=model, voice=voice, style=style, system=system, tone=True, languages="en-US", phrase_list=["Grendel"]
+    model=model,
+    voice=voice,
+    style=style,
+    system=system,
+    tone_mode=ToneMode.ADVANCED,
+    languages="en-US",
+    phrase_list=["Grendel"],
 )
 interface.run(greet=True)

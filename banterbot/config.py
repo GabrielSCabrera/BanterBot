@@ -1,4 +1,5 @@
 import logging
+import re
 from pathlib import Path
 
 import uuid6
@@ -44,4 +45,6 @@ logging.basicConfig(format="%(asctime)s - %(message)s", level=logging_level)
 generate_uuid = uuid6.uuid8
 
 # Define the punctuation marks that can be used to split sentences into phrases for prosody selection.
-phrase_delim = [",", ":", ";", '"', "`", "|", "."]
+phrase_delim = [",", ":", ";", '"', "`", "|"]
+# Compile a regex pattern using the specified delimiters.
+phrase_delim_pattern = re.compile("([" + "".join(phrase_delim) + "]+)")

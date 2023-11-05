@@ -10,6 +10,7 @@ from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.enums import EnvVar, SpeechProcessingType, WordCategory
+from banterbot.utils.phrase import Phrase
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
 from banterbot.utils.word import Word
 
@@ -156,6 +157,54 @@ class TextToSpeech:
                 # Reset all state attributes
                 self._reset()
 
+    def speak_phrases(self, phrases: list[Phrase]) -> Generator[Word, None, bool]:
+        """
+        Uses instances of class `Phrase` to allow for advanced SSML-based speech.
+
+        This method converts the input text into speech using the specified instances of class `Phrase`. It yields the
+        synthesized words one by one, along with their contextual information.
+
+        Args:
+            input_string (str): The input string that is to be converted into speech.
+
+        Yields:
+            Word: A word with contextual information.
+        """
+        # Record the time at which the thread was initialized pre-lock, in order to account for future interruptions.
+        init_time = time.perf_counter_ns()
+
+        # Create SSML markup for the given input_string, voice, and style
+        ssml = self._create_advanced_ssml(phrases)
+
+        # Create a new thread to handle the speech synthesis
+        speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
+
+        with self.__class__._speech_lock:
+
+            # Do not run the listener if an interruption was raised after `init_time`.
+            if self._interrupt < init_time:
+
+                # Prepare an instance of TextToSpeechOutput while will receive values iteratively
+                output = TextToSpeechOutput(
+                    input_string=" ",
+                    timestamp=datetime.datetime.now(),
+                )
+                self._outputs.append(output)
+
+                # Starting the speech synthesizer
+                speech_thread.start()
+
+                # Set the speaking flag to True
+                self._speaking = True
+
+                # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
+                for word in self._callbacks_process(output, init_time):
+                    logging.debug(f"TextToSpeech synthesizer processed word: `{word}`")
+                    yield word
+
+                # Reset all state attributes
+                self._reset()
+
     def _callback_completed(self, event: speechsdk.SessionEventArgs) -> None:
         """
         Callback function for synthesis completed event.
@@ -257,7 +306,8 @@ class TextToSpeech:
         logging.debug("TextToSpeech synthesizer stopped")
         return success
 
-    def _create_ssml(self, text: str, voice: str, style: Optional[str] = None) -> str:
+    @classmethod
+    def _create_ssml(cls, text: str, voice: str, style: Optional[str] = None) -> str:
         """
         Creates an SSML string from the given text, voice, and style.
 
@@ -287,6 +337,51 @@ class TextToSpeech:
 
         # Close the voice and speak tags and return the SSML string
         ssml += "</voice></speak>"
+        return ssml
+
+    @classmethod
+    def _create_advanced_ssml(cls, phrases: list[Phrase]) -> str:
+        """
+        Creates a more advanced SSML string from the given list of `Phrase` instances, that customizes the emphasis,
+        style, pitch, and rate of speech on a sub-sentence level.
+
+        Args:
+            phrases (list[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.
+
+        Returns:
+            str: The SSML string.
+        """
+        # Start the SSML string with the required header
+        ssml = (
+            '<speak version="1.0" '
+            'xmlns="http://www.w3.org/2001/10/synthesis" '
+            'xmlns:mstts="https://www.w3.org/2001/mstts" '
+            'xml:lang="en-US">'
+        )
+
+        # Loop through each text in the list
+        for phrase in phrases:
+            ssml += (
+                # Add the voice tag
+                f'<voice name="{phrase.voice.voice}">'
+                '<mstts:silence type="comma-exact" value="10ms"/>'
+                '<mstts:silence type="Sentenceboundary-exact" value="0ms"/>'
+                '<mstts:silence type="Tailing-exact" value="0ms"/>'
+                '<mstts:silence type="Leading-exact" value="0ms"/>'
+                # Add the express-as tag with the style and styledegree
+                f'<mstts:express-as style="{phrase.style}" styledegree="{phrase.styledegree}">'
+                # Add the prosody tag with the pitch, rate, and emphasis
+                f'<prosody pitch="{phrase.pitch}" rate="{phrase.rate}">'
+                # Add the emphasis tag
+                f'<emphasis level="{phrase.emphasis}">'
+                # Add the text
+                f"{phrase.text}"
+                # Close the emphasis, prosody, and express-as tags
+                "</emphasis></prosody></mstts:express-as></voice>"
+            )
+
+        # Close the voice and speak tags and return the SSML string
+        ssml += "</speak>"
         return ssml
 
     def _process_boundary(self, idx: int) -> Word:

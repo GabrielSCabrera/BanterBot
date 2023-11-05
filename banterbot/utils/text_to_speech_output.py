@@ -1,10 +1,12 @@
 import datetime
-from typing import Iterator, List
+from dataclasses import dataclass
+from typing import Iterator, Optional
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.utils.word import Word
 
 
+@dataclass
 class TextToSpeechOutput:
     """
     The TextToSpeechOutput class encapsulates the output of a text-to-speech conversion, providing a convenient
@@ -15,32 +17,31 @@ class TextToSpeechOutput:
     The primary use case for this class is to store the output of a text-to-speech conversion and provide an easy way to
     access the words in the output. This can be useful for applications that require further processing or analysis of
     the converted text, such as natural language processing or speech synthesis.
+
+    Args:
+        input_string (str): The input string that is to be converted into speech.
+
+        timestamp (datetime.datetime): The time at which the speech began.
+
+        voice (AzureNeuralVoice): The voice to be used for the text-to-speech conversion. This should be an instance
+        of the AzureNeuralVoice class, which represents a specific voice available in the Azure Cognitive Services
+        Text-to-Speech API.
+
+        style (str): The speaking style to be applied to the text-to-speech conversion. This should be a string
+        representing one of the available speaking styles in the Azure Cognitive Services Text-to-Speech API, such
+        as "cheerful", "sad", or "angry".
     """
 
-    def __init__(self, input_string: str, timestamp: datetime.datetime, voice: AzureNeuralVoice, style: str) -> None:
+    input_string: str
+    timestamp: datetime.datetime
+    voice: Optional[AzureNeuralVoice] = None
+    style: Optional[str] = None
+
+    def __post_init__(self) -> None:
         """
-        Initializes a new TextToSpeechOutput instance, setting up the input string and preparing the words list for the
-        converted words.
-
-        Args:
-            input_string (str): The input string that is to be converted into speech.
-
-            timestamp (datetime.datetime): The time at which the speech began.
-
-            voice (AzureNeuralVoice): The voice to be used for the text-to-speech conversion. This should be an instance
-            of the AzureNeuralVoice class, which represents a specific voice available in the Azure Cognitive Services
-            Text-to-Speech API.
-
-            style (str): The speaking style to be applied to the text-to-speech conversion. This should be a string
-            representing one of the available speaking styles in the Azure Cognitive Services Text-to-Speech API, such
-            as "cheerful", "sad", or "angry".
+        Prepares the word list for the converted words.
         """
-        self.input_string = input_string
-        self.timestamp = timestamp
-        self.voice = voice
-        self.style = style
-
-        self.words: List[Word] = []
+        self.words: list[Word] = []
 
     def __getitem__(self, idx: int) -> Word:
         """
@@ -93,12 +94,12 @@ class TextToSpeechOutput:
         """
         self.words.append(entry)
 
-    def extend(self, entries: List[Word]) -> None:
+    def extend(self, entries: list[Word]) -> None:
         """
         Extends a list of Word objects to the words list in the output.
 
         Args:
-            entries (List[Word]): The list of words to be appended to the output. This should be a list containing
+            entries (list[Word]): The list of words to be appended to the output. This should be a list containing
             instances of the Word class, which represents a single word in the text-to-speech output along with its
             associated metadata.
         """
