@@ -343,10 +343,10 @@ class TextToSpeech:
     def _create_advanced_ssml(cls, phrases: list[Phrase]) -> str:
         """
         Creates a more advanced SSML string from the given list of `Phrase` instances, that customizes the emphasis,
-        style, pitch, and rate of speech on a sub-sentence level.
+        style, pitch, and rate of speech on a sub-sentence level, including pitch contouring between phrases.
 
         Args:
-            phrases (list[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.
+            phrases (List[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.
 
         Returns:
             str: The SSML string.
@@ -359,24 +359,26 @@ class TextToSpeech:
             'xml:lang="en-US">'
         )
 
-        # Loop through each text in the list
-        for phrase in phrases:
+        for n, phrase in enumerate(phrases):
+            # Add contour only if there is a pitch transition
+            if phrase.pitch != phrases[min(n + 1, len(phrases) - 1)].pitch:
+                # Set the contour to begin transition at 50% of the current phrase to match the pitch of the next one.
+                contour = f"(50%,{phrase.pitch}) (80%,{phrases[n + 1].pitch})"
+                pitch = f' contour="{contour}"'
+            else:
+                pitch = f' pitch="{phrase.pitch}"' if phrase.pitch else ""
+
+            # Add the voice and other tags along with prosody
             ssml += (
-                # Add the voice tag
                 f'<voice name="{phrase.voice.voice}">'
                 '<mstts:silence type="comma-exact" value="10ms"/>'
-                '<mstts:silence type="Sentenceboundary-exact" value="0ms"/>'
                 '<mstts:silence type="Tailing-exact" value="0ms"/>'
+                '<mstts:silence type="Sentenceboundary-exact" value="5ms"/>'
                 '<mstts:silence type="Leading-exact" value="0ms"/>'
-                # Add the express-as tag with the style and styledegree
                 f'<mstts:express-as style="{phrase.style}" styledegree="{phrase.styledegree}">'
-                # Add the prosody tag with the pitch, rate, and emphasis
-                f'<prosody pitch="{phrase.pitch}" rate="{phrase.rate}">'
-                # Add the emphasis tag
+                f'<prosody{pitch} rate="{phrase.rate}">'
                 f'<emphasis level="{phrase.emphasis}">'
-                # Add the text
                 f"{phrase.text}"
-                # Close the emphasis, prosody, and express-as tags
                 "</emphasis></prosody></mstts:express-as></voice>"
             )
 

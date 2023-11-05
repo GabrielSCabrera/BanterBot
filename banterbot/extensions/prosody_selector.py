@@ -62,7 +62,7 @@ class ProsodySelector:
         sentences: list[str],
         messages: Optional[list[Message]] = None,
         messages_token_count: Optional[list[int]] = None,
-        content: Optional[str] = None,
+        context: Optional[str] = None,
         character: Optional[str] = None,
     ) -> str:
         """
@@ -74,14 +74,14 @@ class ProsodySelector:
             sentences (list[str]): The list of sentences to be processed.
             messages (optional, list[Message]): A list of messages that can be used as conversation context.
             messages_token_count (optional, list[int]): A list of the token count for each message.
-            content (optional, str): Any text send prior to the current one, but not yet registered in the messages.
+            context (optional, str): Any text send prior to the current one, but not yet registered in the messages.
             character (optional, str): A description of the character to assist the ChatCompletion in picking reactions.
 
         Returns:
             str: The randomly selected option.
         """
         phrases = self._split_sentences(sentences)
-        messages = self._get_messages(phrases, messages, messages_token_count, content, character)
+        messages = self._get_messages(phrases, messages, messages_token_count, context, character)
         response = self._openai_manager.prompt(
             messages=messages, split=False, temperature=0.0, top_p=1.0, max_tokens=self._max_tokens(len(phrases))
         )
@@ -99,7 +99,7 @@ class ProsodySelector:
         phrases: list[str],
         messages: Optional[list[Message]] = None,
         messages_token_count: Optional[list[int]] = None,
-        content: Optional[str] = None,
+        context: Optional[str] = None,
         character: Optional[str] = None,
     ) -> list[Message]:
         """
@@ -110,7 +110,7 @@ class ProsodySelector:
             phrases (list[str]): The list of phrases to be processed.
             messages (optional, list[Message]): A list of messages that can be used as conversation context.
             messages_token_count (optional, list[int]): A list of the token count for each message.
-            content (optional, str): Any text send prior to the current one, but not yet registered in the messages.
+            context (optional, str): Any text send prior to the current one, but not yet registered in the messages.
             character (optional, str): A description of the character to assist the ChatCompletion in picking reactions.
 
         Returns:
@@ -119,14 +119,17 @@ class ProsodySelector:
         phrases_numbered = "\n".join(phrases)
 
         system = Message(role=ChatCompletionRoles.SYSTEM, content=self._system_processed)
-        character = Message(role=ChatCompletionRoles.SYSTEM, content=character)
+        messages = [Message(role=ChatCompletionRoles.SYSTEM, content=character)]
+        if context is not None:
+            messages.append(Message(role=ChatCompletionRoles.SYSTEM, content=f"Prior Conversation Context: {context}"))
+
         prompt = Message(
             role=ChatCompletionRoles.USER, content=ProsodySelection.PROMPT.value.format(len(phrases), phrases_numbered)
         )
         dummy_message = Message(
             role=ChatCompletionRoles.ASSISTANT, content=ProsodySelection.DUMMY.value.format(len(phrases))
         )
-        return [system, character, prompt, dummy_message]
+        return [system, *messages, prompt, dummy_message]
 
     def _process_response(self, phrases: list[str], response: str) -> list[Phrase]:
         """
@@ -143,13 +146,14 @@ class ProsodySelector:
         output = []
         responses = response.strip().split("\n")
         for phrase, response in zip(phrases, responses):
-            print(response)
             if response.strip():
                 output.append(
                     Phrase(
                         text=phrase,
                         style=self._voice.styles[min(int(response[:2]), len(self._voice.styles)) - 1],
-                        styledegree=list(Prosody.STYLEDEGREES.values())[min(int(response[2]), len(Prosody.STYLEDEGREES)) - 1],
+                        styledegree=list(Prosody.STYLEDEGREES.values())[
+                            min(int(response[2]), len(Prosody.STYLEDEGREES)) - 1
+                        ],
                         pitch=list(Prosody.PITCHES.values())[min(int(response[3]), len(Prosody.PITCHES)) - 1],
                         rate=list(Prosody.RATES.values())[min(int(response[4]), len(Prosody.RATES)) - 1],
                         emphasis=list(Prosody.EMPHASES.values())[min(int(response[5]), len(Prosody.EMPHASES)) - 1],
@@ -176,8 +180,8 @@ class ProsodySelector:
             result = re.split(config.phrase_delim_pattern, sentence)
             processed = []
             for n, phrase in enumerate(result):
-                if phrase.strip():
-                    if n % 2 == 0 or len(processed) == 0:
+                if phrase := phrase.strip():
+                    if (not re.match(config.phrase_delim_pattern, phrase) and phrase.count(" ") > 1) or not processed:
                         processed.append(phrase)
                     else:
                         processed[-1] += phrase

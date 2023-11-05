@@ -79,15 +79,17 @@ class Prosody:
         "unfriendly",
         "whispering",
     ]
-    STYLEDEGREES = {"x-weak":0.85, "weak":0.95, "normal":1.0, "strong":1.05, "x-strong":1.15}
-    PITCHES = {"x-low":"-0.5%", "low":"-0.25%", "normal":"+0%", "high":"+0.25%", "x-high":"+0.5%"}
-    RATES = {"x-slow":0.85, "slow":0.95,  "normal":1.0, "fast":1.05, "x-fast":1.15}
+    STYLEDEGREES = {"x-weak": 0.85, "weak": 0.95, "normal": 1.0, "strong": 1.05, "x-strong": 1.15}
+    PITCHES = {"x-low": "-0.5%", "low": "-0.25%", "normal": "+0%", "high": "+0.25%", "x-high": "+0.5%"}
+    RATES = {"x-slow": 0.85, "slow": 0.95, "normal": 1.0, "fast": 1.05, "x-fast": 1.15}
     EMPHASES = {"reduced": "reduced", "normal": "none", "exaggerated": "moderate"}
+
 
 class ToneMode:
     """
     Different possible settings for tones in class `Interface`.
     """
+
     NONE = None
     BASIC = 1
     ADVANCED = 2
