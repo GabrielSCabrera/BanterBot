@@ -24,3 +24,19 @@ banterbot.extensions.option\_selector module
     :members:
     :undoc-members:
     :show-inheritance:
+
+banterbot.extensions.persona module
+--------------------------------------------
+
+.. automodule:: banterbot.extensions.persona
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+banterbot.extensions.prosody\_selector module
+--------------------------------------------
+
+.. automodule:: banterbot.extensions.prosody_selector
+    :members:
+    :undoc-members:
+    :show-inheritance:

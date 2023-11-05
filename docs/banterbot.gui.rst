@@ -1,10 +1,10 @@
 banterbot.gui package
 =====================
 
-banterbot.gui.tk\_simple\_interface module
-------------------------------------------
+banterbot.gui.cli module
+------------------------
 
-.. automodule:: banterbot.gui.tk_simple_interface
+.. automodule:: banterbot.gui.cli
    :members:
    :undoc-members:
    :show-inheritance:
@@ -18,10 +18,10 @@ banterbot.gui.tk\_multiplayer\_interface module
    :special-members:
    :show-inheritance:
 
-banterbot.gui.cli module
-------------------------
+banterbot.gui.tk\_simple\_interface module
+------------------------------------------
 
-.. automodule:: banterbot.gui.cli
+.. automodule:: banterbot.gui.tk_simple_interface
    :members:
    :undoc-members:
    :show-inheritance:

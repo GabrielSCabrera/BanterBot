@@ -13,15 +13,6 @@ OpenAIManager
    :special-members:
    :show-inheritance:
 
-TextToSpeech
-~~~~~~~~~~~~
-
-.. autoclass:: banterbot.managers.text_to_speech.TextToSpeech
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
 SpeechToText
 ~~~~~~~~~~~~
 
@@ -31,10 +22,28 @@ SpeechToText
    :special-members:
    :show-inheritance:
 
+TextToSpeech
+~~~~~~~~~~~~
+
+.. autoclass:: banterbot.managers.text_to_speech.TextToSpeech
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
 Interface
 ~~~~~~~~~
 
 .. autoclass:: banterbot.extensions.interface.Interface
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
+
+TKMultiplayerInterface
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: banterbot.gui.tk_multiplayer_interface.TKMultiplayerInterface
    :members:
    :undoc-members:
    :special-members:

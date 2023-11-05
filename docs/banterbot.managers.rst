@@ -1,18 +1,18 @@
 banterbot.managers package
 ==============================
 
+banterbot.managers.memory\_chain
+-----------------------------------------------
+
+.. automodule:: banterbot.managers.memory_chain
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 banterbot.managers.openai\_manager module
 ----------------------------------------------
 
 .. automodule:: banterbot.managers.openai_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-banterbot.managers.text\_to\_speech module
------------------------------------------------
-
-.. automodule:: banterbot.managers.text_to_speech
    :members:
    :undoc-members:
    :show-inheritance:
@@ -25,10 +25,10 @@ banterbot.managers.speech\_to\_text module
    :undoc-members:
    :show-inheritance:
 
-banterbot.managers.memory\_manager
+banterbot.managers.text\_to\_speech module
 -----------------------------------------------
 
-.. automodule:: banterbot.managers.memory_chain
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. automodule:: banterbot.managers.text_to_speech
+   :members:
+   :undoc-members:
+   :show-inheritance:

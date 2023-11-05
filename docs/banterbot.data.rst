@@ -17,14 +17,6 @@ banterbot.data.enums module
    :undoc-members:
    :show-inheritance:
 
-banterbot.data.prompts module
------------------------------
-
-.. automodule:: banterbot.data.prompts
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 banterbot.data.openai\_models module
 ------------------------------------
 
@@ -32,3 +24,11 @@ banterbot.data.openai\_models module
    :members:
    :undoc-members:
    :show-inheritance:
+
+banterbot.data.prompts module
+-----------------------------
+
+.. automodule:: banterbot.data.prompts
+    :members:
+    :undoc-members:
+    :show-inheritance:
