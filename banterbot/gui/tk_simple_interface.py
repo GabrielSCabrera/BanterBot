@@ -5,8 +5,8 @@ from typing import Optional, Union
 
 from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.openai_models import OpenAIModel, get_model_by_name
-from banterbot.extensions.interface import Interface
 from banterbot.data.prompts import Greetings
+from banterbot.extensions.interface import Interface
 
 
 class TKSimpleInterface(tk.Tk, Interface):
@@ -115,7 +115,7 @@ class TKSimpleInterface(tk.Tk, Interface):
         user_name = self.name_entry.get().split(" ")[0].strip()
         super().listener_toggle(user_name)
 
-    def run(self, greet:bool = False) -> None:
+    def run(self, greet: bool = False) -> None:
         """
         Run the BanterBot application. This method starts the main event loop of the tkinter application.
 

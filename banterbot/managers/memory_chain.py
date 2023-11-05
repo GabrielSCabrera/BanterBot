@@ -3,10 +3,8 @@ import shutil
 from typing import Dict, List, Optional
 
 from banterbot import config
-from banterbot.data.enums import SpaCyLangModel
 from banterbot.protos import memory_pb2
 from banterbot.utils.memory import Memory
-from banterbot.utils.message import Message
 from banterbot.utils.nlp import NLP
 
 

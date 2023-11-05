@@ -3,10 +3,9 @@ from typing import Generator
 from unittest.mock import MagicMock, patch
 
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import OpenAIModel, get_model_by_name
+from banterbot.data.openai_models import get_model_by_name
 from banterbot.managers.openai_manager import OpenAIManager
 from banterbot.utils.message import Message
-from banterbot.utils.nlp import NLP
 
 
 class TestOpenAIManager(unittest.TestCase):

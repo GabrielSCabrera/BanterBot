@@ -1,7 +1,7 @@
 import unittest
 
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import OpenAIModel, get_model_by_name
+from banterbot.data.openai_models import get_model_by_name
 from banterbot.protos import memory_pb2
 from banterbot.utils.message import Message
 

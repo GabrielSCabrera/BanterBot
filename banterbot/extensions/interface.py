@@ -116,7 +116,11 @@ class Interface(ABC):
         return self._openai_manager.streaming
 
     def send_message(
-        self, content: str, role: ChatCompletionRoles = ChatCompletionRoles.USER, name: Optional[str] = None, hidden:bool = False
+        self,
+        content: str,
+        role: ChatCompletionRoles = ChatCompletionRoles.USER,
+        name: Optional[str] = None,
+        hidden: bool = False,
     ) -> None:
         """
         Send a message from the user to the conversation.

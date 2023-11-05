@@ -1,10 +1,10 @@
 from enum import Enum
 
-from banterbot.data import azure_neural_voices
 
 class Greetings(Enum):
 
     UNPROMPTED_GREETING = "Briefly greet the user or users, according to the parameters provided."
+
 
 class OptionPredictorPrompts(Enum):
 
@@ -44,55 +44,31 @@ class ToneSelection(Enum):
 
 class ProsodySelection(Enum):
 
-    styles_smallest_set = [
-        "angry",
-        "cheerful",
-        "excited",
-        "friendly",
-        "hopeful",
-        "sad",
-        "shouting",
-        "terrified",
-        "unfriendly",
-        "whispering",
-    ]
-    style_degrees = ["x-weak", "weak", "default", "strong", "x-strong"]
-    pitches = ["x-low", "low", "default", "high", "x-high"]
-    rates = ["x-slow", "slow", "default", "fast", "x-fast"]
-    emphases = ["reduced", "none", "moderate", "strong"]
-
-    styles_smallest_set_str = "\n".join([f"{n+1:02d} {i}" for n, i in enumerate(styles_smallest_set)])
-    style_degrees_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(style_degrees)])
-    pitches_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(pitches)])
-    rates_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(rates)])
-    emphases_str = "\n".join([f"{n+1} {i}" for n, i in enumerate(emphases)])
-
-    prefix = (
+    PREFIX = (
         "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each sub-"
         "sentence in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The "
         "parameters are style, style-degree, pitch, rate, and emphasis:"
     )
 
-    style_prompt = (
+    STYLE = (
         '1. "Style": Represents the emotion or tone of the sub-sentence, reflecting the speaker\'s feelings or '
         "attitude. Chosen based on the conversation's context and intended emotion (this value should change once in "
-        f"a while). Available styles are:\n{styles_smallest_set_str}"
+        f"a while). Available styles are:"
     )
 
-    style_degrees_prompt = (
-        '2. "Style Degree": Indicates the intensity of the style, showing how strongly the speaker feels the emotion:\n'
-        f"{style_degrees_str}"
+    STYLEDEGREE = (
+        '2. "Style Degree": Indicates the intensity of the style, showing how strongly the speaker feels the emotion:'
     )
 
-    pitches_prompt = f'3. "Pitch": Sets the voice pitch for a sub-sentence:\n{pitches_str}'
-    rates_prompt = f'4. "Rate": Controls the speech speed:\n{rates_str}'
+    PITCH = f'3. "Pitch": Sets the voice pitch for a sub-sentence:'
+    RATE = f'4. "Rate": Controls the speech speed:'
 
-    emphases_prompt = (
+    EMPHASIS = (
         '5. "Emphasis": Assigns relative emphasis to a sub-sentence, highlighting importance. Higher values should be '
-        f"assigned to the more important parts of each input (this value should change very often):{emphases_str}"
+        f"assigned to the more important parts of each input (this value should change very often):"
     )
 
-    suffix = (
+    SUFFIX = (
         "Your task is to use the conversational context to select the most appropriate combination of these parameters "
         "for each word in order to mimic the speech patterns of actual people. "
         "Make sure each sub-sentence has an individually tailored array, meaning there should be some variation across "
@@ -101,27 +77,26 @@ class ProsodySelection(Enum):
         "[style style-degree pitch rate emphasis] sub-sentence"
     )
 
-    example = (
-        "Example:\n"
-        "Input:\n"
-        "Oh my gosh,\n"
-        "I can't believe it!\n"
-        "I won the lottery!\n"
-        "But,\n"
-        "what if people start asking me for money?\n"
-        "I'm terrified.\n"
-        "Output:\n"
-        "034663 Oh my gosh,\n"
-        "035454 I can't believe it!\n"
-        "035664 I won the lottery!\n"
-        "092321 But,\n"
-        "092224 what if people start asking me for money?\n"
-        "082123 I'm terrified.\n"
+    EXAMPLE = (
+        "Example:\n" "Generate 6 prosody arrays, one for each of the following sub-sentences, by ID:"
+        "1 Oh my gosh,\n"
+        "2 I can't believe it!\n"
+        "3 I won the lottery!\n"
+        "4 But,\n"
+        "5 what if people start asking me for money?\n"
+        "6 I'm terrified.\n"
+        "Here are the 6 arrays and sub-sentence IDs:\n"
+        "034663 1\n"
+        "035454 2\n"
+        "035664 3\n"
+        "092321 4\n"
+        "092224 5\n"
+        "082123 6\n"
     )
 
-    SYSTEM = "\n".join(
-        [prefix, style_prompt, style_degrees_prompt, pitches_prompt, rates_prompt, emphases_prompt, suffix, example]
-    )
+    PROMPT = "Generate {} prosody arrays, one for each of the following sub-sentences, by ID:\n{}"
+
+    DUMMY = "Here are the {} arrays and sub-sentence IDs:\n"
 
 
 class TextToSpeechPreprocessing(Enum):

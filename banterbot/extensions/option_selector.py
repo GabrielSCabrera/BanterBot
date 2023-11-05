@@ -1,10 +1,8 @@
 import logging
 from typing import List
 
-import numpy as np
-
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import OpenAIModel, get_model_by_name
+from banterbot.data.openai_models import OpenAIModel
 from banterbot.data.prompts import OptionSelectorPrompts
 from banterbot.managers.openai_manager import OpenAIManager
 from banterbot.utils.message import Message

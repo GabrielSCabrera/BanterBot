@@ -3,7 +3,7 @@ This program defines a dataclass and utility functions to represent and manage A
 synthesis. The main components of the program are:
 
     1.  AzureNeuralVoice dataclass: Represents an Azure Neural Voice profile with attributes such as name, voice
-        identifier, gender, pitch, and available styles (tones/emotions).
+        identifier, gender, and available styles (tones/emotions).
 
     2.  _neural_voices: A dictionary containing instances of AzureNeuralVoice for each available voice profile.
 
@@ -17,7 +17,7 @@ profiles based on their requirements (e.g., gender, pitch, or available styles).
 from dataclasses import dataclass
 from typing import List, Optional
 
-from banterbot.data.enums import AzureNeuralVoiceGender
+from banterbot.data.enums import AzureNeuralVoiceGender, Prosody
 
 
 @dataclass
@@ -29,189 +29,67 @@ class AzureNeuralVoice:
         name (str): The name of the voice profile.
         voice (str): The voice identifier used by Azure Text-to-Speech API.
         gender (AzureNeuralVoiceGender): The gender of the voice (either MALE or FEMALE).
-        pitch (int): The relative (by gender) pitch level of the voice, where a lower value indicates a lower pitch.
         styles (List[str], optional): The available styles (i.e., tones/emotions) for the voice.
     """
 
     name: str
     voice: str
     gender: AzureNeuralVoiceGender
-    pitch: int
-    styles: Optional[List[str]]
+    styles: Optional[List[str]] = None
 
 
 # Dictionary containing voice profile data
 _neural_voice_data = {
     "Mattias": {
         "gender": AzureNeuralVoiceGender.MALE,
-        "pitch": 2,
         "voice": "sv-SE-MattiasNeural",
         "styles": None,
     },
     "Aria": {
         "gender": AzureNeuralVoiceGender.FEMALE,
-        "pitch": 3,
         "voice": "en-US-AriaNeural",
-        "styles": [
-            "angry",
-            "chat",
-            "cheerful",
-            "customerservice",
-            "empathetic",
-            "excited",
-            "friendly",
-            "hopeful",
-            "narration-professional",
-            "newscast-casual",
-            "newscast-formal",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES
+        + ["chat", "customerservice", "empathetic", "narration-professional", "newscast-casual", "newscast-formal"],
     },
     "Davis": {
         "gender": AzureNeuralVoiceGender.MALE,
-        "pitch": 0,
         "voice": "en-US-DavisNeural",
-        "styles": [
-            "angry",
-            "chat",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES + ["chat"],
     },
     "Guy": {
         "gender": AzureNeuralVoiceGender.MALE,
-        "pitch": 3,
         "voice": "en-US-GuyNeural",
-        "styles": [
-            "angry",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "newscast",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES + ["newscast"],
     },
     "Jane": {
         "gender": AzureNeuralVoiceGender.FEMALE,
-        "pitch": 4,
         "voice": "en-US-JaneNeural",
-        "styles": [
-            "angry",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES,
     },
     "Jason": {
         "gender": AzureNeuralVoiceGender.MALE,
-        "pitch": 2,
         "voice": "en-US-JasonNeural",
-        "styles": [
-            "angry",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES,
     },
     "Jenny": {
         "gender": AzureNeuralVoiceGender.FEMALE,
-        "pitch": 0,
         "voice": "en-US-JennyNeural",
-        "styles": [
-            "angry",
-            "assistant",
-            "chat",
-            "cheerful",
-            "customerservice",
-            "excited",
-            "friendly",
-            "hopeful",
-            "newscast",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES + ["assistant", "chat", "customerservice", "newscast"],
     },
     "Nancy": {
         "gender": AzureNeuralVoiceGender.FEMALE,
-        "pitch": 2,
         "voice": "en-US-NancyNeural",
-        "styles": [
-            "angry",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES,
     },
     "Sara": {
         "gender": AzureNeuralVoiceGender.FEMALE,
-        "pitch": 1,
         "voice": "en-US-SaraNeural",
-        "styles": [
-            "angry",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES,
     },
     "Tony": {
         "gender": AzureNeuralVoiceGender.MALE,
-        "pitch": 1,
         "voice": "en-US-TonyNeural",
-        "styles": [
-            "angry",
-            "cheerful",
-            "excited",
-            "friendly",
-            "hopeful",
-            "sad",
-            "shouting",
-            "terrified",
-            "unfriendly",
-            "whispering",
-        ],
+        "styles": Prosody.STYLES,
     },
 }
 

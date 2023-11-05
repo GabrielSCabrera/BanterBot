@@ -1,8 +1,8 @@
 import datetime
 import unittest
 
-from banterbot.data.azure_neural_voices import get_voice_by_name, get_voices_by_gender
-from banterbot.data.enums import AzureNeuralVoiceGender, SpeechProcessingType, WordCategory
+from banterbot.data.azure_neural_voices import get_voice_by_name
+from banterbot.data.enums import SpeechProcessingType, WordCategory
 from banterbot.utils.text_to_speech_output import TextToSpeechOutput
 from banterbot.utils.word import Word
 

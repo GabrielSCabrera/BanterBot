@@ -4,11 +4,8 @@ from unittest.mock import patch
 
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
-from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
-from banterbot.data.enums import SpeechProcessingType, WordCategory
+from banterbot.data.azure_neural_voices import get_voice_by_name
 from banterbot.managers.text_to_speech import TextToSpeech
-from banterbot.utils.text_to_speech_output import TextToSpeechOutput
-from banterbot.utils.word import Word
 
 
 class TestTextToSpeech(unittest.TestCase):

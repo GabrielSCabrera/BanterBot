@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from banterbot.data.openai_models import OpenAIModel, get_model_by_name
+from banterbot.data.openai_models import get_model_by_name
 from banterbot.extensions.option_selector import OptionSelector
 from banterbot.utils.message import Message
 

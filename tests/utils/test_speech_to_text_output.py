@@ -3,9 +3,7 @@ import json
 import unittest
 from unittest.mock import MagicMock
 
-from banterbot.data.azure_neural_voices import AzureNeuralVoice
-from banterbot.data.enums import AzureNeuralVoiceGender
-from banterbot.utils.speech_to_text_output import SpeechToTextOutput, WordJSON
+from banterbot.utils.speech_to_text_output import SpeechToTextOutput
 
 
 class TestSpeechToTextOutput(unittest.TestCase):
