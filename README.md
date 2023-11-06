@@ -112,6 +112,8 @@ interface = TKMultiplayerInterface(model=model, voice=voice, system=system, tone
 interface.run()
 ```
 
+There are several ready-to-go characters in the `characters` directory.
+
 ## Chat Logs
 
 Chat logs are saved in the `$HOME/Documents/BanterBot/Conversations/` directory as individual `.txt` files.

@@ -181,6 +181,8 @@ To use BanterBot in a script, create an instance of the `TKSimpleInterface` clas
    interface = TKMultiplayerInterface(model=model, voice=voice, system=system, tone_mode=tone_mode, assistant_name=assistant_name)
    interface.run()
 
+There are several ready-to-go characters in the ``characters`` directory.
+
 Chat Logs
 ---------
 
