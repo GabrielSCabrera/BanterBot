@@ -45,7 +45,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.6"
+version = "0.0.7"
 setup(
     name="BanterBot",
     packages=find_packages(),

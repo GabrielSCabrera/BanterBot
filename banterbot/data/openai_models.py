@@ -1,10 +1,10 @@
 """
 This module provides an overview of the GPT models offered by OpenAI as of May 2023 for the ChatCompletion API. Each
 model entry is represented by an instance of the OpenAIModel class, which provides information about the model's name,
-maximum tokens, version, rank, and tokenizer.
+maximum tokens, generation, rank, and tokenizer.
 
     1.  OpenAIModel dataclass: Represents an OpenAI ChatCompletion model with attributes such as name, max_tokens
-        version, rank, and a tokenizer.
+        generation, rank, and a tokenizer.
 
     2.  _openai_models: A dictionary containing instances of OpenAIModel for each available model.
 
@@ -28,14 +28,14 @@ class OpenAIModel:
     Attributes:
         name (str): The name of the model.
         max_tokens (int): The maximum number of tokens supported by the model.
-        version (int): The version number of the model (e.g., GPT-3.5=3 and GPT-4=4).
+        generation (int): The generation number of the model (e.g., GPT-3.5=3 and GPT-4=4).
         rank (int): The model quality rank; lower values indicate higher quality responses.
         tokenizer (Encoding): An instance of the tiktoken package's Encoding object (i.e., a tokenizer).
     """
 
     name: str
     max_tokens: int
-    version: int
+    generation: float
     rank: int
 
     def __post_init__(self):
@@ -52,22 +52,27 @@ class OpenAIModel:
 _openai_models_dict = {
     "gpt-3.5-turbo": {
         "max_tokens": 4097,
-        "version": 3,
-        "rank": 4,
+        "generation": 3.5,
+        "rank": 5,
     },
     "gpt-3.5-turbo-16k": {
         "max_tokens": 16383,
-        "version": 3,
-        "rank": 3,
+        "generation": 3.5,
+        "rank": 4,
     },
     "gpt-4": {
         "max_tokens": 8191,
-        "version": 4,
-        "rank": 2,
+        "generation": 4,
+        "rank": 3,
     },
     "gpt-4-32k": {
         "max_tokens": 32767,
-        "version": 4,
+        "generation": 4,
+        "rank": 2,
+    },
+    "gpt-4-1106-preview": {
+        "max_tokens": 127999,
+        "generation": 4.5,
         "rank": 1,
     },
 }
