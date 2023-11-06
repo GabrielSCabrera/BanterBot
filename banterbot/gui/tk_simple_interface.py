@@ -32,6 +32,7 @@ class TKSimpleInterface(tk.Tk, Interface):
         system: Optional[str] = None,
         tone_mode: Optional[ToneMode] = None,
         phrase_list: Optional[list[str]] = None,
+        assistant_name: Optional[str] = None,
     ) -> None:
         """
         Initialize the TKSimpleInterface class, which inherits from both tkinter.Tk and Interface.
@@ -57,6 +58,7 @@ class TKSimpleInterface(tk.Tk, Interface):
             system=system,
             tone_mode=tone_mode,
             phrase_list=phrase_list,
+            assistant_name=assistant_name,
         )
 
         # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.

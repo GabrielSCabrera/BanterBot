@@ -30,6 +30,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         tone_mode: Optional[ToneMode] = None,
         system: Optional[str] = None,
         phrase_list: Optional[list[str]] = None,
+        assistant_name: Optional[str] = None,
     ) -> None:
         """
         Initialize the TKMultiplayerInterface class, which inherits from both tkinter.Tk and Interface.
@@ -55,6 +56,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             system=system,
             tone_mode=tone_mode,
             phrase_list=phrase_list,
+            assistant_name=assistant_name,
         )
 
         # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.

@@ -1,10 +1,10 @@
 import argparse
 import logging
 
-from banterbot.data.azure_neural_voices import _neural_voices, get_voice_by_name
-from banterbot.data.openai_models import get_model_by_name
+from banterbot.data.azure_neural_voices import _neural_voices
+from banterbot.data.enums import Prosody, ToneMode
+from banterbot.data.openai_models import _openai_models
 from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
-from banterbot.gui.tk_simple_interface import TKSimpleInterface
 
 
 def run() -> None:
@@ -17,11 +17,12 @@ def run() -> None:
     parser = argparse.ArgumentParser(
         prog="BanterBot GUI",
         description=(
-            "This program initializes a GUI that allows users to interact with a chatbot by entering a name and a "
-            "message, and it displays the conversation history in a scrollable text area. Users can send messages by "
-            "pressing the `Send` button or the `Enter` key. The chatbot's responses are generated using the specified "
-            "OpenAI model and can be played back using the specified Azure Neural Voice. Additionally, users can "
-            "toggle speech-to-text input by pressing the `Listen` button."
+            "This program initializes a GUI that allows users to interact with a chatbot. The user can enter multiple "
+            "names, each with a dedicated button on its right. When holding down the button associated with a given "
+            "name, the user can speak into their microphone and their prompt will be sent to the bot for a response. "
+            "If this does not work, keep the button down until your text is visualized in the scrollable text area."
+            "The chatbot's responses are generated using the specified OpenAI model and will be played back using the "
+            "specified Azure Neural Voice."
         ),
         epilog=(
             "Requires three environment variables for full functionality."
@@ -41,66 +42,64 @@ def run() -> None:
         help="Adds a system prompt to the beginning of the conversation; can help to set the scene.",
     )
 
-    parser.add_argument(
-        "-g",
-        "--gpt4",
-        action="store_true",
-        dest="gpt4",
-        help="Enable GPT-4; only works if you have GPT-4 API access.",
-    )
+    class ModelChoice(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            setattr(namespace, self.dest, _openai_models[values.lower()])
 
     parser.add_argument(
         "-m",
-        "--multiplayer",
-        action="store_true",
-        dest="multiplayer",
-        help="Enables the pre-release multiplayer interface; multiplayer is not fully implemented and may be buggy.",
+        "--model",
+        choices=_openai_models,
+        action=ModelChoice,
+        default=_openai_models["gpt-4"],
+        dest="model",
+        help="Select the OpenAI model the bot should use.",
     )
+
+    class ToneModeChoice(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            conversion_table = {
+                "NONE": ToneMode.NONE,
+                "BASIC": ToneMode.BASIC,
+                "ADVANCED": ToneMode.ADVANCED,
+            }
+            setattr(namespace, self.dest, conversion_table[values.upper()])
 
     parser.add_argument(
-        "-e",
-        "--emotion",
-        action="store_true",
-        dest="tone",
-        help="Enables emotional tone evaluation prior to the bot's responses.",
+        "-t",
+        "--tone-mode",
+        choices=["NONE", "BASIC", "ADVANCED"],
+        action=ToneModeChoice,
+        default=ToneMode.ADVANCED,
+        dest="tone_mode",
+        help="Set the emotional tone evaluation mode for the bot's responses.",
     )
 
-    voices = ", ".join(f"`{voice}`" for voice in _neural_voices.keys())
+    class VoiceChoice(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            setattr(namespace, self.dest, _neural_voices[values.lower()])
+
     parser.add_argument(
         "-v",
         "--voice",
-        action="store",
-        type=str,
-        default="Aria",
+        choices=_neural_voices,
+        action=VoiceChoice,
+        default=_neural_voices["aria"],
         dest="voice",
-        help=f"Select a Microsoft Azure Cognitive Services text-to-speech voice. Options are: {voices}",
+        help=f"Select a Microsoft Azure Cognitive Services text-to-speech voice.",
     )
-
-    universal_styles = [
-        "angry",
-        "cheerful",
-        "excited",
-        "friendly",
-        "hopeful",
-        "sad",
-        "shouting",
-        "terrified",
-        "unfriendly",
-        "whispering",
-    ]
-    universal_styles = ", ".join(f"`{style}`" for style in universal_styles)
 
     parser.add_argument(
         "-s",
         "--style",
+        choices=Prosody.STYLES,
         action="store",
-        type=str,
         default="friendly",
         dest="style",
         help=(
-            "Select a Microsoft Azure Cognitive Services text-to-speech voice style. Universally available styles "
-            f"across all available voices are: {universal_styles}. Some voices may have more available styles, see "
-            "`/banterbot/data/azure_neural_voices.py` for more information."
+            "ONLY WORKS IF --tone-mode=NONE. Select a Microsoft Azure Cognitive Services text-to-speech voice style. "
+            f"Universally available styles across all available voices are: {Prosody.STYLES}. Some voices may have "
+            "more available styles, see `/banterbot/data/azure_neural_voices.py` for more options."
         ),
     )
 
@@ -112,22 +111,39 @@ def run() -> None:
         help="Enable debug mode, which will echo a number of hidden processes to the terminal.",
     )
 
+    parser.add_argument(
+        "-g",
+        "--greet",
+        action="store_true",
+        dest="greet",
+        help="Greet the user on initialization.",
+    )
+
+    parser.add_argument(
+        "-n",
+        "--name",
+        action="store",
+        type=str,
+        dest="name",
+        help=(
+            "Give the assistant a name; only for aesthetic purposes, the bot is not informed. Instead, use `--prompt` "
+            "if you wish to provide it with information."
+        ),
+    )
+
     args = parser.parse_args()
 
     kwargs = {
-        "model": get_model_by_name("gpt-4") if args.gpt4 else get_model_by_name("gpt-3.5-turbo"),
-        "voice": get_voice_by_name(args.voice),
+        "model": args.model,
+        "voice": args.voice,
         "style": args.style,
         "system": args.prompt,
-        "tone": args.tone,
+        "tone_mode": args.tone_mode,
+        "assistant_name": args.name,
     }
 
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    if args.multiplayer:
-        interface = TKMultiplayerInterface(**kwargs)
-    else:
-        interface = TKSimpleInterface(**kwargs)
-
-    interface.run()
+    interface = TKMultiplayerInterface(**kwargs)
+    interface.run(greet=args.greet)

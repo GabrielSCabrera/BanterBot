@@ -22,5 +22,6 @@ interface = TKMultiplayerInterface(
     tone_mode=ToneMode.ADVANCED,
     languages="en-US",
     phrase_list=["Grendel"],
+    assistant_name="Grendel",
 )
 interface.run(greet=True)

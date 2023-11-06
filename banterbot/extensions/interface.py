@@ -34,6 +34,7 @@ class Interface(ABC):
         system: Optional[str] = None,
         tone_mode: Optional[ToneMode] = None,
         phrase_list: Optional[list[str]] = None,
+        assistant_name: Optional[str] = None,
     ) -> None:
         """
         Initialize the BanterBotInterface with the given model, voice, and style.
@@ -64,10 +65,11 @@ class Interface(ABC):
         # Initialize thread management components
         self._thread_queue = ThreadQueue()
 
-        # Initialize model, voice, and style attributes
+        # Initialize model, voice, style, and assistant name attributes
         self._model = model
         self._voice = voice
         self._style = style
+        self._assistant_name = ChatCompletionRoles.ASSISTANT.value.title() if assistant_name is None else assistant_name
 
         # Initialize the OptionSelector for tone selection
         self._tone = tone_mode
@@ -260,7 +262,7 @@ class Interface(ABC):
         # Initialize the generator for asynchronous yielding of sentence blocks
         for block in self._openai_manager.prompt_stream(messages=self._messages):
             if not prefixed:
-                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
+                self.update_conversation_area(f"{self._assistant_name}: ")
                 prefixed = True
 
             messages = self._messages
@@ -308,7 +310,7 @@ class Interface(ABC):
         # Initialize the generator for asynchronous yielding of sentence blocks
         for block in self._openai_manager.prompt_stream(messages=self._messages):
             if not prefixed:
-                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
+                self.update_conversation_area(f"{self._assistant_name}: ")
                 prefixed = True
 
             sentences = " ".join(block)
@@ -337,7 +339,7 @@ class Interface(ABC):
         # Initialize the generator for asynchronous yielding of sentence blocks
         for block in self._openai_manager.prompt_stream(messages=self._messages):
             if not prefixed:
-                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
+                self.update_conversation_area(f"{self._assistant_name}: ")
                 prefixed = True
 
             sentences = " ".join(block)
@@ -377,7 +379,7 @@ class Interface(ABC):
         # Initialize the generator for asynchronous yielding of sentence blocks
         for block in self._openai_manager.prompt_stream(messages=self._messages):
             if not prefixed:
-                self.update_conversation_area(f"{ChatCompletionRoles.ASSISTANT.value.title()}: ")
+                self.update_conversation_area(f"{self._assistant_name}: ")
                 prefixed = True
 
             sentences = " ".join(block)
