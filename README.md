@@ -76,7 +76,7 @@ Start BanterBot with an enhanced graphical user interface by running the command
 
 `-v`, `--voice`: Select a Microsoft Azure Cognitive Services text-to-speech voice. The default is "Aria," but other voices can be specified if available.
 
-`-s`, `--style`: Choose a voice style. This only works if -`-tone-mode=NONE`. It defaults to a "friendly" style, with other styles available as per the Azure Cognitive Services specifications.
+`-s`, `--style`: Choose a voice style. This only works if `--tone-mode=NONE`. It defaults to a "friendly" style, with other styles available as per the Azure Cognitive Services specifications.
 
 `-d`, `--debug`: Enable debug mode to display additional information in the terminal for troubleshooting.
 

@@ -42,6 +42,15 @@ Three environment variables are required for full functionality:
 Components
 ----------
 
+TKMultiplayerInterface
+~~~~~~~~~~~~~~~~~~~~~~
+
+A graphical user interface (GUI) establishes a multiplayer conversation
+environment where up to nine users can interact with the chatbot
+simultaneously. The GUI includes a conversation history area and user
+panels with 'Listen' buttons to process user input. It also supports key
+bindings for user convenience.
+
 OpenAIManager
 ~~~~~~~~~~~~~
 
@@ -74,26 +83,15 @@ conversations with the bot, including sending messages, receiving
 responses, and updating the conversation area. Accepts both keyboard
 inputs and microphone voice inputs.
 
-TKSimpleInterface
-~~~~~~~~~~~~~~~~~
-
-A graphical user interface (GUI) for a chatbot application that employs
-OpenAI models for generating responses, Azure Neural Voices for
-text-to-speech, and Azure speech-to-text. The class inherits from both
-tkinter.Tk and Interface, offering a seamless integration of chatbot
-functionality with an intuitive interface.
-
-TKMultiplayerInterface (In Development)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This GUI establishes a multiplayer conversation environment where up to
-nine users can interact with the chatbot simultaneously. The GUI
-includes a conversation history area and user panels with ‘Listen’
-buttons to process user input. It also supports key bindings for user
-convenience.
-
 Installation
 ------------
+
+Important Note
+~~~~~~~~~~~~~~
+
+BanterBot requires several SpaCy language models to run, and will
+automatically download them on first-time initialization, if they
+are missing -- this process can sometimes take a while.
 
 Pip (Recommended)
 ~~~~~~~~~~~~~~~~~
@@ -122,53 +120,66 @@ Usage
 Launch with Command Line
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Start BanterBot by running the ``banterbot`` command in your terminal.
+Start BanterBot with an enhanced graphical user interface by running the command ``banterbot``
+in your terminal. This GUI allows multiple users to interact with the bot, each with a dedicated
+button for speech input and a display for responses.
 
--  Add the ``-g`` flag to enable GPT-4 for enhanced conversation
-   quality. Please note that GPT-4 API access is required, and using
-   GPT-4 is more costly and slower than the default GPT-3.5-Turbo.
+-  ``-p``, ``--prompt``: Set a system prompt at the beginning of
+   the conversation (e.g., ``-p "You are Grendel the Quiz Troll,
+   a charismatic troll who loves to host quiz shows."``).
 
--  Use the ``-p`` flag followed by a string in quotes to set up a custom
-   character prior to initialization (e.g.,
-   ``-p "You are Grendel the Quiz Troll, a charismatic troll who loves hosting quiz shows."``).
+-  ``-m``, ``--model``: Choose the OpenAI model for conversation
+   generation. Defaults to GPT-4, but other versions can be
+   selected if specified in the code.
 
--  Include the ``-m`` flag to activate the multiplayer interface.
+-  ``-t``, ``--tone-mode``: Configure the emotional tone evaluation
+   mode. Options are NONE, BASIC, or ADVANCED. By default, it is set
+   to ADVANCED.
 
--  Apply the ``-e`` flag to enable emotional tone evaluation before the
-   bot generates its responses.
+-  ``-v``, ``--voice``: Select a Microsoft Azure Cognitive Services
+   text-to-speech voice. The default is "Aria," but other voices
+   can be specified if available.
 
--  To select a Microsoft Azure Cognitive Services text-to-speech voice,
-   use the ``-v`` flag followed by one of the available voice options
-   (e.g., ``-v jenny``).
+-  ``-s``, ``--style``: Choose a voice style. This only works if
+   ``--tone-mode=NONE``. It defaults to a "friendly" style, with
+   other styles available as per the Azure Cognitive Services specifications.
 
--  Select a Microsoft Azure Cognitive Services text-to-speech voice
-   style by using the ``-s`` flag followed by one of the available style
-   options (e.g., ``-s friendly``).
+-  ``-d``, ``--debug``: Enable debug mode to display additional
+   information in the terminal for troubleshooting.
+
+-  ``-g``, ``--greet``: Have the bot greet the user upon startup.
+
+-  ``-n``, ``--name``: Assign a name to the assistant for aesthetic
+   purposes. This does not inform the bot itself; to provide the bot
+   with information, use the ``--prompt`` flag.
+
+Here is an example:
+
+.. code:: bash
+   banterbot -g --model gpt-4 --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --tone-mode ADVANCED --name Grendel
+
 
 Launch with a Python script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use BanterBot in a script, create an instance of the
-``TKSimpleInterface`` class and call the ``run`` method:
+To use BanterBot in a script, create an instance of the `TKSimpleInterface` class and call the `run` method:
 
 .. code:: python
+   from banterbot import TKMultiplayerInterface, get_voice_by_name, get_model_by_name, ToneMode
 
-   from banterbot import TKSimpleInterface, get_voice_by_name, get_model_by_name
-
-   model = get_model_by_name("gpt-3.5-turbo")
+   model = get_model_by_name("gpt-4")
    voice = get_voice_by_name("Davis")
+   assistant_name = "Grendel"
 
-   style = "excited"
+   # Set the tone_mode -- other options are ToneMode.NONE, ToneMode.BASIC.
+   tone_mode = ToneMode.ADVANCED
+
    # Optional system prompt to set up a custom character prior to initializing BanterBot.
    system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."
 
-   # The four arguments `model`, `voice`, `style`, `system`, and `tone` are optional.
-   # Setting `tone` to True enables voice tones and emotions.
-   interface = TKSimpleInterface(model=model, voice=voice, style=style, system=system, tone=True)
+   # The five arguments `model`, `voice`, `system`, `tone_mode`, and `assistant_name` are optional.
+   interface = TKMultiplayerInterface(model=model, voice=voice, system=system, tone_mode=tone_mode, assistant_name=assistant_name)
    interface.run()
-
-For multiplayer, you can swap out TKSimpleInterface in the above code
-with TKMultiplayerInterface.
 
 Chat Logs
 ---------
