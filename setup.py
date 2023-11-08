@@ -15,7 +15,7 @@ dependencies = [
     "azure-cognitiveservices-speech",
     "numpy",
     "uuid6",
-    "protobuf==3.20",
+    "protobuf>=3.20.2",
     "nltk",
     "spacy",
     # # Cannot add specific URLs to dependencies in PyPi, so this is commented out, but it works otherwise.
