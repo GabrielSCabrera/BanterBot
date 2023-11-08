@@ -44,58 +44,69 @@ class ToneSelection(Enum):
 
 class ProsodySelection(Enum):
 
+    PROMPT = "Generate {} six-digit arrays prosody arrays, one for each of the following sub-sentences:\n{}"
+    DUMMY = "Here are the {} six-digit arrays, without any extra text:"
+
     PREFIX = (
         "Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each "
         "sub-sentence in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The "
-        "parameters are style, styledegree, pitch, rate, and emphasis:"
+        "parameters are style, styledegree, pitch, rate, and emphasis."
     )
 
-    STYLE = (
+    STYLE_USER = "Prepare a definition of `style`, then define a set of styles that we will work with."
+    STYLE_ASSISTANT = (
         "Style represents the emotion or tone, reflecting the speaker's feelings or attitude. Chosen based on the "
-        "conversation's context and intended emotion:"
+        "conversation's context and intended emotion."
     )
 
-    STYLEDEGREE = (
-        "Styledegree indicates the intensity of the style, showing how strongly the speaker feels the emotion:"
+    STYLEDEGREE_USER = "Great, now define `styledegree` and present a range of styledegrees to work with."
+    STYLEDEGREE_ASSISTANT = (
+        "Styledegree indicates the intensity of the `style`, showing how strongly the speaker feels the emotion."
     )
 
-    PITCH = "Pitch sets the voice pitch:"
-    RATE = "Rate controls the speed:"
+    PITCH_USER = "Looks good, now prepare a definition of `pitch`, then present a range of pitches to work with."
+    PITCH_ASSISTANT = "Pitch sets the voice's pitch."
 
-    EMPHASIS = (
-        "Higher values of emphasis highlight importance. Higher values should be assigned to the more important parts "
-        "of each input:"
-    )
+    RATE_USER = "Excellent. Now define the term `rate`, and define a range of rates that the assistant may use."
+    RATE_ASSISTANT = "Rate controls the speed at which the assistant speaks."
+
+    EMPHASIS_USER = "Finally, I want you to define `emphasis` and prepare a few emphasis options."
+    EMPHASIS_ASSISTANT = "Emphasis highlights importance in a piece of text."
 
     SUFFIX = (
         "Use the conversational context to select the most appropriate combination of parameters in order to mimic "
         "the speech patterns of actual people. Make sure each sub-sentence has an individually tailored array, meaning "
         "there should be some variation across the output. The output should be in the following format (omit the "
         "spaces between the numbers):\n"
-        "style style-degree pitch rate emphasis"
+        "style styledegree pitch rate emphasis\n"
+        "Where style is a zero-padded number from 1 to {style}, styledegree is a digit from 1 to {styledegree}, pitch is a digit from "
+        "1 to {pitch}, rate is a digit from 1 to {rate}, and emphasis is a digit from 1 to {emphasis}. "
+        "Invalid values include: zeros except for in the first digit (`011111` is ok, but `010111` is not)."
+        "Here is an example I want you to evaluate:"
     )
 
-    EXAMPLE = (
-        "Example:\n"
-        "Generate 6 six-digit prosody arrays, one for each of the following sub-sentences:\n"
+    EXAMPLE_USER = PROMPT.format(
+        6,
         "Oh my gosh,\n"
         "I can't believe it!\n"
         "I won the lottery!\n"
         "But,\n"
         "what if people start asking me for money?\n"
-        "I'm terrified.\n"
-        "Here are the 6 six-digit arrays, without any extra text:\n"
-        "034532\n"
-        "035443\n"
-        "035543\n"
-        "042321\n"
-        "064233\n"
-        "085123"
+        "I'm terrified.\n",
     )
 
-    PROMPT = "Generate {} six-digit arrays prosody arrays, one for each of the following sub-sentences:\n{}"
+    EXAMPLE_ASSISTANT_1 = DUMMY.format(6)
+    EXAMPLE_ASSISTANT_2 = "034532\n035443\n035543\n042321\n064233\n085123"
 
-    DUMMY = "Here are the {} six-digit arrays, without any extra text:"
+    CHARACTER = (
+        "You will also need to consider character traits when crafting a response, taking care to select emotions that "
+        "are characteristic of your personality. Your character is defined as follows:\n{}"
+    )
+
+    CONTEXT = (
+        "Finally, here are some words you spoke prior, use these aid you in selecting a contextually appropriate "
+        "emotional response:\n{}"
+    )
 
 
 class TextToSpeechPreprocessing(Enum):

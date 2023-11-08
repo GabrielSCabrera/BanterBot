@@ -1,11 +1,10 @@
 import logging
-import re
 from pathlib import Path
 
 import uuid6
 
 # Maximum number of retries in calls to the OpenAI API
-RETRY_LIMIT = 2
+RETRY_LIMIT = 3
 
 # The number of seconds to wait if the OpenAI API raises a RateLimitError
 RETRY_TIME = 60
@@ -46,5 +45,3 @@ generate_uuid = uuid6.uuid8
 
 # Define the punctuation marks that can be used to split sentences into phrases for prosody selection.
 phrase_delim = [",", ":", ";", '"', "`", "|"]
-# Compile a regex pattern using the specified delimiters.
-phrase_delim_pattern = re.compile("([" + "".join(phrase_delim) + "]+)")

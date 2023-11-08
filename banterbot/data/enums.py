@@ -1,4 +1,7 @@
+import re
 from enum import Enum
+
+from banterbot import config
 
 
 class EnvVar(Enum):
@@ -83,6 +86,9 @@ class Prosody:
     PITCHES = {"x-low": "-0.5%", "low": "-0.25%", "normal": "+0%", "high": "+0.25%", "x-high": "+0.5%"}
     RATES = {"x-slow": 0.85, "slow": 0.95, "normal": 1.0, "fast": 1.05, "x-fast": 1.15}
     EMPHASES = {"reduced": "reduced", "normal": "none", "exaggerated": "moderate"}
+
+    # Compile a regex pattern using the specified delimiters.
+    PHRASE_PATTERN = re.compile("([" + "".join(config.phrase_delim) + "]+)")
 
 
 class ToneMode:

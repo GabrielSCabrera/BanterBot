@@ -79,7 +79,7 @@ class Interface(ABC):
             system=ToneSelection.SYSTEM.value,
             prompt=ToneSelection.PROMPT.value.format(self._style),
         )
-        self._prosody_selector = ProsodySelector(model=get_model_by_name("gpt-4"), voice=self._voice)
+        self._prosody_selector = ProsodySelector(model=get_model_by_name("gpt-4-1106-preview"), voice=self._voice)
 
         # Initialize the system message, if provided
         self._system = system
@@ -265,16 +265,7 @@ class Interface(ABC):
                 self.update_conversation_area(f"{self._assistant_name}: ")
                 prefixed = True
 
-            messages = self._messages
-            messages_token_count = self._messages_token_count
-            system = ""
-
-            if self._system:
-                messages = messages[1:]
-                messages_token_count = messages_token_count[1:]
-                system = self._system
-
-            phrases = self._prosody_selector.select(block, messages, messages_token_count, content, system)
+            phrases, outputs = self._prosody_selector.select(sentences=block, context=content, system=self._system)
 
             for word in self._text_to_speech.speak_phrases(phrases):
                 self.update_conversation_area(word.word)
