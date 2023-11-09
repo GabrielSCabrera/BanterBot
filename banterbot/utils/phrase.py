@@ -12,9 +12,9 @@ class Phrase:
     """
 
     text: str
-    style: Optional[str]
-    styledegree: Optional[str]
-    pitch: Optional[str]
-    rate: Optional[str]
-    emphasis: Optional[str]
     voice: AzureNeuralVoice
+    style: Optional[str] = None
+    styledegree: Optional[str] = None
+    pitch: Optional[str] = None
+    rate: Optional[str] = None
+    emphasis: Optional[str] = None

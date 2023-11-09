@@ -87,7 +87,7 @@ class Prosody:
     RATES = {"x-slow": 0.85, "slow": 0.95, "normal": 1.0, "fast": 1.05, "x-fast": 1.15}
     EMPHASES = {"reduced": "reduced", "normal": "none", "exaggerated": "moderate"}
 
-    # Compile a regex pattern using the specified delimiters.
+    # Compile a regex pattern using the delimiters specified in the config file, that are used to subdivide sentences.
     PHRASE_PATTERN = re.compile("([" + "".join(config.phrase_delim) + "]+)")
 
 

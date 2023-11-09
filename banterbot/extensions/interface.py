@@ -14,6 +14,7 @@ from banterbot.extensions.prosody_selector import ProsodySelector
 from banterbot.managers.openai_manager import OpenAIManager
 from banterbot.managers.speech_to_text import SpeechToText
 from banterbot.managers.text_to_speech import TextToSpeech
+from banterbot.utils.exceptions import FormatMismatchError
 from banterbot.utils.message import Message
 from banterbot.utils.thread_queue import ThreadQueue
 
@@ -79,7 +80,9 @@ class Interface(ABC):
             system=ToneSelection.SYSTEM.value,
             prompt=ToneSelection.PROMPT.value.format(self._style),
         )
-        self._prosody_selector = ProsodySelector(model=get_model_by_name("gpt-4-1106-preview"), voice=self._voice)
+        self._prosody_selector = ProsodySelector(
+            manager=OpenAIManager(model=get_model_by_name("gpt-4-1106-preview")), voice=self._voice
+        )
 
         # Initialize the system message, if provided
         self._system = system
@@ -266,6 +269,11 @@ class Interface(ABC):
                 prefixed = True
 
             phrases, outputs = self._prosody_selector.select(sentences=block, context=content, system=self._system)
+
+            if phrases is None:
+                print(content)
+                print(block)
+                raise FormatMismatchError()
 
             for word in self._text_to_speech.speak_phrases(phrases):
                 self.update_conversation_area(word.word)

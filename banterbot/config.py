@@ -44,4 +44,4 @@ logging.basicConfig(format="%(asctime)s - %(message)s", level=logging_level)
 generate_uuid = uuid6.uuid8
 
 # Define the punctuation marks that can be used to split sentences into phrases for prosody selection.
-phrase_delim = [",", ":", ";", '"', "`", "|"]
+phrase_delim = [",", ".", "?", "!", ":", ";", '"', "`", "|", "\n"]

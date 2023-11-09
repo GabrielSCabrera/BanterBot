@@ -18,7 +18,7 @@ dependencies = [
     "protobuf>=3.20.2",
     "nltk",
     "spacy",
-    # # Cannot add specific URLs to dependencies in PyPi, so this is commented out, but it works otherwise.
+    # # Cannot add specific URLs to dependencies in PyPI, so this is commented out, but it works otherwise.
     # f"spacy=={spacy_version}",
     # *spacy_dependencies,
 ]

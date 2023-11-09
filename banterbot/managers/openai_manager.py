@@ -46,6 +46,18 @@ class OpenAIManager:
         # Set the interruption flag to the current time: if interruptions are raised, this will be updated.
         self._interrupt: int = time.perf_counter_ns()
 
+    def count_tokens(self, string: str) -> int:
+        """
+        Counts the number of tokens in the provided string.
+
+        Args:
+            string (str): A string provided by the user where the number of tokens are to be counted.
+
+        Returns:
+            int: The number of tokens in the string.
+        """
+        return len(self._model.tokenizer.encode(string))
+
     def prompt(self, messages: List[Message], split: bool = True, **kwargs) -> Union[Tuple[str], str]:
         """
         Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.
@@ -117,25 +129,6 @@ class OpenAIManager:
             bool: The streaming state of the current instance.
         """
         return self._streaming
-
-    def _count_tokens(self, messages: List[Message]) -> int:
-        """
-        Calculates the total number of tokens in the given messages.
-
-        Args:
-            messages (List[Message]): A list of messages. Each message should be an instance of the Message class, which
-            contains the content and role (user or assistant) of the message.
-
-        Returns:
-            int: The total number of tokens in the messages. This is used to ensure that the generated response does not
-            exceed the model's maximum token limit.
-        """
-        num_tokens = 2
-
-        for message in messages:
-            num_tokens += message.count_tokens(self._model)
-
-        return num_tokens
 
     def _request(self, messages: List[Message], stream: bool, **kwargs) -> Union[Iterator, str]:
         """

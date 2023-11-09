@@ -7,29 +7,36 @@ from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.enums import ChatCompletionRoles, Prosody
 from banterbot.data.openai_models import OpenAIModel
 from banterbot.data.prompts import ProsodySelection
-from banterbot.managers.openai_manager import OpenAIManager
-from banterbot.utils.exceptions import FormatMismatchError
 from banterbot.utils.message import Message
 from banterbot.utils.phrase import Phrase
 
 
 class ProsodySelector:
     """
-    Manages prosody selection/extraction for specified instances of class `AzureNeuralVoice`.
+    The ProsodySelector class is responsible for managing prosody selection/extraction for specified instances of the
+    AzureNeuralVoice class. It uses the OpenAI ChatCompletion API to generate prosody settings for a list of sentences.
+
+    Attributes:
+        _model (OpenAIModel): The OpenAI model to be used for generating responses.
+        _openai_manager (OpenAIManager): An instance of the OpenAIManager class.
+        _voice (AzureNeuralVoice): An instance of the AzureNeuralVoice class.
+        _valid (bool): A flag indicating whether the voice styles are not None.
+        _token_counts (dict): A dictionary to cache the maximum number of tokens for a given number of rows.
+        _output_patterns (dict): A dictionary to cache the regex patterns matching the expected ChatCompletion output.
+        _system (list[Message]): A list of system and user messages to be used as a prompt for the ChatCompletion API.
+        _line_pattern (str): A regex pattern that matches one line of expected output for the current model.
     """
 
-    def __init__(self, model: OpenAIModel, voice: AzureNeuralVoice) -> None:
+    def __init__(self, manager: OpenAIModel, voice: AzureNeuralVoice) -> None:
         """
-        Generate a ChatCompletion prompt for the extraction of prosody data for a specified instance of class
-        `AzureNeuralVoice`.
+        Initializes the ProsodySelector class with a specified OpenAI model and AzureNeuralVoice instance.
 
         Args:
-            model (OpenAIModel): The OpenAI model to be used for generating responses.
-            voice (AzureNeuralVoice): An instance of class `AzureNeuralVoice`.
+            manager (OpenAIManager): An instance of class OpenAIManager to be used for generating responses.
+            voice (AzureNeuralVoice): An instance of the AzureNeuralVoice class.
         """
         logging.debug(f"ProsodySelector initialized")
-        self._model = model
-        self._openai_manager = OpenAIManager(model=self._model)
+        self._manager = manager
         self._voice = voice
         self._valid = self._voice.styles is not None
         self._token_counts = {}
@@ -92,14 +99,14 @@ class ProsodySelector:
 
     def select(self, sentences: list[str], context: Optional[str] = None, system: Optional[str] = None) -> str:
         """
-        Extract prosody settings for a list of sentences divided into sub-sentences by asking the OpenAI ChatCompletion
-        API to pick a set of options. The prompt is set up to force the model to return an exact number of tokens with
-        dummy text preceding it in order to yield consistent results efficiently.
+        Extracts prosody settings for a list of sentences by asking the OpenAI ChatCompletion API to pick a set of
+        options. The prompt is set up to force the model to return an exact number of tokens with dummy text preceding
+        it in order to yield consistent results efficiently.
 
         Args:
             sentences (list[str]): The list of sentences to be processed.
-            context (optional, str): Useful prior conversational context originating from the same response.
-            system (optional, str): A system prompt to assist the ChatCompletion in picking reactions.
+            context (Optional[str]): Useful prior conversational context originating from the same response.
+            system (Optional[str]): A system prompt to assist the ChatCompletion in picking reactions.
 
         Returns:
             str: The randomly selected option.
@@ -107,19 +114,18 @@ class ProsodySelector:
 
         for i in range(RETRY_LIMIT):
 
-            # Attempt three different sentence splits in order to modify the input on retry -- this reduces the chance
-            # of a `FormatMismatchError` Exception significantly.
+            # Attempt several different sentence splits in order to modify the input on retry -- this reduces the chance
+            # of a `FormatMismatchError` Exception significantly. `RETRY_LIMIT` is defined in the config file.
             if i == 0:
                 phrases = self._split_sentences(sentences)
-                messages = self._get_messages(phrases, context, system)
             elif i == 1:
                 phrases = " ".join(sentences).split(".")
-                messages = self._get_messages(phrases, context, system)
             else:
                 phrases = [" ".join(sentences)]
-                messages = self._get_messages(phrases, context, system)
 
-            response = self._openai_manager.prompt(
+            messages = self._get_messages(phrases, context, system)
+
+            response = self._manager.prompt(
                 messages=messages,
                 split=False,
                 temperature=0.0,
@@ -130,27 +136,40 @@ class ProsodySelector:
 
             if processed is not None:
                 break
-            elif i + 1 == RETRY_LIMIT:
-                raise FormatMismatchError()
+
+        if processed is None:
+            processed = [Phrase(text=sentence, voice=self._voice) for sentence in sentences]
 
         return processed, outputs
 
     def _get_max_tokens(self, N: int) -> int:
         """
-        Return the maximum number of tokens for the given number of rows of six-digit numbers. Caches all calculated
+        Returns the maximum number of tokens for the given number of rows of six-digit numbers. Caches all calculated
         values.
+
+        Args:
+            N (int): The number of rows.
+
+        Returns:
+            int: The maximum number of tokens.
         """
         # Count the number of tokens for the specified `N`.
         if N not in self._token_counts:
             dummy = "012345\n" * (N - 1) + "012345"
-            self._token_counts[N] = len(self._model.tokenizer.encode(dummy))
+            self._token_counts[N] = self._manager.count_tokens(dummy)
 
         return self._token_counts[N]
 
     def _get_output_pattern(self, N: int) -> int:
         """
-        Return a compiled regex pattern matching the expected ChatCompletion output for a given `N`, or number of
+        Returns a compiled regex pattern matching the expected ChatCompletion output for a given `N`, or number of
         phrases. Caches all calculated values.
+
+        Args:
+            N (int): The number of phrases.
+
+        Returns:
+            int: A compiled regex pattern.
         """
         # Compile a regex pattern that matches `N` lines of expected output from ChatCompletion's prosody evaluation.
         if N not in self._output_patterns:
@@ -162,13 +181,13 @@ class ProsodySelector:
         self, phrases: list[str], context: Optional[str] = None, system: Optional[str] = None
     ) -> list[Message]:
         """
-        Insert the system prompt, user prompt, prefix, suffix, and a dummy message mimicking a successful interaction
+        Inserts the system prompt, user prompt, prefix, suffix, and a dummy message mimicking a successful interaction
         with the ChatCompletion API, into the list of messages.
 
         Args:
             phrases (list[str]): The list of phrases to be processed.
-            context (optional, str): Useful prior conversational context originating from the same response.
-            system (optional, str): A system prompt to assist the ChatCompletion in picking reactions.
+            context (Optional[str]): Useful prior conversational context originating from the same response.
+            system (Optional[str]): A system prompt to assist the ChatCompletion in picking reactions.
 
         Returns:
             list[Message]: The enhanced list of messages.
@@ -214,20 +233,31 @@ class ProsodySelector:
         if re.fullmatch(pattern, response) is not None:
             outputs = re.findall(self._get_output_pattern(1), response)
             for output, phrase in zip(outputs, phrases):
-                processed.append(
-                    Phrase(
-                        text=phrase,
-                        style=self._voice.styles[min(int(response[:2]), len(self._voice.styles)) - 1],
-                        styledegree=list(Prosody.STYLEDEGREES.values())[int(response[2]) - 1],
-                        pitch=list(Prosody.PITCHES.values())[int(response[3]) - 1],
-                        rate=list(Prosody.RATES.values())[int(response[4]) - 1],
-                        emphasis=list(Prosody.EMPHASES.values())[int(response[5]) - 1],
-                        voice=self._voice,
-                    )
-                )
+                processed.append(self._create_phrase(output, phrase))
             return processed, outputs
         else:
             return None, None
+
+    def _create_phrase(self, output: str, phrase: str) -> Phrase:
+        """
+        Given an output from the ChatCompletion API and a phrase, creates an instance of class `Phrase`.
+
+        Args:
+            output (str): The output from the ChatCompletion API.
+            phrase (str): The phrase to be processed.
+
+        Returns:
+            Phrase: An instance of class `Phrase`.
+        """
+        return Phrase(
+            text=phrase,
+            voice=self._voice,
+            style=self._voice.styles[min(int(output[:2]), len(self._voice.styles)) - 1],
+            styledegree=list(Prosody.STYLEDEGREES.values())[int(output[2]) - 1],
+            pitch=list(Prosody.PITCHES.values())[int(output[3]) - 1],
+            rate=list(Prosody.RATES.values())[int(output[4]) - 1],
+            emphasis=list(Prosody.EMPHASES.values())[int(output[5]) - 1],
+        )
 
     def _split_sentences(self, sentences: list[str]) -> tuple[list[str], int]:
         """

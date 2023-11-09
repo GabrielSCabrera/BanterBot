@@ -361,26 +361,38 @@ class TextToSpeech:
 
         for n, phrase in enumerate(phrases):
             # Add contour only if there is a pitch transition
-            if phrase.pitch != phrases[min(n + 1, len(phrases) - 1)].pitch:
+            if phrase.pitch is not None and phrase.pitch != phrases[min(n + 1, len(phrases) - 1)].pitch:
                 # Set the contour to begin transition at 50% of the current phrase to match the pitch of the next one.
                 contour = f"(50%,{phrase.pitch}) (80%,{phrases[n + 1].pitch})"
                 pitch = f' contour="{contour}"'
+            elif phrase.pitch is not None:
+                pitch = f' pitch="{phrase.pitch}"'
             else:
-                pitch = f' pitch="{phrase.pitch}"' if phrase.pitch else ""
+                pitch = ""
 
             # Add the voice and other tags along with prosody
-            ssml += (
-                f'<voice name="{phrase.voice.voice}">'
-                '<mstts:silence type="comma-exact" value="10ms"/>'
-                '<mstts:silence type="Tailing-exact" value="0ms"/>'
-                '<mstts:silence type="Sentenceboundary-exact" value="5ms"/>'
-                '<mstts:silence type="Leading-exact" value="0ms"/>'
-                f'<mstts:express-as style="{phrase.style}" styledegree="{phrase.styledegree}">'
-                f'<prosody{pitch} rate="{phrase.rate}">'
-                f'<emphasis level="{phrase.emphasis}">'
-                f"{phrase.text}"
-                "</emphasis></prosody></mstts:express-as></voice>"
-            )
+            ssml += f'<voice name="{phrase.voice.voice}">'
+            ssml += '<mstts:silence type="comma-exact" value="10ms"/>'
+            ssml += '<mstts:silence type="Tailing-exact" value="0ms"/>'
+            ssml += '<mstts:silence type="Sentenceboundary-exact" value="5ms"/>'
+            ssml += '<mstts:silence type="Leading-exact" value="0ms"/>'
+
+            if phrase.style and phrase.styledegree:
+                ssml += f'<mstts:express-as style="{phrase.style}" styledegree="{phrase.styledegree}">'
+            if pitch or phrase.rate:
+                ssml += f'<prosody{pitch} rate="{phrase.rate if phrase.rate else ""}">'
+            if phrase.emphasis:
+                ssml += f'<emphasis level="{phrase.emphasis}">'
+
+            ssml += f"{phrase.text}"
+
+            if phrase.emphasis:
+                ssml += "</emphasis>"
+            if pitch or phrase.rate:
+                ssml += "</prosody>"
+            if phrase.style and phrase.styledegree:
+                ssml += "</mstts:express-as>"
+            ssml += "</voice>"
 
         # Close the voice and speak tags and return the SSML string
         ssml += "</speak>"
