@@ -62,29 +62,17 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.
         self.protocol("WM_DELETE_WINDOW", self._quit)
 
-    def update_conversation_area(self, word: str) -> None:
-        super().update_conversation_area(word)
-        self.conversation_area["state"] = tk.NORMAL
-        self.conversation_area.insert(tk.END, word)
-        self.conversation_area.update_idletasks()
-        self.conversation_area["state"] = tk.DISABLED
-        self.conversation_area.see(tk.END)
-
-    def select_all_on_focus(self, event) -> None:
-        widget = event.widget
-        if widget == self.name_entry:
-            self._name_entry_focused = True
-            widget.selection_range(0, tk.END)
-            widget.icursor(tk.END)
-        else:
-            self._name_entry_focused = False
-
     def listener_activate(self, idx: int) -> None:
         user_name = self.name_entries[idx].get().split(" ")[0].strip()
         super().listener_activate(user_name)
 
-    def listener_deactivate(self, soft: bool = True) -> None:
-        super().listener_deactivate(soft=soft)
+    def request_response(self) -> None:
+        if self._messages:
+            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+            self._speech_to_text.interrupt()
+            self._text_to_speech.interrupt()
+            self._openai_manager.interrupt()
+            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
 
     def run(self, greet: bool = False) -> None:
         """
@@ -96,6 +84,23 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         if greet:
             self.system_prompt(Greetings.UNPROMPTED_GREETING.value)
         self.mainloop()
+
+    def select_all_on_focus(self, event) -> None:
+        widget = event.widget
+        if widget == self.name_entry:
+            self._name_entry_focused = True
+            widget.selection_range(0, tk.END)
+            widget.icursor(tk.END)
+        else:
+            self._name_entry_focused = False
+
+    def update_conversation_area(self, word: str) -> None:
+        super().update_conversation_area(word)
+        self.conversation_area["state"] = tk.NORMAL
+        self.conversation_area.insert(tk.END, word)
+        self.conversation_area.update_idletasks()
+        self.conversation_area["state"] = tk.DISABLED
+        self.conversation_area.see(tk.END)
 
     def _quit(self) -> None:
         """
@@ -162,11 +167,3 @@ class TKMultiplayerInterface(tk.Tk, Interface):
 
         self.request_btn.bind(f"<ButtonRelease-1>", lambda event: self.request_response())
         self.bind("<Return>", lambda event: self.request_response())
-
-    def request_response(self) -> None:
-        if self._messages:
-            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            self._speech_to_text.interrupt()
-            self._text_to_speech.interrupt()
-            self._openai_manager.interrupt()
-            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
