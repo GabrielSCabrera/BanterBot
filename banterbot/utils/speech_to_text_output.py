@@ -1,10 +1,10 @@
 import datetime
 import json
-from typing import Iterator, List, Optional, TypedDict
+from typing import Iterator, Optional, TypedDict
 
 import azure.cognitiveservices.speech as speechsdk
 
-from banterbot.data.enums import SpeechProcessingType, WordCategory
+from banterbot.data.enums import SpaCyLangModel, SpeechProcessingType, WordCategory
 from banterbot.utils.nlp import NLP
 from banterbot.utils.word import Word
 
@@ -32,7 +32,10 @@ class SpeechToTextOutput:
     A class that encapsulates the speech-to-text output data.
     """
 
-    def __init__(self, recognition_result: speechsdk.SpeechRecognitionResult, language: Optional[str] = None) -> None:
+    @classmethod
+    def from_recognition_result(
+        cls, recognition_result: speechsdk.SpeechRecognitionResult, language: Optional[str] = None
+    ) -> "SpeechToTextOutput":
         """
         Constructor for the SpeechToTextOutput class. Designed to create lightweight instances with most attributes
         initially set to None. Computation-intensive operations are performed on-demand when respective properties are
@@ -42,25 +45,117 @@ class SpeechToTextOutput:
             recognition_result (speechsdk.SpeechRecognitionResult): The result from a speech recognition event.
             language (str, optional): The language used during the speech-to-text recognition, if not auto-detected.
         """
-        self._result = recognition_result
-        self._data = json.loads(self._result.json)
-        self._offset = None
-        self._duration = None
-        self._sents = None
-        self._words = None
-        self._language = language if language is not None else self._extract_language()
+        data = json.loads(recognition_result.json)
+        language = language if language is not None else self._extract_language(recognition_result=recognition_result)
+        return cls(data=data, language=language)
 
-    def _extract_words(self, words_raw: List[WordJSON]) -> List[Word]:
+    @classmethod
+    def _extract_language(cls, recognition_result: speechsdk.SpeechRecognitionResult) -> Optional[str]:
         """
-        Private method that extracts Word objects from raw data.
+        If the language is not provided (as it should be if auto-detection is disabled) then extract the auto-detected
+        language as a string. Return None if the process fails.
 
         Args:
-            words_raw (List[WordJSON]): A list of dictionaries containing raw data of words.
+            recognition_result (speechsdk.SpeechRecognitionResult): The result from a speech recognition event.
 
         Returns:
-            List[Word]: A list of Word objects.
+            str, optional: The auto-detected language from the speech-to-text output.
+        """
+        language_key = speechsdk.PropertyId.SpeechServiceConnection_AutoDetectSourceLanguageResult
+        language = None
+        if language_key in recognition_result.properties:
+            language = recognition_result.properties[language_key]
+        return language
+
+    def __init__(
+        self,
+        data: dict,
+        language: str,
+        offset: Optional[datetime.timedelta] = None,
+        duration: Optional[datetime.timedelta] = None,
+        offset_end: Optional[datetime.timedelta] = None,
+        sents: Optional[tuple[str, ...]] = None,
+        words: Optional[list[Word]] = None,
+    ) -> None:
+        """
+        Constructor for the SpeechToTextOutput class. Designed to create lightweight instances with most attributes
+        initially set to None unless provided explicitly on initialization. Computation-intensive operations are
+        instead performed lazily: i.e., when respective properties are accessed.
+
+        Args:
+            data (speechsdk.SpeechRecognitionResult): The JSON data output from a speech recognition event.
+            language (str): The language used during the speech-to-text recognition.
+            offset (optional, datetime.timedelta): The number of milliseconds between recognition start and the output.
+            duration (optional, datetime.timedelta): The duration of the output in milliseconds.
+            sents (optional, tuple[str, ...]): The split sentences of the output as a tuple.
+            words (optional, list[Word]): A list of words from the output.
+
+        """
+        self._data = data
+        self._language = language
+        self._offset = offset
+        self._duration = duration
+        self._offset_end = offset_end
+        self._sents = sents
+        self._words = words
+
+    def from_cutoff(self, cutoff: datetime.timedelta) -> "SpeechToTextOutput":
+        """
+        Create a new instance of class `SpeechToTextOutput` that only contains the text spoken up until a time-based
+        cutoff is reached.
+
+        Args:
+            cutoff (datetime.timedelta): The cutoff time (or duration) of the new instance.
+
+        Returns:
+            SpeechToTextOutput: The new instance of `SpeechToTextOutput`.
+        """
+
+        doc = NLP.model(SpaCyLangModel.EN_CORE_WEB_SM)(self.display)
+
+        words = []
+        last_token_end = 0
+
+        for token in doc:
+            for word in self.words:
+                if token.text.lower() == word.word and word.offset <= cutoff:
+                    words.append(word)
+                    last_token_end = token.idx + len(token.text)
+                    break
+
+        data = {
+            "Id": self._data["Id"],
+            "RecognitionStatus": self._data["RecognitionStatus"],
+            "Offset": self._data["Offset"],
+            "Duration": sum(i["Duration"] for i in self._data["NBest"][0]["Words"][: len(words)]),
+            "Channel": self._data["Channel"],
+            "DisplayText": self.display[:last_token_end],
+            "NBest": [
+                {
+                    "Confidence": self._data["NBest"][0]["Confidence"],
+                    "Lexical": self._data["NBest"][0]["Lexical"],
+                    "ITN": self._data["NBest"][0]["ITN"],
+                    "MaskedITN": self._data["NBest"][0]["MaskedITN"],
+                    "Display": self._data["NBest"][0]["Display"],
+                    "Words": self._data["NBest"][0]["Words"][: len(words)],
+                }
+            ],
+        }
+
+        return self.__class__(data=data, language=self._language)
+
+    def _extract_words(self, words_raw: list[WordJSON]) -> list[Word]:
+        """
+        Private method that extracts `Word` objects from raw data.
+
+        Args:
+            words_raw (list[WordJSON]): A list of dictionaries containing raw word data.
+
+        Returns:
+            list[Word]: A list of `Word` objects.
         """
         words = []
+
         for word in words_raw:
             words.append(
                 Word(
@@ -74,41 +169,27 @@ class SpeechToTextOutput:
             )
         return words
 
-    def _extract_language(self) -> Optional[str]:
-        """
-        If the language is not provided (as it should be if auto-detection is disabled) then extract the auto-detected
-        language as a string. Return None if the process fails.
-
-        Returns:
-            str, optional: The auto-detected language from the speech-to-text output.
-        """
-        language_key = speechsdk.PropertyId.SpeechServiceConnection_AutoDetectSourceLanguageResult
-        language = None
-        if language_key in self._result.properties.keys():
-            language = self._result.properties[language_key]
-        return language
-
     @property
-    def words(self) -> List[Word]:
+    def words(self) -> list[Word]:
         """
         A getter property that returns a list of Word objects. If the list is not already computed, it triggers
         computation.
 
         Returns:
-            List[str]: A list of words.
+            list[str]: A list of words.
         """
         if self._words is None:
             self._words = self._extract_words(words_raw=self._data["NBest"][0]["Words"])
         return self._words
 
     @property
-    def sents(self) -> List[str]:
+    def sents(self) -> tuple[str, ...]:
         """
         A getter property that returns a list of sentences. If the list is not already computed, it triggers
         computation.
 
         Returns:
-            List[str]: A list of sentences.
+            list[str]: A list of sentences.
         """
         if self._sents is None:
             self._sents = NLP.segment_sentences(string=self._data["NBest"][0]["Display"], whitespace=True)
@@ -147,6 +228,18 @@ class SpeechToTextOutput:
         if self._duration is None:
             self._duration = datetime.timedelta(microseconds=self._data["Duration"] / 10)
         return self._duration
+
+    @property
+    def offset_end(self) -> datetime.timedelta:
+        """
+        A getter property that returns the offset + duration of the recognized speech in the audio stream.
+
+        Returns:
+            datetime.timedelta: The duration + offset in the form of a datetime.timedelta object.
+        """
+        if self._offset_end is None:
+            self._offset_end = self.offset + self.duration
+        return self._offset_end
 
     @property
     def confidence(self) -> float:
@@ -213,7 +306,7 @@ class SpeechToTextOutput:
 
     def __iter__(self) -> Iterator[Word]:
         """
-        Overloads the iterator to allow for iteration over the Word objects in the output.
+        Overloads the iterator to allow for iteration over the `Word` objects in the output.
 
         Yields:
             Word: The next Word object in the output.

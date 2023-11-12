@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import threading
@@ -6,7 +7,7 @@ from typing import Generator, List, Optional, Union
 
 import azure.cognitiveservices.speech as speechsdk
 
-from banterbot.config import DEFAULT_LANGUAGE
+from banterbot.config import DEFAULT_LANGUAGE, soft_interruption_delay
 from banterbot.data.enums import EnvVar
 from banterbot.utils.speech_to_text_output import SpeechToTextOutput
 
@@ -77,17 +78,16 @@ class SpeechToText:
         # Reset the state variables of the speech-to-text recognizer
         self._reset()
 
-    def interrupt(self, soft: bool = False) -> None:
+    def interrupt(self, soft: bool = True) -> None:
         """
         Interrupts an ongoing speech-to-text process, if any. This method sets the interrupt flag to the current time,
         which will stop any speech-to-text processes activated prior to the current time.
 
         Args:
-            soft (bool): If True, allows a final sentence to be yielded if its recognition began prior to interruption.
+            soft (bool): If True, allows the recognizer to keep processing data that was recorded prior to interruption.
         """
-        # Wait for any buffering words to be completely recognized.
-        if soft:
-            self._buffering.wait()
+        # Allow the recognizer to wait for any buffering words to be completely recognized.
+        self._soft_interrupt = soft
         # Update the interruption time.
         self._interrupt: int = time.perf_counter_ns()
         # Release the threading.Event instance that the listener is waiting for.
@@ -107,26 +107,23 @@ class SpeechToText:
         # Only allow one listener to be active at once.
         with self.__class__._listen_lock:
 
-            # Do not run the listener if an interruption was raised after `init_time`.
-            if self._interrupt < init_time:
+            # Prepare a list which will contain all the recognized input words.
+            output = []
+            self._outputs.append(output)
 
-                # Prepare a list which will contain all the recognized input words.
-                output = []
-                self._outputs.append(output)
+            # Set the listening flag to True
+            self._listening = True
 
-                # Set the listening flag to True
-                self._listening = True
+            # Starting the speech recognizer
+            self._recognizer.start_continuous_recognition_async()
 
-                # Starting the speech recognizer
-                self._recognizer.start_continuous_recognition_async()
+            # Monitor the recognition progress in the main thread, yielding sentences as they are processed
+            for block in self._callbacks_process(output, init_time):
+                logging.debug(f"SpeechToText listener processed block: `{block}`")
+                yield block
 
-                # Monitor the recognition progress in the main thread, yielding sentences as they are processed
-                for block in self._callbacks_process(output, init_time):
-                    logging.debug(f"SpeechToText listener processed block: `{block}`")
-                    yield block
-
-                # Reset all state attributes
-                self._reset()
+            # Reset all state attributes
+            self._reset()
 
     @property
     def listening(self) -> bool:
@@ -192,15 +189,13 @@ class SpeechToText:
     def _reset(self) -> None:
         """
         Resets the state variables of the speech-to-text recognizer, such as the list of events, the listening flag,
-        recognition started flag, and new events flag.
+        the soft interruption flag, recognition started flag, and new events flag.
         """
         self._events: List[SpeechToTextOutput] = []
         self._listening: bool = False
-        self._buffering: threading.Event = threading.Event()
+        self._soft_interrupt: bool = False
         self._start_recognition: threading.Event = threading.Event()
         self._new_events: threading.Event = threading.Event()
-
-        self._buffering.set()
 
     def _recognizer_events_connect(self) -> None:
         """
@@ -212,9 +207,6 @@ class SpeechToText:
         # Connect the recognized event to the _process_recognized method
         self._recognizer.recognized.connect(self._process_recognized)
 
-        # Connect the recognized event to the _process_recognized method
-        self._recognizer.recognizing.connect(self._callback_recognizing)
-
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
         """
         Callback function for recognition started event. Signals that the recognition process has started.
@@ -223,15 +215,6 @@ class SpeechToText:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the recognition started.
         """
         self._start_recognition.set()
-
-    def _callback_recognizing(self, event: speechsdk.SessionEventArgs) -> None:
-        """
-        Callback function for recognizing in progress event. Signals that recognition is in progress.
-
-        Args:
-            event (speechsdk.SessionEventArgs): Event arguments containing information about the latest recognized word.
-        """
-        self._buffering.clear()
 
     def _callbacks_process(self, output: List[SpeechToTextOutput], init_time: int) -> Generator[str, None, None]:
         """
@@ -269,6 +252,29 @@ class SpeechToText:
         self._recognizer.stop_continuous_recognition()
         logging.debug("SpeechToText listener stopped")
 
+        if self._soft_interrupt:
+            # Prepare a timedelta object indicating how long the listener was active.
+            offset = datetime.timedelta(milliseconds=1e-6 * (self._interrupt - init_time)) + soft_interruption_delay
+
+            final_length = len(self._events)
+
+            while idx < final_length:
+                event = self._events[idx]
+
+                if event.offset < offset and event.offset_end >= offset:
+                    self._events[idx] = event.from_cutoff(cutoff=offset)
+                    event = self._events[idx]
+                    output.append(event)
+                    yield str(event)
+                    break
+
+                elif event.offset_end < offset:
+                    break
+                else:
+                    output.append(event)
+                    idx += 1
+                    yield str(event)
+
     def _process_recognized(self, event: speechsdk.SpeechRecognitionEventArgs) -> None:
         """
         Processes the recognized speech event by appending it to the list of events and setting the `new_events` flag.
@@ -276,6 +282,9 @@ class SpeechToText:
         Args:
             event (speechsdk.SpeechRecognitionEventArgs): The recognized speech event.
         """
-        self._buffering.set()
-        self._events.append(SpeechToTextOutput(event.result, self._languages if not self._auto_detection else None))
+        self._events.append(
+            SpeechToTextOutput.from_recognition_result(
+                event.result, self._languages if not self._auto_detection else None
+            )
+        )
         self._new_events.set()

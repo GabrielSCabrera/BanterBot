@@ -1,7 +1,7 @@
+import importlib.resources
 import json
 import random
-from typing import Optional
-import importlib.resources
+
 import banterbot.resources
 
 

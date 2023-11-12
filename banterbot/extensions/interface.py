@@ -238,7 +238,7 @@ class Interface(ABC):
         """
         if self._listening_toggle:
             self._listening_toggle = False
-            self._speech_to_text.interrupt(soft=soft)
+            self._speech_to_text.interrupt(soft=True)
 
     def get_response(self) -> None:
         """
