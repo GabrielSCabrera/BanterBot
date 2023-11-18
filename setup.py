@@ -25,6 +25,8 @@ description = (
     "interactions with emotional tone selection. Features real-time monitoring and Tkinter frontend."
 )
 
+url = "https://github.com/GabrielSCabrera/BanterBot"
+
 with open("README.md", "r") as fs:
     long_description = fs.read()
 
@@ -79,6 +81,6 @@ setup(
     packages=find_packages(),
     package_data={"banterbot.protos": ["*.py"], "banterbot.resources": ["*"]},
     test_suite="setup.run_tests",
-    url="https://github.com/GabrielSCabrera/BanterBot",
+    url=url,
     version=version,
 )
