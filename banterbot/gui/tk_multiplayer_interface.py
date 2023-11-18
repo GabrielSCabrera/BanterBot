@@ -69,10 +69,8 @@ class TKMultiplayerInterface(tk.Tk, Interface):
     def request_response(self) -> None:
         if self._messages:
             # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            self._speech_to_text.interrupt()
-            self._text_to_speech.interrupt()
-            self._openai_manager.interrupt()
-            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
+            self.interrupt()
+            self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
 
     def run(self, greet: bool = False) -> None:
         """
@@ -106,9 +104,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         """
         This method is called on exit, and interrupts any currently running activity.
         """
-        self._openai_manager.interrupt()
-        self._text_to_speech.interrupt()
-        self._speech_to_text.interrupt()
+        self.interrupt()
         self.quit()
         self.destroy()
 

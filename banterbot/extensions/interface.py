@@ -1,6 +1,7 @@
 import datetime
 import logging
 import threading
+import time
 from abc import ABC, abstractmethod
 from typing import List, Optional, Union
 
@@ -124,6 +125,95 @@ class Interface(ABC):
         """
         return self._openai_manager.streaming
 
+    def interrupt(self, soft: bool = False, shutdown_time: Optional[int] = None) -> None:
+        """
+        Interrupts all speech-to-text recognition, text-to-speech synthesis, and OpenAI API streams.
+
+        Args:
+            soft (bool): If True, allows the recognizer to keep processing data that was recorded prior to interruption.
+            shutdown_time (Optional[int]): The time at which the listener was deactivated.
+        """
+        self._speech_to_text.interrupt(soft=soft, shutdown_time=shutdown_time)
+        self._text_to_speech.interrupt()
+        self._openai_manager.interrupt()
+
+    def listener_toggle(self, name: Optional[str] = None) -> None:
+        """
+        Toggle the listening state of the bot. If the bot is currently listening, it will stop listening for user input
+        using speech-to-text. If the bot is not currently listening, it will start listening for user input using
+        speech-to-text.
+
+        Args:
+            name (Optional[str]): The name of the user sending the message. Defaults to None.
+        """
+        if self._listening_toggle:
+            self.listener_deactivate()
+        else:
+            self.listener_activate(name=name)
+
+    def listener_activate(self, name: Optional[str] = None) -> None:
+        """
+        Activate the speech-to-text listener.
+
+        Args:
+            name (Optional[str]): The name of the user sending the message. Defaults to None.
+        """
+        if not self._listening_toggle:
+            self._listening_toggle = True
+            init_time = time.perf_counter_ns()
+            self._listen_thread = threading.Thread(
+                target=self._listen, kwargs={"name": name, "init_time": init_time}, daemon=True
+            )
+            self._listen_thread.start()
+
+    def listener_deactivate(self) -> None:
+        """
+        Deactivate the speech-to-text listener.
+        """
+        if self._listening_toggle:
+            self._listening_toggle = False
+            shutdown_time = time.perf_counter_ns()
+            self._speech_to_text.interrupt(soft=True, shutdown_time=shutdown_time)
+
+    def prompt(self, message: str, name: Optional[str] = None) -> None:
+        """
+        Prompt the bot with the given user message.
+
+        Args:
+            message (str): The message content from the user.
+            name (Optional[str]): The name of the user sending the message. Defaults to None.
+        """
+        # Do not send the message if it is empty.
+        if message.strip():
+
+            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+            self.interrupt()
+
+            message_thread = threading.Thread(
+                target=self.send_message,
+                args=(
+                    message,
+                    ChatCompletionRoles.USER,
+                    name,
+                ),
+                daemon=True,
+            )
+            self._thread_queue.add_task(message_thread, unskippable=True)
+            self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
+
+    def respond(self) -> None:
+        """
+        Get a response from the bot and update the conversation area with the response. This method handles generating
+        the bot's response using the OpenAIManager and updating the conversation area with the response text using
+        text-to-speech synthesis.
+        """
+        if self._tone is None:
+            self._respond_no_tone()
+        elif self._tone == ToneMode.BASIC:
+            self._respond_basic_tone()
+        elif self._tone == ToneMode.ADVANCED:
+            self._respond_advanced_tone()
+
     def send_message(
         self,
         content: str,
@@ -159,10 +249,7 @@ class Interface(ABC):
         if message.strip():
 
             # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            if self._thread_queue.is_alive():
-                self._openai_manager.interrupt()
-                self._text_to_speech.interrupt()
-                self._speech_to_text.interrupt()
+            self.interrupt()
 
             message_thread = threading.Thread(
                 target=self.send_message,
@@ -175,85 +262,57 @@ class Interface(ABC):
                 daemon=True,
             )
             self._thread_queue.add_task(message_thread, unskippable=True)
-            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
+            self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
 
-    def prompt(self, message: str, name: Optional[str] = None) -> None:
+    @abstractmethod
+    def update_conversation_area(self, word: str) -> None:
         """
-        Prompt the bot with the given user message.
+        Update the conversation area with the given word, and add the word to the chat log.
+        This method should be implemented by subclasses to handle updating the specific GUI components.
 
         Args:
-            message (str): The message content from the user.
-            name (Optional[str]): The name of the user sending the message. Defaults to None.
+            word (str): The word to add to the conversation area.
         """
-        # Do not send the message if it is empty.
-        if message.strip():
+        self._append_to_chat_log(word)
 
-            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            if self._thread_queue.is_alive():
-                self._openai_manager.interrupt()
-                self._text_to_speech.interrupt()
-                self._speech_to_text.interrupt()
-
-            message_thread = threading.Thread(
-                target=self.send_message,
-                args=(
-                    message,
-                    ChatCompletionRoles.USER,
-                    name,
-                ),
-                daemon=True,
-            )
-            self._thread_queue.add_task(message_thread, unskippable=True)
-            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
-
-    def listener_toggle(self, name: Optional[str] = None) -> None:
+    @abstractmethod
+    def run(self) -> None:
         """
-        Toggle the listening state of the bot. If the bot is currently listening, it will stop listening for user input
-        using speech-to-text. If the bot is not currently listening, it will start listening for user input using
-        speech-to-text.
+        Run the frontend application.
+        This method should be implemented by subclasses to handle the main event loop of the specific GUI framework.
+        """
+
+    @abstractmethod
+    def _init_gui(self) -> None:
+        """
+        Initialize the graphical user interface for the frontend.
+        This method should be implemented by subclasses to create the specific GUI components.
+        """
+
+    def _append_to_chat_log(self, word: str) -> None:
+        """
+        Updates the chat log with the latest output.
 
         Args:
-            name (Optional[str]): The name of the user sending the message. Defaults to None.
+            word (str): The word to be added to the conversation area.
         """
-        if self._listening_toggle:
-            self.listener_deactivate()
-        else:
-            self.listener_activate(name=name)
+        with self._log_lock:
+            logging.debug(f"Interface appended new data to the chat log")
+            with open(self._log_path, "a+") as fs:
+                fs.write(word)
 
-    def listener_activate(self, name: Optional[str] = None) -> None:
+    def _get_next_tone(self):
         """
-        Activate the speech-to-text listener.
+        Sends the message history as an input to the tone selector to semi-randomly select a fitting tone for the
+        assistant's next response. If the tone selection fails, returns the default style.
 
-        Args:
-            name (Optional[str]): The name of the user sending the message. Defaults to None.
+        Returns:
+            str: A voice tone compatible with the active AzureNeuralVoice instance.
         """
-        if not self._listening_toggle:
-            self._listening_toggle = True
-            self._listen_thread = threading.Thread(target=self._listen, args=(name,), daemon=True)
-            self._listen_thread.start()
+        tone = self._tone_selector.select(self._messages)
+        return tone if tone is not None else self._style
 
-    def listener_deactivate(self, soft: bool = True) -> None:
-        """
-        Deactivate the speech-to-text listener.
-        """
-        if self._listening_toggle:
-            self._listening_toggle = False
-            self._speech_to_text.interrupt(soft=True)
-
-    def get_response(self) -> None:
-        """
-        Get a response from the bot and update the conversation area with the response. This method handles generating
-        the bot's response using the OpenAIManager and updating the conversation area with the response text using
-        text-to-speech synthesis.
-        """
-        if self._tone is None:
-            self._get_response_no_tone()
-        elif self._tone == ToneMode.BASIC:
-            self._get_response_basic_tone()
-        elif self._tone == ToneMode.ADVANCED:
-            self._get_response_advanced_tone()
-
-    def _get_response_advanced_tone(self) -> None:
+    def _respond_advanced_tone(self) -> None:
         """
         Get a response from the bot and update the conversation area with the response. This method handles generating
         the bot's response using the OpenAIManager and updating the conversation area with the response text using
@@ -271,8 +330,6 @@ class Interface(ABC):
             phrases, outputs = self._prosody_selector.select(sentences=block, context=content, system=self._system)
 
             if phrases is None:
-                print(content)
-                print(block)
                 raise FormatMismatchError()
 
             for word in self._text_to_speech.speak_phrases(phrases):
@@ -287,9 +344,9 @@ class Interface(ABC):
         self._messages.append(message)
         self._messages_token_count.append(message.count_tokens(model=self._model))
 
-        self.end_response()
+        self._response_end()
 
-    def _get_response_basic_tone(self) -> None:
+    def _respond_basic_tone(self) -> None:
         """
         Get a response from the bot and update the conversation area with the response. This method handles generating
         the bot's response using the OpenAIManager and updating the conversation area with the response text using
@@ -324,9 +381,9 @@ class Interface(ABC):
         message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
         self._messages.append(message)
         self._messages_token_count.append(message.count_tokens(model=self._model))
-        self.end_response()
+        self._response_end()
 
-    def _get_response_no_tone(self) -> None:
+    def _respond_no_tone(self) -> None:
         """
         Get a response from the bot and update the conversation area with the response. This method handles generating
         the bot's response using the OpenAIManager and updating the conversation area with the response text using
@@ -353,98 +410,31 @@ class Interface(ABC):
         message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
         self._messages.append(message)
         self._messages_token_count.append(message.count_tokens(model=self._model))
-        self.end_response()
+        self._response_end()
 
-    def get_response_advanced(self) -> None:
-        """
-        Get a response from the bot and update the conversation area with the response. This method handles generating
-        the bot's response using the OpenAIManager and updating the conversation area with the response text using
-        text-to-speech synthesis.
-        """
-        prefixed = False
-        content = []
-        style = self._style
-
-        # If the tone is to be evaluated, evaluate it once before yielding the blocks
-        if self._tone:
-            style = self._get_next_tone()
-            tone_content = f"Tone: {style}\n"
-            # Add an intermediate message (not visualized in the conversation area) noting the assistant's tone.
-            self._append_to_chat_log(tone_content)
-            message = Message(role=ChatCompletionRoles.ASSISTANT, content=tone_content)
-            self._messages.append(message)
-            self._messages_token_count.append(message.count_tokens(model=self._model))
-
-        # Initialize the generator for asynchronous yielding of sentence blocks
-        for block in self._openai_manager.prompt_stream(messages=self._messages):
-            if not prefixed:
-                self.update_conversation_area(f"{self._assistant_name}: ")
-                prefixed = True
-
-            sentences = " ".join(block)
-            for word in self._text_to_speech.speak(sentences, voice=self._voice, style=style):
-                self.update_conversation_area(word.word)
-                content.append(word.word)
-
-            self.update_conversation_area(" ")
-            content.append(" ")
-
-        content = "".join(content)
-        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
-        self._messages.append(message)
-        self._messages_token_count.append(message.count_tokens(model=self._model))
-        self.end_response()
-        speak_phrases
-
-    def end_response(self) -> None:
+    def _response_end(self) -> None:
         """
         End the bot's response and update the conversation area accordingly. This method should be called after the
         bot's response has been fully generated and added to the conversation area.
         """
         self.update_conversation_area("\n\n")
 
-    @abstractmethod
-    def _init_gui(self) -> None:
-        """
-        Initialize the graphical user interface for the frontend.
-        This method should be implemented by subclasses to create the specific GUI components.
-        """
-
-    @abstractmethod
-    def update_conversation_area(self, word: str) -> None:
-        """
-        Update the conversation area with the given word, and add the word to the chat log.
-        This method should be implemented by subclasses to handle updating the specific GUI components.
-
-        Args:
-            word (str): The word to add to the conversation area.
-        """
-        self._append_to_chat_log(word)
-
-    @abstractmethod
-    def run(self) -> None:
-        """
-        Run the frontend application.
-        This method should be implemented by subclasses to handle the main event loop of the specific GUI framework.
-        """
-
-    def _listen(self, name: Optional[str] = None) -> None:
+    def _listen(self, name: Optional[str] = None, init_time: Optional[int] = None) -> None:
         """
         Listen for user input using speech-to-text and prompt the bot with the transcribed message.
 
         Args:
             name (Optional[str]): The name of the user sending the message. Defaults to None.
+            init_time (Optional[int]): The time at which the listener was activated.
         """
         # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-        self._speech_to_text.interrupt()
-        self._text_to_speech.interrupt()
-        self._openai_manager.interrupt()
+        self.interrupt(shutdown_time=init_time)
 
         # Flag is set to True if a new user input is detected.
         input_detected = False
 
         # Listen for user input using speech-to-text
-        for sentence in self._speech_to_text.listen():
+        for sentence in self._speech_to_text.listen(init_time=init_time):
 
             # Do not send the message if it is empty.
             if sentence.strip():
@@ -465,27 +455,4 @@ class Interface(ABC):
                 self._thread_queue.add_task(message_thread, unskippable=True)
 
         if input_detected:
-            self._thread_queue.add_task(threading.Thread(target=self.get_response, daemon=True))
-
-    def _append_to_chat_log(self, word: str) -> None:
-        """
-        Updates the chat log with the latest output.
-
-        Args:
-            word (str): The word to be added to the conversation area.
-        """
-        with self._log_lock:
-            logging.debug(f"Interface appended new data to the chat log")
-            with open(self._log_path, "a+") as fs:
-                fs.write(word)
-
-    def _get_next_tone(self):
-        """
-        Sends the message history as an input to the tone selector to semi-randomly select a fitting tone for the
-        assistant's next response. If the tone selection fails, returns the default style.
-
-        Returns:
-            str: A voice tone compatible with the active AzureNeuralVoice instance.
-        """
-        tone = self._tone_selector.select(self._messages)
-        return tone if tone is not None else self._style
+            self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))

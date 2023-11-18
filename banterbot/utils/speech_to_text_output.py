@@ -99,13 +99,15 @@ class SpeechToTextOutput:
         self._sents = sents
         self._words = words
 
-    def from_cutoff(self, cutoff: datetime.timedelta) -> "SpeechToTextOutput":
+    def from_cutoff(
+        self, lower_cutoff: Optional[datetime.timedelta] = None, upper_cutoff: Optional[datetime.timedelta] = None
+    ) -> "SpeechToTextOutput":
         """
-        Create a new instance of class `SpeechToTextOutput` that only contains the text spoken up until a time-based
-        cutoff is reached.
+        Create a new instance of class `SpeechToTextOutput` that only contains the text spoken within a cutoff interval.
 
         Args:
-            cutoff (datetime.timedelta): The cutoff time (or duration) of the new instance.
+            lower_cutoff (datetime.timedelta): The lower cutoff time (or duration) of the new instance.
+            upper_cutoff (datetime.timedelta): The upper cutoff time (or duration) of the new instance.
 
         Returns:
             SpeechToTextOutput: The new instance of `SpeechToTextOutput`.
@@ -118,31 +120,40 @@ class SpeechToTextOutput:
 
         for token in doc:
             for word in self.words:
-                if token.text.lower() == word.word and word.offset <= cutoff:
+                if (
+                    token.text.lower() == word.word
+                    and (upper_cutoff is None or word.offset <= upper_cutoff)
+                    and (lower_cutoff is None or word.offset >= lower_cutoff)
+                ):
                     words.append(word)
                     last_token_end = token.idx + len(token.text)
                     break
 
-        data = {
-            "Id": self._data["Id"],
-            "RecognitionStatus": self._data["RecognitionStatus"],
-            "Offset": self._data["Offset"],
-            "Duration": sum(i["Duration"] for i in self._data["NBest"][0]["Words"][: len(words)]),
-            "Channel": self._data["Channel"],
-            "DisplayText": self.display[:last_token_end],
-            "NBest": [
-                {
-                    "Confidence": self._data["NBest"][0]["Confidence"],
-                    "Lexical": self._data["NBest"][0]["Lexical"],
-                    "ITN": self._data["NBest"][0]["ITN"],
-                    "MaskedITN": self._data["NBest"][0]["MaskedITN"],
-                    "Display": self._data["NBest"][0]["Display"],
-                    "Words": self._data["NBest"][0]["Words"][: len(words)],
-                }
-            ],
-        }
+        if len(words) > 0:
 
-        return self.__class__(data=data, language=self._language)
+            data = {
+                "Id": self._data["Id"],
+                "RecognitionStatus": self._data["RecognitionStatus"],
+                "Offset": self._data["Offset"],
+                "Duration": sum(i["Duration"] for i in self._data["NBest"][0]["Words"][: len(words)]),
+                "Channel": self._data["Channel"],
+                "DisplayText": self.display[:last_token_end],
+                "NBest": [
+                    {
+                        "Confidence": self._data["NBest"][0]["Confidence"],
+                        "Lexical": self._data["NBest"][0]["Lexical"],
+                        "ITN": self._data["NBest"][0]["ITN"],
+                        "MaskedITN": self._data["NBest"][0]["MaskedITN"],
+                        "Display": self._data["NBest"][0]["Display"],
+                        "Words": self._data["NBest"][0]["Words"][: len(words)],
+                    }
+                ],
+            }
+
+            return self.__class__(data=data, language=self._language)
+
+        else:
+            return None
 
     def _extract_words(self, words_raw: list[WordJSON]) -> list[Word]:
         """
