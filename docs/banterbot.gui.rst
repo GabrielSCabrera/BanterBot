@@ -12,7 +12,7 @@ banterbot.gui.cli module
 banterbot.gui.tk\_multiplayer\_interface module
 -----------------------------------------------
 
-.. autoclass:: banterbot.gui.tk_multiplayer_interface
+.. automodule:: banterbot.gui.tk_multiplayer_interface
    :members:
    :undoc-members:
    :special-members:
