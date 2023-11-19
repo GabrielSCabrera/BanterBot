@@ -4,11 +4,13 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Optional, Union
 
-from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.enums import ToneMode
-from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
+from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
+from banterbot.managers.openai_model_manager import OpenAIModelManager
+from banterbot.utils.azure_neural_voice import AzureNeuralVoice
+from banterbot.utils.openai_model import OpenAIModel
 
 
 class TKMultiplayerInterface(tk.Tk, Interface):
@@ -23,8 +25,8 @@ class TKMultiplayerInterface(tk.Tk, Interface):
 
     def __init__(
         self,
-        model: OpenAIModel = get_model_by_name("gpt-3.5-turbo"),
-        voice: AzureNeuralVoice = get_voice_by_name("Aria"),
+        model: OpenAIModel = OpenAIModelManager.load("gpt-3.5-turbo"),
+        voice: AzureNeuralVoice = AzureNeuralVoiceManager.load("Aria"),
         style: str = "chat",
         languages: Optional[Union[str, list[str]]] = None,
         tone_mode: Optional[ToneMode] = None,
@@ -109,7 +111,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         self.destroy()
 
     def _init_gui(self) -> None:
-        self.title(f"BanterBot {self._model.name}")
+        self.title(f"BanterBot {self._model.model}")
         self.configure(bg="black")
         self.geometry("1024x565")
         self._font = ("Cascadia Code", 16)

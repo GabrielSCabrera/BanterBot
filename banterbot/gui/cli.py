@@ -1,10 +1,10 @@
 import argparse
 import logging
 
-from banterbot.data.azure_neural_voices import _neural_voices
 from banterbot.data.enums import Prosody, ToneMode
-from banterbot.data.openai_models import _openai_models
 from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
+from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
+from banterbot.managers.openai_model_manager import OpenAIModelManager
 
 
 def run() -> None:
@@ -44,14 +44,14 @@ def run() -> None:
 
     class ModelChoice(argparse.Action):
         def __call__(self, parser, namespace, values, option_string=None):
-            setattr(namespace, self.dest, _openai_models[values.lower()])
+            setattr(namespace, self.dest, OpenAIModelManager.load(values.lower()))
 
     parser.add_argument(
         "-m",
         "--model",
-        choices=_openai_models,
+        choices=OpenAIModelManager.list(),
         action=ModelChoice,
-        default=_openai_models["gpt-4"],
+        default=OpenAIModelManager.load("gpt-4-turbo"),
         dest="model",
         help="Select the OpenAI model the bot should use.",
     )
@@ -77,14 +77,14 @@ def run() -> None:
 
     class VoiceChoice(argparse.Action):
         def __call__(self, parser, namespace, values, option_string=None):
-            setattr(namespace, self.dest, _neural_voices[values.lower()])
+            setattr(namespace, self.dest, AzureNeuralVoiceManager.load(values.lower()))
 
     parser.add_argument(
         "-v",
         "--voice",
-        choices=_neural_voices,
+        choices=AzureNeuralVoiceManager.list(),
         action=VoiceChoice,
-        default=_neural_voices["aria"],
+        default=AzureNeuralVoiceManager.load("aria"),
         dest="voice",
         help=f"Select a Microsoft Azure Cognitive Services text-to-speech voice.",
     )

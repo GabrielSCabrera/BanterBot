@@ -37,7 +37,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.8"
+version = "0.0.9"
 setup(
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
@@ -45,7 +45,7 @@ setup(
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "Intended Audience :: End Users/Desktop",
+        "Intended Audience 1:: End Users/Desktop",
         "Programming Language :: Python :: 3.11",
         "Topic :: Communications :: Chat",
         "Topic :: Multimedia :: Sound/Audio :: Speech",

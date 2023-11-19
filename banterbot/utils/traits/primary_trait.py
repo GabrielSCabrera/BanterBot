@@ -2,11 +2,12 @@ import importlib.resources
 import json
 import random
 
+from typing_extensions import Self
+
 import banterbot.resources
 
 
 class PrimaryTrait:
-
     traits_data = None
 
     def __init__(self, name: str, description: str, value: int, value_description: str):
@@ -28,7 +29,7 @@ class PrimaryTrait:
         return f"{self.name} (Value: {self.value}): {self.value_description}"
 
     @classmethod
-    def load_random(cls, uuid: str):
+    def load_random(cls, uuid: str) -> Self:
         """
         Load a PrimaryTrait instance based on a UUID with a randomly selected value.
 
@@ -47,7 +48,7 @@ class PrimaryTrait:
         return cls(data["name"], data["description"], value, value_description)
 
     @classmethod
-    def load_select(cls, uuid: str, value: int):
+    def load_select(cls, uuid: str, value: int) -> Self:
         """
         Load a PrimaryTrait instance based on a UUID with a specified value.
 

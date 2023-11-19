@@ -3,6 +3,7 @@ import json
 from typing import Iterator, Optional, TypedDict
 
 import azure.cognitiveservices.speech as speechsdk
+from typing_extensions import Self
 
 from banterbot.data.enums import SpaCyLangModel, SpeechProcessingType, WordCategory
 from banterbot.utils.nlp import NLP
@@ -27,7 +28,7 @@ class WordJSON(TypedDict):
     Confidence: float
 
 
-class SpeechToTextOutput:
+class SpeechRecognitionOutput:
     """
     A class that encapsulates the speech-to-text output data.
     """
@@ -35,11 +36,11 @@ class SpeechToTextOutput:
     @classmethod
     def from_recognition_result(
         cls, recognition_result: speechsdk.SpeechRecognitionResult, language: Optional[str] = None
-    ) -> "SpeechToTextOutput":
+    ) -> Self:
         """
-        Constructor for the SpeechToTextOutput class. Designed to create lightweight instances with most attributes
-        initially set to None. Computation-intensive operations are performed on-demand when respective properties are
-        accessed, instead of during initialization.
+        Constructor for the `SpeechRecognitionOutput` class. Designed to create lightweight instances with most
+        attributes initially set to None. Computation-intensive operations are performed on-demand when respective
+        properties are accessed, instead of during initialization.
 
         Args:
             recognition_result (speechsdk.SpeechRecognitionResult): The result from a speech recognition event.
@@ -78,9 +79,9 @@ class SpeechToTextOutput:
         words: Optional[list[Word]] = None,
     ) -> None:
         """
-        Constructor for the SpeechToTextOutput class. Designed to create lightweight instances with most attributes
-        initially set to None unless provided explicitly on initialization. Computation-intensive operations are
-        instead performed lazily: i.e., when respective properties are accessed.
+        Constructor for the `SpeechRecognitionOutput` class. Designed to create lightweight instances with most
+        attributes initially set to None unless provided explicitly on initialization. Computation-intensive operations
+        are instead performed lazily: i.e., when respective properties are accessed.
 
         Args:
             data (speechsdk.SpeechRecognitionResult): The JSON data output from a speech recognition event.
@@ -101,16 +102,17 @@ class SpeechToTextOutput:
 
     def from_cutoff(
         self, lower_cutoff: Optional[datetime.timedelta] = None, upper_cutoff: Optional[datetime.timedelta] = None
-    ) -> "SpeechToTextOutput":
+    ) -> Self:
         """
-        Create a new instance of class `SpeechToTextOutput` that only contains the text spoken within a cutoff interval.
+        Create a new instance of class `SpeechRecognitionOutput` that only contains the text spoken within a cutoff
+        interval.
 
         Args:
             lower_cutoff (datetime.timedelta): The lower cutoff time (or duration) of the new instance.
             upper_cutoff (datetime.timedelta): The upper cutoff time (or duration) of the new instance.
 
         Returns:
-            SpeechToTextOutput: The new instance of `SpeechToTextOutput`.
+            SpeechRecognitionOutput: The new instance of `SpeechRecognitionOutput`.
         """
 
         doc = NLP.model(SpaCyLangModel.EN_CORE_WEB_SM)(self.display)
@@ -130,7 +132,6 @@ class SpeechToTextOutput:
                     break
 
         if len(words) > 0:
-
             data = {
                 "Id": self._data["Id"],
                 "RecognitionStatus": self._data["RecognitionStatus"],

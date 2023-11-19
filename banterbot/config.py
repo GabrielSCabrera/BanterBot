@@ -31,6 +31,12 @@ personae.mkdir(parents=True, exist_ok=True)
 # The name of the directory in which memories should be saved
 memories = "memories"
 
+# The name of the resource file containing Microsoft Azure Cognitive Speech Services Neural Voices.
+azure_neural_voices = "azure_neural_voices.json"
+
+# The name of the resource file containing OpenAI ChatCompletion models.
+openai_models = "openai_models.json"
+
 # The extension that should be used in saving protocol buffers to file
 protobuf_extension = ".bin"
 

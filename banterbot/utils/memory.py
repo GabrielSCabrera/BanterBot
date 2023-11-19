@@ -1,6 +1,8 @@
 import datetime
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
+
+from typing_extensions import Self
 
 from banterbot import config
 
@@ -12,23 +14,22 @@ from banterbot.utils.message import Message
 @dataclass
 class Memory:
     """
-    This class represents a single memory of a persona in the form of a dataclass.
-    A memory is defined by keywords, a summary, an impact score, a timestamp,
-    and associated messages.
+    This class represents a single memory of a persona in the form of a dataclass. A memory is defined by keywords, a
+    summary, an impact score, a timestamp, and associated messages.
 
     Args:
-        keywords (List[str]): The list of keywords that summarize the memory.
+        keywords (list[str]): The list of keywords that summarize the memory.
         summary (str): A brief summary of the memory.
         impact (float): A score to indicate the impact of the memory on the persona (accepts values 1 to 100).
         timestamp (datetime.datetime): The time when the memory occurred.
-        messages (List[Message]): The list of messages associated with the memory.
+        messages (list[Message]): The list of messages associated with the memory.
     """
 
-    keywords: List[str]
+    keywords: list[str]
     summary: str
     impact: int
     timestamp: datetime.datetime
-    messages: List[Message]
+    messages: list[Message]
     uuid: Optional[str] = None
 
     def __post_init__(self):
@@ -42,7 +43,7 @@ class Memory:
 
     def __eq__(self, memory: "Memory"):
         """
-        Equality magic method, to allow equality checks between different instances of class Memory with the same
+        Equality magic method, to allow equality checks between different instances of class `Memory` with the same
         contents.
 
         Args:
@@ -59,12 +60,12 @@ class Memory:
 
     def to_protobuf(self) -> memory_pb2.Memory:
         """
-        Converts this Memory instance into a protobuf object.
+        Converts this `Memory` instance into a protobuf object.
         Args:
-            self: The instance of the Memory class.
+            self: The instance of the `Memory` class.
 
         Returns:
-            memory_pb2.Memory: The protobuf object equivalent of the Memory instance.
+            memory_pb2.Memory: The protobuf object equivalent of the `Memory` instance.
         """
         memory = memory_pb2.Memory()
         memory.keywords.extend(self.keywords)
@@ -78,7 +79,7 @@ class Memory:
 
     def serialize(self) -> str:
         """
-        Returns a serialized bytes string version of the current Memory instance.
+        Returns a serialized bytes string version of the current `Memory` instance.
 
         Returns:
             str: A string containing binary bytes.
@@ -86,12 +87,12 @@ class Memory:
         return self.to_protobuf().SerializeToString()
 
     @classmethod
-    def deserialize(cls, data: str) -> "Memory":
+    def deserialize(cls, data: str) -> Self:
         """
-        Constructs a Memory instance from a serialized string of binary bytes.
+        Constructs a `Memory` instance from a serialized string of binary bytes.
 
         Returns:
-            Memory: The constructed Memory instance.
+            Memory: The constructed `Memory` instance.
         """
         memory = memory_pb2.Memory()
         memory.ParseFromString(data)
@@ -100,15 +101,15 @@ class Memory:
     @classmethod
     def from_protobuf(cls, memory: memory_pb2.Memory) -> "Memory":
         """
-        Constructs a Memory instance from a protobuf object.
+        Constructs a `Memory` instance from a protobuf object.
 
         Args:
             memory (memory_pb2.Memory): The protobuf object to convert.
 
         Returns:
-            Memory: The constructed Memory instance.
+            Memory: The constructed `Memory` instance.
         """
-        # The Memory instance is created with the same attributes as the protobuf object.
+        # The `Memory` instance is created with the same attributes as the protobuf object.
         return cls(
             keywords=memory.keywords,
             summary=memory.summary,

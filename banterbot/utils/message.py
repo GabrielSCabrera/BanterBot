@@ -1,11 +1,13 @@
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Optional
+
+from typing_extensions import Self
 
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import OpenAIModel
 
 # File `memory_pb2.py` is automatically generated from protoc
 from banterbot.protos import memory_pb2
+from banterbot.utils.openai_model import OpenAIModel
 
 
 @dataclass
@@ -50,7 +52,7 @@ class Message:
         )
 
     @classmethod
-    def from_protobuf(cls, message_proto: memory_pb2.Message) -> "Message":
+    def from_protobuf(cls, message_proto: memory_pb2.Message) -> Self:
         """
         Constructs a Message instance from a protobuf object.
 
@@ -91,7 +93,7 @@ class Message:
             OpenAIModel class, which contains the tokenizer and other model-specific information.
 
         Returns:
-            int: The number of tokens in the given messages. Please note that this count includes tokens for message
+            int: The number of tokens in the specified messages. Please note that this count includes tokens for message
             metadata and may vary based on the specific tokenizer used by the model.
         """
         # Add 4 tokens to account for message metadata
@@ -106,7 +108,7 @@ class Message:
 
         return num_tokens
 
-    def __call__(self) -> Dict[str, str]:
+    def __call__(self) -> dict[str, str]:
         """
         Creates and returns a dictionary that is compatible with the OpenAI ChatCompletion API.
 
@@ -114,7 +116,7 @@ class Message:
         API.
 
         Returns:
-            Dict[str, str]: A dictionary containing the role (converted to string), content, and optionally the name of
+            dict[str, str]: A dictionary containing the role (converted to string), content, and optionally the name of
             the message sender.
         """
         output = {"role": self.role.value, "content": self.content}

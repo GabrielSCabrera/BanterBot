@@ -1,0 +1,163 @@
+{
+    "mattias": {
+        "gender": "MALE",
+        "voice": "sv-SE-MattiasNeural",
+        "styles": null
+    },
+    "aria": {
+        "gender": "FEMALE",
+        "voice": "en-US-AriaNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering",
+            "chat",
+            "customerservice",
+            "empathetic",
+            "narration-professional",
+            "newscast-casual",
+            "newscast-formal"
+        ]
+    },
+    "davis": {
+        "gender": "MALE",
+        "voice": "en-US-DavisNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering",
+            "chat"
+        ]
+    },
+    "guy": {
+        "gender": "MALE",
+        "voice": "en-US-GuyNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering",
+            "newscast"
+        ]
+    },
+    "jane": {
+        "gender": "FEMALE",
+        "voice": "en-US-JaneNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering"
+        ]
+    },
+    "jason": {
+        "gender": "MALE",
+        "voice": "en-US-JasonNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering"
+        ]
+    },
+    "jenny": {
+        "gender": "FEMALE",
+        "voice": "en-US-JennyNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering",
+            "assistant",
+            "chat",
+            "customerservice",
+            "newscast"
+        ]
+    },
+    "nancy": {
+        "gender": "FEMALE",
+        "voice": "en-US-NancyNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering"
+        ]
+    },
+    "sara": {
+        "gender": "FEMALE",
+        "voice": "en-US-SaraNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering"
+        ]
+    },
+    "tony": {
+        "gender": "MALE",
+        "voice": "en-US-TonyNeural",
+        "styles": [
+            "angry",
+            "cheerful",
+            "excited",
+            "friendly",
+            "hopeful",
+            "sad",
+            "shouting",
+            "terrified",
+            "unfriendly",
+            "whispering"
+        ]
+    }
+}

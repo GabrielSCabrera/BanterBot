@@ -3,7 +3,7 @@ import json
 import unittest
 from unittest.mock import MagicMock
 
-from banterbot.utils.speech_to_text_output import SpeechToTextOutput
+from banterbot.utils.speech_to_text_output import SpeechRecognitionOutput
 
 
 class TestSpeechToTextOutput(unittest.TestCase):
@@ -82,7 +82,7 @@ class TestSpeechToTextOutput(unittest.TestCase):
         )
         self.recognition_result = MagicMock()
         self.recognition_result.json = json_data
-        self.stt_output = SpeechToTextOutput(recognition_result=self.recognition_result)
+        self.stt_output = SpeechRecognitionOutput(recognition_result=self.recognition_result)
 
     def test_recognition_status(self):
         self.assertEqual(self.stt_output.recognition_status, "Success")

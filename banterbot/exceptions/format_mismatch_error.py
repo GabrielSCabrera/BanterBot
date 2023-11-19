@@ -4,7 +4,6 @@ from typing import Optional
 class FormatMismatchError(ValueError):
     """
     Exception raised when the output format from an external API does not match the expected format.
-
     This can be used to signal a mismatch in the expected structure or content type of the data returned from an API
     call.
 

@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-from banterbot.data.openai_models import get_model_by_name
 from banterbot.extensions.option_predictor import OptionPredictor
 from banterbot.utils.message import Message
 
@@ -11,13 +10,13 @@ class TestOptionPredictor(unittest.TestCase):
     This test suite covers the main functionality of the `OptionPredictor` class. The `setUp` method initializes an
     instance of `OptionPredictor` and the necessary variables for testing. Two test methods are included:
 
-        1. `test_evaluate`: This test checks if the `evaluate` method returns the expected probabilities for the given
-            options. It uses the `unittest.mock.patch` decorator to mock the `OpenAIManager.prompt` method, ensuring
+        1. `test_evaluate`: This test checks if the `evaluate` method returns the expected probabilities for the specified
+            options. It uses the `unittest.mock.patch` decorator to mock the `OpenAIService.prompt` method, ensuring
             that the API is not actually called. The test verifies that the returned probabilities match the expected
             values and that the `prompt` method is called once.
 
-        2. `test_random_select`: This test checks if the `random_select` method returns a valid option from the given
-            options. It also uses the `unittest.mock.patch` decorator to mock the `OpenAIManager.prompt` method. The
+        2. `test_random_select`: This test checks if the `random_select` method returns a valid option from the specified
+            options. It also uses the `unittest.mock.patch` decorator to mock the `OpenAIService.prompt` method. The
             test verifies that the selected option is in the list of options and that the `prompt` method is called
             once.
 
@@ -25,7 +24,7 @@ class TestOptionPredictor(unittest.TestCase):
     """
 
     def setUp(self):
-        self.model = get_model_by_name("gpt-3.5-turbo")
+        self.model = OpenAIModelManager.load("gpt-3.5-turbo")
         self.options = [
             "angry",
             "cheerful",
@@ -47,7 +46,7 @@ class TestOptionPredictor(unittest.TestCase):
             model=self.model, options=self.options, system=self.system, prompt=self.prompt, seed=self.seed
         )
 
-    @patch("banterbot.extensions.option_predictor.OpenAIManager.prompt")
+    @patch("banterbot.extensions.option_predictor.OpenAIService.prompt")
     def test_evaluate(self, mock_prompt):
         mock_prompt.return_value = (
             "angry:0\ncheerful:50\nexcited:20\nfriendly:10\nhopeful:10\nsad:5\nshouting:0\nterrified:0\nunfriendly:5"
@@ -70,7 +69,7 @@ class TestOptionPredictor(unittest.TestCase):
         self.assertEqual(probabilities, expected_probabilities)
         mock_prompt.assert_called_once()
 
-    @patch("banterbot.extensions.option_predictor.OpenAIManager.prompt")
+    @patch("banterbot.extensions.option_predictor.OpenAIService.prompt")
     def test_random_select(self, mock_prompt):
         mock_prompt.return_value = (
             "angry:0\ncheerful:50\nexcited:20\nfriendly:10\nhopeful:10\nsad:5\nshouting:0\nterrified:0\nunfriendly:5"

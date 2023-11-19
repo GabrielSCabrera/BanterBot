@@ -1,7 +1,7 @@
-from banterbot import TKMultiplayerInterface, ToneMode, get_model_by_name, get_voice_by_name
+from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKMultiplayerInterface, ToneMode
 
-model = get_model_by_name("gpt-4-1106-preview")
-voice = get_voice_by_name("Jason")
+model = OpenAIModelManager.load("gpt-4-turbo")
+voice = AzureNeuralVoiceManager.load("Jason")
 
 style = "sad"
 

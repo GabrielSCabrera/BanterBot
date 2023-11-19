@@ -22,7 +22,7 @@ message Memory {
 // Memory indexing entry structure for linking keywords to memories.
 message MemoryIndexEntry {
     string keyword = 1;                     // A single keyword associated with one or more memories.
-    repeated string memory_uuids = 2;       // UUIDs of the memories associated with the given keyword.
+    repeated string memory_uuids = 2;       // UUIDs of the memories associated with the specified keyword.
 }
 
 // Memory indexing structure for linking keywords to memories.

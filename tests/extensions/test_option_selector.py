@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-from banterbot.data.openai_models import get_model_by_name
 from banterbot.extensions.option_selector import OptionSelector
 from banterbot.utils.message import Message
 
@@ -10,8 +9,8 @@ class TestOptionSelector(unittest.TestCase):
     """
     This test suite covers the main functionality of the `OptionSelector` class. The `setUp` method initializes an
     instance of `OptionSelector` and the necessary variables for testing. One test method is included `test_select`:
-    This test checks if the `select` method returns the expected option for the given options. It uses the
-    `unittest.mock.patch` decorator to mock the `OpenAIManager.prompt` method, ensuring that the API is not actually
+    This test checks if the `select` method returns the expected option for the specified options. It uses the
+    `unittest.mock.patch` decorator to mock the `OpenAIService.prompt` method, ensuring that the API is not actually
     called. The test verifies that the returned option matches the expected value and that the `prompt` method is called
     once.
 
@@ -19,7 +18,7 @@ class TestOptionSelector(unittest.TestCase):
     """
 
     def setUp(self):
-        self.model = get_model_by_name("gpt-3.5-turbo")
+        self.model = OpenAIModelManager.load("gpt-3.5-turbo")
         self.options = [
             "angry",
             "cheerful",
@@ -40,7 +39,7 @@ class TestOptionSelector(unittest.TestCase):
             model=self.model, options=self.options, system=self.system, prompt=self.prompt
         )
 
-    @patch("banterbot.extensions.option_selector.OpenAIManager.prompt")
+    @patch("banterbot.extensions.option_selector.OpenAIService.prompt")
     def test_select(self, mock_prompt):
         mock_prompt.return_value = "2"
         messages = [Message(role="user", content="Hello, how are you?")]

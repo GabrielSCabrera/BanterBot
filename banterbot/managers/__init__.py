@@ -1,11 +1,5 @@
+from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.memory_chain import MemoryChain
-from banterbot.managers.openai_manager import OpenAIManager
-from banterbot.managers.speech_to_text import SpeechToText
-from banterbot.managers.text_to_speech import TextToSpeech
+from banterbot.managers.openai_model_manager import OpenAIModelManager
 
-__all__ = [
-    "MemoryChain",
-    "OpenAIManager",
-    "SpeechToText",
-    "TextToSpeech",
-]
+__all__ = ["AzureNeuralVoiceManager", "MemoryChain", "OpenAIModelManager"]

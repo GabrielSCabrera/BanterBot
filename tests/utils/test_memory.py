@@ -1,6 +1,5 @@
 import datetime
 import unittest
-from typing import List
 
 from banterbot.data.enums import ChatCompletionRoles
 from banterbot.utils.memory import Memory
@@ -21,11 +20,11 @@ class TestMemory(unittest.TestCase):
     """
 
     def setUp(self):
-        self.keywords: List[str] = ["keyword1", "keyword2", "keyword3"]
+        self.keywords: list[str] = ["keyword1", "keyword2", "keyword3"]
         self.summary: str = "This is a test memory summary."
         self.impact: int = 50
         self.timestamp: datetime.datetime = datetime.datetime.now()
-        self.messages: List[Message] = [
+        self.messages: list[Message] = [
             Message(role=ChatCompletionRoles.USER, content="User message 1"),
             Message(role=ChatCompletionRoles.ASSISTANT, content="Assistant message 1"),
             Message(role=ChatCompletionRoles.USER, content="User message 2"),

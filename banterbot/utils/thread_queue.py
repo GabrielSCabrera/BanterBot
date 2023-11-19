@@ -1,6 +1,5 @@
 import logging
 import threading
-from typing import List
 
 
 class ThreadQueue:
@@ -15,7 +14,7 @@ class ThreadQueue:
     def __init__(self):
         logging.debug(f"ThreadQueue initialized")
         self._lock = threading.Lock()
-        self._event_queue: List[threading.Event] = []
+        self._event_queue: list[threading.Event] = []
 
     def is_alive(self) -> bool:
         """

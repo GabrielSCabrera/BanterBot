@@ -1,7 +1,6 @@
 import unittest
 
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import get_model_by_name
 from banterbot.protos import memory_pb2
 from banterbot.utils.message import Message
 
@@ -39,7 +38,7 @@ class TestMessage(unittest.TestCase):
             role=ChatCompletionRoles.SYSTEM,
             content="You are an AI assistant.",
         )
-        self.model = get_model_by_name("gpt-3.5-turbo")
+        self.model = OpenAIModelManager.load("gpt-3.5-turbo")
 
     def test_to_protobuf(self):
         user_message_proto = self.user_message.to_protobuf()

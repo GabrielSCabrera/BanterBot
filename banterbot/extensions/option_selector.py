@@ -1,11 +1,10 @@
 import logging
-from typing import List
 
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import OpenAIModel
 from banterbot.data.prompts import OptionSelectorPrompts
-from banterbot.managers.openai_manager import OpenAIManager
+from banterbot.services.openai_service import OpenAIService
 from banterbot.utils.message import Message
+from banterbot.utils.openai_model import OpenAIModel
 
 
 class OptionSelector:
@@ -13,13 +12,13 @@ class OptionSelector:
     The OptionSelector class facilitates evaluating and selecting the most suitable option from a set of provided
     options given a conversational context.
 
-    This class enhances the capabilities of the base OpenAIManager by providing a mechanism for option assessment for
+    This class enhances the capabilities of the base `OpenAIService` by providing a mechanism for option assessment for
     potential responses. The options provided can represent any category or attribute, such as emotional tones, topics,
     sentiment, etc., thus allowing for a variety of uses.
 
     The class accepts three main parameters: a list of options (strings), a prompt, and an initial system message. The
     system message sets the context for the OptionSelector's task, while the prompt provides a guideline for the
-    evaluation. The most suitable option is then selected based on the given conversational context.
+    evaluation. The most suitable option is then selected based on the specified conversational context.
 
     Example: Emotional Tone Selection
 
@@ -35,13 +34,13 @@ class OptionSelector:
     response.
     """
 
-    def __init__(self, model: OpenAIModel, options: List[str], system: str, prompt: str):
+    def __init__(self, model: OpenAIModel, options: list[str], system: str, prompt: str):
         """
-        Initialize the OptionSelector with the given model, options, system message, prompt, and optional seed.
+        Initialize the OptionSelector with the specified model, options, system message, prompt, and optional seed.
 
         Args:
             model (OpenAIModel): The OpenAI model to be used for generating responses.
-            options (List[str]): A list of strings representing the options to be evaluated.
+            options (list[str]): A list of strings representing the options to be evaluated.
             system (str): The initial system message that sets the context for the OptionSelector's task.
             prompt (str): The prompt that provides a guideline for the evaluation.
         """
@@ -50,17 +49,17 @@ class OptionSelector:
         self._system = system
         self._prompt = prompt
 
-        self._openai_manager = OpenAIManager(model=model)
+        self._openai_manager = OpenAIService(model=model)
         self._system_processed = self._init_system_prompt()
 
-    def select(self, messages: List[Message]) -> str:
+    def select(self, messages: list[Message]) -> str:
         """
         Select an option by asking the OpenAI ChatCompletion API to pick an answer. The prompt is set up to force the
         model to return a single token with dummy text preceding it in order to yield consistent results in an efficient
         way.
 
         Args:
-            messages (List[Message]): The list of messages to be processed.
+            messages (list[Message]): The list of messages to be processed.
 
         Returns:
             str: The randomly selected option.
@@ -86,16 +85,16 @@ class OptionSelector:
         system_prompt = f"{self._system} {OptionSelectorPrompts.PREFIX.value}{options}"
         return system_prompt
 
-    def _insert_messages(self, messages: List[Message]) -> List[Message]:
+    def _insert_messages(self, messages: list[Message]) -> list[Message]:
         """
         Insert the system prompt, user prompt, prefix, suffix, and a dummy message mimicking a successful interaction
         with the ChatCompletion API, into the list of messages.
 
         Args:
-            messages (List[Message]): The list of messages to be processed.
+            messages (list[Message]): The list of messages to be processed.
 
         Returns:
-            List[Message]: The enhanced list of messages.
+            list[Message]: The enhanced list of messages.
         """
         prefix = Message(role=ChatCompletionRoles.SYSTEM, content=self._system_processed)
         suffix = Message(role=ChatCompletionRoles.USER, content=self._prompt)

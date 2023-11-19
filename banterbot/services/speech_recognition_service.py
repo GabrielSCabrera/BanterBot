@@ -9,13 +9,14 @@ import azure.cognitiveservices.speech as speechsdk
 
 from banterbot.config import DEFAULT_LANGUAGE, soft_interruption_delay
 from banterbot.data.enums import EnvVar
-from banterbot.utils.speech_to_text_output import SpeechToTextOutput
+from banterbot.utils.speech_recognition_output import SpeechRecognitionOutput
 
 
-class SpeechToText:
+class SpeechRecognitionService:
     """
-    The SpeechToText class provides an interface to convert spoken language into written text using Azure Cognitive
-    Services. It allows continuous speech recognition and provides real-time results as sentences are recognized.
+    The `SpeechRecognitionService` class provides an interface to convert spoken language into written text using Azure
+    Cognitive Speech Services. It allows continuous speech recognition and provides real-time results as sentences are
+    recognized.
     """
 
     # Create a lock that prevents race conditions when listening
@@ -27,16 +28,16 @@ class SpeechToText:
         phrase_list: Optional[list[str]] = None,
     ) -> None:
         """
-        Initializes the SpeechToText instance by setting up the Azure Cognitive Services speech configuration and
-        recognizer. Argument `recognition_language` can take one or more values, each representing a language the
-        recognizer can expect to receive as an input. The recognizer will attempt to auto-detect the language if
-        multiple are provided.
+        Initializes the `SpeechRecognitionService` instance by setting up the Azure Cognitive Services speech
+        configuration and recognizer. Argument `recognition_language` can take one or more values, each representing a
+        language the recognizer can expect to receive as an input. The recognizer will attempt to auto-detect the
+        language if multiple are provided.
 
         Args:
             languages (Union[str, list[str]): The language(s) the speech-to-text recognizer expects to hear.
             phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
         """
-        logging.debug(f"SpeechToText initialized")
+        logging.debug(f"SpeechRecognitionService initialized")
 
         # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
@@ -51,7 +52,7 @@ class SpeechToText:
         self._speech_config.request_word_level_timestamps()
 
         # Initialize the output and total length variables
-        self._outputs: list[SpeechToTextOutput] = []
+        self._outputs: list[SpeechRecognitionOutput] = []
 
         # Determine whether language auto-detection should be activated
         self._languages = DEFAULT_LANGUAGE if languages is None else languages
@@ -62,6 +63,10 @@ class SpeechToText:
 
         # Initialize an instance of `PhraseListGrammar` which is used to provide context to improve speech recognition
         self._phrase_list_grammar = speechsdk.PhraseListGrammar.from_recognizer(self._recognizer)
+
+        # Add any phrases in `phrase_list` to the `PhraseListGrammar`.
+        if phrase_list:
+            self.add_phrases(phrase_list)
 
         # Connect the speech recognizer events to their corresponding callbacks
         self._recognizer_events_connect()
@@ -106,7 +111,7 @@ class SpeechToText:
         # If a hard interrupt is initiated, interrupt the Event waiting for the recognition to end.
         if not soft:
             self._stop_recognition.set()
-        logging.debug("SpeechToText listener interrupted")
+        logging.debug("SpeechRecognitionService listener interrupted")
 
     def listen(self, init_time: Optional[int] = None) -> Generator[str, None, None]:
         """
@@ -121,10 +126,8 @@ class SpeechToText:
 
         # Only allow one listener to be active at once.
         with self.__class__._listen_lock:
-
             # Do not run the listener if an interruption was raised after `init_time`.
             if self._interrupt <= init_time:
-
                 # Prepare a list which will contain all the recognized input words.
                 output = []
                 self._outputs.append(output)
@@ -134,10 +137,10 @@ class SpeechToText:
 
                 # Monitor the recognition progress in the main thread, yielding sentences as they are processed
                 for block in self._callbacks_process(output=output, init_time=init_time):
-                    logging.debug(f"SpeechToText listener processed block: `{block}`")
+                    logging.debug(f"SpeechRecognitionService listener processed block: `{block}`")
                     yield block
 
-                logging.debug("SpeechToText listener stopped")
+                logging.debug("SpeechRecognitionService listener stopped")
 
                 # Reset all state attributes
                 self._reset()
@@ -145,7 +148,8 @@ class SpeechToText:
     @property
     def listening(self) -> bool:
         """
-        If the current instance of SpeechToText is in the process of listening, returns True. Otherwise, returns False.
+        If the current instance of `SpeechRecognitionService` is in the process of listening, returns True. Otherwise,
+        returns False.
 
         Returns:
             bool: The listening state of the current instance.
@@ -164,8 +168,8 @@ class SpeechToText:
 
     def add_phrases(self, phrases: list[str]) -> None:
         """
-        Add a new phrase to the PhraseListGrammar instance, which implements a bias towards the given words/phrases that
-        can help improve speech recognition in circumstances where there may be potential ambiguity.
+        Add a new phrase to the PhraseListGrammar instance, which implements a bias towards the specified words/phrases
+        that can help improve speech recognition in circumstances where there may be potential ambiguity.
 
         Args:
             phrases(list[str]): Provide the recognizer with additional text context to improve recognition.
@@ -183,7 +187,7 @@ class SpeechToText:
         """
         Set the language(s) being recognized by the Speech-to-Text recognizer in two modes: if a string is given to
         argument `languages` in the __init__ method, then set the language explicitly in the Azure speech SDK
-        `SpeechRecognizer` object in this `SpeechToText` instance. If a list of languages is given, use the
+        `SpeechRecognizer` object in this `SpeechRecognitionService` instance. If a list of languages is given, use the
         `AutoDetectSourceLanguageConfig` object from the speech SDK to allow the `SpeechRecognizer` to automatically
         choose the input language from one of those provided.
 
@@ -208,7 +212,7 @@ class SpeechToText:
         Resets the state variables of the speech-to-text recognizer, such as the list of events, the listening flag,
         the soft interruption flag, recognition started flag, recognition stopped flag, and new events flag.
         """
-        self._events: list[SpeechToTextOutput] = []
+        self._events: list[SpeechRecognitionOutput] = []
         self._listening: bool = False
         self._soft_interrupt: bool = False
         self._start_recognition_time = 0
@@ -250,13 +254,13 @@ class SpeechToText:
         self._start_recognition_time = time.perf_counter_ns()
         self._start_recognition.set()
 
-    def _callbacks_process(self, output: list[SpeechToTextOutput], init_time: int) -> Generator[str, None, None]:
+    def _callbacks_process(self, output: list[SpeechRecognitionOutput], init_time: int) -> Generator[str, None, None]:
         """
         Processes the recognized speech events and appends them to the output list. Yields sentences as they are
         processed.
 
         Args:
-            output (list[SpeechToTextOutput]): The list in which to store the recognized speech events.
+            output (list[SpeechRecognitionOutput]): The list in which to store the recognized speech events.
             init_time (int): The time at which the listening was initialized.
 
         Yields:
@@ -272,11 +276,10 @@ class SpeechToText:
         self._start_recognition.wait()
 
         t = time.perf_counter_ns()
-        logging.debug("SpeechToText listener started")
+        logging.debug("SpeechRecognitionService listener started")
 
         # Continuously monitor the recognition progress
         while self._interrupt <= init_time:
-
             self._new_events.wait()
             self._new_events.clear()
 
@@ -294,7 +297,6 @@ class SpeechToText:
             # Prepare a timedelta object indicating how long the listener was active.
             cutoff = datetime.timedelta(microseconds=1e-3 * (self._interrupt - init_time)) + soft_interruption_delay
             for idx in range(idx, len(self._events)):
-
                 if self._events[idx].offset - self._total_offset > cutoff:
                     break
                 elif self._events[idx].offset_end - self._total_offset > cutoff:
@@ -317,7 +319,7 @@ class SpeechToText:
             self._total_offset = datetime.timedelta(microseconds=event.offset / 10)
 
         self._events.append(
-            SpeechToTextOutput.from_recognition_result(
+            SpeechRecognitionOutput.from_recognition_result(
                 event.result, self._languages if not self._auto_detection else None
             )
         )

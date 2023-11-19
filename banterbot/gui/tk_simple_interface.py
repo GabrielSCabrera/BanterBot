@@ -3,11 +3,13 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Optional, Union
 
-from banterbot.data.azure_neural_voices import AzureNeuralVoice, get_voice_by_name
 from banterbot.data.enums import ToneMode
-from banterbot.data.openai_models import OpenAIModel, get_model_by_name
 from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
+from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
+from banterbot.managers.openai_model_manager import OpenAIModelManager
+from banterbot.utils.azure_neural_voice import AzureNeuralVoice
+from banterbot.utils.openai_model import OpenAIModel
 
 
 class TKSimpleInterface(tk.Tk, Interface):
@@ -25,8 +27,8 @@ class TKSimpleInterface(tk.Tk, Interface):
 
     def __init__(
         self,
-        model: OpenAIModel = get_model_by_name("gpt-3.5-turbo"),
-        voice: AzureNeuralVoice = get_voice_by_name("Aria"),
+        model: OpenAIModel = OpenAIModelManager.load("gpt-3.5-turbo"),
+        voice: AzureNeuralVoice = AzureNeuralVoiceManager.load("Aria"),
         style: str = "chat",
         languages: Optional[Union[str, list[str]]] = None,
         system: Optional[str] = None,
@@ -66,7 +68,7 @@ class TKSimpleInterface(tk.Tk, Interface):
 
     def update_conversation_area(self, word: str) -> None:
         """
-        Update the conversation area with the given word.
+        Update the conversation area with the specified word.
 
         Args:
             word (str): The word to be added to the conversation area.
@@ -133,9 +135,9 @@ class TKSimpleInterface(tk.Tk, Interface):
         """
         This method is called on exit, and interrupts any currently running activity.
         """
-        self._openai_manager.interrupt()
-        self._text_to_speech.interrupt()
-        self._speech_to_text.interrupt()
+        self._openai_service.interrupt()
+        self._speech_synthesis_service.interrupt()
+        self._speech_recognition_service.interrupt()
         self.quit()
         self.destroy()
 
@@ -144,7 +146,7 @@ class TKSimpleInterface(tk.Tk, Interface):
         Initialize the graphical user interface for the BanterBot application.
         This method sets up the main window, conversation area, input fields, and buttons.
         """
-        self.title(f"BanterBot {self._model.name}")
+        self.title(f"BanterBot {self._model.model}")
         self.configure(bg="black")
         self.geometry("1024x768")
         self._font = ("Cascadia Code", 16)

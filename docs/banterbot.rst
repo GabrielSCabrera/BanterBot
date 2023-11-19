@@ -4,28 +4,28 @@ BanterBot Package
 Classes
 -------
 
-OpenAIManager
+OpenAIService
 ~~~~~~~~~~~~~
 
-.. autoclass:: banterbot.managers.openai_manager.OpenAIManager
+.. autoclass:: banterbot.services.openai_service.OpenAIService
    :members:
    :undoc-members:
    :special-members:
    :show-inheritance:
 
-SpeechToText
-~~~~~~~~~~~~
+SpeechSynthesisService
+~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: banterbot.managers.speech_to_text.SpeechToText
+.. autoclass:: banterbot.services.speech_synthesis_service.SpeechSynthesisService
    :members:
    :undoc-members:
    :special-members:
    :show-inheritance:
 
-TextToSpeech
-~~~~~~~~~~~~
+SpeechRecognitionService
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: banterbot.managers.text_to_speech.TextToSpeech
+.. autoclass:: banterbot.services.speech_recognition_service.SpeechRecognitionService
    :members:
    :undoc-members:
    :special-members:
@@ -76,4 +76,5 @@ banterbot.config module
    banterbot.extensions
    banterbot.gui
    banterbot.managers
+   banterbot.services
    banterbot.utils

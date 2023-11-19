@@ -3,11 +3,11 @@ import re
 from typing import Optional
 
 from banterbot.config import RETRY_LIMIT
-from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.enums import ChatCompletionRoles, Prosody
-from banterbot.data.openai_models import OpenAIModel
 from banterbot.data.prompts import ProsodySelection
+from banterbot.utils.azure_neural_voice import AzureNeuralVoice
 from banterbot.utils.message import Message
+from banterbot.utils.openai_model import OpenAIModel
 from banterbot.utils.phrase import Phrase
 
 
@@ -18,7 +18,7 @@ class ProsodySelector:
 
     Attributes:
         _model (OpenAIModel): The OpenAI model to be used for generating responses.
-        _openai_manager (OpenAIManager): An instance of the OpenAIManager class.
+        _openai_manager (OpenAIService): An instance of the OpenAIService class.
         _voice (AzureNeuralVoice): An instance of the AzureNeuralVoice class.
         _valid (bool): A flag indicating whether the voice styles are not None.
         _token_counts (dict): A dictionary to cache the maximum number of tokens for a given number of rows.
@@ -32,7 +32,7 @@ class ProsodySelector:
         Initializes the ProsodySelector class with a specified OpenAI model and AzureNeuralVoice instance.
 
         Args:
-            manager (OpenAIManager): An instance of class OpenAIManager to be used for generating responses.
+            manager (OpenAIService): An instance of class OpenAIService to be used for generating responses.
             voice (AzureNeuralVoice): An instance of the AzureNeuralVoice class.
         """
         logging.debug(f"ProsodySelector initialized")
@@ -113,9 +113,8 @@ class ProsodySelector:
         """
 
         for i in range(RETRY_LIMIT):
-
-            # Attempt several different sentence splits in order to modify the input on retry -- this reduces the chance
-            # of a `FormatMismatchError` Exception significantly. `RETRY_LIMIT` is defined in the config file.
+            # Attempt several different sentence splits in order to modify the input on retry -- significantly reduces
+            # the chance of raising a `FormatMismatchError` Exception. `RETRY_LIMIT` is defined in the config file.
             if i == 0:
                 phrases = self._split_sentences(sentences)
             elif i == 1:
@@ -144,8 +143,8 @@ class ProsodySelector:
 
     def _get_max_tokens(self, N: int) -> int:
         """
-        Returns the maximum number of tokens for the given number of rows of six-digit numbers. Caches all calculated
-        values.
+        Returns the maximum number of tokens for the specified number of rows of six-digit numbers. Caches all
+        calculated values.
 
         Args:
             N (int): The number of rows.

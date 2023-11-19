@@ -3,15 +3,14 @@ from typing import Generator
 from unittest.mock import MagicMock, patch
 
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.openai_models import get_model_by_name
-from banterbot.managers.openai_manager import OpenAIManager
+from banterbot.services.openai_service import OpenAIService
 from banterbot.utils.message import Message
 
 
-class TestOpenAIManager(unittest.TestCase):
+class TestOpenAIService(unittest.TestCase):
     """
-    This test suite covers the main functionality of the `OpenAIManager` class. The `setUp` method initializes an
-    instance of `OpenAIManager` and a list of messages to be used in the tests. The tests cover the following methods:
+    This test suite covers the main functionality of the `OpenAIService` class. The `setUp` method initializes an
+    instance of `OpenAIService` and a list of messages to be used in the tests. The tests cover the following methods:
 
         1. `test_prompt`: Tests the `prompt` method, ensuring that it returns a list of sentences.
         2. `test_prompt_no_split`: Tests the `prompt` method with the `split` parameter set to `False`, ensuring that it
@@ -26,8 +25,8 @@ class TestOpenAIManager(unittest.TestCase):
     """
 
     def setUp(self):
-        self.model = get_model_by_name("gpt-3.5-turbo")
-        self.manager = OpenAIManager(self.model)
+        self.model = OpenAIModelManager.load("gpt-3.5-turbo")
+        self.manager = OpenAIService(self.model)
 
         self.messages = [
             Message(role=ChatCompletionRoles.SYSTEM, content="You are an AI assistant."),

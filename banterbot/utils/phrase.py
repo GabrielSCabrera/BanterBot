@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from banterbot.data.azure_neural_voices import AzureNeuralVoice
+from banterbot.utils.azure_neural_voice import AzureNeuralVoice
 
 
 @dataclass
 class Phrase:
     """
-    Contains processed data for a sub-sentence returned from a ChatCompletion ProsodySelection prompt, ready for
-    SSML interpretation.
+    Contains processed data for a sub-sentence returned from a ChatCompletion ProsodySelection prompt, ready for SSML
+    interpretation.
     """
 
     text: str

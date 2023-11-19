@@ -3,29 +3,30 @@ import logging
 import os
 import threading
 import time
-from typing import Generator, List, Optional, TypedDict
+from typing import Generator, Optional, TypedDict
 
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
-from banterbot.data.azure_neural_voices import AzureNeuralVoice
 from banterbot.data.enums import EnvVar, SpeechProcessingType, WordCategory
+from banterbot.utils.azure_neural_voice import AzureNeuralVoice
 from banterbot.utils.phrase import Phrase
-from banterbot.utils.text_to_speech_output import TextToSpeechOutput
+from banterbot.utils.speech_synthesis_output import SpeechSynthesisOutput
 from banterbot.utils.word import Word
 
 
 class TimedEvent(TypedDict):
     """
-    A specifically typed dictionary which is appended to the list of events in a TextToSpeech instance during speech
-    synthesis in a callback, containing the exact time at which the words in the event should be synthesized.
+    A specifically typed dictionary which is appended to the list of events in a `SpeechSynthesisService` instance
+    during speech synthesis in a callback, containing the exact time at which the words in the event should be
+    synthesized.
     """
 
     event: speechsdk.SessionEventArgs
     time: int
 
 
-class TextToSpeech:
+class SpeechSynthesisService:
     """
     A class to handle text-to-speech synthesis utilizing Azure's Cognitive Services.
 
@@ -42,13 +43,13 @@ class TextToSpeech:
         output_format: SpeechSynthesisOutputFormat = SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3,
     ) -> None:
         """
-        Initializes an instance of the TextToSpeech class with a specified output format.
+        Initializes an instance of the `SpeechSynthesisService` class with a specified output format.
 
         Args:
             output_format (SpeechSynthesisOutputFormat, optional): The desired output format for the synthesized speech.
                 Default is Audio16Khz32KBitRateMonoMp3.
         """
-        logging.debug(f"TextToSpeech initialized")
+        logging.debug(f"SpeechSynthesisService initialized")
 
         # Initialize the speech configuration with the Azure subscription and region
         self._speech_config = speechsdk.SpeechConfig(
@@ -57,7 +58,7 @@ class TextToSpeech:
         )
 
         # Initialize the output and total length variables
-        self._outputs: List[TextToSpeechOutput] = []
+        self._outputs: list[SpeechSynthesisOutput] = []
 
         # Initialize the speech synthesizer with the speech configuration
         self._synthesizer = speechsdk.SpeechSynthesizer(speech_config=self._speech_config)
@@ -81,19 +82,20 @@ class TextToSpeech:
         self._reset()
 
     @property
-    def output(self) -> List[TextToSpeechOutput]:
+    def output(self) -> list[SpeechSynthesisOutput]:
         """
-        Getter for the output property, which is a list of TextToSpeechOutput objects.
+        Getter for the output property, which is a list of SpeechSynthesisOutput objects.
 
         Returns:
-            List[TextToSpeechOutput]: The list of synthesized outputs.
+            list[SpeechSynthesisOutput]: The list of synthesized outputs.
         """
         return self._outputs
 
     @property
     def speaking(self) -> bool:
         """
-        If the current instance of TextToSpeech is in the process of speaking, returns True. Otherwise, returns False.
+        If the current instance of `SpeechSynthesisService` is in the process of speaking, returns True. Otherwise,
+        returns False.
 
         Args:
             bool: The speaking state of the current instance.
@@ -106,11 +108,11 @@ class TextToSpeech:
         which will cause any text-to-speech processes activated prior to the current time to stop.
         """
         self._interrupt: int = time.perf_counter_ns()
-        logging.debug("TextToSpeech synthesizer interrupted")
+        logging.debug("SpeechSynthesisService synthesizer interrupted")
 
     def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[Word, None, bool]:
         """
-        Speaks the given text using the specified voice and style.
+        Speaks the specified text using the specified voice and style.
 
         This method converts the input text into speech using the specified voice and style. It yields the synthesized
         words one by one, along with their contextual information.
@@ -126,19 +128,17 @@ class TextToSpeech:
         # Record the time at which the thread was initialized pre-lock, in order to account for future interruptions.
         init_time = time.perf_counter_ns()
 
-        # Create SSML markup for the given input_string, voice, and style
+        # Create SSML markup for the specified input_string, voice, and style
         ssml = self._create_ssml(input_string, voice, style)
 
         # Create a new thread to handle the speech synthesis
         speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
 
         with self.__class__._speech_lock:
-
             # Do not run the listener if an interruption was raised after `init_time`.
             if self._interrupt < init_time:
-
-                # Prepare an instance of TextToSpeechOutput while will receive values iteratively
-                output = TextToSpeechOutput(
+                # Prepare an instance of SpeechSynthesisOutput while will receive values iteratively
+                output = SpeechSynthesisOutput(
                     input_string=input_string, timestamp=datetime.datetime.now(), voice=voice, style=style
                 )
                 self._outputs.append(output)
@@ -151,7 +151,7 @@ class TextToSpeech:
 
                 # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
                 for word in self._callbacks_process(output, init_time):
-                    logging.debug(f"TextToSpeech synthesizer processed word: `{word}`")
+                    logging.debug(f"SpeechSynthesisService synthesizer processed word: `{word}`")
                     yield word
 
                 # Reset all state attributes
@@ -173,19 +173,17 @@ class TextToSpeech:
         # Record the time at which the thread was initialized pre-lock, in order to account for future interruptions.
         init_time = time.perf_counter_ns()
 
-        # Create SSML markup for the given input_string, voice, and style
+        # Create SSML markup for the specified input_string, voice, and style
         ssml = self._create_advanced_ssml(phrases)
 
         # Create a new thread to handle the speech synthesis
         speech_thread = threading.Thread(target=self._speak, args=(ssml,), daemon=True)
 
         with self.__class__._speech_lock:
-
             # Do not run the listener if an interruption was raised after `init_time`.
             if self._interrupt < init_time:
-
-                # Prepare an instance of TextToSpeechOutput while will receive values iteratively
-                output = TextToSpeechOutput(
+                # Prepare an instance of SpeechSynthesisOutput while will receive values iteratively
+                output = SpeechSynthesisOutput(
                     input_string=" ",
                     timestamp=datetime.datetime.now(),
                 )
@@ -199,7 +197,7 @@ class TextToSpeech:
 
                 # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
                 for word in self._callbacks_process(output, init_time):
-                    logging.debug(f"TextToSpeech synthesizer processed word: `{word}`")
+                    logging.debug(f"SpeechSynthesisService synthesizer processed word: `{word}`")
                     yield word
 
                 # Reset all state attributes
@@ -234,7 +232,6 @@ class TextToSpeech:
         """
         # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
-
             # Add the event and timing information to the list of events
             self._events.append(
                 {
@@ -260,7 +257,7 @@ class TextToSpeech:
         self._synthesizer.synthesis_canceled.connect(self._callback_completed)
         self._synthesizer.synthesis_completed.connect(self._callback_completed)
 
-    def _callbacks_process(self, output: TextToSpeechOutput, init_time: int) -> Generator[Word, None, bool]:
+    def _callbacks_process(self, output: SpeechSynthesisOutput, init_time: int) -> Generator[Word, None, bool]:
         """
         Monitors the synthesis progress and updates the output accordingly.
 
@@ -268,7 +265,7 @@ class TextToSpeech:
         object with the processed words and yields them one by one.
 
         Args:
-            output (TextToSpeechOutput): The output object to which the processed words will be added.
+            output (SpeechSynthesisOutput): The output object to which the processed words will be added.
             init_time (int): The time at which the speech was initialized.
 
         Yields:
@@ -285,11 +282,10 @@ class TextToSpeech:
         self._start_synthesis.wait()
         start_timer = time.perf_counter_ns()
 
-        logging.debug("TextToSpeech synthesizer started")
+        logging.debug("SpeechSynthesisService synthesizer started")
 
         # Continuously monitor the synthesis progress
         while self._interrupt < init_time and (not self._synthesis_completed or idx < len(self._events)):
-
             dt = time.perf_counter_ns() - start_timer
 
             while self._interrupt < init_time and idx < len(self._events) and dt >= self._events[idx]["time"]:
@@ -303,13 +299,13 @@ class TextToSpeech:
 
         # Stop the synthesizer
         self._synthesizer.stop_speaking()
-        logging.debug("TextToSpeech synthesizer stopped")
+        logging.debug("SpeechSynthesisService synthesizer stopped")
         return success
 
     @classmethod
     def _create_ssml(cls, text: str, voice: str, style: Optional[str] = None) -> str:
         """
-        Creates an SSML string from the given text, voice, and style.
+        Creates an SSML string from the specified text, voice, and style.
 
         Args:
             text (str): The input string that is to be converted into speech.
@@ -342,11 +338,11 @@ class TextToSpeech:
     @classmethod
     def _create_advanced_ssml(cls, phrases: list[Phrase]) -> str:
         """
-        Creates a more advanced SSML string from the given list of `Phrase` instances, that customizes the emphasis,
+        Creates a more advanced SSML string from the specified list of `Phrase` instances, that customizes the emphasis,
         style, pitch, and rate of speech on a sub-sentence level, including pitch contouring between phrases.
 
         Args:
-            phrases (List[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.
+            phrases (list[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.
 
         Returns:
             str: The SSML string.
@@ -431,7 +427,7 @@ class TextToSpeech:
         Resets the state variables of the text-to-speech synthesizer, such as the list of events, synthesis timer, the
         interrupt flag, the speaking flag, the synthesis completed flag, and synthesis started flag.
         """
-        self._events: List[TimedEvent] = []
+        self._events: list[TimedEvent] = []
         self._speaking = False
         self._synthesis_completed = False
         self._start_synthesis = threading.Event()

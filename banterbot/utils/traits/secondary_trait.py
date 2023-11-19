@@ -1,6 +1,7 @@
 import numpy as np
+from typing_extensions import Self
 
-from banterbot.utils.primary_trait import PrimaryTrait
+from banterbot.utils.traits.primary_trait import PrimaryTrait
 
 
 class SecondaryTrait:
@@ -25,7 +26,7 @@ class SecondaryTrait:
         primary_trait1: PrimaryTrait,
         primary_trait2: PrimaryTrait,
         cov: float = 0.95,
-    ) -> "SecondaryTrait":
+    ) -> Self:
         """
         Create a SecondaryTrait instance based on two primary traits, using a Gaussian distribution to select a value
         from a provided grid.

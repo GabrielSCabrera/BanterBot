@@ -1,7 +1,15 @@
 banterbot.managers package
 ==============================
 
-banterbot.managers.memory\_chain
+banterbot.managers.azure\_neural\_voice\_manager module
+-----------------------------------------------
+
+.. automodule:: banterbot.managers.azure_neural_voice_manager
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    
+banterbot.managers.memory\_chain module
 -----------------------------------------------
 
 .. automodule:: banterbot.managers.memory_chain
@@ -9,26 +17,19 @@ banterbot.managers.memory\_chain
     :undoc-members:
     :show-inheritance:
 
-banterbot.managers.openai\_manager module
-----------------------------------------------
-
-.. automodule:: banterbot.managers.openai_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-banterbot.managers.speech\_to\_text module
+banterbot.managers.openai\_model\_manager module
 -----------------------------------------------
 
-.. automodule:: banterbot.managers.speech_to_text
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. automodule:: banterbot.managers.openai_model_manager
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-banterbot.managers.text\_to\_speech module
+banterbot.managers.resource\_manager module
 -----------------------------------------------
 
-.. automodule:: banterbot.managers.text_to_speech
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. automodule:: banterbot.managers.resource_manager
+    :members:
+    :undoc-members:
+    :show-inheritance:    
+

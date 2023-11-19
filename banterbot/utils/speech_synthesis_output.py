@@ -2,14 +2,14 @@ import datetime
 from dataclasses import dataclass
 from typing import Iterator, Optional
 
-from banterbot.data.azure_neural_voices import AzureNeuralVoice
+from banterbot.utils.azure_neural_voice import AzureNeuralVoice
 from banterbot.utils.word import Word
 
 
 @dataclass
-class TextToSpeechOutput:
+class SpeechSynthesisOutput:
     """
-    The TextToSpeechOutput class encapsulates the output of a text-to-speech conversion, providing a convenient
+    The `SpeechSynthesisOutput` class encapsulates the output of a text-to-speech conversion, providing a convenient
     interface for working with and manipulating the converted data. This class is designed to store the input text, the
     timestamp, the voice and style used for conversion, and the list of Word objects representing the individual words
     in the output.
@@ -45,7 +45,7 @@ class TextToSpeechOutput:
 
     def __getitem__(self, idx: int) -> Word:
         """
-        Allows for indexing into the TextToSpeechOutput object to retrieve words at specific positions.
+        Allows for indexing into the `SpeechSynthesisOutput` object to retrieve words at specific positions.
 
         Args:
             idx (int): The index of the word to retrieve.
@@ -67,7 +67,7 @@ class TextToSpeechOutput:
 
     def __len__(self) -> int:
         """
-        Allows for the use of len() on a TextToSpeechOutput instance, returning the number of words in the output.
+        Allows for the use of len() on a `SpeechSynthesisOutput` instance, returning the number of words in the output.
 
         Returns:
             int: The number of words in the output.
@@ -76,7 +76,7 @@ class TextToSpeechOutput:
 
     def __str__(self) -> str:
         """
-        Converts the TextToSpeechOutput instance into a string, concatenating all the words in the output.
+        Converts the `SpeechSynthesisOutput` instance into a string, concatenating all the words in the output.
 
         Returns:
             str: The string representation of the text-to-speech output. This will be a concatenation of all the words

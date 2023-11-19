@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import azure.cognitiveservices.speech as speechsdk
 
-from banterbot.managers.speech_to_text import SpeechToText
+from banterbot.services.speech_synthesis_service import SpeechToText
 
 
 class TestSpeechToText(unittest.TestCase):
@@ -28,7 +28,6 @@ class TestSpeechToText(unittest.TestCase):
         with patch("azure.cognitiveservices.speech.SpeechConfig") as mock_speech_config, patch(
             "azure.cognitiveservices.speech.SpeechRecognizer"
         ) as mock_speech_recognizer, patch("azure.cognitiveservices.speech.Connection") as mock_connection:
-
             # Create a SpeechToText instance with the mocked configuration and recognizer
             self.speech_to_text = SpeechToText()
 

@@ -27,11 +27,11 @@ Three environment variables are required for full functionality:
 
 A graphical user interface (GUI) establishes a multiplayer conversation environment where up to nine users can interact with the chatbot simultaneously. The GUI includes a conversation history area and user panels with 'Listen' buttons to process user input. It also supports key bindings for user convenience.
 
-### OpenAIManager
+### OpenAIService
 
 A class responsible for managing interactions with the OpenAI ChatCompletion API. It offers functionality to generate responses from the API based on input messages. It supports generating responses in their entirety or as a stream of response blocks.
 
-### TextToSpeech
+### SpeechSynthesisService
 
 A class that handles text-to-speech synthesis using Azure's Cognitive Services. It supports a wide range of output formats, voices, and speaking styles. The synthesized speech can be interrupted, and the progress can be monitored in real-time.
 
@@ -87,7 +87,7 @@ Start BanterBot with an enhanced graphical user interface by running the command
 Here is an example:
 
 ```bash
-banterbot -g --model gpt-4 --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --tone-mode ADVANCED --name Grendel
+banterbot -g --model gpt-4-turbo --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --tone-mode ADVANCED --name Grendel
 ```
 
 ### Launch with a Python script
@@ -95,10 +95,10 @@ banterbot -g --model gpt-4 --voice davis --prompt "You are Grendel the Quiz Trol
 To use BanterBot in a script, create an instance of the `TKSimpleInterface` class and call the `run` method:
 
 ```python
-from banterbot import TKMultiplayerInterface, get_voice_by_name, get_model_by_name, ToneMode
+from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, ToneMode, TKMultiplayerInterface
 
-model = get_model_by_name("gpt-4")
-voice = get_voice_by_name("Davis")
+model = OpenAIModelManager.load("gpt-4-turbo")
+voice = AzureNeuralVoiceManager.load("Davis")
 assistant_name = "Grendel"
 
 # Set the tone_mode -- other options are ToneMode.NONE, ToneMode.BASIC.

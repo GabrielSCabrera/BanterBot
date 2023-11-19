@@ -1,6 +1,8 @@
 import logging
 import shutil
-from typing import Dict, List, Optional
+from typing import Optional
+
+from typing_extensions import Self
 
 from banterbot import config
 from banterbot.protos import memory_pb2
@@ -17,7 +19,7 @@ class MemoryChain:
     """
 
     @classmethod
-    def create(cls) -> "MemoryChain":
+    def create(cls) -> Self:
         """
         Generate a new empty set of memories and associated UUID.
 
@@ -39,7 +41,7 @@ class MemoryChain:
         return cls(uuid=uuid, memory_index={})
 
     @classmethod
-    def load(cls, uuid: str) -> "MemoryChain":
+    def load(cls, uuid: str) -> Self:
         """
         Load the memories from a binary file using Protocol Buffers deserialization and creates a MemoryChain instance.
         This method is used to load an existing set of memories from a file, allowing for the continuation of a previous
@@ -74,14 +76,14 @@ class MemoryChain:
         """
         shutil.rmtree(config.personae / uuid)
 
-    def __init__(self, uuid: str, memory_index: Dict[str, List[str]]) -> None:
+    def __init__(self, uuid: str, memory_index: dict[str, list[str]]) -> None:
         """
         Initialize a new instance of MemoryChain.
 
         Args:
             uuid (str): The UUID associated with this set of memories.
 
-            memory_index (Dict[str, List[str]]): The dictionary mapping from keyword to list of memory UUIDs. This index
+            memory_index (dict[str, list[str]]): The dictionary mapping from keyword to list of memory UUIDs. This index
             is used to efficiently look up memories based on keywords.
         """
         logging.debug(f"MemoryChain initialized with UUID: `{uuid}`")
@@ -107,14 +109,14 @@ class MemoryChain:
         self._update_index(memory=memory)
         self._save_index()
 
-    def extend(self, memories: List[Memory]) -> None:
+    def extend(self, memories: list[Memory]) -> None:
         """
         Extend the current set of memories with a list of memories. This method is used to add multiple memories to the
         MemoryChain at once, allowing for the storage of new information in bulk. All changes are saved to file as soon
         as they are made.
 
         Args:
-            memories (List[Memory]): The list of memories to append.
+            memories (list[Memory]): The list of memories to append.
         """
         for memory in memories:
             self._memories[memory.uuid] = memory
@@ -122,28 +124,28 @@ class MemoryChain:
             self._update_index(memory=memory)
         self._save_index()
 
-    def search(self, keywords: List[str], fuzzy_threshold: Optional[float] = None) -> List[Memory]:
+    def search(self, keywords: list[str], fuzzy_threshold: Optional[float] = None) -> list[Memory]:
         """
-        Look up memories based on keywords. This method is used to retrieve memories that are relevant to the given
+        Look up memories based on keywords. This method is used to retrieve memories that are relevant to the specified
         keywords. It can also perform fuzzy matching, allowing for the retrieval of memories that are similar to the
         given keywords based on a similarity threshold.
 
         Args:
-            keywords (List[str]): The list of keywords to look up.
+            keywords (list[str]): The list of keywords to look up.
 
             fuzzy_threshold (Optional[float]): The threshold for fuzzy matching. If None, only returns exact matches. If
             a value is provided, memories with keywords that have a similarity score greater than or equal to the
             threshold will also be returned.
 
         Returns:
-            List[Memory]: The list of matching memories.
+            list[Memory]: The list of matching memories.
         """
         memory_uuids = set()
         memories = []
         if fuzzy_threshold is not None:
             self._update_similarity_cache(keywords=keywords)
 
-            # Find additional keywords that are similar to the given keywords
+            # Find additional keywords that are similar to the specified keywords
             keywords_extension = []
             cache_filtered = [i for i in self._index_cache.keys() if i not in keywords]
             for keyword in keywords:
@@ -223,27 +225,27 @@ class MemoryChain:
         with open(self._directory / filename, "rb") as fs:
             self._memories[memory_uuid] = Memory.deserialize(fs.read())
 
-    def _update_token_cache(self, keywords: List[str]) -> None:
+    def _update_token_cache(self, keywords: list[str]) -> None:
         """
         Update the token cache with new keywords. This method is used to keep the token cache up-to-date when new
         keywords are added to the MemoryChain. The token cache allows for efficient computation of similarity scores
         between keywords.
 
         Args:
-            keywords (List[str]): The new keywords to update the cache with.
+            keywords (list[str]): The new keywords to update the cache with.
         """
         new_keywords = [keyword for keyword in keywords if keyword not in self._token_cache.keys()]
         for keyword, token in zip(new_keywords, NLP.tokenize(strings=new_keywords)):
             self._token_cache[keyword] = token
 
-    def _update_similarity_cache(self, keywords: List[str]) -> None:
+    def _update_similarity_cache(self, keywords: list[str]) -> None:
         """
         Update the similarity cache with new keywords. This method is used to keep the similarity cache up-to-date when
         new keywords are added to the MemoryChain. The similarity cache allows for efficient computation of similarity
         scores between keywords, enabling fuzzy matching in the search method.
 
         Args:
-            keywords (List[str]): The new keywords to update the cache with.
+            keywords (list[str]): The new keywords to update the cache with.
         """
         self._update_token_cache(keywords=keywords)
         for keyword_indexed in self._index_cache.keys():
