@@ -9,26 +9,10 @@ banterbot.extensions.interface module
    :undoc-members:
    :show-inheritance:
 
-banterbot.extensions.option\_predictor module
----------------------------------------------
-
-.. automodule:: banterbot.extensions.option_predictor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 banterbot.extensions.option\_selector module
 --------------------------------------------
 
 .. automodule:: banterbot.extensions.option_selector
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-banterbot.extensions.persona module
---------------------------------------------
-
-.. automodule:: banterbot.extensions.persona
     :members:
     :undoc-members:
     :show-inheritance:
