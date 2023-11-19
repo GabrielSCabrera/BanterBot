@@ -165,6 +165,7 @@ Launch with a Python script
 To use BanterBot in a script, create an instance of the `TKMultiplayerInterface` class and call the `run` method:
 
 .. code:: python
+   
    from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, ToneMode, TKMultiplayerInterface
 
    model = OpenAIModelManager.load("gpt-4-turbo")
