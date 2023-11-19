@@ -35,7 +35,7 @@ A class responsible for managing interactions with the OpenAI ChatCompletion API
 
 A class that handles text-to-speech synthesis using Azure's Cognitive Services. It supports a wide range of output formats, voices, and speaking styles. The synthesized speech can be interrupted, and the progress can be monitored in real-time.
 
-### SpeechToText
+### SpeechRecognitionService
 A class that provides an interface to convert spoken language into written text using Azure Cognitive Services. It allows continuous speech recognition and provides real-time results as sentences are recognized.
 
 ## Installation
@@ -92,7 +92,7 @@ banterbot -g --model gpt-4-turbo --voice davis --prompt "You are Grendel the Qui
 
 ### Launch with a Python script
 
-To use BanterBot in a script, create an instance of the `TKSimpleInterface` class and call the `run` method:
+To use BanterBot in a script, create an instance of the `TKMultiplayerInterface` class and call the `run` method:
 
 ```python
 from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, ToneMode, TKMultiplayerInterface
