@@ -45,7 +45,7 @@ setup(
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "Intended Audience 1:: End Users/Desktop",
+        "Intended Audience :: End Users/Desktop",
         "Programming Language :: Python :: 3.11",
         "Topic :: Communications :: Chat",
         "Topic :: Multimedia :: Sound/Audio :: Speech",
