@@ -2,13 +2,12 @@ import datetime
 from dataclasses import dataclass
 from typing import Optional
 
+# File `memory_pb2.py` is automatically generated from protoc
 from typing_extensions import Self
 
 from banterbot import config
-
-# File `memory_pb2.py` is automatically generated from protoc
+from banterbot.models.message import Message
 from banterbot.protos import memory_pb2
-from banterbot.utils.message import Message
 
 
 @dataclass

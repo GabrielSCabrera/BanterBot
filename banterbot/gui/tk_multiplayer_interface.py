@@ -9,8 +9,8 @@ from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.openai_model_manager import OpenAIModelManager
-from banterbot.utils.azure_neural_voice import AzureNeuralVoice
-from banterbot.utils.openai_model import OpenAIModel
+from banterbot.models.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.openai_model import OpenAIModel
 
 
 class TKMultiplayerInterface(tk.Tk, Interface):
@@ -30,6 +30,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         style: str = "chat",
         languages: Optional[Union[str, list[str]]] = None,
         tone_mode: Optional[ToneMode] = None,
+        tone_mode_model: OpenAIModel = None,
         system: Optional[str] = None,
         phrase_list: Optional[list[str]] = None,
         assistant_name: Optional[str] = None,
@@ -57,6 +58,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             languages=languages,
             system=system,
             tone_mode=tone_mode,
+            tone_mode_model=tone_mode_model,
             phrase_list=phrase_list,
             assistant_name=assistant_name,
         )

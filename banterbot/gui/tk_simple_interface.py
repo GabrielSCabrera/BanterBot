@@ -8,8 +8,8 @@ from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.openai_model_manager import OpenAIModelManager
-from banterbot.utils.azure_neural_voice import AzureNeuralVoice
-from banterbot.utils.openai_model import OpenAIModel
+from banterbot.models.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.openai_model import OpenAIModel
 
 
 class TKSimpleInterface(tk.Tk, Interface):
@@ -33,6 +33,7 @@ class TKSimpleInterface(tk.Tk, Interface):
         languages: Optional[Union[str, list[str]]] = None,
         system: Optional[str] = None,
         tone_mode: Optional[ToneMode] = None,
+        tone_mode_model: OpenAIModel = None,
         phrase_list: Optional[list[str]] = None,
         assistant_name: Optional[str] = None,
     ) -> None:
@@ -59,6 +60,7 @@ class TKSimpleInterface(tk.Tk, Interface):
             languages=languages,
             system=system,
             tone_mode=tone_mode,
+            tone_mode_model=tone_mode_model,
             phrase_list=phrase_list,
             assistant_name=assistant_name,
         )

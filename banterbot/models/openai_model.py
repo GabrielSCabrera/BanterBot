@@ -11,7 +11,7 @@ class OpenAIModel:
     Attributes:
         model (str): The name of the model.
         max_tokens (int): The maximum number of tokens supported by the model.
-        generation (int): The generation number of the model (e.g., GPT-3.5=3 and GPT-4=4).
+        generation (int): The generation number of the model (e.g., GPT-3.5=3.5 and GPT-4=4).
         rank (int): The model quality rank; lower values indicate higher quality responses.
         tokenizer (Encoding): An instance of the tiktoken package's Encoding object (i.e., a tokenizer).
     """

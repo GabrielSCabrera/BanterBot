@@ -95,7 +95,7 @@ banterbot -g --model gpt-4-turbo --voice davis --prompt "You are Grendel the Qui
 To use BanterBot in a script, create an instance of the `TKMultiplayerInterface` class and call the `run` method:
 
 ```python
-from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, ToneMode, TKMultiplayerInterface
+from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKMultiplayerInterface, ToneMode
 
 model = OpenAIModelManager.load("gpt-4-turbo")
 voice = AzureNeuralVoiceManager.load("Davis")

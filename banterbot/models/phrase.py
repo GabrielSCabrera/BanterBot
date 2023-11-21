@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from banterbot.utils.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.azure_neural_voice import AzureNeuralVoice
 
 
 @dataclass

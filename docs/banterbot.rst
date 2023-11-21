@@ -73,8 +73,11 @@ banterbot.config module
    :maxdepth: 4
 
    banterbot.data
+   banterbot.exceptions
    banterbot.extensions
    banterbot.gui
    banterbot.managers
+   banterbot.models
    banterbot.services
+   banterbot.types
    banterbot.utils

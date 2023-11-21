@@ -9,7 +9,7 @@ import azure.cognitiveservices.speech as speechsdk
 
 from banterbot.config import DEFAULT_LANGUAGE, soft_interruption_delay
 from banterbot.data.enums import EnvVar
-from banterbot.utils.speech_recognition_output import SpeechRecognitionOutput
+from banterbot.models.speech_recognition_output import SpeechRecognitionOutput
 
 
 class SpeechRecognitionService:
@@ -272,23 +272,19 @@ class SpeechRecognitionService:
         # Starting the speech recognizer
         self._recognizer.start_continuous_recognition()
 
-        # Wait until the recognition has started before proceeding
-        self._start_recognition.wait()
-
-        t = time.perf_counter_ns()
         logging.debug("SpeechRecognitionService listener started")
 
+        dt = self._start_recognition_time + 1e3 * soft_interruption_delay.microseconds + self._interrupt - init_time
+
         # Continuously monitor the recognition progress
-        while self._interrupt <= init_time:
+        while self._interrupt < init_time:
             self._new_events.wait()
             self._new_events.clear()
 
-            while self._interrupt <= init_time and idx < len(self._events):
+            while self._interrupt < init_time and idx < len(self._events):
                 output.append(self._events[idx])
                 yield str(self._events[idx])
                 idx += 1
-
-        dt = self._start_recognition_time + 1e3 * soft_interruption_delay.microseconds + self._interrupt - init_time
 
         # Stop the recognizer
         self._recognizer.stop_continuous_recognition()

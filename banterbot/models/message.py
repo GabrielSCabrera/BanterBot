@@ -4,10 +4,10 @@ from typing import Optional
 from typing_extensions import Self
 
 from banterbot.data.enums import ChatCompletionRoles
+from banterbot.models.openai_model import OpenAIModel
 
 # File `memory_pb2.py` is automatically generated from protoc
 from banterbot.protos import memory_pb2
-from banterbot.utils.openai_model import OpenAIModel
 
 
 @dataclass

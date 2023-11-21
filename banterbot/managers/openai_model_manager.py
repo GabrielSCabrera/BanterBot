@@ -1,6 +1,6 @@
 from banterbot import config
 from banterbot.managers.resource_manager import ResourceManager
-from banterbot.utils.openai_model import OpenAIModel
+from banterbot.models.openai_model import OpenAIModel
 
 
 class OpenAIModelManager:

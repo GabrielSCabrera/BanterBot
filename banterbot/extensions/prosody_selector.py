@@ -5,10 +5,10 @@ from typing import Optional
 from banterbot.config import RETRY_LIMIT
 from banterbot.data.enums import ChatCompletionRoles, Prosody
 from banterbot.data.prompts import ProsodySelection
-from banterbot.utils.azure_neural_voice import AzureNeuralVoice
-from banterbot.utils.message import Message
-from banterbot.utils.openai_model import OpenAIModel
-from banterbot.utils.phrase import Phrase
+from banterbot.models.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.message import Message
+from banterbot.models.openai_model import OpenAIModel
+from banterbot.models.phrase import Phrase
 
 
 class ProsodySelector:
@@ -116,13 +116,13 @@ class ProsodySelector:
             # Attempt several different sentence splits in order to modify the input on retry -- significantly reduces
             # the chance of raising a `FormatMismatchError` Exception. `RETRY_LIMIT` is defined in the config file.
             if i == 0:
-                phrases = self._split_sentences(sentences)
+                phrases = self._split_sentences(sentences=sentences)
             elif i == 1:
                 phrases = " ".join(sentences).split(".")
             else:
                 phrases = [" ".join(sentences)]
 
-            messages = self._get_messages(phrases, context, system)
+            messages = self._get_messages(phrases=phrases, system=system, context=context)
 
             response = self._manager.prompt(
                 messages=messages,
@@ -138,6 +138,12 @@ class ProsodySelector:
 
         if processed is None:
             processed = [Phrase(text=sentence, voice=self._voice) for sentence in sentences]
+        else:
+            outputs = [
+                ProsodySelection.PROMPT.value.format(len(phrases), "\n".join(phrases)),
+                ProsodySelection.DUMMY.value.format(len(phrases)),
+                "\n".join(outputs),
+            ]
 
         return processed, outputs
 
@@ -177,7 +183,7 @@ class ProsodySelector:
         return self._output_patterns[N]
 
     def _get_messages(
-        self, phrases: list[str], context: Optional[str] = None, system: Optional[str] = None
+        self, phrases: list[str], system: Optional[str] = None, context: Optional[str] = None
     ) -> list[Message]:
         """
         Inserts the system prompt, user prompt, prefix, suffix, and a dummy message mimicking a successful interaction
@@ -193,12 +199,12 @@ class ProsodySelector:
         """
         messages = self._system.copy()
 
-        if not system:
+        if system:
             messages.append(
                 Message(role=ChatCompletionRoles.SYSTEM, content=ProsodySelection.CHARACTER.value.format(system))
             )
 
-        if not context:
+        if context:
             messages.append(
                 Message(role=ChatCompletionRoles.SYSTEM, content=ProsodySelection.CONTEXT.value.format(context))
             )

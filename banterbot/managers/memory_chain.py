@@ -5,8 +5,8 @@ from typing import Optional
 from typing_extensions import Self
 
 from banterbot import config
+from banterbot.models.memory import Memory
 from banterbot.protos import memory_pb2
-from banterbot.utils.memory import Memory
 from banterbot.utils.nlp import NLP
 
 

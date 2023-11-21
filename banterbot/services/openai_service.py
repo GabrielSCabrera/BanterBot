@@ -8,9 +8,9 @@ import openai
 
 from banterbot.config import RETRY_LIMIT, RETRY_TIME
 from banterbot.data.enums import EnvVar
-from banterbot.utils.message import Message
+from banterbot.models.message import Message
+from banterbot.models.openai_model import OpenAIModel
 from banterbot.utils.nlp import NLP
-from banterbot.utils.openai_model import OpenAIModel
 
 # Set the OpenAI API key
 openai.api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
@@ -29,7 +29,7 @@ class OpenAIService:
 
     def __init__(self, model: OpenAIModel) -> None:
         """
-        Initializes an OpenAIService instance for a specific model.
+        Initializes an `OpenAIService` instance for a specific model.
 
         Args:
             model (OpenAIModel): The OpenAI model to be used. This should be an instance of the OpenAIModel class, which
@@ -40,7 +40,7 @@ class OpenAIService:
         # The selected model that will be used in OpenAI ChatCompletion prompts.
         self._model = model
 
-        # Indicates whether the current instance of OpenAIService is streaming.
+        # Indicates whether the current instance of `OpenAIService` is streaming.
         self._streaming = False
 
         # Set the interruption flag to zero: if interruptions are raised, this will be updated.
@@ -140,7 +140,7 @@ class OpenAIService:
         """
         return self._streaming
 
-    def _response_parse_stream(self, response: Iterator, init_time: int) -> Generator[list[str], None, bool]:
+    def _response_parse_stream(self, response: Iterator, init_time: int) -> Generator[list[str], None, None]:
         """
         Parses a streaming response from the OpenAI API and yields blocks of text as they are received.
 
@@ -151,9 +151,6 @@ class OpenAIService:
         Yields:
             Generator[list[str], None, bool]: Lists of sentences as blocks. Each block contains one or more sentences
             that form a part of the generated response.
-
-        Returns:
-            bool: True if the generator completed its iterations, False otherwise (due to interruption).
         """
         text = ""
         logging.debug("OpenAIService stream started")
@@ -163,7 +160,7 @@ class OpenAIService:
 
             if self._interrupt >= init_time:
                 logging.debug(f"OpenAIService interrupted")
-                return False
+                break
 
             if "content" in delta.keys():
                 text += delta["content"]
@@ -172,13 +169,12 @@ class OpenAIService:
                 text = sentences[-1]
                 logging.debug(f"OpenAIService yielded sentences: {sentences[:-1]}")
                 yield sentences[:-1]
+        else:
+            sentences = NLP.segment_sentences(text)
+            logging.debug(f"OpenAIService yielded final sentences: {sentences[:-1]}")
+            yield sentences
 
-        sentences = NLP.segment_sentences(text)
-        logging.debug(f"OpenAIService yielded final sentences: {sentences[:-1]}")
-        yield sentences
-
-        logging.debug("OpenAIService stream stopped")
-        return True
+            logging.debug("OpenAIService stream stopped")
 
     def _request(self, messages: list[Message], stream: bool, **kwargs) -> Union[Iterator, str]:
         """
@@ -221,7 +217,7 @@ class OpenAIService:
 
             except openai.error.RateLimitError:
                 retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
-                retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
+                retry_timestamp = datetime.datetime.strftime(retry_timestamp, "%H:%M:%S")
                 error_message = (
                     f"OpenAIService encountered an OpenAI Rate Limiting Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
                     f"{RETRY_TIME} seconds until {retry_timestamp} to retry."

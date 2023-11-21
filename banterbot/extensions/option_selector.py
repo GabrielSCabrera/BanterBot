@@ -2,9 +2,9 @@ import logging
 
 from banterbot.data.enums import ChatCompletionRoles
 from banterbot.data.prompts import OptionSelectorPrompts
+from banterbot.models.message import Message
+from banterbot.models.openai_model import OpenAIModel
 from banterbot.services.openai_service import OpenAIService
-from banterbot.utils.message import Message
-from banterbot.utils.openai_model import OpenAIModel
 
 
 class OptionSelector:

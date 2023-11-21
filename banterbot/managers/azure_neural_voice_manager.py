@@ -1,7 +1,7 @@
 from banterbot import config
 from banterbot.data.enums import AzureNeuralVoiceGender
 from banterbot.managers.resource_manager import ResourceManager
-from banterbot.utils.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.azure_neural_voice import AzureNeuralVoice
 
 
 class AzureNeuralVoiceManager:

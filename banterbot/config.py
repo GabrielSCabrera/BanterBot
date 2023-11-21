@@ -51,7 +51,7 @@ logging.basicConfig(format="%(asctime)s - %(message)s", level=logging_level)
 generate_uuid = uuid6.uuid8
 
 # Define the punctuation marks that can be used to split sentences into phrases for prosody selection.
-phrase_delim = [",", ".", "?", "!", ":", ";", '"', "`", "|", "\n"]
+phrase_delim = [",", ".", "?", "!", ":", ";", '"', "`", "|", "\n", "\t", "\r\n"]
 
 # The amount of time that should be added to a "soft interruption" as defined in class `SpeechToText`.
-soft_interruption_delay: datetime.timedelta = datetime.timedelta(seconds=0.5)
+soft_interruption_delay: datetime.timedelta = datetime.timedelta(seconds=0.75)

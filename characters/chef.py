@@ -24,6 +24,7 @@ interface = TKMultiplayerInterface(
     style=style,
     system=system,
     tone_mode=ToneMode.ADVANCED,
+    tone_mode_model=model,
     languages="en-US",
     phrase_list=["Boyardine", "Chef Boyardine"],
     assistant_name="Boyardine",

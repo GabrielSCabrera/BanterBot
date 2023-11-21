@@ -99,8 +99,8 @@ class ProsodySelection(Enum):
     )
 
     CONTEXT = (
-        "Finally, here are some words you spoke prior, use these aid you in selecting a contextually appropriate "
-        "emotional response:\n{}"
+        "Finally, here is your previous partial output from the same query (streamed in chunks), use this to aid you "
+        "in selecting a contextually appropriate emotional response:\n{}"
     )
 
 

@@ -16,18 +16,6 @@ class ThreadQueue:
         self._lock = threading.Lock()
         self._event_queue: list[threading.Event] = []
 
-    def is_alive(self) -> bool:
-        """
-        Check if the last task in the queue is still running.
-
-        Returns:
-            bool: True if the last task is still running, False otherwise.
-        """
-        if not self._event_queue:
-            return False
-        else:
-            return not self._event_queue[-1].is_set()
-
     def add_task(self, thread: threading.Thread, unskippable: bool = False) -> None:
         """
         Add a new task to the queue.
@@ -48,6 +36,18 @@ class ThreadQueue:
             target=self._thread_wrapper, args=(thread, index, unskippable), daemon=thread.daemon
         )
         wrapper_thread.start()
+
+    def is_alive(self) -> bool:
+        """
+        Check if the last task in the queue is still running.
+
+        Returns:
+            bool: True if the last task is still running, False otherwise.
+        """
+        if not self._event_queue:
+            return False
+        else:
+            return not self._event_queue[-1].is_set()
 
     def _thread_wrapper(self, thread: threading.Thread, index: int, unskippable: bool) -> None:
         """

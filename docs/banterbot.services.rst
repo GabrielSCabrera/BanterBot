@@ -4,7 +4,7 @@ banterbot.services package
 banterbot.services.openai\_service module
 -----------------------------------------
 
-.. automodule:: banterbot.services.speech_recognition_service
+.. automodule:: banterbot.services.openai_service
    :members:
    :undoc-members:
    :show-inheritance:
