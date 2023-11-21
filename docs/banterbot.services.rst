@@ -9,8 +9,8 @@ banterbot.services.openai\_service module
    :undoc-members:
    :show-inheritance:
 
-banterbot.services.speech\_to\_text module
-------------------------------------------
+banterbot.services.speech\_synthesis\_service module
+---------------------------------------------------
 
 .. automodule:: banterbot.services.speech_synthesis_service
    :members:
