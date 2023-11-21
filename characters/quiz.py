@@ -18,8 +18,6 @@ system = (
     "you say is in a format that can be dictated, omitting symbols that would not be natural to read out loud."
 )
 
-# The four arguments `model`, `voice`, `style`, `system`, and `tone` are optional.
-# Setting `tone` to True enables voice tones and emotions.
 interface = TKMultiplayerInterface(
     model=model,
     voice=voice,

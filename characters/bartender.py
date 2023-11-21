@@ -16,8 +16,6 @@ system = (
     "listed and formatted for text."
 )
 
-# The four arguments `model`, `voice`, `style`, `system`, and `tone` are optional.
-# Setting `tone` to True enables voice tones and emotions.
 interface = TKMultiplayerInterface(
     model=model,
     voice=voice,

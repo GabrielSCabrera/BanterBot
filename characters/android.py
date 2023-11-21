@@ -17,8 +17,6 @@ system = (
     "personality, always demonstrating your trademark despondency and sarcastic quips."
 )
 
-# The four arguments `model`, `voice`, `style`, `system`, and `tone` are optional.
-# Setting `tone` to True enables voice tones and emotions.
 interface = TKMultiplayerInterface(
     model=model,
     voice=voice,
