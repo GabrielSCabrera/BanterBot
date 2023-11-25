@@ -7,7 +7,7 @@ from typing import Generator, Optional, Union
 
 import azure.cognitiveservices.speech as speechsdk
 
-from banterbot.config import DEFAULT_LANGUAGE, soft_interruption_delay
+from banterbot.config import DEFAULT_LANGUAGE, INTERRUPTION_DELAY
 from banterbot.data.enums import EnvVar
 from banterbot.models.speech_recognition_output import SpeechRecognitionOutput
 
@@ -37,45 +37,8 @@ class SpeechRecognitionService:
             languages (Union[str, list[str]): The language(s) the speech-to-text recognizer expects to hear.
             phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
         """
-        logging.debug(f"SpeechRecognitionService initialized")
-
-        # Initialize the speech configuration with the Azure subscription and region
-        self._speech_config = speechsdk.SpeechConfig(
-            subscription=os.environ.get(EnvVar.AZURE_SPEECH_KEY.value),
-            region=os.environ.get(EnvVar.AZURE_SPEECH_REGION.value),
-        )
-
-        # Allowing the speech configuration to recognize profane words
-        self._speech_config.set_profanity(speechsdk.ProfanityOption.Raw)
-
-        # Activate the receipt of data pertaining to word timings
-        self._speech_config.request_word_level_timestamps()
-
-        # Initialize the output and total length variables
-        self._outputs: list[SpeechRecognitionOutput] = []
-
-        # Determine whether language auto-detection should be activated
-        self._languages = DEFAULT_LANGUAGE if languages is None else languages
-        self._auto_detection = not isinstance(self._languages, str)
-
-        # Initialize the speech recognizer with the speech configuration and language settings
-        self._recognizer = speechsdk.SpeechRecognizer(speech_config=self._speech_config, **self._language_kwargs())
-
-        # Initialize an instance of `PhraseListGrammar` which is used to provide context to improve speech recognition
-        self._phrase_list_grammar = speechsdk.PhraseListGrammar.from_recognizer(self._recognizer)
-
-        # Add any phrases in `phrase_list` to the `PhraseListGrammar`.
-        if phrase_list:
-            self.add_phrases(phrase_list)
-
-        # Connect the speech recognizer events to their corresponding callbacks
-        self._recognizer_events_connect()
-
-        # Creating a new instance of Connection class
-        self._connection = speechsdk.Connection.from_recognizer(self._recognizer)
-
-        # Pre-connecting the speech recognizer for reduced latency
-        self._connection.open(True)
+        # Initialize the `SpeechRecognizer`.
+        self._init_recognizer(languages=languages, phrase_list=phrase_list)
 
         # Set the interruption flag to zero: if interruptions are raised, this will be updated
         self._interrupt: int = 0
@@ -183,7 +146,55 @@ class SpeechRecognitionService:
         """
         self._phrase_list_grammar.clear()
 
-    def _language_kwargs(self) -> dict:
+    def _init_recognizer(
+        self, languages: Union[str, list[str]] = None, phrase_list: Optional[list[str]] = None
+    ) -> None:
+        """
+        Initialize an instance of the the Microsoft Azure Cognitive Services Speech SDK `SpeechRecognizer` class and
+        configure it with any user-provided custom settings, or alternatively its package defaults, then open a
+        connection to reduce overhead.
+
+        Args:
+            languages (Union[str, list[str]): The language(s) the speech-to-text recognizer expects to hear.
+            phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
+        """
+        logging.debug(f"SpeechRecognitionService initialized")
+
+        # Initialize the speech configuration with the Azure subscription and region
+        self._speech_config = speechsdk.SpeechConfig(
+            subscription=os.environ.get(EnvVar.AZURE_SPEECH_KEY.value),
+            region=os.environ.get(EnvVar.AZURE_SPEECH_REGION.value),
+        )
+
+        # Allowing the speech configuration to recognize profane words
+        self._speech_config.set_profanity(speechsdk.ProfanityOption.Raw)
+
+        # Activate the receipt of data pertaining to word timings
+        self._speech_config.request_word_level_timestamps()
+
+        # Initialize the output and total length variables
+        self._outputs: list[SpeechRecognitionOutput] = []
+
+        # Initialize the speech recognizer with the speech configuration and language settings
+        self._recognizer = speechsdk.SpeechRecognizer(speech_config=self._speech_config, **self._language_kwargs())
+
+        # Initialize an instance of `PhraseListGrammar` which is used to provide context to improve speech recognition
+        self._phrase_list_grammar = speechsdk.PhraseListGrammar.from_recognizer(self._recognizer)
+
+        # Add any phrases in `phrase_list` to the `PhraseListGrammar`.
+        if phrase_list:
+            self.add_phrases(phrase_list)
+
+        # Connect the speech recognizer events to their corresponding callbacks
+        self._recognizer_events_connect()
+
+        # Creating a new instance of Connection class
+        self._connection = speechsdk.Connection.from_recognizer(self._recognizer)
+
+        # Pre-connecting the speech recognizer for reduced latency
+        self._connection.open(True)
+
+    def _language_kwargs(self, languages: Union[str, list[str]] = None) -> dict:
         """
         Set the language(s) being recognized by the Speech-to-Text recognizer in two modes: if a string is given to
         argument `languages` in the __init__ method, then set the language explicitly in the Azure speech SDK
@@ -191,9 +202,16 @@ class SpeechRecognitionService:
         `AutoDetectSourceLanguageConfig` object from the speech SDK to allow the `SpeechRecognizer` to automatically
         choose the input language from one of those provided.
 
+        Args:
+            languages (Union[str, list[str]): The language(s) the speech-to-text recognizer expects to hear.
+
         Returns:
             dict: A dictionary of keywords arguments for the Speech Recognizer.
         """
+        # Determine whether language auto-detection should be activated
+        self._languages = DEFAULT_LANGUAGE if languages is None else languages
+        self._auto_detection = not isinstance(self._languages, str)
+
         if self._auto_detection:
             self._speech_config.set_property(
                 property_id=speechsdk.PropertyId.SpeechServiceConnection_LanguageIdMode,
@@ -274,7 +292,7 @@ class SpeechRecognitionService:
 
         logging.debug("SpeechRecognitionService listener started")
 
-        dt = self._start_recognition_time + 1e3 * soft_interruption_delay.microseconds + self._interrupt - init_time
+        dt = self._start_recognition_time + 1e3 * INTERRUPTION_DELAY.microseconds + self._interrupt - init_time
 
         # Continuously monitor the recognition progress
         while self._interrupt < init_time:
@@ -291,7 +309,7 @@ class SpeechRecognitionService:
 
         if self._soft_interrupt >= self._interrupt:
             # Prepare a timedelta object indicating how long the listener was active.
-            cutoff = datetime.timedelta(microseconds=1e-3 * (self._interrupt - init_time)) + soft_interruption_delay
+            cutoff = datetime.timedelta(microseconds=1e-3 * (self._interrupt - init_time)) + INTERRUPTION_DELAY
             for idx in range(idx, len(self._events)):
                 if self._events[idx].offset - self._total_offset > cutoff:
                     break

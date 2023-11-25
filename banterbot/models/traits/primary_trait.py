@@ -1,14 +1,16 @@
-import importlib.resources
-import json
 import random
 
 from typing_extensions import Self
 
-import banterbot.resources
+from banterbot.managers.resource_manager import ResourceManager
+from repo.banterbot.paths import primary_traits
 
 
 class PrimaryTrait:
-    traits_data = None
+    """
+    Primary trait loading and management, with options for random generation or specified parameters using data from the
+    `paths.primary_traits` resource.
+    """
 
     def __init__(self, name: str, description: str, value: int, value_description: str):
         """
@@ -39,8 +41,7 @@ class PrimaryTrait:
         Returns:
             PrimaryTrait: An instance of PrimaryTrait with a randomly selected value.
         """
-        if data is None:
-            data = cls._load_uuid(uuid)
+        data = cls._load_uuid(uuid)
 
         value = random.randrange(len(data["levels"]))
 
@@ -59,8 +60,7 @@ class PrimaryTrait:
         Returns:
             PrimaryTrait: An instance of PrimaryTrait with the specified value.
         """
-        if data is None:
-            data = cls._load_uuid(uuid)
+        data = cls._load_uuid(uuid)
 
         if not isinstance(value, int) or 0 > value >= len(data["levels"]):
             raise ValueError("Specified value is out of the valid range for this trait.")
@@ -71,21 +71,19 @@ class PrimaryTrait:
     @classmethod
     def _load_uuid(cls, uuid: str):
         """
-        Helper method to load trait data from JSON based on UUID. Only loads data once to reduce overhead, and saves
-        the JSON dict to cache in class attribute `traits_data`.
+        Helper method to load trait data from the `primary_traits` JSON based on UUID.
 
         Args:
             uuid (str): The UUID of the trait.
 
         Returns:
-            dict: The data of the trait.
+            dict: The data for the specified trait.
         """
-        if cls.traits_data is None:
-            # Load the JSON data if it is not already cached.
-            with open(importlib.resources.files(banterbot.resources).joinpath("traits.json"), "r") as fs:
-                cls.traits_data = json.load(fs)
+        traits_data = ResourceManager.load_json(filename=primary_traits, cache=True, reset=False)
 
         # Search for the trait data based on UUID
-        for traits in cls.traits_data["primary_traits"].values():
-            if uuid in traits:
-                return traits[uuid]
+        if uuid in traits_data["primary_traits"]:
+            return traits_data["primary_traits"][uuid]
+        else:
+            message = f"The specified UUID `{uuid}` is not a known Primary Trait in `resources/{primary_traits}`"
+            raise KeyError(message)

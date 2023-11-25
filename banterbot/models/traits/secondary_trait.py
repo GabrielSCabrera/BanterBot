@@ -1,7 +1,7 @@
 import numpy as np
 from typing_extensions import Self
 
-from banterbot.utils.traits.primary_trait import PrimaryTrait
+from banterbot.models.traits.primary_trait import PrimaryTrait
 
 
 class SecondaryTrait:

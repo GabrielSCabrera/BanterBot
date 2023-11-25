@@ -1,10 +1,10 @@
 banterbot.models package
 =======================
 
-banterbot.models.azure\_neural\_voice module
+banterbot.models.azure\_neural\_voice\_profile module
 --------------------------------------------
 
-.. automodule:: banterbot.models.azure_neural_voice
+.. automodule:: banterbot.models.azure_neural_voice_profile
     :members:
     :undoc-members:
     :show-inheritance:

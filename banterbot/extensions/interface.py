@@ -5,16 +5,16 @@ import time
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
-from banterbot.config import chat_logs
 from banterbot.data.enums import ChatCompletionRoles, ToneMode
 from banterbot.data.prompts import ToneSelection
 from banterbot.exceptions.format_mismatch_error import FormatMismatchError
 from banterbot.extensions.option_selector import OptionSelector
 from banterbot.extensions.prosody_selector import ProsodySelector
 from banterbot.managers.openai_model_manager import OpenAIModelManager
-from banterbot.models.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
+from banterbot.paths import chat_logs
 from banterbot.services.openai_service import OpenAIService
 from banterbot.services.speech_recognition_service import SpeechRecognitionService
 from banterbot.services.speech_synthesis_service import SpeechSynthesisService
@@ -31,7 +31,7 @@ class Interface(ABC):
     def __init__(
         self,
         model: OpenAIModel,
-        voice: AzureNeuralVoice,
+        voice: AzureNeuralVoiceProfile,
         style: str,
         languages: Optional[Union[str, list[str]]] = None,
         system: Optional[str] = None,
@@ -82,7 +82,7 @@ class Interface(ABC):
         self._tone = tone_mode
         self._tone_selector = OptionSelector(
             model=self._openai_service_tone,
-            options=self._voice.styles,
+            options=self._voice.style_list,
             system=ToneSelection.SYSTEM.value,
             prompt=ToneSelection.PROMPT.value.format(self._style),
         )

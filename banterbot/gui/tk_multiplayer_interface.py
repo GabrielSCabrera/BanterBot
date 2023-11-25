@@ -9,7 +9,7 @@ from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.openai_model_manager import OpenAIModelManager
-from banterbot.models.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.openai_model import OpenAIModel
 
 
@@ -26,7 +26,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
     def __init__(
         self,
         model: OpenAIModel = OpenAIModelManager.load("gpt-3.5-turbo"),
-        voice: AzureNeuralVoice = AzureNeuralVoiceManager.load("Aria"),
+        voice: AzureNeuralVoiceProfile = AzureNeuralVoiceManager.load("Aria"),
         style: str = "chat",
         languages: Optional[Union[str, list[str]]] = None,
         tone_mode: Optional[ToneMode] = None,

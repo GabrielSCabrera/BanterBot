@@ -4,6 +4,7 @@ from typing import Optional
 
 from typing_extensions import Self
 
+import banterbot.paths
 from banterbot import config
 from banterbot.models.memory import Memory
 from banterbot.protos import memory_pb2
@@ -29,12 +30,12 @@ class MemoryChain:
         uuid = config.generate_uuid().hex
 
         # Create new directory for the new UUID and memory files
-        directory = config.personae / uuid / config.memories
+        directory = banterbot.paths.personae / uuid / banterbot.paths.memories
         directory.mkdir(exist_ok=True, parents=True)
 
         # Create new memory index file
         memory_index = memory_pb2.MemoryIndex()
-        with open(config.personae / uuid / config.memory_index, "wb+") as fs:
+        with open(banterbot.paths.personae / uuid / banterbot.paths.memory_index, "wb+") as fs:
             fs.write(memory_index.SerializeToString())
 
         logging.debug(f"MemoryChain created new UUID: `{uuid}`")
@@ -57,7 +58,7 @@ class MemoryChain:
 
         # Read memory index file
         memory_index_object = memory_pb2.MemoryIndex()
-        with open(config.personae / uuid / config.memory_index, "rb") as fs:
+        with open(banterbot.paths.personae / uuid / banterbot.paths.memory_index, "rb") as fs:
             memory_index_object.ParseFromString(fs.read())
 
         # Parse the memory index file into a dictionary
@@ -74,7 +75,7 @@ class MemoryChain:
         Args:
             uuid (str): The UUID associated with this set of memories.
         """
-        shutil.rmtree(config.personae / uuid)
+        shutil.rmtree(banterbot.paths.personae / uuid)
 
     def __init__(self, uuid: str, memory_index: dict[str, list[str]]) -> None:
         """
@@ -88,7 +89,7 @@ class MemoryChain:
         """
         logging.debug(f"MemoryChain initialized with UUID: `{uuid}`")
         self.uuid = uuid
-        self._directory = config.personae / self.uuid / config.memories
+        self._directory = banterbot.paths.personae / self.uuid / banterbot.paths.memories
         self._index_cache = memory_index
         self._memories = {}
         self._similarity_cache = {}
@@ -172,7 +173,7 @@ class MemoryChain:
         """
         Save an instance of class Memory to file using protocol buffers.
         """
-        filename = memory.uuid + config.protobuf_extension
+        filename = memory.uuid + banterbot.paths.protobuf_extension
         with open(self._directory / filename, "wb+") as fs:
             fs.write(memory.serialize())
 
@@ -187,7 +188,7 @@ class MemoryChain:
             memory_index_entry.memory_uuids.extend(memory_uuids)
             memory_index.entries.append(memory_index_entry)
 
-        with open(config.personae / self.uuid / config.memory_index, "wb+") as fs:
+        with open(banterbot.paths.personae / self.uuid / banterbot.paths.memory_index, "wb+") as fs:
             fs.write(memory_index.SerializeToString())
 
     def _find_memories(self) -> None:
@@ -197,7 +198,7 @@ class MemoryChain:
         retrieval of memories when needed.
         """
         directory = self._directory
-        self._memories = {path.stem: None for path in directory.glob("*" + config.protobuf_extension)}
+        self._memories = {path.stem: None for path in directory.glob("*" + banterbot.paths.protobuf_extension)}
 
     def _update_index(self, memory: Memory) -> None:
         """
@@ -221,7 +222,7 @@ class MemoryChain:
         Args:
             memory_uuid (str): The UUID of the memory to load.
         """
-        filename = memory_uuid + config.protobuf_extension
+        filename = memory_uuid + banterbot.paths.protobuf_extension
         with open(self._directory / filename, "rb") as fs:
             self._memories[memory_uuid] = Memory.deserialize(fs.read())
 

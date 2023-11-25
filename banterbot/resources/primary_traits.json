@@ -1,0 +1,146 @@
+{
+    "018bf3b6-e25d-8cee-b2e8-a81f31f8c270": {
+        "name": "Openness",
+        "description": "Openness to experience",
+        "levels": [
+            "Reserved",
+            "Curious",
+            "Inventive"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b342-b4b39411e7bd": {
+        "name": "Conscientiousness",
+        "description": "Level of conscientious behavior",
+        "levels": [
+            "Easygoing",
+            "Organized",
+            "Diligent"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b3a0-63b6c6108eea": {
+        "name": "Extraversion",
+        "description": "Level of sociability and enthusiasm",
+        "levels": [
+            "Reserved",
+            "Sociable",
+            "Energetic"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b3d9-1346c1fea251": {
+        "name": "Agreeableness",
+        "description": "Level of friendliness and compassion",
+        "levels": [
+            "Critical",
+            "Cooperative",
+            "Compassionate"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b431-0e492abed59c": {
+        "name": "Neuroticism",
+        "description": "Tendency towards emotional instability",
+        "levels": [
+            "Calm",
+            "Sensitive",
+            "Anxious"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b460-a6bf4caf985b": {
+        "name": "Collectivism vs Individualism",
+        "description": "Preference for group harmony vs self-reliance",
+        "levels": [
+            "Collectivist",
+            "Balanced",
+            "Individualist"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b4b6-e51d602971bd": {
+        "name": "Power Distance",
+        "description": "Acceptance of hierarchical order",
+        "levels": [
+            "Egalitarian",
+            "Moderate",
+            "Authoritarian"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b4e8-2e156dc9e3b6": {
+        "name": "Uncertainty Avoidance",
+        "description": "Tolerance for ambiguity and uncertainty",
+        "levels": [
+            "Adaptable",
+            "Cautious",
+            "Rigorous"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b52a-5e79c03a396a": {
+        "name": "Masculinity vs Femininity",
+        "description": "Preference for achievement vs cooperation",
+        "levels": [
+            "Competitive",
+            "Balanced",
+            "Nurturing"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b541-9b389cd2255f": {
+        "name": "Long-Term vs Short-Term Orientation",
+        "description": "Focus on future rewards vs present rewards",
+        "levels": [
+            "Traditional",
+            "Balanced",
+            "Progressive"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b5b9-8c7ff4cb5ae0": {
+        "name": "Indulgence vs Restraint",
+        "description": "Tendency towards gratification vs control",
+        "levels": [
+            "Indulgent",
+            "Balanced",
+            "Restrained"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b5c3-a3e443b948df": {
+        "name": "Prudishness vs Openness in Social Norms",
+        "description": "Attitude towards social norms and taboos",
+        "levels": [
+            "Conservative",
+            "Moderate",
+            "Liberal"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b627-31ebbbfbc038": {
+        "name": "Religious Orientation",
+        "description": "Degree of religious influence in life",
+        "levels": [
+            "Secular",
+            "Moderate",
+            "Devout"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b67f-cb579617d8e9": {
+        "name": "Harmony vs Competition",
+        "description": "Preference for cooperative vs competitive interactions",
+        "levels": [
+            "Harmonious",
+            "Balanced",
+            "Competitive"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b69a-a9623c93f489": {
+        "name": "Communication Style",
+        "description": "Preference for high-context vs low-context communication",
+        "levels": [
+            "Implicit",
+            "Adaptive",
+            "Explicit"
+        ]
+    },
+    "018bf3b6-e25d-8cee-b6ff-cdd81fefbb17": {
+        "name": "Adaptability and Change",
+        "description": "Openness to change and new experiences",
+        "levels": [
+            "Stable",
+            "Flexible",
+            "Dynamic"
+        ]
+    }
+}

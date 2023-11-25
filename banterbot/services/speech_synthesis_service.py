@@ -9,7 +9,7 @@ import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
 from banterbot.data.enums import EnvVar, SpeechProcessingType, WordCategory
-from banterbot.models.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.phrase import Phrase
 from banterbot.models.word import Word
 from banterbot.types.timed_event import TimedEvent
@@ -91,7 +91,7 @@ class SpeechSynthesisService:
         self._interrupt: int = time.perf_counter_ns()
         logging.debug("SpeechSynthesisService synthesizer interrupted")
 
-    def speak(self, input_string: str, voice: AzureNeuralVoice, style: str) -> Generator[Word, None, None]:
+    def speak(self, input_string: str, voice: AzureNeuralVoiceProfile, style: str) -> Generator[Word, None, None]:
         """
         Speaks the specified text using the specified voice and style.
 
@@ -260,7 +260,7 @@ class SpeechSynthesisService:
             'xmlns="http://www.w3.org/2001/10/synthesis" '
             'xmlns:mstts="https://www.w3.org/2001/mstts" '
             'xml:lang="en-US">'
-            f'<voice name="{voice.voice}">'
+            f'<voice name="{voice.short_name}">'
         )
 
         # If a speaking style is specified, add the express-as tag
@@ -306,7 +306,7 @@ class SpeechSynthesisService:
                 pitch = ""
 
             # Add the voice and other tags along with prosody
-            ssml += f'<voice name="{phrase.voice.voice}">'
+            ssml += f'<voice name="{phrase.voice.short_name}">'
             ssml += '<mstts:silence type="comma-exact" value="10ms"/>'
             ssml += '<mstts:silence type="Tailing-exact" value="0ms"/>'
             ssml += '<mstts:silence type="Sentenceboundary-exact" value="5ms"/>'

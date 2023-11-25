@@ -33,16 +33,6 @@ class WordCategory(Enum):
     PUNCTUATION = "punctuation"
 
 
-class AzureNeuralVoiceGender(Enum):
-    """
-    Neural voice gender categories for the Azure Speech API.
-    """
-
-    MALE = "male"
-    FEMALE = "female"
-    NEUTRAL = "neutral"
-
-
 class SpaCyLangModel(Enum):
     """
     Names of SpaCy languge models.
@@ -88,7 +78,7 @@ class Prosody:
     EMPHASES = {"reduced": "reduced", "normal": "none", "exaggerated": "moderate"}
 
     # Compile a regex pattern using the delimiters specified in the config file, that are used to subdivide sentences.
-    PHRASE_PATTERN = re.compile("([" + "".join(config.phrase_delim) + "]+)")
+    PHRASE_PATTERN = re.compile("([" + "".join(config.PHRASE_DELIM) + "]+)")
 
 
 class ToneMode:

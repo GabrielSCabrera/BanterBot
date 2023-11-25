@@ -1,3 +1,4 @@
+import csv
 import importlib.resources
 import json
 from io import StringIO
@@ -20,50 +21,51 @@ class ResourceManager:
     _json_data: dict[dict[Any]] = {}
 
     @classmethod
-    def clear_cache(cls) -> None:
+    def reset_cache(cls) -> None:
         """
-        Clear the entire cache by deleting the contents of the `ResourceLoader._raw_data`, `ResourceLoader._csv_data`,
+        Reset the entire cache by deleting the contents of the `ResourceLoader._raw_data`, `ResourceLoader._csv_data`,
         and `ResourceLoader._json_data` dicts.
         """
-        cls.clear_raw_cache()
-        cls.clear_csv_cache()
-        cls.clear_json_cache()
+        cls.reset_raw_cache()
+        cls.reset_csv_cache()
+        cls.reset_json_cache()
 
     @classmethod
-    def clear_raw_cache(cls) -> None:
+    def reset_raw_cache(cls) -> None:
         """
-        Clear the raw data cache by deleting the contents of the `ResourceLoader._raw_data` dict.
+        Reset the raw data cache by deleting the contents of the `ResourceLoader._raw_data` dict.
         """
         cls._raw_data.clear()
 
     @classmethod
-    def clear_csv_cache(cls) -> None:
+    def reset_csv_cache(cls) -> None:
         """
-        Clear the CSV data cache by deleting the contents of the `ResourceLoader._csv_data` dict.
+        Reset the CSV data cache by deleting the contents of the `ResourceLoader._csv_data` dict.
         """
         cls._csv_data.clear()
 
     @classmethod
-    def clear_json_cache(cls) -> None:
+    def reset_json_cache(cls) -> None:
         """
-        Clear the JSON data cache by deleting the contents of the `ResourceLoader._json_data` dict.
+        Reset the JSON data cache by deleting the contents of the `ResourceLoader._json_data` dict.
         """
         cls._json_data.clear()
 
     @classmethod
-    def load_raw(cls, filename: str, cache: bool = True, encoding: str = "utf-8") -> str:
+    def load_raw(cls, filename: str, cache: bool = True, reset: bool = False, encoding: str = "utf-8") -> str:
         """
         Load a specified file by filename and return its contents as a string.
 
         Args:
             filename (str): The name of the resource file — should including its suffix.
             cache (bool): If True, cache the loaded data to reduce overhead the next time its loaded.
+            reset (bool): If set to True, reloads the contents from file, disregarding the current state of the cache.
             encoding (str): The type of encoding to use when loading the resource.
 
         Returns:
             str: The resource file's contents as a string.
         """
-        if filename not in cls._raw_data:
+        if reset or filename not in cls._raw_data:
             path = importlib.resources.files(banterbot.resources).joinpath(filename)
             try:
                 with open(file=path, mode="r", encoding=encoding) as fs:
@@ -80,19 +82,20 @@ class ResourceManager:
         return data
 
     @classmethod
-    def load_json(cls, filename: str, cache: bool = True, encoding: str = "utf-8") -> dict[Any]:
+    def load_json(cls, filename: str, cache: bool = True, reset: bool = False, encoding: str = "utf-8") -> dict[Any]:
         """
         Load a specified JSON file by filename and return its contents as a dictionary.
 
         Args:
             filename (str): The name of the resource file — should be a JSON file.
             cache (bool): If True, cache the loaded data to reduce overhead the next time its loaded.
+            reset (bool): If set to True, reloads the contents from file, disregarding the current state of the cache.
             encoding (str): The type of encoding to use when loading the resource.
 
         Returns:
             dict[Any]: The JSON data formatted as a dictionary.
         """
-        if filename not in cls._json_data:
+        if reset or filename not in cls._json_data:
             raw_data = cls.load_raw(filename=filename, cache=False, encoding=encoding)
             try:
                 data = json.loads(raw_data)
@@ -112,6 +115,7 @@ class ResourceManager:
         cls,
         filename: str,
         cache: bool = True,
+        reset: bool = False,
         encoding: str = "utf-8",
         delimiter: str = ",",
         quotechar: str = '"',
@@ -124,6 +128,7 @@ class ResourceManager:
         Args:
             filename (str): The name of the resource file — should be a CSV file.
             cache (bool): If True, cache the loaded data to reduce overhead the next time its loaded.
+            reset (bool): If set to True, reloads the contents from file, disregarding the current state of the cache.
             encoding (str): The type of encoding to use when loading the resource.
             delimiter (str): The CSV delimiter character.
             quotechar (str): The CSV quote character.
@@ -133,7 +138,7 @@ class ResourceManager:
         Returns:
             list[list[str]]: The CSV data formatted as a nested list of strings.
         """
-        if filename not in cls._csv_data:
+        if reset or filename not in cls._csv_data:
             raw_data = cls.load_raw(filename=filename, cache=False, encoding=encoding)
             try:
                 data = []

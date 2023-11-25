@@ -5,7 +5,7 @@ from typing import Optional
 from banterbot.config import RETRY_LIMIT
 from banterbot.data.enums import ChatCompletionRoles, Prosody
 from banterbot.data.prompts import ProsodySelection
-from banterbot.models.azure_neural_voice import AzureNeuralVoice
+from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
 from banterbot.models.phrase import Phrase
@@ -27,7 +27,7 @@ class ProsodySelector:
         _line_pattern (str): A regex pattern that matches one line of expected output for the current model.
     """
 
-    def __init__(self, manager: OpenAIModel, voice: AzureNeuralVoice) -> None:
+    def __init__(self, manager: OpenAIModel, voice: AzureNeuralVoiceProfile) -> None:
         """
         Initializes the ProsodySelector class with a specified OpenAI model and AzureNeuralVoice instance.
 
@@ -38,7 +38,7 @@ class ProsodySelector:
         logging.debug(f"ProsodySelector initialized")
         self._manager = manager
         self._voice = voice
-        self._valid = self._voice.styles is not None
+        self._valid = self._voice.style_list is not None
         self._token_counts = {}
         self._output_patterns = {}
         self._init_system()
@@ -50,7 +50,7 @@ class ProsodySelector:
         of expected output for the current model.
         """
         # Convert the different prosody options into
-        styles = "\n".join([f"{n+1:02d} {i}" for n, i in enumerate(self._voice.styles)])
+        styles = "\n".join([f"{n+1:02d} {i}" for n, i in enumerate(self._voice.style_list)])
         styledegrees = "\n".join([f"{n+1} {i}" for n, i in enumerate(Prosody.STYLEDEGREES)])
         pitches = "\n".join([f"{n+1} {i}" for n, i in enumerate(Prosody.PITCHES)])
         rates = "\n".join([f"{n+1} {i}" for n, i in enumerate(Prosody.RATES)])
@@ -76,7 +76,7 @@ class ProsodySelector:
             Message(
                 role=ChatCompletionRoles.USER,
                 content=ProsodySelection.SUFFIX.value.format(
-                    style=len(self._voice.styles),
+                    style=len(self._voice.style_list),
                     styledegree=len(Prosody.STYLEDEGREES),
                     pitch=len(Prosody.PITCHES),
                     rate=len(Prosody.RATES),
@@ -90,7 +90,7 @@ class ProsodySelector:
 
         # Given the possible ranges of Prosody settings, generate a regex pattern that asserts valid settings.
         self._line_pattern = (
-            f"[0-{len(self._voice.styles) // 10}][1-{min(len(self._voice.styles), 9)}]"
+            f"[0-{len(self._voice.style_list) // 10}][1-{min(len(self._voice.style_list), 9)}]"
             f"[1-{len(Prosody.STYLEDEGREES)}]"
             f"[1-{len(Prosody.PITCHES)}]"
             f"[1-{len(Prosody.RATES)}]"
@@ -257,7 +257,7 @@ class ProsodySelector:
         return Phrase(
             text=phrase,
             voice=self._voice,
-            style=self._voice.styles[min(int(output[:2]), len(self._voice.styles)) - 1],
+            style=self._voice.style_list[min(int(output[:2]), len(self._voice.style_list)) - 1],
             styledegree=list(Prosody.STYLEDEGREES.values())[int(output[2]) - 1],
             pitch=list(Prosody.PITCHES.values())[int(output[3]) - 1],
             rate=list(Prosody.RATES.values())[int(output[4]) - 1],

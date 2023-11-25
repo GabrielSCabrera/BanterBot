@@ -1,10 +1,106 @@
 import argparse
 import logging
+import textwrap
 
 from banterbot.data.enums import Prosody, ToneMode
 from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.openai_model_manager import OpenAIModelManager
+
+
+class CustomHelpFormatter(argparse.HelpFormatter):
+    def _fill_text(self, text, width, indent):
+        text = textwrap.dedent(text)
+        text = textwrap.indent(text, indent)
+        text = text.splitlines()
+        text = [textwrap.fill(line, width) for line in text]
+        text = "\n".join(text)
+        return text
+
+
+def voice_search() -> None:
+    """
+    An extra tool that can be used to search through the available Azure Cognitive Services Neural Voices.
+    """
+    parser = argparse.ArgumentParser(
+        prog="BanterBot Voice Search",
+        usage="%(prog)s [options]",
+        description=(
+            "Use this tool to search through available Azure Cognitive Services Neural Voices using the provided "
+            "search parameters (country, gender, language, region). For more information visit:\n"
+            "https://learn.microsoft.com/azure/ai-services/speech-service/language-support?tabs=tts"
+        ),
+        epilog=(
+            "Requires two environment variables for voice search:\n"
+            "\n1) AZURE_SPEECH_KEY: A valid Azure Cognitive Services Speech API key for text-to-speech and "
+            "speech-to-text functionality,"
+            "\n2) AZURE_SPEECH_REGION: The region associated with your Azure Cognitive Services Speech API key."
+        ),
+        formatter_class=CustomHelpFormatter,
+    )
+
+    parser.add_argument(
+        "--country",
+        action="store",
+        choices=AzureNeuralVoiceManager.list_countries(),
+        dest="country",
+        help="Filter by country code.",
+        nargs="*",
+        type=str,
+    )
+
+    parser.add_argument(
+        "--gender",
+        action="store",
+        choices=AzureNeuralVoiceManager.list_genders(),
+        dest="gender",
+        help="Filter by country code.",
+        nargs="*",
+        type=str,
+    )
+
+    parser.add_argument(
+        "--language",
+        action="store",
+        choices=AzureNeuralVoiceManager.list_languages(),
+        dest="language",
+        help="Filter by language code.",
+        nargs="*",
+        type=str,
+    )
+
+    parser.add_argument(
+        "--region",
+        action="store",
+        choices=AzureNeuralVoiceManager.list_regions(),
+        dest="region",
+        help="Filter by region name.",
+        nargs="*",
+        type=str,
+    )
+
+    parser.add_argument(
+        "--style",
+        action="store",
+        choices=AzureNeuralVoiceManager.list_styles(),
+        dest="style",
+        help="Filter by voice style.",
+        nargs="*",
+        type=str,
+    )
+
+    args = parser.parse_args()
+    kwargs = {
+        "gender": args.gender,
+        "language": args.language,
+        "country": args.country,
+        "region": args.region,
+        "style": args.style,
+    }
+
+    search_results = sorted(AzureNeuralVoiceManager.search(**kwargs), key=lambda x: x.name)
+    for voice in search_results:
+        print(voice, end="\n\n")
 
 
 def run() -> None:
@@ -16,6 +112,7 @@ def run() -> None:
     """
     parser = argparse.ArgumentParser(
         prog="BanterBot GUI",
+        usage="%(prog)s [options]",
         description=(
             "This program initializes a GUI that allows users to interact with a chatbot. The user can enter multiple "
             "names, each with a dedicated button on its right. When holding down the button associated with a given "
@@ -25,16 +122,16 @@ def run() -> None:
             "specified Azure Neural Voice."
         ),
         epilog=(
-            "Requires three environment variables for full functionality."
-            "1) OPENAI_API_KEY: A valid OpenAI API key,"
-            "2) AZURE_SPEECH_KEY: A valid Azure Cognitive Services Speech API key for text-to-speech and "
+            "Requires three environment variables for full functionality.\n"
+            "\n1) OPENAI_API_KEY: A valid OpenAI API key,"
+            "\n2) AZURE_SPEECH_KEY: A valid Azure Cognitive Services Speech API key for text-to-speech and "
             "speech-to-text functionality,"
-            "3) AZURE_SPEECH_REGION: The region associated with your Azure Cognitive Services Speech API key."
+            "\n3) AZURE_SPEECH_REGION: The region associated with your Azure Cognitive Services Speech API key."
         ),
+        formatter_class=CustomHelpFormatter,
     )
 
     parser.add_argument(
-        "-p",
         "--prompt",
         action="store",
         type=str,
@@ -47,7 +144,6 @@ def run() -> None:
             setattr(namespace, self.dest, OpenAIModelManager.load(values.lower()))
 
     parser.add_argument(
-        "-m",
         "--model",
         choices=OpenAIModelManager.list(),
         action=ModelChoice,
@@ -66,7 +162,6 @@ def run() -> None:
             setattr(namespace, self.dest, conversion_table[values.upper()])
 
     parser.add_argument(
-        "-t",
         "--tone-mode",
         choices=["NONE", "BASIC", "ADVANCED"],
         action=ToneModeChoice,
@@ -80,17 +175,17 @@ def run() -> None:
             setattr(namespace, self.dest, AzureNeuralVoiceManager.load(values.lower()))
 
     parser.add_argument(
-        "-v",
         "--voice",
-        choices=AzureNeuralVoiceManager.list(),
         action=VoiceChoice,
         default=AzureNeuralVoiceManager.load("aria"),
         dest="voice",
-        help=f"Select a Microsoft Azure Cognitive Services text-to-speech voice.",
+        help=(
+            "Select a Microsoft Azure Cognitive Services text-to-speech voice. Use the included console script "
+            "`banterbot-voice-search` to find a suitable voice for your BanterBot."
+        ),
     )
 
     parser.add_argument(
-        "-s",
         "--style",
         choices=Prosody.STYLES,
         action="store",
@@ -104,7 +199,6 @@ def run() -> None:
     )
 
     parser.add_argument(
-        "-d",
         "--debug",
         action="store_true",
         dest="debug",
@@ -112,7 +206,6 @@ def run() -> None:
     )
 
     parser.add_argument(
-        "-g",
         "--greet",
         action="store_true",
         dest="greet",
@@ -120,7 +213,6 @@ def run() -> None:
     )
 
     parser.add_argument(
-        "-n",
         "--name",
         action="store",
         type=str,

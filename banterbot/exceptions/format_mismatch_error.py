@@ -12,10 +12,10 @@ class FormatMismatchError(ValueError):
         expression (Optional[str]): The input expression or API response that caused the error. This is optional and
         used for providing context in the error message.
 
-        message (str): An explanation of the error. Defaults to a standard message about format mismatch.
+        message (Optional[str]): An explanation of the error. Defaults to a standard message about format mismatch.
 
     Raises:
-        FormatMismatchError: An error occurred due to a mismatch in the expected format.
+        FormatMismatchError: An error occurred due to a mismatch in the expected output format.
     """
 
     def __init__(self, expression: Optional[str] = None, message: Optional[str] = None) -> None:

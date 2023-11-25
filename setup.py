@@ -37,7 +37,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.9"
+version = "0.0.10"
 setup(
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
@@ -46,7 +46,7 @@ setup(
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: End Users/Desktop",
-        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.10.6",
         "Topic :: Communications :: Chat",
         "Topic :: Multimedia :: Sound/Audio :: Speech",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -55,7 +55,7 @@ setup(
     description=description,
     download_url=url + f"/releases/download/v{version}-alpha/BanterBot-{version}.tar.gz",
     entry_points={
-        "console_scripts": ["banterbot=banterbot.gui.cli:run"],
+        "console_scripts": ["banterbot=banterbot.gui.cli:run", "banterbot-voice-search=banterbot.gui.cli:voice_search"],
     },
     install_requires=dependencies,
     keywords=[
