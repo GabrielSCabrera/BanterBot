@@ -83,7 +83,7 @@ Start BanterBot with an enhanced graphical user interface by running the command
 Here is an example:
 
 ```bash
-banterbot -g --model gpt-4-turbo --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --name Grendel
+banterbot --greet --model gpt-4-turbo --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --name Grendel
 ```
 
 Additionally, you can use `banterbot-voice-search` to search through all the available voices. For example:
