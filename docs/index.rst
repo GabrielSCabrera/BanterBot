@@ -178,7 +178,9 @@ To use BanterBot in a script, create an instance of the ``TKMultiplayerInterface
 
    # The four arguments `model`, `voice`, `system`, and `assistant_name` are optional.
    interface = TKMultiplayerInterface(model=model, voice=voice, system=system, assistant_name=assistant_name)
-   interface.run()
+   
+   # Setting `greet` to True instructs BanterBot to initiate the converstion. Otherwise, the user must initiate.
+   interface.run(greet=True)
 
 There are several ready-to-go characters in the ``characters`` directory, which is included in the package repository.
 
