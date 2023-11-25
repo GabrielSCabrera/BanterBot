@@ -180,13 +180,11 @@ class SpeechSynthesisService:
         # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
             # Add the event and timing information to the list of events
-            self._events.append(
-                {
-                    "event": event,
-                    "time": 5e8 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
-                    "word": self._process_event(event=event, first_word=len(self._events) == 0),
-                }
-            )
+            self._events.append({
+                "event": event,
+                "time": 5e8 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
+                "word": self._process_event(event=event, first_word=len(self._events) == 0),
+            })
 
     def _callbacks_connect(self) -> None:
         """

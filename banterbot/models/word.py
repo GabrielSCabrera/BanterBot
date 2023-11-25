@@ -52,7 +52,7 @@ class Word:
             str: A string containing the word, the time elapsed since the beginning of speech synthesis, and its source.
         """
         description = (
-            f"<"
+            "<"
             f"word: `{self.word}` "
             f"| offset: {self.offset.seconds}s "
             f"| duration: {self.duration.seconds}s "

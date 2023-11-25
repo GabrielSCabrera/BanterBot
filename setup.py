@@ -55,7 +55,11 @@ setup(
     description=description,
     download_url=url + f"/releases/download/v{version}-alpha/BanterBot-{version}.tar.gz",
     entry_points={
-        "console_scripts": ["banterbot=banterbot.gui.cli:run", "banterbot-voice-search=banterbot.gui.cli:voice_search"],
+        "console_scripts": [
+            "banterbot=banterbot.gui.cli:run",
+            "banterbot-voice-search=banterbot.gui.cli:voice_search",
+            "banterbot-character=banterbot.gui.cli:character",
+        ],
     },
     install_requires=dependencies,
     keywords=[

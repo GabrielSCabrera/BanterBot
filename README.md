@@ -86,13 +86,21 @@ Here is an example:
 banterbot --greet --model gpt-4-turbo --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --name Grendel
 ```
 
-Additionally, you can use `banterbot-voice-search` to search through all the available voices. For example:
+Additionally, you can use `banterbot character` to select a pre-loaded character to interact with. For example:
 
 ```bash
-banterbot-voice-search --language en fr
+banterbot character android
 ```
 
-Will list all English (en) and French (fr) voice models. Run `banterbot-voice-search -h` for more information.
+Will start a conversation with Marvin the Paranoid Android.
+
+You can also use `banterbot voice-search` to search through all the available voices. For example:
+
+```bash
+banterbot voice-search --language en fr
+```
+
+Will list all English (en) and French (fr) voice models. Run `banterbot voice-search -h` for more information.
 
 ### Launch with a Python script
 
@@ -114,8 +122,6 @@ interface = TKMultiplayerInterface(model=model, voice=voice, system=system, assi
 # Setting `greet` to True instructs BanterBot to initiate the converstion. Otherwise, the user must initiate.
 interface.run(greet=True)
 ```
-
-There are several ready-to-go characters in the `characters` directory, which is included in the package repository.
 
 ## Chat Logs
 

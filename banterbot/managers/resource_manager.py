@@ -9,7 +9,6 @@ import banterbot.resources
 
 
 class ResourceManager:
-
     """
     An interface to simplify loading resources from the `/banterbot/resources/` data directory. In addition to
     syntactically simplifying the process, this class gives the option to cache the loaded files to reduce overhead on
