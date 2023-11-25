@@ -46,7 +46,7 @@ setup(
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: End Users/Desktop",
-        "Programming Language :: Python :: 3.10.6",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Communications :: Chat",
         "Topic :: Multimedia :: Sound/Audio :: Speech",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
