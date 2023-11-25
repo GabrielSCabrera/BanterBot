@@ -124,65 +124,63 @@ Start BanterBot with an enhanced graphical user interface by running the command
 in your terminal. This GUI allows multiple users to interact with the bot, each with a dedicated
 button for speech input and a display for responses.
 
--  ``-p``, ``--prompt``: Set a system prompt at the beginning of
-   the conversation (e.g., ``-p "You are Grendel the Quiz Troll,
-   a charismatic troll who loves to host quiz shows."``).
+-  ``--prompt``: Set a system prompt at the beginning of
+   the conversation (e.g., ``--prompt "You are Grendel the 
+   Quiz Troll, a charismatic troll who loves to host quiz 
+   shows."``).
 
--  ``-m``, ``--model``: Choose the OpenAI model for conversation
+-  ``--model``: Choose the OpenAI model for conversation
    generation. Defaults to GPT-4, but other versions can be
    selected if specified in the code.
 
--  ``-t``, ``--tone-mode``: Configure the emotional tone evaluation
-   mode. Options are NONE, BASIC, or ADVANCED. By default, it is set
-   to ADVANCED.
-
--  ``-v``, ``--voice``: Select a Microsoft Azure Cognitive Services
+-  ``--voice``: Select a Microsoft Azure Cognitive Services
    text-to-speech voice. The default is "Aria," but other voices
    can be specified if available.
 
--  ``-s``, ``--style``: Choose a voice style. This only works if
-   ``--tone-mode=NONE``. It defaults to a "friendly" style, with
-   other styles available as per the Azure Cognitive Services specifications.
-
--  ``-d``, ``--debug``: Enable debug mode to display additional
+-  ``--debug``: Enable debug mode to display additional
    information in the terminal for troubleshooting.
 
--  ``-g``, ``--greet``: Have the bot greet the user upon startup.
+-  ``--greet``: Have the bot greet the user upon startup.
 
--  ``-n``, ``--name``: Assign a name to the assistant for aesthetic
+-  ``--name``: Assign a name to the assistant for aesthetic
    purposes. This does not inform the bot itself; to provide the bot
    with information, use the ``--prompt`` flag.
 
 Here is an example:
 
 .. code:: bash
-   banterbot -g --model gpt-4-turbo --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --tone-mode ADVANCED --name Grendel
 
+   banterbot -g --model gpt-4-turbo --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --name Grendel
+
+Additionally, you can use ``banterbot-voice-search`` to search through all the available voices. For example:
+
+.. code:: bash
+
+   banterbot-voice-search --language en fr
+
+Will list all English (en) and French (fr) voice models. Run ``banterbot-voice-search -h`` for more information.
 
 Launch with a Python script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use BanterBot in a script, create an instance of the `TKMultiplayerInterface` class and call the `run` method:
+To use BanterBot in a script, create an instance of the ``TKMultiplayerInterface`` class and call its ``run`` method:
 
 .. code:: python
    
-   from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKMultiplayerInterface, ToneMode
+   from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKMultiplayerInterface
 
    model = OpenAIModelManager.load("gpt-4-turbo")
    voice = AzureNeuralVoiceManager.load("Davis")
    assistant_name = "Grendel"
 
-   # Set the tone_mode -- other options are ToneMode.NONE, ToneMode.BASIC.
-   tone_mode = ToneMode.ADVANCED
-
    # Optional system prompt to set up a custom character prior to initializing BanterBot.
    system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."
 
-   # The five arguments `model`, `voice`, `system`, `tone_mode`, and `assistant_name` are optional.
-   interface = TKMultiplayerInterface(model=model, voice=voice, system=system, tone_mode=tone_mode, assistant_name=assistant_name)
+   # The four arguments `model`, `voice`, `system`, and `assistant_name` are optional.
+   interface = TKMultiplayerInterface(model=model, voice=voice, system=system, assistant_name=assistant_name)
    interface.run()
 
-There are several ready-to-go characters in the ``characters`` directory.
+There are several ready-to-go characters in the ``characters`` directory, which is included in the package repository.
 
 Chat Logs
 ---------

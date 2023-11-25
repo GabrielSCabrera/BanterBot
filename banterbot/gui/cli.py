@@ -116,10 +116,10 @@ def run() -> None:
         description=(
             "This program initializes a GUI that allows users to interact with a chatbot. The user can enter multiple "
             "names, each with a dedicated button on its right. When holding down the button associated with a given "
-            "name, the user can speak into their microphone and their prompt will be sent to the bot for a response. "
-            "If this does not work, keep the button down until your text is visualized in the scrollable text area."
-            "The chatbot's responses are generated using the specified OpenAI model and will be played back using the "
-            "specified Azure Neural Voice."
+            "name, the user can speak into their microphone and their prompt will be sent to the bot for a response."
+            "\n\nThe chatbot's responses are generated using the specified OpenAI model and will be played back using "
+            "the specified Azure Neural Voice.\n\nUse the included console script `banterbot-voice-search` to find a "
+            "suitable voice for your BanterBot."
         ),
         epilog=(
             "Requires three environment variables for full functionality.\n"
@@ -161,15 +161,6 @@ def run() -> None:
             }
             setattr(namespace, self.dest, conversion_table[values.upper()])
 
-    parser.add_argument(
-        "--tone-mode",
-        choices=["NONE", "BASIC", "ADVANCED"],
-        action=ToneModeChoice,
-        default=ToneMode.ADVANCED,
-        dest="tone_mode",
-        help="Set the emotional tone evaluation mode for the bot's responses.",
-    )
-
     class VoiceChoice(argparse.Action):
         def __call__(self, parser, namespace, values, option_string=None):
             setattr(namespace, self.dest, AzureNeuralVoiceManager.load(values.lower()))
@@ -179,23 +170,7 @@ def run() -> None:
         action=VoiceChoice,
         default=AzureNeuralVoiceManager.load("aria"),
         dest="voice",
-        help=(
-            "Select a Microsoft Azure Cognitive Services text-to-speech voice. Use the included console script "
-            "`banterbot-voice-search` to find a suitable voice for your BanterBot."
-        ),
-    )
-
-    parser.add_argument(
-        "--style",
-        choices=Prosody.STYLES,
-        action="store",
-        default="friendly",
-        dest="style",
-        help=(
-            "ONLY WORKS IF --tone-mode=NONE. Select a Microsoft Azure Cognitive Services text-to-speech voice style. "
-            f"Universally available styles across all available voices are: {Prosody.STYLES}. Some voices may have "
-            "more available styles, see `/banterbot/data/azure_neural_voices.py` for more options."
-        ),
+        help="Select a Microsoft Azure Cognitive Services text-to-speech voice.",
     )
 
     parser.add_argument(
@@ -228,9 +203,7 @@ def run() -> None:
     kwargs = {
         "model": args.model,
         "voice": args.voice,
-        "style": args.style,
         "system": args.prompt,
-        "tone_mode": args.tone_mode,
         "assistant_name": args.name,
     }
 
