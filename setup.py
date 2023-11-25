@@ -37,7 +37,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.10"
+version = "0.0.11"
 setup(
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
