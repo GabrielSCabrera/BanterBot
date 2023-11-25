@@ -54,13 +54,7 @@ setup(
     ],
     description=description,
     download_url=url + f"/releases/download/v{version}-alpha/BanterBot-{version}.tar.gz",
-    entry_points={
-        "console_scripts": [
-            "banterbot=banterbot.gui.cli:run",
-            "banterbot-voice-search=banterbot.gui.cli:voice_search",
-            "banterbot-character=banterbot.gui.cli:character",
-        ],
-    },
+    entry_points={"console_scripts": ["banterbot=banterbot.gui.cli:run"]},
     install_requires=dependencies,
     keywords=[
         "tkinter",
