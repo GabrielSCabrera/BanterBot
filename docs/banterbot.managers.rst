@@ -33,3 +33,11 @@ banterbot.managers.resource\_manager module
     :undoc-members:
     :show-inheritance:    
 
+banterbot.utils.stream\_manager module
+--------------------------------------
+
+.. automodule:: banterbot.utils.stream_manager
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

@@ -4,8 +4,8 @@ import json
 from io import StringIO
 from typing import Any
 
-import banterbot
 import banterbot.resources
+from banterbot import config
 
 
 class ResourceManager:
@@ -67,7 +67,7 @@ class ResourceManager:
         if reset or filename not in cls._raw_data:
             path = importlib.resources.files(banterbot.resources).joinpath(filename)
             try:
-                with open(file=path, mode="r", encoding=encoding) as fs:
+                with open(file=path, mode="r", encoding=config.ENCODING) as fs:
                     data = fs.read()
             except FileNotFoundError:
                 message = f"Class `ResourceLoader` found no such resource: `{filename}`"

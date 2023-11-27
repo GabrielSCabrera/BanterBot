@@ -15,6 +15,9 @@ SEED = 1337
 # The default language used in speech-to-text recognition
 DEFAULT_LANGUAGE = "en-US"
 
+# The default encoding format to use in reading/writing to file.
+ENCODING = "utf-8"
+
 # Set the log settings
 logging_level = logging.INFO
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging_level)

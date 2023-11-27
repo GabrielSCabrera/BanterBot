@@ -2,7 +2,7 @@ import datetime
 import logging
 import os
 import time
-from typing import Generator, Iterator, Union
+from typing import Generator, Iterator, Optional, Union
 
 import openai
 
@@ -58,12 +58,15 @@ class OpenAIService:
         """
         return len(self._model.tokenizer.encode(string))
 
-    def interrupt(self) -> None:
+    def interrupt(self, interrupt_ns: Optional[int] = None) -> None:
         """
         Interrupts any ongoing streaming processes. This method sets the interrupt flag to the current time, which will
         cause any streaming processes activated prior to the current time to stop.
+
+        Args:
+            interrupt_ns (Optional[int]): The time at which the stream was interrupted.
         """
-        self._interrupt: int = time.perf_counter_ns()
+        self._interrupt = max(interrupt_ns if interrupt_ns is not None else time.perf_counter_ns(), self._interrupt)
         logging.debug("OpenAIService stream interrupted")
 
     def prompt(self, messages: list[Message], split: bool = True, **kwargs) -> Union[tuple[str], str]:

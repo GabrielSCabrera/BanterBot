@@ -55,19 +55,19 @@ class SpeechRecognitionService:
         # Reset the state variables of the speech-to-text recognizer
         self._reset()
 
-    def interrupt(self, soft: bool = False, shutdown_time: Optional[int] = None) -> None:
+    def interrupt(self, soft: bool = False, interrupt_ns: Optional[int] = None) -> None:
         """
         Interrupts an ongoing speech-to-text process, if any. This method sets the interrupt flag to the current time,
         which will stop any speech-to-text processes activated prior to the current time.
 
         Args:
             soft (bool): If True, allows the recognizer to keep processing data that was recorded prior to interruption.
-            shutdown_time (Optional[int]): The time at which the listener was deactivated.
+            interrupt_ns (Optional[int]): The time at which the listener was deactivated.
         """
         # Allow the recognizer to wait for any buffering words to be completely recognized.
-        self._soft_interrupt = shutdown_time if soft else self._soft_interrupt
+        self._soft_interrupt = max(interrupt_ns if soft else self._soft_interrupt, self._soft_interrupt)
         # Update the interruption time.
-        self._interrupt: int = shutdown_time if shutdown_time is not None else time.perf_counter_ns()
+        self._interrupt = max(interrupt_ns if interrupt_ns is not None else time.perf_counter_ns(), self._interrupt)
         # Release any threading.Event instances that the listener may be waiting for.
         self._start_recognition.set()
         self._new_events.set()

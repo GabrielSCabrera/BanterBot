@@ -83,12 +83,15 @@ class SpeechSynthesisService:
         """
         return self._start_synthesis.is_set()
 
-    def interrupt(self) -> None:
+    def interrupt(self, interrupt_ns: Optional[int] = None) -> None:
         """
         Interrupts an ongoing text-to-speech process, if any. This method sets the interrupt flag to the current time,
         which will cause any text-to-speech processes activated prior to the current time to stop.
+
+        Args:
+            interrupt_ns (Optional[int]): The time at which the recognizer was interrupted.
         """
-        self._interrupt: int = time.perf_counter_ns()
+        self._interrupt = max(interrupt_ns if interrupt_ns is not None else time.perf_counter_ns(), self._interrupt)
         logging.debug("SpeechSynthesisService synthesizer interrupted")
 
     def speak(self, input_string: str, voice: AzureNeuralVoiceProfile, style: str) -> Generator[Word, None, None]:
@@ -180,11 +183,13 @@ class SpeechSynthesisService:
         # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
             # Add the event and timing information to the list of events
-            self._events.append({
-                "event": event,
-                "time": 5e8 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
-                "word": self._process_event(event=event, first_word=len(self._events) == 0),
-            })
+            self._events.append(
+                {
+                    "event": event,
+                    "time": 5e8 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
+                    "word": self._process_event(event=event, first_word=len(self._events) == 0),
+                }
+            )
 
     def _callbacks_connect(self) -> None:
         """

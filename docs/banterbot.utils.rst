@@ -1,6 +1,14 @@
 banterbot.utils package
 =======================
 
+banterbot.utils.indexed\_event module
+-------------------------------------
+
+.. automodule:: banterbot.utils.indexed_event
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 banterbot.utils.nlp module
 --------------------------
 
@@ -13,6 +21,14 @@ banterbot.utils.thread\_queue module
 ------------------------------------
 
 .. automodule:: banterbot.utils.thread_queue
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+banterbot.utils.time\_resolver module
+-------------------------------------
+
+.. automodule:: banterbot.utils.time_resolver
    :members:
    :undoc-members:
    :show-inheritance:

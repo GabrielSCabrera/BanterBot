@@ -5,9 +5,9 @@ banterbot.extensions.interface module
 -------------------------------------
 
 .. automodule:: banterbot.extensions.interface
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 banterbot.extensions.option\_selector module
 --------------------------------------------

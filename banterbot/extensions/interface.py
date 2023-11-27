@@ -5,6 +5,7 @@ import time
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
+from banterbot import config
 from banterbot.data.enums import ChatCompletionRoles, ToneMode
 from banterbot.data.prompts import ToneSelection
 from banterbot.exceptions.format_mismatch_error import FormatMismatchError
@@ -143,7 +144,7 @@ class Interface(ABC):
             soft (bool): If True, allows the recognizer to keep processing data that was recorded prior to interruption.
             shutdown_time (Optional[int]): The time at which the listener was deactivated.
         """
-        self._speech_recognition_service.interrupt(soft=soft, shutdown_time=shutdown_time)
+        self._speech_recognition_service.interrupt(soft=soft, interrupt_ns=shutdown_time)
         self._speech_synthesis_service.interrupt()
         self._openai_service.interrupt()
         self._interrupt = time.perf_counter_ns() if not shutdown_time else shutdown_time
@@ -188,7 +189,7 @@ class Interface(ABC):
         if self._listening_toggle:
             self._listening_toggle = False
             shutdown_time = time.perf_counter_ns()
-            self._speech_recognition_service.interrupt(soft=True, shutdown_time=shutdown_time)
+            self._speech_recognition_service.interrupt(soft=True, interrupt_ns=shutdown_time)
 
     def prompt(self, message: str, name: Optional[str] = None) -> None:
         """
@@ -310,7 +311,7 @@ class Interface(ABC):
         """
         with self._log_lock:
             logging.debug(f"Interface appended new data to the chat log")
-            with open(self._log_path, "a+") as fs:
+            with open(self._log_path, "a+", encoding=config.ENCODING) as fs:
                 fs.write(word)
 
     def _get_next_tone(self):
