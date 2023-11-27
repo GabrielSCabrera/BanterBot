@@ -27,9 +27,11 @@ class StreamManager:
             "log": threading.Lock(),
         }
 
-        self._parser: Callable[[IndexedEvent], Any] = lambda x: x
+        self._parser: Callable[[IndexedEvent, bool], Any] = lambda x, y: x
         self._parser_finalizer: Optional[Callable[[IndexedEvent], Any]] = None
         self._interrupt: int = 0
+        self._idx: int = 0
+        self._idx_max: Optional[int] = None
         self._log: list[StreamLogEntry] = []
 
         self._reset()
@@ -46,12 +48,13 @@ class StreamManager:
             self._interrupt = timestamp
         self._events["kill"].set()
 
-    def connect_parser(self, func: Callable[[IndexedEvent], Any]) -> None:
+    def connect_parser(self, func: Callable[[IndexedEvent, bool], Any]) -> None:
         """
-        Connects a parser function for processing each streamed item.
+        Connects a parser function for processing each streamed item. The parser function should take an IndexedEvent
+        and a boolean indicating whether the stream is on its final iteration.
 
         Args:
-            func (Callable[[IndexedEvent], Any]): The parser function to be used.
+            func (Callable[[IndexedEvent, bool], Any]): The parser function to be used.
         """
         self._parser = func
 
@@ -126,7 +129,7 @@ class StreamManager:
         Yields:
             Any: The result of processing a log entry.
         """
-        while timestamp < self._interrupt:
+        while timestamp < self._interrupt and (self._idx_max is None or self._idx <= self._idx_max):
             self._events["indexed"].wait()
             yield self._parser(self._log[self._idx])
             self._idx += 1
@@ -151,6 +154,7 @@ class StreamManager:
         Args:
             iterable (Iterable[Any]): The iterable to stream data from.
         """
-        for value in iterable:
+        for n, value in enumerate(iterable):
             self._append_to_log(value=value)
             self._events["indexed"].increment()
+        self._idx_max = n - 1

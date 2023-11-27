@@ -8,8 +8,10 @@ import openai
 
 from banterbot.config import RETRY_LIMIT, RETRY_TIME
 from banterbot.data.enums import EnvVar
+from banterbot.managers.stream_manager import StreamManager
 from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
+from banterbot.models.stream_log_entry import StreamLogEntry
 from banterbot.utils.nlp import NLP
 
 # Set the OpenAI API key
@@ -45,6 +47,13 @@ class OpenAIService:
 
         # Set the interruption flag to zero: if interruptions are raised, this will be updated.
         self._interrupt: int = 0
+
+        # The text that is currently being processed by the OpenAI ChatCompletion API.
+        self._text: str = ""
+
+        # Initialize the StreamManager for handling streaming processes.
+        self._stream_manager = StreamManager()
+        self._stream_manager.connect_parser(self._response_parse_stream)
 
     def count_tokens(self, string: str) -> int:
         """
@@ -107,8 +116,8 @@ class OpenAIService:
             block contains one or more sentences that form a part of the generated response. This can be used to display
             the response to the user in real-time or for further processing.
         """
-        # Record the time at which the request was made, in order to account for future interruptions.
-        init_time = time.perf_counter_ns()
+        # Reset the state of the current instance of OpenAIService
+        self._reset()
 
         # Obtain a response from the OpenAI ChatCompletion API
         response = self._request(messages=messages, stream=True, **kwargs)
@@ -117,7 +126,7 @@ class OpenAIService:
         self._streaming = True
 
         # Yield the responses as they are streamed
-        for block in self._response_parse_stream(response=response, init_time=init_time):
+        for block in self._response_parse_stream(response=response):
             yield block
 
         # Reset the streaming flag to False
@@ -142,6 +151,53 @@ class OpenAIService:
             bool: The streaming state of the current instance.
         """
         return self._streaming
+
+    def _parser(self, entry: StreamLogEntry, final_iteration: bool) -> list[str]:
+        """
+        Parses a chunk of data from the OpenAI API response.
+
+        Args:
+            entry (StreamLogEntry): A log entry from the OpenAI API response.
+            final_iteration (bool): Whether the current chunk is the final chunk of data from the OpenAI API response.
+
+        Returns:
+            list[str]: A list of sentences parsed from the chunk.
+        """
+        if "content" in entry.value["choices"][0]["delta"].keys():
+            self._text += entry.value["choices"][0]["delta"]["content"]
+
+        # If the current chunk is the final chunk of data from the OpenAI API response, parse the final chunk.
+        if final_iteration:
+            sentences = NLP.segment_sentences(self._text)
+            logging.debug(f"OpenAIService yielded final sentences: {sentences[:-1]}")
+            logging.debug("OpenAIService stream stopped")
+            return sentences
+
+        # If the current chunk is not the final chunk of data from the OpenAI API response, parse the chunk.
+        elif len(sentences := NLP.segment_sentences(self._text)) > 1:
+            self._text = sentences[-1]
+            logging.debug(f"OpenAIService yielded sentences: {sentences[:-1]}")
+            return sentences[:-1]
+
+    def _parser_finalizer(self, chunk: openai.openai_object.OpenAIObject) -> list[str]:
+        """
+        Parses the final chunk of data from the OpenAI API response.
+
+        Args:
+            chunk (openai.openai_object.OpenAIObject): The final chunk of data from the OpenAI API response.
+
+        Returns:
+            list[str]: A list of sentences parsed from the chunk.
+        """
+        text = ""
+        delta = chunk["choices"][0]["delta"]
+
+        if "content" in delta.keys():
+            text += delta["content"]
+
+        sentences = NLP.segment_sentences(text)
+        logging.debug(f"OpenAIService yielded final sentences: {sentences[:-1]}")
+        return sentences
 
     def _response_parse_stream(self, response: Iterator, init_time: int) -> Generator[list[str], None, None]:
         """
@@ -233,3 +289,9 @@ class OpenAIService:
             raise openai.error.APIError
 
         return response if stream else response.choices[0].message.content.strip()
+
+    def _reset(self) -> None:
+        """
+        Resets the state of the current instance of OpenAIService.
+        """
+        self._text = ""
