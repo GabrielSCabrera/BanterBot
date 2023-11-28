@@ -13,6 +13,7 @@ from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
 from banterbot.models.stream_log_entry import StreamLogEntry
 from banterbot.utils.nlp import NLP
+from banterbot.utils.shared_data import SharedData
 
 # Set the OpenAI API key
 openai.api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
@@ -53,7 +54,7 @@ class OpenAIService:
 
         # Initialize the StreamManager for handling streaming processes.
         self._stream_manager = StreamManager()
-        self._stream_manager.connect_parser(self._response_parse_stream)
+        self._stream_manager.connect_stream_processor(self._response_parse_stream)
 
     def count_tokens(self, string: str) -> int:
         """
@@ -152,52 +153,40 @@ class OpenAIService:
         """
         return self._streaming
 
-    def _parser(self, entry: StreamLogEntry, final_iteration: bool) -> list[str]:
+    def _stream_processor(self, log: list[StreamLogEntry], idx: int, shared_data: SharedData) -> list[str]:
         """
         Parses a chunk of data from the OpenAI API response.
 
         Args:
-            entry (StreamLogEntry): A log entry from the OpenAI API response.
-            final_iteration (bool): Whether the current chunk is the final chunk of data from the OpenAI API response.
+            log (list[StreamLogEntry]): A list of StreamLogEntry instances containing the data from the OpenAI API
+            response.
+            idx (int): The index of the current chunk of data.
 
         Returns:
             list[str]: A list of sentences parsed from the chunk.
         """
-        if "content" in entry.value["choices"][0]["delta"].keys():
-            self._text += entry.value["choices"][0]["delta"]["content"]
-
-        # If the current chunk is the final chunk of data from the OpenAI API response, parse the final chunk.
-        if final_iteration:
-            sentences = NLP.segment_sentences(self._text)
-            logging.debug(f"OpenAIService yielded final sentences: {sentences[:-1]}")
-            logging.debug("OpenAIService stream stopped")
-            return sentences
+        if "content" in log[idx].value["choices"][0]["delta"].keys():
+            self._text += log[idx].value["choices"][0]["delta"]["content"]
 
         # If the current chunk is not the final chunk of data from the OpenAI API response, parse the chunk.
-        elif len(sentences := NLP.segment_sentences(self._text)) > 1:
-            self._text = sentences[-1]
-            logging.debug(f"OpenAIService yielded sentences: {sentences[:-1]}")
-            return sentences[:-1]
+        if len(self._sentences := NLP.segment_sentences(self._text)) > 1:
+            self._text = self._sentences[-1]
+            logging.debug(f"OpenAIService yielded sentences: {self._sentences[:-1]}")
+            return self._sentences[:-1]
 
-    def _parser_finalizer(self, chunk: openai.openai_object.OpenAIObject) -> list[str]:
+    def _stream_completion_handler(self, log: list[StreamLogEntry]) -> None:
         """
-        Parses the final chunk of data from the OpenAI API response.
+        Handles the completion of the OpenAI API response.
 
         Args:
-            chunk (openai.openai_object.OpenAIObject): The final chunk of data from the OpenAI API response.
-
-        Returns:
-            list[str]: A list of sentences parsed from the chunk.
+            log (list[StreamLogEntry]): A list of StreamLogEntry instances containing the data from the OpenAI API
+            response.
         """
-        text = ""
-        delta = chunk["choices"][0]["delta"]
-
-        if "content" in delta.keys():
-            text += delta["content"]
-
-        sentences = NLP.segment_sentences(text)
-        logging.debug(f"OpenAIService yielded final sentences: {sentences[:-1]}")
-        return sentences
+        # If the current chunk is the final chunk of data from the OpenAI API response, parse the final chunk.
+        self._sentences = NLP.segment_sentences(self._text)
+        logging.debug(f"OpenAIService yielded final sentences: {self._sentences[:-1]}")
+        logging.debug("OpenAIService stream stopped")
+        return self._sentences
 
     def _response_parse_stream(self, response: Iterator, init_time: int) -> Generator[list[str], None, None]:
         """

@@ -27,7 +27,7 @@ class StreamLogEntry:
         Returns:
             str: Metadata about the current entry.
         """
-        return f"<StreamLogEntry at {TimeResolver.resolve(self.timestamp)} of type `{type(self.value)}`>"
+        return f"<StreamLogEntry at {TimeResolver.resolve(self.timestamp)} of type `{type(self.value).__name__}`>"
 
     def __repr__(self) -> str:
         """
@@ -36,4 +36,4 @@ class StreamLogEntry:
         Returns:
             str: Metadata about the current entry.
         """
-        return f"<StreamLogEntry | {self.timestamp} | {type(self.value)}>"
+        return f"<StreamLogEntry | {self.timestamp} | {type(self.value).__name__}>"
