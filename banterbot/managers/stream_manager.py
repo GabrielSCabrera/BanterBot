@@ -1,14 +1,15 @@
 import inspect
 import threading
 import time
-from collections.abc import Callable, Generator, Iterable
+from collections.abc import Callable, Iterable
+from copy import deepcopy
 from typing import Any, Optional
 
 from banterbot.handlers.stream_handler import StreamHandler
 from banterbot.models.stream_log_entry import StreamLogEntry
+from banterbot.utils.closable_queue import ClosableQueue
 from banterbot.utils.indexed_event import IndexedEvent
 from banterbot.utils.number import Number
-from banterbot.utils.shared_data import SharedData
 
 
 class StreamManager:
@@ -20,91 +21,100 @@ class StreamManager:
         """
         Initializes the StreamManager with default values.
         """
-        self._stream_processor: Callable[[IndexedEvent, int, SharedData], Any] = lambda x, y: x
-        self._stream_finalizer: Optional[Callable[[IndexedEvent, SharedData], Any]] = None
+        self._processor: Callable[[IndexedEvent, int, dict], Any] = None
+        self._exception_handler: Optional[Callable[[IndexedEvent, dict], Any]] = None
+        self._completion_handler: Callable[[IndexedEvent, int, dict], Any] = None
 
-    def connect_stream_processor(self, func: Callable[[list[StreamLogEntry], int, SharedData], Any]) -> None:
+    def connect_processor(self, func: Callable[[list[StreamLogEntry], int, dict], Any]) -> None:
         """
-        Connects a parser function for processing each streamed item. The parser function should take an IndexedEvent,
-        the current index, and a dictionary, which will contain shared data between the connected functions.
+        Connects a processor function for processing each streamed item. The stream processor function should take a
+        list of `StreamLogEntry` instances, the current index of the log, and a dictionary which will contain shared
+        data between the connected functions.
 
         Args:
-            func (Callable[[list[StreamLogEntry], int, SharedData], Any]): The parser function to be used.
+            func (Callable[[list[StreamLogEntry], int, dict], Any]): The stream processor function to be used.
         """
         if inspect.signature(func).parameters != ["log", "index", "shared_data"]:
             raise ValueError(
-                "Argument `func` in method `connect_stream_processor` of class `StreamManager` should have the"
-                " following signature: `func(log: list[StreamLogEntry], index: int, shared: SharedData) -> Any`."
+                "Argument `func` in method `connect_processor` of class `StreamManager` expects the following"
+                " signature: `func(log: list[StreamLogEntry], index: int, shared_data: dict) -> Any`."
             )
-        self._stream_processor = func
+        self._processor = func
 
-    def connect_stream_completion_handler(self, func: Callable[[list[StreamLogEntry], SharedData], Any]) -> None:
+    def connect_completion_handler(self, func: Callable[[list[StreamLogEntry], dict], Any]) -> None:
         """
-        Connects a stream completion handler function for handling the final result of the parser. The handler function
-        should take an IndexedEvent and a dictionary, which will contain shared data between the connected functions.
+        Connects an optional completion handler function for handling the final result of the parser. The handler
+        function should take a list of `StreamLogEntry` instances and a dictionary which will contain shared data
+        between the connected functions.
 
         Args:
-            func (Callable[[list[StreamLogEntry], SharedData], Any]): The completion handler function to be used.
+            func (Callable[[list[StreamLogEntry], dict], Any]): The completion handler function to be used.
         """
         if inspect.signature(func).parameters != ["log", "shared_data"]:
             raise ValueError(
-                "Argument `func` in method `connect_stream_processor` of class `StreamManager` should have the"
-                " following signature: `func(log: list[StreamLogEntry], shared: SharedData) -> Any`."
+                "Argument `func` in method `connect_completion_handler` of class `StreamManager`  expects the following"
+                " signature: `func(log: list[StreamLogEntry], shared_data: dict) -> Any`."
             )
 
-        self._stream_completion_handler = func
+        self._completion_handler = func
 
-    def connect_stream_finalizer(self, func: Callable[[list[StreamLogEntry], int, SharedData], Any]) -> None:
+    def connect_exception_handler(self, func: Callable[[list[StreamLogEntry], int, dict], Any]) -> None:
         """
-        Connects a finalizer function for the parser, to be used after streaming is complete. The finalizer function
-        should take an IndexedEvent, the current index, and a dictionary, which will contain shared data between the
-        connected functions.
+        Connects an optional exception handler function for the parser, to be used when the stream iterable is
+        interrupted. The stream exception handler function is provided with the log and the current index for all
+        remaining items in thestream. The handler function should take a list of `StreamLogEntry` instances, the
+        current index of the log, and a dictionary which will contain shared data between the connected functions.
 
         Args:
-            func (Callable[[list[StreamLogEntry], int, SharedData], Any]): The finalizer function to be used.
+            func (Callable[[list[StreamLogEntry], int, dict], Any]): The finalizer function to be used.
         """
         if inspect.signature(func).parameters != ["log", "index", "shared_data"]:
             raise ValueError(
-                "Argument `func` in method `connect_stream_processor` of class `StreamManager` should have the"
-                " following signature: `func(log: list[StreamLogEntry], index: int, shared_data: SharedData) -> Any`."
+                "Argument `func` in method `connect_exception_handler` of class `StreamManager`  expects the following"
+                " signature: `func(log: list[StreamLogEntry], index: int, shared_data: dict) -> Any`."
             )
-        self._stream_finalizer = func
+        self._exception_handler = func
 
     def stream(
-        self, iterable: Iterable[Any], close_method: Optional[str] = None, timestamp: Optional[int] = None
+        self,
+        iterable: Iterable[Any],
+        close_stream: Optional[Callable] = None,
+        init_shared_data: Optional[dict[str, Any]] = None,
     ) -> None:
         """
         Starts streaming data from an iterable source in a separate thread.
 
         Args:
             iterable (Iterable[Any]): The iterable to stream data from.
-            close_method (Optional[str]): The method to use for closing the iterable.
-            timestamp (Optional[int]): The timestamp to start processing from.
+            close_stream (Optional[str]): The method to use for closing the iterable.
+            init_shared_data (Optional[dict[str, Any]]): The initial shared data to use.
         """
+        # Getting the timestamp of the stream.
+        timestamp = time.perf_counter_ns()
 
+        # Checking if a stream processor function has been connected, and raising an error if not.
+        if self._processor is None:
+            raise ValueError(
+                "No processor function has been connected. Please use the `connect_processor` method to connect a"
+                " processor function."
+            )
+
+        # Creating the indexed event and kill event to be used.
         indexed_event = IndexedEvent()
         kill_event = threading.Event()
 
+        # Creating the interrupt, index, and index_max values to be used.
+        interrupt = Number(value=0)
         index_max = Number(None)
+
+        # Creating the queue and log to be used.
+        queue = ClosableQueue()
         log = []
 
-        timestamp = time.perf_counter_ns() if not timestamp else timestamp
-
-        # # Creating the stream processor thread with the `_wrap_stream_processor` method as the target function.
-        # processor_thread = threading.Thread(
-        #     target=self._wrap_stream_processor,
-        #     kwargs={
-        #         "timestamp": timestamp,
-        #         "interrupt": interrupt,
-        #         "finalize_event": finalize_event,
-        #         "indexed_event": indexed_event,
-        #         "log": log,
-        #         "index": index,
-        #         "index_max": index_max,
-        #         "shared_data": shared_data,
-        #     },
-        #     daemon=True,
-        # )
+        # Creating copies of the stream processor, completion handler, and exception handler to be used.
+        processor = deepcopy(self._processor)
+        completion_handler = self._completion_handler if deepcopy(self._completion_handler) else None
+        exception_handler = self._exception_handler if deepcopy(self._exception_handler) else None
 
         # Creating the stream thread with the `_wrap_stream` method as the target function.
         stream_thread = threading.Thread(
@@ -115,35 +125,39 @@ class StreamManager:
                 "kill_event": kill_event,
                 "log": log,
                 "iterable": iterable,
-                "close_method": close_method,
+                "close_stream": close_stream,
+            },
+            daemon=False,
+        )
+
+        # Creating the stream processor thread with the `_wrap_stream_processor` method as the target function.
+        processor_thread = threading.Thread(
+            target=self._wrap_processor,
+            kwargs={
+                "timestamp": timestamp,
+                "interrupt": interrupt,
+                "index_max": index_max,
+                "indexed_event": indexed_event,
+                "queue": queue,
+                "log": log,
+                "processor": processor,
+                "completion_handler": completion_handler,
+                "exception_handler": exception_handler,
+                "init_shared_data": init_shared_data,
             },
             daemon=True,
         )
 
         # Starting the stream processor and stream threads.
-        # processor_thread.start()
         stream_thread.start()
 
         # Return an instance of StreamHandler
-        return StreamHandler(stream_thread, kill_event, log)
-
-        # # Starting the parser finalizer thread if defined
-        # if self.connect_stream_finalizer is not None:
-        #     parser_finalizer_thread = threading.Thread(
-        #         target=self._wrap_stream_finalizer,
-        #         kwargs={
-        #             "finalize_event": finalize_event,
-        #             "log": log,
-        #             "index": index,
-        #             "shared_data": shared_data,
-        #         },
-        #         daemon=False,
-        #     )
-        #     parser_finalizer_thread.start()
-
-        # # Joining the parser finalizer thread after completion
-        # if self.connect_stream_finalizer is not None:
-        #     parser_finalizer_thread.join()
+        return StreamHandler(
+            interrupt=interrupt,
+            kill_event=kill_event,
+            queue=queue,
+            processor_thread=processor_thread,
+        )
 
     def _wrap_stream(
         self,
@@ -152,7 +166,7 @@ class StreamManager:
         kill_event: threading.Event,
         log: list[StreamLogEntry],
         iterable: Iterable[Any],
-        close_method: Optional[str] = None,
+        close_stream: Optional[str] = None,
     ) -> None:
         """
         Wraps the `_stream` thread to allow for instant interruption using the `kill` event.
@@ -163,7 +177,7 @@ class StreamManager:
             kill_event (threading.Event): The event to use for interrupting the stream.
             log (list[StreamLogEntry]): The log to store streamed data in.
             iterable (Iterable[Any]): The iterable to stream data from.
-            close_method (Optional[str]): The method to use for closing the iterable.
+            close_stream (Optional[str]): The method to use for closing the iterable.
         """
         # Instantiating the stream thread with the `_stream` method as the target function.
         thread = threading.Thread(
@@ -183,10 +197,10 @@ class StreamManager:
         # Waiting for the kill event to be set.
         kill_event.wait()
 
-        # Closing the iterable if the stream thread is still alive and a close method is defined.
-        if thread.is_alive() and close_method:
-            # Close the iterable if it has a close method.
-            getattr(iterable, close_method)()
+        # Closing the iterable if the stream thread is still alive and a callable that closes the stream is defined.
+        if thread.is_alive() and close_stream:
+            # Close the iterable using the provided method-closing callable.
+            close_stream()
 
     def _stream(
         self,
@@ -212,55 +226,52 @@ class StreamManager:
         index_max.set(n - 1)
         kill_event.set()
 
-    def _wrap_stream_finalizer(
+    def _wrap_processor(
         self,
-        finalize_event: threading.Event,
-        log: list[StreamLogEntry],
-        index: Number,
-        shared_data: SharedData,
-    ) -> Generator[Any, None, None]:
-        """
-        Wraps the parser finalizer function to process remaining items in the stream log.
-
-        Args:
-            finalize_event (threading.Event): The event to use for finalizing the stream.
-            log (list[StreamLogEntry]): The log to store streamed data in.
-            index (Number): The index to start processing from.
-            shared_data (SharedData): The shared dictionary to use for processing.
-
-        Yields:
-            Any: The result of processing a log entry.
-        """
-        finalize_event.wait()
-        while index < len(log):
-            yield self._stream_finalizer(log=log, index=index, shared_data=shared_data)
-            index += 1
-
-    def _wrap_stream_processor(
-        self,
-        timestamp: int,
+        timestamp: float,
         interrupt: Number,
-        finalize_event: threading.Event,
-        indexed_event: IndexedEvent,
-        log: list[StreamLogEntry],
-        index: Number,
         index_max: Number,
-        shared_data: SharedData,
+        indexed_event: IndexedEvent,
+        queue: ClosableQueue,
+        log: list[StreamLogEntry],
+        processor: Callable[[list[StreamLogEntry], int, dict], Any],
+        completion_handler: Optional[Callable[[list[StreamLogEntry], dict], Any]],
+        exception_handler: Callable[[list[StreamLogEntry], int, dict], Any],
+        init_shared_data: Optional[dict[str, Any]] = None,
     ) -> None:
         """
         Wraps the parser function to process each item in the stream log.
 
         Args:
-            timestamp (int): The timestamp to start processing from.
-            shared_data (dict): The shared dictionary to use for processing.
-
-        Yields:
-            Any: The result of processing a log entry.
+            timestamp (float): The timestamp of the stream.
+            interrupt (Number): The interrupt time of the stream.
+            index_max (Number): The maximum index to stream to.
+            indexed_event (IndexedEvent): The indexed event to use for tracking the current index.
+            queue (ClosableQueue): The queue to store processed data in.
+            log (list[StreamLogEntry]): The log to store streamed data in.
+            stream_processor (Callable[[list[StreamLogEntry], int, dict], Any]): The stream processor function to
+                be used.
+            stream_completion_handler (Optional[Callable[[list[StreamLogEntry], dict], Any]]): The completion
+                handler function to be used.
+            stream_exception_handler (Callable[[list[StreamLogEntry], int, dict], Any]): The exception handler
+                function to be used.
         """
+        index = 0
+        if init_shared_data:
+            shared_data = deepcopy(init_shared_data)
+        else:
+            shared_data = dict()
+
         while timestamp < interrupt and (index_max.value is None or index <= index_max):
             indexed_event.wait()
-            yield self._stream_processor(log=log, index=index, shared_data=shared_data)
+            queue.put(processor(log=log, index=index, shared_data=shared_data))
             index += 1
         else:
-            yield self._stream_completion_handler(log=log, shared_data=shared_data)
-        finalize_event.set()
+            if timestamp < interrupt and completion_handler:
+                queue.put(completion_handler(log=log, shared_data=shared_data))
+
+        if exception_handler:
+            while index < len(log):
+                queue.put(exception_handler(log=log, index=index, shared_data=shared_data))
+                index += 1
+        queue.close()

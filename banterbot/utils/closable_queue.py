@@ -21,8 +21,8 @@ class ClosableQueue(queue.Queue):
     the consumer thread exits when the queue is empty and closed.
     """
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, maxsize: int = 0) -> None:
+        super().__init__(maxsize=maxsize)
         self._closed = False
         self._in_context = False
         self._close_lock = threading.Lock()
@@ -33,11 +33,6 @@ class ClosableQueue(queue.Queue):
             self.all_tasks_done.notify_all()
 
     def put(self, item: Any, block: bool = True, timeout: Optional[float] = None) -> None:
-        if not self._in_context:
-            raise RuntimeError(
-                "Method `put(item: Any, block: bool, timeout: Optional[float])` in class `ClosableQueue` was called"
-                " outside of a context manager."
-            )
         with self._close_lock:
             if self._closed:
                 raise RuntimeError(
@@ -47,16 +42,15 @@ class ClosableQueue(queue.Queue):
             else:
                 super().put(item, block, timeout)
 
-    def closed(self) -> bool:
-        with self._close_lock:
-            return self._closed
+    def finished(self) -> bool:
+        return self._closed and self.empty()
 
     def __iter__(self) -> Self:
         return self
 
     def __next__(self) -> Any:
         with self._close_lock:
-            if not self.empty() or not self._closed:
+            if not self.finished():
                 return self.get()
             raise StopIteration
 

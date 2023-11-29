@@ -79,13 +79,3 @@ class Prosody:
 
     # Compile a regex pattern using the delimiters specified in the config file, that are used to subdivide sentences.
     PHRASE_PATTERN = re.compile("([" + "".join(config.PHRASE_DELIM) + "]+)")
-
-
-class ToneMode:
-    """
-    Different possible settings for tones in class `Interface`.
-    """
-
-    NONE = None
-    BASIC = 1
-    ADVANCED = 2

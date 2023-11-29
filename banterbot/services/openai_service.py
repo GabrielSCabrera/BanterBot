@@ -49,12 +49,10 @@ class OpenAIService:
         # Set the interruption flag to zero: if interruptions are raised, this will be updated.
         self._interrupt: int = 0
 
-        # The text that is currently being processed by the OpenAI ChatCompletion API.
-        self._text: str = ""
-
         # Initialize the StreamManager for handling streaming processes.
         self._stream_manager = StreamManager()
-        self._stream_manager.connect_stream_processor(self._response_parse_stream)
+        self._stream_manager.connect_processor(self._response_parse_stream)
+        self._stream_manager.connect_completion_handler(self._completion_handler)
 
     def count_tokens(self, string: str) -> int:
         """
@@ -68,24 +66,13 @@ class OpenAIService:
         """
         return len(self._model.tokenizer.encode(string))
 
-    def interrupt(self, interrupt_ns: Optional[int] = None) -> None:
-        """
-        Interrupts any ongoing streaming processes. This method sets the interrupt flag to the current time, which will
-        cause any streaming processes activated prior to the current time to stop.
-
-        Args:
-            interrupt_ns (Optional[int]): The time at which the stream was interrupted.
-        """
-        self._interrupt = max(interrupt_ns if interrupt_ns is not None else time.perf_counter_ns(), self._interrupt)
-        logging.debug("OpenAIService stream interrupted")
-
     def prompt(self, messages: list[Message], split: bool = True, **kwargs) -> Union[tuple[str], str]:
         """
         Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.
 
         Args:
-            messages (list[Message]): A list of messages. Each message should be an instance of the Message class, which
-            contains the content and role (user or assistant) of the message.
+            messages (list[Message]): A list of messages. Each message should be an instance of the `Message` class,
+            which contains the content and role (user or assistant) of the message.
 
             split (bool): Whether the response should be split into sentences.
 
@@ -101,37 +88,25 @@ class OpenAIService:
         sentences = NLP.segment_sentences(response) if split else response
         return sentences
 
-    def prompt_stream(self, messages: list[Message], **kwargs) -> Generator[tuple[str], None, None]:
+    def prompt_stream(self, messages: list[Message], **kwargs) -> Generator[list[str], None, None]:
         """
         Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.
 
         Args:
-            messages (list[Message]): A list of messages. Each message should be an instance of the Message class, which
-            contains the content and role (user or assistant) of the message.
+            messages (list[Message]): A list of messages. Each message should be an instance of the `Message` class,
+            which contains the content and role (user or assistant) of the message.
 
             **kwargs: Additional parameters for the API request. These can include settings such as temperature, top_p,
             and frequency_penalty.
 
-        Yields:
-            Generator[list[str], None, None]: A stream of blocks of sentences as the response from the OpenAI API. Each
-            block contains one or more sentences that form a part of the generated response. This can be used to display
-            the response to the user in real-time or for further processing.
+        Returns:
+            Generator: A generator that yields blocks of sentences from the OpenAI API response.
         """
-        # Reset the state of the current instance of OpenAIService
-        self._reset()
-
         # Obtain a response from the OpenAI ChatCompletion API
         response = self._request(messages=messages, stream=True, **kwargs)
-
-        # Set the streaming flag to True
-        self._streaming = True
-
-        # Yield the responses as they are streamed
-        for block in self._response_parse_stream(response=response):
-            yield block
-
-        # Reset the streaming flag to False
-        self._streaming = False
+        return self._stream_manager.stream(
+            response=response, close=response.close, init_shared_data={"text": "", "sentences": []}
+        )
 
     @property
     def model(self) -> OpenAIModel:
@@ -143,94 +118,52 @@ class OpenAIService:
         """
         return self._model
 
-    @property
-    def streaming(self) -> bool:
-        """
-        If the current instance of OpenAIService is in the process of streaming, returns True. Otherwise, returns False.
-
-        Args:
-            bool: The streaming state of the current instance.
-        """
-        return self._streaming
-
-    def _stream_processor(self, log: list[StreamLogEntry], idx: int, shared_data: SharedData) -> list[str]:
+    def _processor(self, log: list[StreamLogEntry], index: int, shared_data: SharedData) -> list[str]:
         """
         Parses a chunk of data from the OpenAI API response.
 
         Args:
-            log (list[StreamLogEntry]): A list of StreamLogEntry instances containing the data from the OpenAI API
+            log (list[StreamLogEntry]): A list of `StreamLogEntry` instances containing the data from the OpenAI API
             response.
-            idx (int): The index of the current chunk of data.
+            index (int): The index of the current chunk of data.
+            shared_data (SharedData): A dictionary containing shared data between the stream handler and the processor.
 
         Returns:
             list[str]: A list of sentences parsed from the chunk.
         """
-        if "content" in log[idx].value["choices"][0]["delta"].keys():
-            self._text += log[idx].value["choices"][0]["delta"]["content"]
+        if "content" in log[index].value["choices"][0]["delta"].keys():
+            shared_data["text"] += log[index].value["choices"][0]["delta"]["content"]
+
+        shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])
 
         # If the current chunk is not the final chunk of data from the OpenAI API response, parse the chunk.
-        if len(self._sentences := NLP.segment_sentences(self._text)) > 1:
-            self._text = self._sentences[-1]
-            logging.debug(f"OpenAIService yielded sentences: {self._sentences[:-1]}")
-            return self._sentences[:-1]
+        if len(shared_data["sentences"]) > 1:
+            shared_data["text"] = shared_data["sentences"][-1]
+            logging.debug(f"OpenAIService yielded sentences: {shared_data['sentences'][:-1]}")
+            return shared_data["sentences"][:-1]
 
-    def _stream_completion_handler(self, log: list[StreamLogEntry]) -> None:
+    def _completion_handler(self, log: list[StreamLogEntry], shared_data: SharedData) -> None:
         """
         Handles the completion of the OpenAI API response.
 
         Args:
-            log (list[StreamLogEntry]): A list of StreamLogEntry instances containing the data from the OpenAI API
+            log (list[StreamLogEntry]): A list of `StreamLogEntry` instances containing the data from the OpenAI API
             response.
+            shared_data (SharedData): A dictionary containing shared data between the stream handler and the processor.
         """
         # If the current chunk is the final chunk of data from the OpenAI API response, parse the final chunk.
-        self._sentences = NLP.segment_sentences(self._text)
-        logging.debug(f"OpenAIService yielded final sentences: {self._sentences[:-1]}")
+        shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])
+        logging.debug(f"OpenAIService yielded final sentences: {shared_data['sentences'][:-1]}")
         logging.debug("OpenAIService stream stopped")
-        return self._sentences
-
-    def _response_parse_stream(self, response: Iterator, init_time: int) -> Generator[list[str], None, None]:
-        """
-        Parses a streaming response from the OpenAI API and yields blocks of text as they are received.
-
-        Args:
-            response (Iterator): A streaming response from the OpenAI ChatCompletion API.
-            init_time (int): The time at which the stream was initialized.
-
-        Yields:
-            Generator[list[str], None, bool]: Lists of sentences as blocks. Each block contains one or more sentences
-            that form a part of the generated response.
-        """
-        text = ""
-        logging.debug("OpenAIService stream started")
-
-        for chunk in response:
-            delta = chunk["choices"][0]["delta"]
-
-            if self._interrupt >= init_time:
-                logging.debug(f"OpenAIService interrupted")
-                break
-
-            if "content" in delta.keys():
-                text += delta["content"]
-
-            if len(sentences := NLP.segment_sentences(text)) > 1:
-                text = sentences[-1]
-                logging.debug(f"OpenAIService yielded sentences: {sentences[:-1]}")
-                yield sentences[:-1]
-        else:
-            sentences = NLP.segment_sentences(text)
-            logging.debug(f"OpenAIService yielded final sentences: {sentences[:-1]}")
-            yield sentences
-
-            logging.debug("OpenAIService stream stopped")
+        return shared_data["sentences"]
 
     def _request(self, messages: list[Message], stream: bool, **kwargs) -> Union[Iterator, str]:
         """
         Sends a request to the OpenAI API and generates a response based on the specified parameters.
 
         Args:
-            messages (list[Message]): A list of messages. Each message should be an instance of the Message class, which
-            contains the content and role (user or assistant) of the message.
+            messages (list[Message]): A list of messages. Each message should be an instance of the `Message` class,
+            which contains the content and role (user or assistant) of the message.
 
             stream (bool): Whether the response should be returned as an iterable stream or a complete text.
 
@@ -278,9 +211,3 @@ class OpenAIService:
             raise openai.error.APIError
 
         return response if stream else response.choices[0].message.content.strip()
-
-    def _reset(self) -> None:
-        """
-        Resets the state of the current instance of OpenAIService.
-        """
-        self._text = ""

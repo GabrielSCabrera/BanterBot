@@ -69,60 +69,7 @@ class SpeechSynthesisService:
         self._stop_synthesis: threading.Event = threading.Event()
         self._new_events: threading.Event = threading.Event()
 
-        # Reset the state variables of the text-to-speech synthesizer
         self._reset()
-
-    @property
-    def speaking(self) -> bool:
-        """
-        If the current instance of `SpeechSynthesisService` is in the process of speaking, returns True. Otherwise,
-        returns False.
-
-        Args:
-            bool: The speaking state of the current instance.
-        """
-        return self._start_synthesis.is_set()
-
-    def interrupt(self, interrupt_ns: Optional[int] = None) -> None:
-        """
-        Interrupts an ongoing text-to-speech process, if any. This method sets the interrupt flag to the current time,
-        which will cause any text-to-speech processes activated prior to the current time to stop.
-
-        Args:
-            interrupt_ns (Optional[int]): The time at which the recognizer was interrupted.
-        """
-        self._interrupt = max(interrupt_ns if interrupt_ns is not None else time.perf_counter_ns(), self._interrupt)
-        logging.debug("SpeechSynthesisService synthesizer interrupted")
-
-    def speak(self, input_string: str, voice: AzureNeuralVoiceProfile, style: str) -> Generator[Word, None, None]:
-        """
-        Speaks the specified text using the specified voice and style.
-
-        This method converts the input text into speech using the specified voice and style. It yields the synthesized
-        words one by one, along with their contextual information.
-
-        Args:
-            input_string (str): The input string that is to be converted into speech.
-            voice (AzureNeuralVoice): The voice to be used.
-            style (str): The speaking style to be applied.
-
-        Yields:
-            Word: A word with contextual information.
-        """
-        # Record the time at which the thread was initialized pre-lock, in order to account for future interruptions.
-        init_time = time.perf_counter_ns()
-
-        # Create SSML markup for the specified input_string, voice, and style
-        ssml = self._create_ssml(input_string, voice, style)
-
-        with self.__class__._speech_lock:
-            # Continuously monitor the synthesis progress in the main thread, yielding words as they are uttered
-            for word in self._callbacks_process(ssml, init_time):
-                logging.debug(f"SpeechSynthesisService synthesizer processed word: `{word}`")
-                yield word
-
-            # Reset all state attributes
-            self._reset()
 
     def speak_phrases(self, phrases: list[Phrase]) -> Generator[Word, None, None]:
         """
@@ -151,45 +98,6 @@ class SpeechSynthesisService:
 
             # Reset all state attributes
             self._reset()
-
-    def _callback_completed(self, event: speechsdk.SessionEventArgs) -> None:
-        """
-        Callback function for synthesis completed event.
-        Sets the synthesis completed flag to True.
-
-        Args:
-            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.
-        """
-        self._stop_synthesis.set()
-
-    def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
-        """
-        Callback function for synthesis started event. Signals that the synthesis process has started.
-
-        Args:
-            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
-        """
-        self._start_synthesis_time = time.perf_counter_ns()
-        self._start_synthesis.set()
-
-    def _callback_word_boundary(self, event: speechsdk.SessionEventArgs) -> None:
-        """
-        Callback function for word boundary event.
-        Appends the boundary information to the boundaries list.
-
-        Args:
-            event (speechsdk.SessionEventArgs): Event arguments containing information about the word boundary.
-        """
-        # Check if the type is not a sentence boundary
-        if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
-            # Add the event and timing information to the list of events
-            self._events.append(
-                {
-                    "event": event,
-                    "time": 5e8 + 100 * event.audio_offset + 1e9 * event.duration.total_seconds() / event.word_length,
-                    "word": self._process_event(event=event, first_word=len(self._events) == 0),
-                }
-            )
 
     def _callbacks_connect(self) -> None:
         """
@@ -243,39 +151,6 @@ class SpeechSynthesisService:
         # Stop the synthesizer
         self._synthesizer.stop_speaking()
         logging.debug("SpeechSynthesisService synthesizer stopped")
-
-    @classmethod
-    def _create_ssml(cls, text: str, voice: str, style: Optional[str] = None) -> str:
-        """
-        Creates an SSML string from the specified text, voice, and style.
-
-        Args:
-            text (str): The input string that is to be converted into speech.
-            voice (AzureNeuralVoice): The voice to be used.
-            style (str, optional): The speaking style to be applied. Default is None.
-
-        Returns:
-            str: The SSML string.
-        """
-        # Start the SSML string with the required header and voice tag
-        ssml = (
-            '<speak version="1.0" '
-            'xmlns="http://www.w3.org/2001/10/synthesis" '
-            'xmlns:mstts="https://www.w3.org/2001/mstts" '
-            'xml:lang="en-US">'
-            f'<voice name="{voice.short_name}">'
-        )
-
-        # If a speaking style is specified, add the express-as tag
-        if style:
-            text = f'<mstts:express-as style="{style}">{text}</mstts:express-as>'
-
-        # Add the text to the SSML string
-        ssml += text
-
-        # Close the voice and speak tags and return the SSML string
-        ssml += "</voice></speak>"
-        return ssml
 
     @classmethod
     def _create_advanced_ssml(cls, phrases: list[Phrase]) -> str:

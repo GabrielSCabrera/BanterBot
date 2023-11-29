@@ -58,7 +58,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             languages=languages,
             system=system,
             tone_mode=tone_mode,
-            tone_mode_model=tone_mode_model,
+            tone_model=tone_mode_model,
             phrase_list=phrase_list,
             assistant_name=assistant_name,
         )

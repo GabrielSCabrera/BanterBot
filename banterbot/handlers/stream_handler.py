@@ -1,9 +1,8 @@
 import threading
-from typing import Any, Callable, Optional
+import time
 
-from banterbot.models.stream_log_entry import StreamLogEntry
+from banterbot.utils.closable_queue import ClosableQueue
 from banterbot.utils.number import Number
-from banterbot.utils.shared_data import SharedData
 
 
 class StreamHandler:
@@ -12,46 +11,51 @@ class StreamHandler:
     """
 
     def __init__(
-        self,
-        stream_thread: threading.Thread,
-        kill_event: threading.Event,
-        log: list[StreamLogEntry],
-        stream_processor: Callable[[list[StreamLogEntry], int, SharedData], Any],
-        stream_finalizer: Optional[Callable[[list[StreamLogEntry], SharedData], Any]],
-    ):
-        self._stream_thread = stream_thread
-        self._kill_event = kill_event
-        self._log = log
-        self._stream_processor = stream_processor
-        self._stream_finalizer = stream_finalizer
-
-        self._shared_data = SharedData()
-        self._finalize_event = threading.Event()
-        self._interrupt = Number(value=0)
-        self._index = Number(value=0)
-
-    def interrupt(self):
+        self, interrupt: Number, kill_event: threading.Event, queue: ClosableQueue, processor_thread: threading.Thread
+    ) -> None:
         """
-        Interrupt the active stream.
+        Initializes the stream handler with the given parameters. This should not be called directly, but rather
+        through the `StreamHandler.create` method. This is because the `StreamHandler` class is not thread-safe.
+
+        Args:
+            interrupt (Number): The shared interrupt value.
+            kill_event (threading.Event): The shared kill event.
+            queue (ClosableQueue): The shared queue.
+            processor_thread (threading.Thread): The shared processor thread.
+        """
+        self._interrupt = interrupt
+        self._kill_event = kill_event
+        self._queue = queue
+        self._iterating = False
+
+        processor_thread.start()
+        processor_thread.join()
+
+    def __iter__(self) -> ClosableQueue:
+        """
+        Inherits the `__iter__` method from the `ClosableQueue` class to allow for iteration over the stream handler.
+        """
+        # Prevent multiple iterations over the stream handler.
+        with self._close_lock:
+            if self._iterating:
+                raise RuntimeError("Cannot iterate over the same instance of `StreamHandler` more than once.")
+            self._iterating = True
+
+            # Return the queue for iteration as a generator.
+            return iter(self._queue)
+
+    def is_alive(self) -> bool:
+        """
+        Returns whether the stream handler is alive or not.
+
+        Returns:
+            bool: Whether the stream handler is alive or not.
+        """
+        return not self._queue.finished()
+
+    def interrupt(self) -> None:
+        """
+        Interrupt the active stream by setting the interrupt value to the current time and setting the kill event.
         """
         self._kill_event.set()
-        if self._stream_finalizer:
-            self._stream_finalizer(log=self._log, shared_data=self._shared_data)
-
-    def __iter__(self):
-        """
-        Allow iteration over the streamed values.
-        """
-        return self
-
-    def __next__(self):
-        """
-        Return the next item from the stream after processing it.
-        """
-        if self._index < len(self._log):
-            entry = self._log[self._index]
-            processed_entry = self._stream_processor(entry, self._index, self._shared_data)
-            self._index += 1
-            return processed_entry
-        else:
-            raise StopIteration
+        self._interrupt.value = time.perf_counter_ns()

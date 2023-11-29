@@ -6,11 +6,12 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union
 
 from banterbot import config
-from banterbot.data.enums import ChatCompletionRoles, ToneMode
+from banterbot.data.enums import ChatCompletionRoles
 from banterbot.data.prompts import ToneSelection
 from banterbot.exceptions.format_mismatch_error import FormatMismatchError
 from banterbot.extensions.option_selector import OptionSelector
 from banterbot.extensions.prosody_selector import ProsodySelector
+from banterbot.handlers.stream_handler import StreamHandler
 from banterbot.managers.openai_model_manager import OpenAIModelManager
 from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.message import Message
@@ -36,8 +37,7 @@ class Interface(ABC):
         style: str,
         languages: Optional[Union[str, list[str]]] = None,
         system: Optional[str] = None,
-        tone_mode: Optional[ToneMode] = None,
-        tone_mode_model: OpenAIModel = None,
+        tone_model: OpenAIModel = None,
         phrase_list: Optional[list[str]] = None,
         assistant_name: Optional[str] = None,
     ) -> None:
@@ -56,17 +56,27 @@ class Interface(ABC):
         """
         logging.debug(f"Interface initialized")
         # Select the OpenAI ChatCompletion model for tone evaluation.
-        tone_mode_model = OpenAIModelManager.load("gpt-3.5-turbo") if tone_mode_model is None else tone_mode_model
+        tone_model = OpenAIModelManager.load("gpt-3.5-turbo") if tone_model is None else tone_model
 
         # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure Text-to-Speech components
         self._openai_service = OpenAIService(model=model)
-        self._openai_service_tone = OpenAIService(model=tone_mode_model)
+        self._openai_service_tone = OpenAIService(model=tone_model)
         self._speech_recognition_service = SpeechRecognitionService(languages=languages, phrase_list=phrase_list)
         self._speech_synthesis_service = SpeechSynthesisService()
 
         # Initialize message handling and conversation attributes
         self._messages: list[Message] = []
+        self._stream_handlers: dict[str, list[StreamHandler]] = {
+            "openai": [],
+            "speech_recognition": [],
+            "speech_synthesis": [],
+        }
         self._log_lock = threading.Lock()
+        self._stream_handlers_locks = {
+            "openai": threading.Lock(),
+            "speech_recognition": threading.Lock(),
+            "speech_synthesis": threading.Lock(),
+        }
         self._log_path = chat_logs / f"chat_{datetime.datetime.now().strftime('%Y%m%dT%H%M%S')}.txt"
         self._listening_toggle = False
 
@@ -80,7 +90,6 @@ class Interface(ABC):
         self._assistant_name = ChatCompletionRoles.ASSISTANT.value.title() if assistant_name is None else assistant_name
 
         # Initialize the OptionSelector for tone selection
-        self._tone = tone_mode
         self._tone_selector = OptionSelector(
             model=self._openai_service_tone,
             options=self._voice.style_list,
@@ -126,16 +135,6 @@ class Interface(ABC):
         """
         return self._speech_synthesis_service.speaking
 
-    @property
-    def streaming(self) -> bool:
-        """
-        If the current instance of OpenAIService is in the process of streaming, returns True. Otherwise, returns False.
-
-        Args:
-            bool: The streaming state of the current instance.
-        """
-        return self._openai_service.streaming
-
     def interrupt(self, soft: bool = False, shutdown_time: Optional[int] = None) -> None:
         """
         Interrupts all speech-to-text recognition, text-to-speech synthesis, and OpenAI API streams.
@@ -144,9 +143,19 @@ class Interface(ABC):
             soft (bool): If True, allows the recognizer to keep processing data that was recorded prior to interruption.
             shutdown_time (Optional[int]): The time at which the listener was deactivated.
         """
-        self._speech_recognition_service.interrupt(soft=soft, interrupt_ns=shutdown_time)
-        self._speech_synthesis_service.interrupt()
-        self._openai_service.interrupt()
+        with self._stream_handlers_locks["openai"]:
+            for handler in self._stream_handlers["openai"]:
+                handler.interrupt()
+            self._stream_handlers["openai"].clear()
+
+        with self._stream_handlers_locks["speech_recognition"]:
+            self._speech_recognition_service.interrupt(soft=soft, interrupt_ns=shutdown_time)
+            self._stream_handlers["speech_recognition"].clear()
+
+        with self._stream_handlers_locks["speech_synthesis"]:
+            self._speech_synthesis_service.interrupt()
+            self._stream_handlers["speech_synthesis"].clear()
+
         self._interrupt = time.perf_counter_ns() if not shutdown_time else shutdown_time
 
     def listener_toggle(self, name: Optional[str] = None) -> None:
@@ -215,19 +224,6 @@ class Interface(ABC):
             )
             self._thread_queue.add_task(message_thread, unskippable=True)
             self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
-
-    def respond(self) -> None:
-        """
-        Get a response from the bot and update the conversation area with the response. This method handles generating
-        the bot's response using the OpenAIService and updating the conversation area with the response text using
-        text-to-speech synthesis.
-        """
-        if self._tone is None:
-            self._respond_no_tone()
-        elif self._tone == ToneMode.BASIC:
-            self._respond_basic_tone()
-        elif self._tone == ToneMode.ADVANCED:
-            self._respond_advanced_tone()
 
     def send_message(
         self,
@@ -314,18 +310,7 @@ class Interface(ABC):
             with open(self._log_path, "a+", encoding=config.ENCODING) as fs:
                 fs.write(word)
 
-    def _get_next_tone(self):
-        """
-        Sends the message history as an input to the tone selector to semi-randomly select a fitting tone for the
-        assistant's next response. If the tone selection fails, returns the default style.
-
-        Returns:
-            str: A voice tone compatible with the active AzureNeuralVoice instance.
-        """
-        tone = self._tone_selector.select(self._messages)
-        return tone if tone is not None else self._style
-
-    def _respond_advanced_tone(self) -> None:
+    def respond(self) -> None:
         """
         Get a response from the bot and update the conversation area with the response. This method handles generating
         the bot's response using the OpenAIService and updating the conversation area with the response text using
@@ -335,8 +320,12 @@ class Interface(ABC):
         content = []
         context = []
 
+        stream_handler = self._openai_service.prompt_stream(messages=self._messages)
+        with self._stream_handlers_locks["openai"]:
+            self._stream_handlers.append(stream_handler)
+
         # Initialize the generator for asynchronous yielding of sentence blocks
-        for block in self._openai_service.prompt_stream(messages=self._messages):
+        for block in stream_handler:
             if not prefixed:
                 self.update_conversation_area(f"{self._assistant_name}: ")
                 prefixed = True
@@ -354,66 +343,11 @@ class Interface(ABC):
             content.append(" ")
 
         content = "".join(content)
-        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
-        self._messages.append(message)
 
-        self._response_end()
+        if content.strip():
+            message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
+            self._messages.append(message)
 
-    def _respond_basic_tone(self) -> None:
-        """
-        Get a response from the bot and update the conversation area with the response. This method handles generating
-        the bot's response using the OpenAIService and updating the conversation area with the response text using
-        text-to-speech synthesis.
-        """
-        prefixed = False
-        content = []
-
-        style = self._get_next_tone()
-        tone_content = f"Tone: {style}\n"
-        # Add an intermediate message (not visualized in the conversation area) noting the assistant's tone.
-        self._append_to_chat_log(tone_content)
-        message = Message(role=ChatCompletionRoles.ASSISTANT, content=tone_content)
-        self._messages.append(message)
-
-        # Initialize the generator for asynchronous yielding of sentence blocks
-        for block in self._openai_service.prompt_stream(messages=self._messages):
-            if not prefixed:
-                self.update_conversation_area(f"{self._assistant_name}: ")
-                prefixed = True
-            sentences = " ".join(block)
-            for word in self._speech_synthesis_service.speak(sentences, voice=self._voice, style=style):
-                self.update_conversation_area(word.word)
-                content.append(word.word)
-            self.update_conversation_area(" ")
-            content.append(" ")
-        content = "".join(content)
-        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
-        self._messages.append(message)
-        self._response_end()
-
-    def _respond_no_tone(self) -> None:
-        """
-        Get a response from the bot and update the conversation area with the response. This method handles generating
-        the bot's response using the OpenAIService and updating the conversation area with the response text using
-        text-to-speech synthesis.
-        """
-        prefixed = False
-        content = []
-
-        # Initialize the generator for asynchronous yielding of sentence blocks
-        for block in self._openai_service.prompt_stream(messages=self._messages):
-            if not prefixed:
-                self.update_conversation_area(f"{self._assistant_name}: ")
-                prefixed = True
-            sentences = " ".join(block)
-            for word in self._speech_synthesis_service.speak(sentences, voice=self._voice, style=self._style):
-                self.update_conversation_area(word.word)
-                content.append(word.word)
-            self.update_conversation_area(" ")
-            content.append(" ")
-        content = "".join(content)
-        message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
-        self._messages.append(message)
         self._response_end()
 
     def _response_end(self) -> None:
