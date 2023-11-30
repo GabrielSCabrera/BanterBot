@@ -4,8 +4,10 @@ from typing import Any, Optional
 
 from typing_extensions import Self
 
+from banterbot.utils.indexed_event import IndexedEvent
 
-class ClosableQueue(queue.Queue):
+
+class CloseableQueue(queue.Queue):
     """
     A queue that can be closed to prevent further puts. This is useful for when you have a producer thread that you
     want to stop once it has finished producing items, but you don't want to stop the consumer thread from consuming
@@ -25,42 +27,50 @@ class ClosableQueue(queue.Queue):
         super().__init__(maxsize=maxsize)
         self._closed = False
         self._in_context = False
-        self._close_lock = threading.Lock()
+        self._iterating_lock = threading.Lock()
+        self._context_lock = threading.Lock()
+        self._indexed_event = IndexedEvent()
+        self._iterating = False
 
     def close(self) -> None:
-        with self._close_lock:
-            self._closed = True
-            self.all_tasks_done.notify_all()
+        self._closed = True
+        self._indexed_event.increment()
 
     def put(self, item: Any, block: bool = True, timeout: Optional[float] = None) -> None:
-        with self._close_lock:
-            if self._closed:
-                raise RuntimeError(
-                    "Method `put(item: Any, block: bool, timeout: Optional[float])` in class `ClosableQueue` was called"
-                    " after the instance was closed."
-                )
-            else:
-                super().put(item, block, timeout)
+        if self._closed:
+            raise RuntimeError(
+                "Method `put(item: Any, block: bool, timeout: Optional[float])` in class `CloseableQueue` was"
+                " called after the instance was closed."
+            )
+        else:
+            super().put(item, block, timeout)
+            self._indexed_event.increment()
 
     def finished(self) -> bool:
         return self._closed and self.empty()
 
     def __iter__(self) -> Self:
-        return self
+        with self._iterating_lock:
+            if self._iterating:
+                raise RuntimeError(
+                    "Method `__iter__()` in class `CloseableQueue` was called while the instance was already iterating."
+                )
+            self._iterating = True
 
-    def __next__(self) -> Any:
-        with self._close_lock:
-            if not self.finished():
-                return self.get()
-            raise StopIteration
+        while not self.finished():
+            self._indexed_event.wait()
+            if not self.empty():
+                yield super().get()
 
     def __enter__(self) -> Self:
-        if self._in_context:
-            raise RuntimeError(
-                "Method `__enter__()` in class `ClosableQueue` was called while the instance was already in a context"
-            )
-        self._in_context = True
-        return self
+        with self._context_lock:
+            if self._in_context:
+                raise RuntimeError(
+                    "Method `__enter__()` in class `CloseableQueue` was called while the instance was already in a"
+                    " context."
+                )
+            self._in_context = True
+            return self
 
     def __exit__(self) -> None:
         self._in_context = False

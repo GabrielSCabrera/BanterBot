@@ -1,6 +1,14 @@
 banterbot.utils package
 =======================
 
+banterbot.utils.closeable\_queue module
+---------------------------------------
+
+.. automodule:: banterbot.utils.closeable_queue
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 banterbot.utils.indexed\_event module
 -------------------------------------
 
@@ -13,6 +21,14 @@ banterbot.utils.nlp module
 --------------------------
 
 .. automodule:: banterbot.utils.nlp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+banterbot.utils.number module
+-----------------------------
+
+.. automodule:: banterbot.utils.number
    :members:
    :undoc-members:
    :show-inheritance:

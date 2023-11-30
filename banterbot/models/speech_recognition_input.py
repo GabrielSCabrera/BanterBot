@@ -5,13 +5,13 @@ from typing import Iterator, Optional
 import azure.cognitiveservices.speech as speechsdk
 from typing_extensions import Self
 
-from banterbot.data.enums import SpaCyLangModel, SpeechProcessingType, WordCategory
+from banterbot.data.enums import SpaCyLangModel, SpeechProcessingType
 from banterbot.models.word import Word
 from banterbot.types.wordjson import WordJSON
 from banterbot.utils.nlp import NLP
 
 
-class SpeechRecognitionOutput:
+class SpeechRecognitionInput:
     """
     A class that encapsulates the speech-to-text output data.
     """
@@ -21,7 +21,7 @@ class SpeechRecognitionOutput:
         cls, recognition_result: speechsdk.SpeechRecognitionResult, language: Optional[str] = None
     ) -> Self:
         """
-        Constructor for the `SpeechRecognitionOutput` class. Designed to create lightweight instances with most
+        Constructor for the `SpeechRecognitionInput` class. Designed to create lightweight instances with most
         attributes initially set to None. Computation-intensive operations are performed on-demand when respective
         properties are accessed, instead of during initialization.
 
@@ -62,7 +62,7 @@ class SpeechRecognitionOutput:
         words: Optional[list[Word]] = None,
     ) -> None:
         """
-        Constructor for the `SpeechRecognitionOutput` class. Designed to create lightweight instances with most
+        Constructor for the `SpeechRecognitionInput` class. Designed to create lightweight instances with most
         attributes initially set to None unless provided explicitly on initialization. Computation-intensive operations
         are instead performed lazily: i.e., when respective properties are accessed.
 
@@ -87,7 +87,7 @@ class SpeechRecognitionOutput:
         self, lower_cutoff: Optional[datetime.timedelta] = None, upper_cutoff: Optional[datetime.timedelta] = None
     ) -> Self:
         """
-        Create a new instance of class `SpeechRecognitionOutput` that only contains the text spoken within a cutoff
+        Create a new instance of class `SpeechRecognitionInput` that only contains the text spoken within a cutoff
         interval.
 
         Args:
@@ -95,7 +95,7 @@ class SpeechRecognitionOutput:
             upper_cutoff (datetime.timedelta): The upper cutoff time (or duration) of the new instance.
 
         Returns:
-            SpeechRecognitionOutput: The new instance of `SpeechRecognitionOutput`.
+            SpeechRecognitionInput: The new instance of `SpeechRecognitionInput`.
         """
 
         doc = NLP.model(SpaCyLangModel.EN_CORE_WEB_SM)(self.display)
@@ -157,7 +157,7 @@ class SpeechRecognitionOutput:
                     word=word["Word"],
                     offset=datetime.timedelta(microseconds=word["Offset"] / 10),
                     duration=datetime.timedelta(microseconds=word["Duration"] / 10),
-                    category=WordCategory.WORD,
+                    category=speechsdk.SpeechSynthesisBoundaryType.Word,
                     source=SpeechProcessingType.STT,
                     confidence=word["Confidence"],
                 )

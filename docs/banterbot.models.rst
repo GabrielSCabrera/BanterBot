@@ -41,10 +41,10 @@ banterbot.models.phrase module
    :undoc-members:
    :show-inheritance:
 
-banterbot.models.speech\_recognition\_output module
+banterbot.models.speech\_recognition\_input module
 ---------------------------------------------------
 
-.. automodule:: banterbot.models.speech_recognition_output
+.. automodule:: banterbot.models.speech_recognition_input
    :members:
    :undoc-members:
    :show-inheritance:

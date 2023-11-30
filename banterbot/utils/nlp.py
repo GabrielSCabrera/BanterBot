@@ -164,9 +164,9 @@ class NLP:
         Args:
             name (str): The name of the SpaCy model to download.
         """
-        print(f'Downloading SpaCy language model: "{name}". This will only happen once.\n\n\n')
+        logging.info(f'Downloading SpaCy language model: "{name}". This will only happen once.\n\n\n')
         spacy.cli.download(name)
-        print(f'\n\n\nFinished download of SpaCy language model: "{name}".')
+        logging.info(f'\n\n\nFinished download of SpaCy language model: "{name}".')
 
     @classmethod
     def _load_model(cls, *, name: str, **kwargs) -> spacy.language.Language:

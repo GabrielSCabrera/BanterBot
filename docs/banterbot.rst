@@ -40,19 +40,10 @@ Interface
    :special-members:
    :show-inheritance:
 
-TKMultiplayerInterface
+TKInterface
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: banterbot.gui.tk_multiplayer_interface.TKMultiplayerInterface
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
-TKSimpleInterface
-~~~~~~~~~~~~~~~~~
-
-.. autoclass:: banterbot.gui.tk_simple_interface.TKSimpleInterface
+.. autoclass:: banterbot.gui.tk_interface.TKInterface
    :members:
    :undoc-members:
    :special-members:

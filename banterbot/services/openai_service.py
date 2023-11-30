@@ -1,22 +1,20 @@
 import datetime
 import logging
 import os
+import threading
 import time
-from typing import Generator, Iterator, Optional, Union
+from typing import Iterator, Optional, Union
 
 import openai
 
 from banterbot.config import RETRY_LIMIT, RETRY_TIME
 from banterbot.data.enums import EnvVar
+from banterbot.handlers.stream_handler import StreamHandler
 from banterbot.managers.stream_manager import StreamManager
 from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
 from banterbot.models.stream_log_entry import StreamLogEntry
 from banterbot.utils.nlp import NLP
-from banterbot.utils.shared_data import SharedData
-
-# Set the OpenAI API key
-openai.api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
 
 
 class OpenAIService:
@@ -30,6 +28,8 @@ class OpenAIService:
     processing and generation.
     """
 
+    api_key_set = False
+
     def __init__(self, model: OpenAIModel) -> None:
         """
         Initializes an `OpenAIService` instance for a specific model.
@@ -39,6 +39,11 @@ class OpenAIService:
             contains information about the model, such as its name and maximum token limit.
         """
         logging.debug(f"OpenAIService initialized")
+
+        # Set the OpenAI API key
+        if not self.__class__.api_key_set:
+            openai.api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
+            self.__class__.api_key_set = True
 
         # The selected model that will be used in OpenAI ChatCompletion prompts.
         self._model = model
@@ -51,8 +56,26 @@ class OpenAIService:
 
         # Initialize the StreamManager for handling streaming processes.
         self._stream_manager = StreamManager()
-        self._stream_manager.connect_processor(self._response_parse_stream)
+        self._stream_manager.connect_processor(self._processor)
         self._stream_manager.connect_completion_handler(self._completion_handler)
+
+        # The latest interruption time.
+        self._interrupt = 0
+
+        # A list of active stream handlers.
+        self._stream_handlers = []
+        self._stream_handlers_lock = threading.Lock()
+
+    def interrupt(self) -> None:
+        """
+        Interrupts the current OpenAI ChatCompletion process.
+        """
+        self._interrupt = time.perf_counter_ns()
+        with self._stream_handlers_lock:
+            for handler in self._stream_handlers:
+                handler.interrupt()
+            self._stream_handlers.clear()
+        logging.debug(f"OpenAIService Interrupted")
 
     def count_tokens(self, string: str) -> int:
         """
@@ -88,7 +111,7 @@ class OpenAIService:
         sentences = NLP.segment_sentences(response) if split else response
         return sentences
 
-    def prompt_stream(self, messages: list[Message], **kwargs) -> Generator[list[str], None, None]:
+    def prompt_stream(self, messages: list[Message], init_time: Optional[int] = None, **kwargs) -> StreamHandler:
         """
         Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.
 
@@ -96,17 +119,26 @@ class OpenAIService:
             messages (list[Message]): A list of messages. Each message should be an instance of the `Message` class,
             which contains the content and role (user or assistant) of the message.
 
+            init_time (Optional[int]): The time at which the stream was initialized.
+
             **kwargs: Additional parameters for the API request. These can include settings such as temperature, top_p,
             and frequency_penalty.
 
         Returns:
-            Generator: A generator that yields blocks of sentences from the OpenAI API response.
+            StreamHandler: A handler for the stream of blocks of sentences forming the response from the OpenAI API.
         """
-        # Obtain a response from the OpenAI ChatCompletion API
-        response = self._request(messages=messages, stream=True, **kwargs)
-        return self._stream_manager.stream(
-            response=response, close=response.close, init_shared_data={"text": "", "sentences": []}
-        )
+        # Record the time at which the stream was initialized pre-lock, in order to account for future interruptions.
+        init_time = time.perf_counter_ns() if init_time is None else init_time
+        if self._interrupt < init_time:
+            # Obtain a response from the OpenAI ChatCompletion API
+            response = self._request(messages=messages, stream=True, **kwargs)
+            handler = self._stream_manager.stream(
+                iterable=response, close_stream=response.close, init_shared_data={"text": "", "sentences": []}
+            )
+            with self._stream_handlers_lock:
+                self._stream_handlers.append(handler)
+
+            return handler
 
     @property
     def model(self) -> OpenAIModel:
@@ -118,7 +150,7 @@ class OpenAIService:
         """
         return self._model
 
-    def _processor(self, log: list[StreamLogEntry], index: int, shared_data: SharedData) -> list[str]:
+    def _processor(self, log: list[StreamLogEntry], index: int, shared_data: dict) -> list[str]:
         """
         Parses a chunk of data from the OpenAI API response.
 
@@ -126,7 +158,7 @@ class OpenAIService:
             log (list[StreamLogEntry]): A list of `StreamLogEntry` instances containing the data from the OpenAI API
             response.
             index (int): The index of the current chunk of data.
-            shared_data (SharedData): A dictionary containing shared data between the stream handler and the processor.
+            shared_data (dict): A dictionary containing shared data between the stream handler and the processor.
 
         Returns:
             list[str]: A list of sentences parsed from the chunk.
@@ -142,14 +174,14 @@ class OpenAIService:
             logging.debug(f"OpenAIService yielded sentences: {shared_data['sentences'][:-1]}")
             return shared_data["sentences"][:-1]
 
-    def _completion_handler(self, log: list[StreamLogEntry], shared_data: SharedData) -> None:
+    def _completion_handler(self, log: list[StreamLogEntry], shared_data: dict) -> None:
         """
         Handles the completion of the OpenAI API response.
 
         Args:
             log (list[StreamLogEntry]): A list of `StreamLogEntry` instances containing the data from the OpenAI API
             response.
-            shared_data (SharedData): A dictionary containing shared data between the stream handler and the processor.
+            shared_data (dict): A dictionary containing shared data between the stream handler and the processor.
         """
         # If the current chunk is the final chunk of data from the OpenAI API response, parse the final chunk.
         shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])

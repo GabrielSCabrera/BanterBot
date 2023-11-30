@@ -7,11 +7,8 @@ from typing import Optional, Union
 
 from banterbot import config
 from banterbot.data.enums import ChatCompletionRoles
-from banterbot.data.prompts import ToneSelection
 from banterbot.exceptions.format_mismatch_error import FormatMismatchError
-from banterbot.extensions.option_selector import OptionSelector
 from banterbot.extensions.prosody_selector import ProsodySelector
-from banterbot.handlers.stream_handler import StreamHandler
 from banterbot.managers.openai_model_manager import OpenAIModelManager
 from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.message import Message
@@ -66,17 +63,7 @@ class Interface(ABC):
 
         # Initialize message handling and conversation attributes
         self._messages: list[Message] = []
-        self._stream_handlers: dict[str, list[StreamHandler]] = {
-            "openai": [],
-            "speech_recognition": [],
-            "speech_synthesis": [],
-        }
         self._log_lock = threading.Lock()
-        self._stream_handlers_locks = {
-            "openai": threading.Lock(),
-            "speech_recognition": threading.Lock(),
-            "speech_synthesis": threading.Lock(),
-        }
         self._log_path = chat_logs / f"chat_{datetime.datetime.now().strftime('%Y%m%dT%H%M%S')}.txt"
         self._listening_toggle = False
 
@@ -89,13 +76,7 @@ class Interface(ABC):
         self._style = style
         self._assistant_name = ChatCompletionRoles.ASSISTANT.value.title() if assistant_name is None else assistant_name
 
-        # Initialize the OptionSelector for tone selection
-        self._tone_selector = OptionSelector(
-            model=self._openai_service_tone,
-            options=self._voice.style_list,
-            system=ToneSelection.SYSTEM.value,
-            prompt=ToneSelection.PROMPT.value.format(self._style),
-        )
+        # Initialize the ProsodySelector.
         self._prosody_selector = ProsodySelector(
             manager=self._openai_service_tone,
             voice=self._voice,
@@ -135,7 +116,7 @@ class Interface(ABC):
         """
         return self._speech_synthesis_service.speaking
 
-    def interrupt(self, soft: bool = False, shutdown_time: Optional[int] = None) -> None:
+    def interrupt(self, shutdown_time: Optional[int] = None) -> None:
         """
         Interrupts all speech-to-text recognition, text-to-speech synthesis, and OpenAI API streams.
 
@@ -143,19 +124,10 @@ class Interface(ABC):
             soft (bool): If True, allows the recognizer to keep processing data that was recorded prior to interruption.
             shutdown_time (Optional[int]): The time at which the listener was deactivated.
         """
-        with self._stream_handlers_locks["openai"]:
-            for handler in self._stream_handlers["openai"]:
-                handler.interrupt()
-            self._stream_handlers["openai"].clear()
-
-        with self._stream_handlers_locks["speech_recognition"]:
-            self._speech_recognition_service.interrupt(soft=soft, interrupt_ns=shutdown_time)
-            self._stream_handlers["speech_recognition"].clear()
-
-        with self._stream_handlers_locks["speech_synthesis"]:
-            self._speech_synthesis_service.interrupt()
-            self._stream_handlers["speech_synthesis"].clear()
-
+        logging.debug(f"Interface Interrupted")
+        self._openai_service.interrupt()
+        self._speech_recognition_service.interrupt()
+        self._speech_synthesis_service.interrupt()
         self._interrupt = time.perf_counter_ns() if not shutdown_time else shutdown_time
 
     def listener_toggle(self, name: Optional[str] = None) -> None:
@@ -186,7 +158,7 @@ class Interface(ABC):
             init_time = time.perf_counter_ns()
             self._listen_thread = threading.Thread(
                 target=self._listen,
-                kwargs={"name": name, "init_time": init_time},
+                kwargs={"init_time": init_time, "name": name},
                 daemon=True,
             )
             self._listen_thread.start()
@@ -208,6 +180,7 @@ class Interface(ABC):
             message (str): The message content from the user.
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
+        init_time = time.perf_counter_ns()
         # Do not send the message if it is empty.
         if message.strip():
             # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
@@ -223,7 +196,9 @@ class Interface(ABC):
                 daemon=True,
             )
             self._thread_queue.add_task(message_thread, unskippable=True)
-            self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
+            self._thread_queue.add_task(
+                threading.Thread(target=self.respond, kwargs={"init_time": init_time}, daemon=True)
+            )
 
     def send_message(
         self,
@@ -255,11 +230,9 @@ class Interface(ABC):
         Args:
             message (str): The message content from the user.
         """
+        init_time = time.perf_counter_ns()
         # Do not send the message if it is empty.
         if message.strip():
-            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            self.interrupt()
-
             message_thread = threading.Thread(
                 target=self.send_message,
                 args=(
@@ -271,7 +244,9 @@ class Interface(ABC):
                 daemon=True,
             )
             self._thread_queue.add_task(message_thread, unskippable=True)
-            self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
+            self._thread_queue.add_task(
+                threading.Thread(target=self.respond, kwargs={"init_time": init_time}, daemon=True)
+            )
 
     @abstractmethod
     def update_conversation_area(self, word: str) -> None:
@@ -310,7 +285,7 @@ class Interface(ABC):
             with open(self._log_path, "a+", encoding=config.ENCODING) as fs:
                 fs.write(word)
 
-    def respond(self) -> None:
+    def respond(self, init_time: int) -> None:
         """
         Get a response from the bot and update the conversation area with the response. This method handles generating
         the bot's response using the OpenAIService and updating the conversation area with the response text using
@@ -320,44 +295,36 @@ class Interface(ABC):
         content = []
         context = []
 
-        stream_handler = self._openai_service.prompt_stream(messages=self._messages)
-        with self._stream_handlers_locks["openai"]:
-            self._stream_handlers.append(stream_handler)
+        # Add the name of the assistant to the conversation area.
+        self.update_conversation_area(f"{self._assistant_name}: ")
 
-        # Initialize the generator for asynchronous yielding of sentence blocks
-        for block in stream_handler:
-            if not prefixed:
-                self.update_conversation_area(f"{self._assistant_name}: ")
-                prefixed = True
+        open_ai_stream = self._openai_service.prompt_stream(messages=self._messages, init_time=init_time)
+        if open_ai_stream is not None:
+            # Initialize the generator for asynchronous yielding of sentence blocks
+            for block in open_ai_stream:
+                phrases, context = self._prosody_selector.select(sentences=block, context=content, system=self._system)
 
-            phrases, context = self._prosody_selector.select(sentences=block, context=content, system=self._system)
+                if phrases is None:
+                    raise FormatMismatchError()
 
-            if phrases is None:
-                raise FormatMismatchError()
+                print("PHRASES")
+                print(phrases)
+                for word in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
+                    self.update_conversation_area(word.word)
+                    content.append(word.word)
 
-            for word in self._speech_synthesis_service.speak_phrases(phrases):
-                self.update_conversation_area(word.word)
-                content.append(word.word)
+                self.update_conversation_area(" ")
+                content.append(" ")
 
-            self.update_conversation_area(" ")
-            content.append(" ")
+            content = "".join(content)
 
-        content = "".join(content)
+            if content.strip():
+                message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
+                self._messages.append(message)
 
-        if content.strip():
-            message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
-            self._messages.append(message)
+            self.update_conversation_area("\n\n")
 
-        self._response_end()
-
-    def _response_end(self) -> None:
-        """
-        End the bot's response and update the conversation area accordingly. This method should be called after the
-        bot's response has been fully generated and added to the conversation area.
-        """
-        self.update_conversation_area("\n\n")
-
-    def _listen(self, name: Optional[str] = None, init_time: Optional[int] = None) -> None:
+    def _listen(self, init_time: int, name: Optional[str] = None) -> None:
         """
         Listen for user input using speech-to-text and prompt the bot with the transcribed message.
 
@@ -369,12 +336,9 @@ class Interface(ABC):
         input_detected = False
 
         # Listen for user input using speech-to-text
-        for sentence in self._speech_recognition_service.listen(init_time=init_time):
-            # Break the loop if interrupted
-            if init_time < self._interrupt:
-                break
+        for sentence in self._speech_recognition_service.recognize(init_time=init_time):
             # Do not send the message if it is empty.
-            elif sentence.strip():
+            if sentence.strip():
                 # Set the flag to True since a new user input was detected.
                 input_detected = True
 
@@ -392,4 +356,6 @@ class Interface(ABC):
         # Respond if the listening loop is not broken.
         else:
             if input_detected:
-                self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
+                self._thread_queue.add_task(
+                    threading.Thread(target=self.respond, kwargs={"init_time": init_time}, daemon=True)
+                )

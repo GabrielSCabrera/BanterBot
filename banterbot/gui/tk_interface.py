@@ -4,7 +4,6 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Optional, Union
 
-from banterbot.data.enums import ToneMode
 from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
@@ -13,7 +12,7 @@ from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.openai_model import OpenAIModel
 
 
-class TKMultiplayerInterface(tk.Tk, Interface):
+class TKInterface(tk.Tk, Interface):
     """
     A graphical user interface (GUI) class that enables interaction with the BanterBot chatbot in a multiplayer mode.
     It supports functionalities such as text input, text-to-speech and speech-to-text capabilities for up to 9 users
@@ -29,8 +28,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
         voice: AzureNeuralVoiceProfile = AzureNeuralVoiceManager.load("Aria"),
         style: str = "chat",
         languages: Optional[Union[str, list[str]]] = None,
-        tone_mode: Optional[ToneMode] = None,
-        tone_mode_model: OpenAIModel = None,
+        tone_model: OpenAIModel = None,
         system: Optional[str] = None,
         phrase_list: Optional[list[str]] = None,
         assistant_name: Optional[str] = None,
@@ -57,8 +55,7 @@ class TKMultiplayerInterface(tk.Tk, Interface):
             style=style,
             languages=languages,
             system=system,
-            tone_mode=tone_mode,
-            tone_model=tone_mode_model,
+            tone_model=tone_model,
             phrase_list=phrase_list,
             assistant_name=assistant_name,
         )
@@ -73,7 +70,6 @@ class TKMultiplayerInterface(tk.Tk, Interface):
     def request_response(self) -> None:
         if self._messages:
             # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            self.interrupt()
             self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
 
     def run(self, greet: bool = False) -> None:

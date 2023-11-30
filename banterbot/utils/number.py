@@ -16,6 +16,12 @@ class Number:
         """
         self.set(value=value)
 
+    def is_null(self) -> None:
+        """
+        Returns whether or not the current instance is null.
+        """
+        return self.value is None
+
     def set(self, value) -> None:
         """
         Sets the value of the current instance.

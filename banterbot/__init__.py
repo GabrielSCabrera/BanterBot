@@ -1,8 +1,6 @@
-from banterbot.data.enums import ToneMode
 from banterbot.extensions.interface import Interface
 from banterbot.extensions.persona import Persona
-from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
-from banterbot.gui.tk_simple_interface import TKSimpleInterface
+from banterbot.gui.tk_interface import TKInterface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.memory_chain import MemoryChain
 from banterbot.managers.openai_model_manager import OpenAIModelManager
@@ -12,11 +10,9 @@ from banterbot.services.speech_synthesis_service import SpeechSynthesisService
 from banterbot.utils.nlp import NLP
 
 __all__ = [
-    "ToneMode",
     "Interface",
     "Persona",
-    "TKMultiplayerInterface",
-    "TKSimpleInterface",
+    "TKInterface",
     "AzureNeuralVoiceManager",
     "MemoryChain",
     "OpenAIModelManager",

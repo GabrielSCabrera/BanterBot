@@ -2,7 +2,9 @@ import datetime
 from dataclasses import dataclass
 from typing import Optional
 
-from banterbot.data.enums import SpeechProcessingType, WordCategory
+import azure.cognitiveservices.speech as speechsdk
+
+from banterbot.data.enums import SpeechProcessingType
 
 
 @dataclass(frozen=True)
@@ -16,7 +18,7 @@ class Word:
         word (str): The word that has been synthesized/recognized.
         offset (datetime.timedelta): Time elapsed between initialization and synthesis/recognition.
         duration (datetime.timedelta): Amount of time required for the word to be fully spoken.
-        category (WordCategory): The category of the text contents.
+        category (speechsdk.SpeechSynthesisBoundaryType): The category of the text contents.
         confidence (Optional[int]): The confidence score (for speech-to-text) for the specified word.
         source: SpeechProcessingType: Whether the word's source is text-to-speech (TTS) or speech-to-text (STT).
     """
@@ -24,7 +26,7 @@ class Word:
     word: str
     offset: datetime.timedelta
     duration: datetime.timedelta
-    category: WordCategory
+    category: speechsdk.SpeechSynthesisBoundaryType
     source: SpeechProcessingType
     confidence: Optional[float] = None
 

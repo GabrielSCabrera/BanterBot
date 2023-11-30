@@ -111,7 +111,10 @@ class IndexedEvent(threading.Event):
             )
         with self._lock:
             self._counter = N
-            super().set()
+            if self._counter > 0:
+                super().set()
+            else:
+                super().clear()
 
     def wait(self, timeout: float = None) -> bool:
         """
@@ -126,6 +129,6 @@ class IndexedEvent(threading.Event):
         """
         with self._lock:
             self._counter = self._counter - 1 if self._counter > 0 else self._counter
-            if self._counter <= 0:
-                return super().wait(timeout)
-            return True
+        if self._counter <= 0:
+            return super().wait(timeout)
+        return True

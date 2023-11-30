@@ -1,4 +1,3 @@
-from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
-from banterbot.gui.tk_simple_interface import TKSimpleInterface
+from banterbot.gui.tk_interface import TKInterface
 
-__all__ = ["TKMultiplayerInterface", "TKSimpleInterface"]
+__all__ = ["TKInterface"]

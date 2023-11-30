@@ -24,15 +24,6 @@ class ChatCompletionRoles(Enum):
     USER = "user"
 
 
-class WordCategory(Enum):
-    """
-    Word boundary categories for the Azure Speech API.
-    """
-
-    WORD = "word"
-    PUNCTUATION = "punctuation"
-
-
 class SpaCyLangModel(Enum):
     """
     Names of SpaCy languge models.
