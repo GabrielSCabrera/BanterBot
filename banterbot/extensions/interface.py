@@ -308,7 +308,7 @@ class Interface(ABC):
                     raise FormatMismatchError()
 
                 for item in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
-                    print("SYNTHESIS: ", item)
+                    print("SYNTHESIS: ", item.value.word)
                     self.update_conversation_area(item.value.word)
                     content.append(item.value.word)
 

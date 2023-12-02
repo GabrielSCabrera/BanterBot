@@ -33,25 +33,21 @@ class StreamHandler:
         self._interrupt = interrupt
         self._kill_event = kill_event
         self._queue = queue
-        self._iterating = False
         self._shared_data = shared_data
-        self._close_lock = threading.Lock()
-
-        processor_thread.start()
-        processor_thread.join()
+        self._processor_thread = processor_thread
 
     def __iter__(self) -> CloseableQueue:
         """
         Inherits the `__iter__` method from the `CloseableQueue` class to allow for iteration over the stream handler.
         """
+        # Start the processor thread.
+        self._processor_thread.start()
         # Prevent multiple iterations over the stream handler.¨
         logging.debug(f"StreamHandler iterating")
-        with self._close_lock:
-            if self._iterating:
-                raise RuntimeError("Cannot iterate over the same instance of `StreamHandler` more than once.")
-            self._iterating = True
-            # Return the queue for iteration as a generator.
-            return iter(self._queue)
+        # Return the queue for iteration as a generator.
+        print("Iterating")
+        for item in self._queue:
+            yield item
 
     def is_alive(self) -> bool:
         """

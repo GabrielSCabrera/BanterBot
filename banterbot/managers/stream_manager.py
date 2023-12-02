@@ -220,6 +220,7 @@ class StreamManager:
             print("STREAM: ", value)
             log.append(StreamLogEntry(value=value))
             indexed_event.increment()
+            time.sleep(0.01)
         kill_event.set()
 
     def _wrap_processor(
@@ -260,7 +261,6 @@ class StreamManager:
             if kill_event.is_set() and index >= len(log):
                 continue
             try:
-                print(log[index])
                 output = processor(log=log, index=index, shared_data=shared_data)
                 if output is not None:
                     queue.put(output)

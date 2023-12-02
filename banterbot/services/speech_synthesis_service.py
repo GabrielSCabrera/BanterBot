@@ -159,7 +159,7 @@ class SpeechSynthesisService:
                 "word": Word(
                     word=(
                         event.text
-                        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word and self._first_word
+                        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation or self._first_word
                         else " " + event.text
                     ),
                     offset=datetime.timedelta(microseconds=event.audio_offset / 10),

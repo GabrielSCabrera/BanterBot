@@ -52,7 +52,7 @@ class SpeechSynthesisHandler:
             self._iterating = True
 
         # Start synthesizing.
-        self._synthesizer.speak_ssml_async(self._ssml)
+        self._synthesizer.speak_ssml(self._ssml)
         logging.debug("SpeechSynthesisHandler synthesizer started")
 
         # Process the words as they are synthesized.
