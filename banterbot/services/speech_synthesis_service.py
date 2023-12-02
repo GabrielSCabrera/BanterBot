@@ -42,7 +42,7 @@ class SpeechSynthesisService:
         self._init_synthesizer(output_format=output_format)
 
         # Initialize the StreamManager for handling streaming processes.
-        self._stream_manager = StreamManager(lock=self.__class__._synthesis_lock)
+        self._stream_manager = StreamManager()
 
         # Indicates whether the current instance of `SpeechSynthesisService` is speaking.
         self._speaking = False
@@ -81,6 +81,7 @@ class SpeechSynthesisService:
 
         with self.__class__._synthesis_lock:
             self._queue = CloseableQueue()
+            self._first_word = True
 
             iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queue)
             handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
@@ -147,26 +148,27 @@ class SpeechSynthesisService:
         # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
             # Add the event and timing information to the list of events
-            self._queue.put(
-                StreamLogEntry(
-                    {
-                        "event": event,
-                        "time": (
-                            self._start_synthesis_time
-                            + 5e8
-                            + 100 * event.audio_offset
-                            + 1e9 * event.duration.total_seconds() / event.word_length
-                        ),
-                        "word": Word(
-                            word=event.text if self._queue.empty() else " " + event.text,
-                            offset=datetime.timedelta(microseconds=event.audio_offset / 10),
-                            duration=event.duration,
-                            category=event.boundary_type,
-                            source=SpeechProcessingType.TTS,
-                        ),
-                    }
-                )
-            )
+            self._queue.put({
+                "event": event,
+                "time": (
+                    self._start_synthesis_time
+                    + 5e8
+                    + 100 * event.audio_offset
+                    + 1e9 * event.duration.total_seconds() / event.word_length
+                ),
+                "word": Word(
+                    word=(
+                        event.text
+                        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word and self._first_word
+                        else " " + event.text
+                    ),
+                    offset=datetime.timedelta(microseconds=event.audio_offset / 10),
+                    duration=event.duration,
+                    category=event.boundary_type,
+                    source=SpeechProcessingType.TTS,
+                ),
+            })
+            self._first_word = False
 
     def _callbacks_connect(self):
         """

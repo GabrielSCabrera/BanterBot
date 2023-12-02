@@ -55,21 +55,17 @@ class SpeechSynthesisHandler:
         self._synthesizer.speak_ssml_async(self._ssml)
         logging.debug("SpeechSynthesisHandler synthesizer started")
 
-        print("SSML")
-        print(self._ssml)
-
         # Process the words as they are synthesized.
-        for stream_log_entry in self._queue:
-            word = stream_log_entry.value
+        for item in self._queue:
             # Determine if a delay is needed to match the word's offset.
-            dt = 1e-9 * (word["time"] - time.perf_counter_ns())
+            dt = 1e-9 * (item["time"] - time.perf_counter_ns())
             # If a delay is needed, wait for the specified time.
             if dt > 0:
                 time.sleep(dt)
 
             # Yield the word.
-            yield word
-            logging.debug(f"SpeechSynthesisHandler yielded word: `{word['text']}`")
+            yield item["word"]
+            logging.debug(f"SpeechSynthesisHandler yielded word: `{item['word']}`")
 
     def close(self):
         self._synthesizer.stop_speaking()

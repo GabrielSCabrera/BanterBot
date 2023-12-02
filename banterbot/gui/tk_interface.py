@@ -1,5 +1,6 @@
 import logging
 import threading
+import time
 import tkinter as tk
 from tkinter import ttk
 from typing import Optional, Union
@@ -70,7 +71,9 @@ class TKInterface(tk.Tk, Interface):
     def request_response(self) -> None:
         if self._messages:
             # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            self._thread_queue.add_task(threading.Thread(target=self.respond, daemon=True))
+            self._thread_queue.add_task(
+                threading.Thread(target=self.respond, kwargs={"init_time": time.perf_counter_ns()}, daemon=True)
+            )
 
     def run(self, greet: bool = False) -> None:
         """

@@ -25,6 +25,14 @@ banterbot.models.message module
    :undoc-members:
    :show-inheritance:
 
+banterbot.models.number module
+-----------------------------
+
+.. automodule:: banterbot.models.number
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 banterbot.models.openai\_model module
 -------------------------------------
 

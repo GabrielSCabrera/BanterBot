@@ -50,7 +50,7 @@ class SpeechRecognitionService:
         self._last_total_offset = 0
 
         # Initialize the `StreamManager` for handling streaming processes.
-        self._stream_manager = StreamManager(lock=self.__class__._recognition_lock)
+        self._stream_manager = StreamManager()
 
         # Indicates whether the current instance of `SpeechRecognitionService` is listening.
         self._recognizing = False

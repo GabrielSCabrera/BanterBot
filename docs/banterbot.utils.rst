@@ -25,14 +25,6 @@ banterbot.utils.nlp module
    :undoc-members:
    :show-inheritance:
 
-banterbot.utils.number module
------------------------------
-
-.. automodule:: banterbot.utils.number
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 banterbot.utils.thread\_queue module
 ------------------------------------
 

@@ -59,6 +59,7 @@ class CloseableQueue(queue.Queue):
 
         while not self.finished():
             self._indexed_event.wait()
+            self._indexed_event.decrement()
             if not self.empty():
                 yield super().get()
 

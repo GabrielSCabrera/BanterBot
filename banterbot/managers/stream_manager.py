@@ -7,10 +7,10 @@ from copy import deepcopy
 from typing import Any, Optional
 
 from banterbot.handlers.stream_handler import StreamHandler
+from banterbot.models.number import Number
 from banterbot.models.stream_log_entry import StreamLogEntry
 from banterbot.utils.closeable_queue import CloseableQueue
 from banterbot.utils.indexed_event import IndexedEvent
-from banterbot.utils.number import Number
 
 
 class StreamManager:
@@ -18,14 +18,13 @@ class StreamManager:
     Manages streaming of data through threads and allows hard or soft interruption of the streamed data.
     """
 
-    def __init__(self, lock: Optional[threading.Lock] = None) -> None:
+    def __init__(self) -> None:
         """
         Initializes the StreamManager with default values.
         """
         self._processor: Callable[[IndexedEvent, int, dict], Any] = lambda log, index, shared_data: log[index]
         self._exception_handler: Optional[Callable[[IndexedEvent, dict], Any]] = None
         self._completion_handler: Callable[[IndexedEvent, int, dict], Any] = None
-        self._lock = lock
 
     def connect_processor(self, func: Callable[[list[StreamLogEntry], int, dict], Any]) -> None:
         """
@@ -101,7 +100,6 @@ class StreamManager:
 
         # Creating the interrupt, index, and index_max values to be used.
         interrupt = Number(value=0)
-        index_max = Number(None)
 
         # Creating the queue and log to be used.
         queue = CloseableQueue()
@@ -122,7 +120,6 @@ class StreamManager:
         stream_thread = threading.Thread(
             target=self._wrap_stream,
             kwargs={
-                "index_max": index_max,
                 "indexed_event": indexed_event,
                 "kill_event": kill_event,
                 "log": log,
@@ -138,8 +135,8 @@ class StreamManager:
             kwargs={
                 "timestamp": timestamp,
                 "interrupt": interrupt,
-                "index_max": index_max,
                 "indexed_event": indexed_event,
+                "kill_event": kill_event,
                 "queue": queue,
                 "log": log,
                 "processor": self._processor,
@@ -164,7 +161,6 @@ class StreamManager:
 
     def _wrap_stream(
         self,
-        index_max: Number,
         indexed_event: IndexedEvent,
         kill_event: threading.Event,
         log: list[StreamLogEntry],
@@ -175,7 +171,6 @@ class StreamManager:
         Wraps the `_stream` thread to allow for instant interruption using the `kill` event.
 
         Args:
-            index_max (Number): The maximum index to stream to.
             indexed_event (IndexedEvent): The indexed event to use for tracking the current index.
             kill_event (threading.Event): The event to use for interrupting the stream.
             log (list[StreamLogEntry]): The log to store streamed data in.
@@ -186,7 +181,6 @@ class StreamManager:
         thread = threading.Thread(
             target=self._stream,
             kwargs={
-                "index_max": index_max,
                 "indexed_event": indexed_event,
                 "kill_event": kill_event,
                 "log": log,
@@ -207,7 +201,6 @@ class StreamManager:
 
     def _stream(
         self,
-        index_max: Number,
         indexed_event: IndexedEvent,
         kill_event: threading.Event,
         log: list[StreamLogEntry],
@@ -223,19 +216,18 @@ class StreamManager:
             log (list[StreamLogEntry]): The log to store streamed data in.
             iterable (Iterable[Any]): The iterable to stream data from.
         """
-        for n, value in enumerate(iterable):
+        for value in iterable:
+            print("STREAM: ", value)
             log.append(StreamLogEntry(value=value))
             indexed_event.increment()
-        index_max.set(n - 1)
-        indexed_event.increment()
         kill_event.set()
 
     def _wrap_processor(
         self,
         timestamp: float,
         interrupt: Number,
-        index_max: Number,
         indexed_event: IndexedEvent,
+        kill_event: threading.Event,
         queue: CloseableQueue,
         log: list[StreamLogEntry],
         processor: Callable[[list[StreamLogEntry], int, dict], Any],
@@ -249,8 +241,8 @@ class StreamManager:
         Args:
             timestamp (float): The timestamp of the stream.
             interrupt (Number): The interrupt time of the stream.
-            index_max (Number): The maximum index to stream to.
             indexed_event (IndexedEvent): The indexed event to use for tracking the current index.
+            kill_event (threading.Event): The event to use for interrupting the stream.
             queue (CloseableQueue): The queue to store processed data in.
             log (list[StreamLogEntry]): The log to store streamed data in.
             stream_processor (Callable[[list[StreamLogEntry], int, dict], Any]): The stream processor function to
@@ -262,11 +254,13 @@ class StreamManager:
             shared_data (Optional[dict[str, Any]]): The shared data to be used.
         """
         index = 0
-        while interrupt < timestamp and (index_max.is_null() or index < index_max):
+        while interrupt < timestamp and (not kill_event.is_set() or index < len(log)):
             indexed_event.wait()
-            if not index_max.is_null() and index >= index_max:
+            indexed_event.decrement()
+            if kill_event.is_set() and index >= len(log):
                 continue
             try:
+                print(log[index])
                 output = processor(log=log, index=index, shared_data=shared_data)
                 if output is not None:
                     queue.put(output)
@@ -289,6 +283,3 @@ class StreamManager:
                     break
                 index += 1
         queue.close()
-
-        if self._lock and self._lock.locked():
-            self._lock.release()

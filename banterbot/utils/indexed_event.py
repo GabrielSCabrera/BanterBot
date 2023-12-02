@@ -84,7 +84,37 @@ class IndexedEvent(threading.Event):
 
         with self._lock:
             self._counter += N
-            super().set()
+            if self._counter > 0:
+                super().set()
+
+    def decrement(self, N: int = 1) -> None:
+        """
+        Decrements the counter by a specified amount. It also clears the event if zero is reached, blocking the
+        consumer.
+
+        Args:
+            N (int): The amount to decrement the counter by. Must be non-negative.
+
+        Raises:
+            ValueError: If N is less than 1 or N is not a number.
+        """
+        if N < 0 or not isinstance(N, int):
+            raise ValueError(
+                "Argument `N` in class `IndexedEvent` method `decrement(N: int)` must be a non-negative integer."
+            )
+
+        with self._lock:
+            if self._counter - N < 0:
+                raise ValueError(
+                    "Argument `N` in class `IndexedEvent` method `decrement(N: int)` must be less than or equal to the"
+                    f" current counter value ({self._counter})."
+                )
+
+            self._counter -= N
+            if self._counter > 0:
+                super().set()
+            else:
+                super().clear()
 
     def is_set(self) -> bool:
         """
@@ -105,30 +135,13 @@ class IndexedEvent(threading.Event):
         Raises:
             ValueError: If N is less than 1 or N is not a number.
         """
-        if N < 0 or not isinstance(N, int):
-            raise ValueError(
-                "Argument `N` in class `IndexedEvent` method `set(N: int)` must be a non-negative integer."
-            )
         with self._lock:
-            self._counter = N
-            if self._counter > 0:
+            if N < 0 or not isinstance(N, int):
+                raise ValueError(
+                    "Argument `N` in class `IndexedEvent` method `set(N: int)` must be a non-negative integer."
+                )
+            elif N > 0:
                 super().set()
             else:
                 super().clear()
-
-    def wait(self, timeout: float = None) -> bool:
-        """
-        Waits for the event to be set (data to be available), then decrements the counter, indicating a data chunk has
-        been processed. If the counter reaches zero, indicating no more data, the event is cleared.
-
-        Args:
-            timeout (float): Optional timeout for the wait.
-
-        Returns:
-            bool: True if the event was set (data was processed), False if it timed out.
-        """
-        with self._lock:
-            self._counter = self._counter - 1 if self._counter > 0 else self._counter
-        if self._counter <= 0:
-            return super().wait(timeout)
-        return True
+            self._counter = N

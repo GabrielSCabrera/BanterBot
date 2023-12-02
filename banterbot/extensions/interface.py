@@ -13,6 +13,7 @@ from banterbot.managers.openai_model_manager import OpenAIModelManager
 from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
+from banterbot.models.word import Word
 from banterbot.paths import chat_logs
 from banterbot.services.openai_service import OpenAIService
 from banterbot.services.speech_recognition_service import SpeechRecognitionService
@@ -303,15 +304,13 @@ class Interface(ABC):
             # Initialize the generator for asynchronous yielding of sentence blocks
             for block in open_ai_stream:
                 phrases, context = self._prosody_selector.select(sentences=block, context=content, system=self._system)
-
                 if phrases is None:
                     raise FormatMismatchError()
 
-                print("PHRASES")
-                print(phrases)
-                for word in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
-                    self.update_conversation_area(word.word)
-                    content.append(word.word)
+                for item in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
+                    print("SYNTHESIS: ", item)
+                    self.update_conversation_area(item.value.word)
+                    content.append(item.value.word)
 
                 self.update_conversation_area(" ")
                 content.append(" ")

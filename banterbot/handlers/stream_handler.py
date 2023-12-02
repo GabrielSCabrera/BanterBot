@@ -2,8 +2,8 @@ import logging
 import threading
 import time
 
+from banterbot.models.number import Number
 from banterbot.utils.closeable_queue import CloseableQueue
-from banterbot.utils.number import Number
 
 
 class StreamHandler:
