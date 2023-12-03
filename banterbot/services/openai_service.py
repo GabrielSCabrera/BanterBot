@@ -29,6 +29,7 @@ class OpenAIService:
     """
 
     api_key_set = False
+    client = None
 
     def __init__(self, model: OpenAIModel) -> None:
         """
@@ -42,7 +43,8 @@ class OpenAIService:
 
         # Set the OpenAI API key
         if not self.__class__.api_key_set:
-            openai.api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
+            api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
+            self.__class__.client = openai.OpenAI(api_key=api_key)
             self.__class__.api_key_set = True
 
         # The selected model that will be used in OpenAI ChatCompletion prompts.
@@ -131,9 +133,11 @@ class OpenAIService:
         init_time = time.perf_counter_ns() if init_time is None else init_time
         if self._interrupt < init_time:
             # Obtain a response from the OpenAI ChatCompletion API
-            response = self._request(messages=messages, stream=True, **kwargs)
+            stream = self._request(messages=messages, stream=True, **kwargs)
             handler = self._stream_manager.stream(
-                iterable=response, close_stream=response.close, init_shared_data={"text": "", "sentences": []}
+                iterable=stream,
+                close_stream=stream.response.close,
+                init_shared_data={"text": "", "sentences": []},
             )
             with self._stream_handlers_lock:
                 self._stream_handlers.append(handler)
@@ -163,8 +167,8 @@ class OpenAIService:
         Returns:
             list[str]: A list of sentences parsed from the chunk.
         """
-        if "content" in log[index].value["choices"][0]["delta"].keys():
-            shared_data["text"] += log[index].value["choices"][0]["delta"]["content"]
+        if log[index].value.choices[0].delta.content is not None:
+            shared_data["text"] += log[index].value.choices[0].delta.content
 
         shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])
 
@@ -213,11 +217,11 @@ class OpenAIService:
         success = False
         for i in range(RETRY_LIMIT):
             try:
-                response = openai.ChatCompletion.create(**kwargs)
+                response = self.__class__.client.chat.completions.create(**kwargs)
                 success = True
                 break
 
-            except openai.error.APIError:
+            except openai.APIError:
                 retry_time = 0.25
                 retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=retry_time)
                 retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
@@ -228,7 +232,7 @@ class OpenAIService:
                 logging.info(error_message)
                 time.sleep(retry_time)
 
-            except openai.error.RateLimitError:
+            except openai.RateLimitError:
                 retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
                 retry_timestamp = datetime.datetime.strftime(retry_timestamp, "%H:%M:%S")
                 error_message = (
@@ -240,6 +244,6 @@ class OpenAIService:
 
         if not success:
             logging.info(f"OpenAIService encountered too many OpenAI Errors - exiting program.")
-            raise openai.error.APIError
+            raise openai.APIError
 
         return response if stream else response.choices[0].message.content.strip()

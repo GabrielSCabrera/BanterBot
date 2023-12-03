@@ -222,6 +222,7 @@ class StreamManager:
             indexed_event.increment()
             time.sleep(0.01)
         kill_event.set()
+        indexed_event.increment()
 
     def _wrap_processor(
         self,
