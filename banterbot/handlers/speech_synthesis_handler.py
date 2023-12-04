@@ -52,7 +52,7 @@ class SpeechSynthesisHandler:
             self._iterating = True
 
         # Start synthesizing.
-        self._synthesizer.speak_ssml(self._ssml)
+        self._synthesizer.speak_ssml_async(self._ssml)
         logging.debug("SpeechSynthesisHandler synthesizer started")
 
         # Process the words as they are synthesized.
@@ -61,14 +61,14 @@ class SpeechSynthesisHandler:
             dt = 1e-9 * (item["time"] - time.perf_counter_ns())
             # If a delay is needed, wait for the specified time.
             if dt > 0:
-                time.sleep(dt)
+                time.sleep(dt if dt >= 0 else 0)
 
             # Yield the word.
             yield item["word"]
             logging.debug(f"SpeechSynthesisHandler yielded word: `{item['word']}`")
 
     def close(self):
-        self._synthesizer.stop_speaking()
+        self._synthesizer.stop_speaking_async()
 
     @classmethod
     def _phrases_to_ssml(cls, phrases: list[Phrase]) -> str:

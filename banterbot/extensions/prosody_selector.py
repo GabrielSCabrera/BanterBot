@@ -111,7 +111,6 @@ class ProsodySelector:
         Returns:
             str: The randomly selected option.
         """
-
         for i in range(RETRY_LIMIT):
             # Attempt several different sentence splits in order to modify the input on retry -- significantly reduces
             # the chance of raising a `FormatMismatchError` Exception. `RETRY_LIMIT` is defined in the config file.

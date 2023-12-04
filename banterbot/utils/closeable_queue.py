@@ -59,6 +59,7 @@ class CloseableQueue(queue.Queue):
             self._iterating = True
 
         while not self.finished():
+            time.sleep(0)
             self._indexed_event.wait()
             self._indexed_event.decrement()
             if not self.empty():

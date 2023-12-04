@@ -37,7 +37,7 @@ class SpeechRecognitionHandler:
             self._iterating = True
 
         # Start recognizing.
-        self._recognizer.start_continuous_recognition()
+        self._recognizer.start_continuous_recognition_async()
         logging.debug("SpeechRecognitionHandler recognizer started")
 
         # Process the sentences as they are recognized.
@@ -49,4 +49,4 @@ class SpeechRecognitionHandler:
         """
         Closes the speech synthesis process.
         """
-        self._recognizer.stop_continuous_recognition()
+        self._recognizer.stop_continuous_recognition_async()

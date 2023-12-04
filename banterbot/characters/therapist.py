@@ -5,7 +5,7 @@ def run() -> None:
     """
     Runs the TKMultiplayerInterface for a custom-made character.
     """
-    model = OpenAIModelManager.load("gpt-3.5-turbo")
+    model = OpenAIModelManager.load("gpt-4-turbo")
     voice = AzureNeuralVoiceManager.load("Davis")
 
     style = "friendly"

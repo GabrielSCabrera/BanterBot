@@ -19,7 +19,7 @@ DEFAULT_LANGUAGE = "en-US"
 ENCODING = "utf-8"
 
 # Set the log settings
-logging_level = logging.INFO
+logging_level = logging.CRITICAL
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging_level)
 
 # Define the type of UUID that should be used across all modules

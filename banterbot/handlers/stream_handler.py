@@ -45,10 +45,9 @@ class StreamHandler:
         # Prevent multiple iterations over the stream handler.¨
         logging.debug(f"StreamHandler iterating")
         # Return the queue for iteration as a generator.
-        print("Iterating")
         for item in self._queue:
             yield item
-            time.sleep(0.05)
+            time.sleep(0)
 
     def is_alive(self) -> bool:
         """
@@ -66,3 +65,4 @@ class StreamHandler:
         self._kill_event.set()
         self._interrupt.set(time.perf_counter_ns())
         self._shared_data["interrupt"] = self._interrupt.value
+        logging.debug(f"StreamHandler interrupted")

@@ -52,9 +52,6 @@ class SpeechRecognitionService:
         # Initialize the `StreamManager` for handling streaming processes.
         self._stream_manager = StreamManager()
 
-        # Indicates whether the current instance of `SpeechRecognitionService` is listening.
-        self._recognizing = False
-
         # The latest interruption time.
         self._interrupt = 0
 
@@ -90,35 +87,34 @@ class SpeechRecognitionService:
         """
         self._phrase_list_grammar.clear()
 
-    def recognize(self, init_time: Optional[int] = None) -> StreamHandler:
+    def recognize(self, init_time: Optional[int] = None) -> Union[StreamHandler, tuple[()]]:
         """
         Recognizes speech and returns a generator that yields the recognized sentences as they are processed.
 
         Args:
             init_time (Optional[int]): The time at which the recognition was initialized.
 
-        Yields:
-            StreamHandler: A handler for the stream of recognized sentences.
+        Returns:
+            Union[StreamHandler, tuple[()]: A handler for the stream of recognized sentences, or an empty tuple if the
+                recognition was interrupted.
         """
         # Record the time at which the recognition was initialized pre-lock, in order to account for future interruptions.
         init_time = time.perf_counter_ns() if init_time is None else init_time
 
         # Only allow one listener to be active at once.
-        self.__class__._recognition_lock.acquire()
+        with self.__class__._recognition_lock:
+            if self._interrupt >= init_time:
+                return tuple()
+            else:
+                self._queue = CloseableQueue()
 
-        if self._interrupt < init_time:
-            self.__class__._recognition_lock.release()
-        else:
-            self._queue = CloseableQueue()
-
-            shared_data = {"init_time": init_time}
-            iterator = SpeechRecognitionHandler(recognizer=self._recognizer, queue=self._queue)
-            handler = self._stream_manager.stream(
-                iterator=iterator, close_stream=iterator.close, shared_data=shared_data
-            )
-            with self._stream_handlers_lock:
-                self._stream_handlers.append(handler)
-            return handler
+                iterable = SpeechRecognitionHandler(recognizer=self._recognizer, queue=self._queue)
+                handler = self._stream_manager.stream(
+                    iterable=iterable, close_stream=iterable.close, init_shared_data={"init_time": init_time}
+                )
+                with self._stream_handlers_lock:
+                    self._stream_handlers.append(handler)
+                return handler
 
     def _init_recognizer(
         self, languages: Union[str, list[str]] = None, phrase_list: Optional[list[str]] = None
@@ -206,7 +202,6 @@ class SpeechRecognitionService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the recognition stopped.
         """
         logging.debug("SpeechRecognitionService disconnected")
-        self._recognizer = False
         self._queue.close()
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
@@ -247,10 +242,8 @@ class SpeechRecognitionService:
             self._total_offset = datetime.timedelta(microseconds=event.offset / 10)
 
         self._queue.put(
-            StreamLogEntry(
-                SpeechRecognitionInput.from_recognition_result(
-                    event.result, self._languages if not self._auto_detection else None
-                )
+            SpeechRecognitionInput.from_recognition_result(
+                event.result, self._languages if not self._auto_detection else None
             )
         )
 

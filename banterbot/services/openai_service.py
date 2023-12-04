@@ -54,15 +54,12 @@ class OpenAIService:
         self._streaming = False
 
         # Set the interruption flag to zero: if interruptions are raised, this will be updated.
-        self._interrupt: int = 0
+        self._interrupt = 0
 
         # Initialize the StreamManager for handling streaming processes.
         self._stream_manager = StreamManager()
         self._stream_manager.connect_processor(self._processor)
         self._stream_manager.connect_completion_handler(self._completion_handler)
-
-        # The latest interruption time.
-        self._interrupt = 0
 
         # A list of active stream handlers.
         self._stream_handlers = []
@@ -113,7 +110,9 @@ class OpenAIService:
         sentences = NLP.segment_sentences(response) if split else response
         return sentences
 
-    def prompt_stream(self, messages: list[Message], init_time: Optional[int] = None, **kwargs) -> StreamHandler:
+    def prompt_stream(
+        self, messages: list[Message], init_time: Optional[int] = None, **kwargs
+    ) -> Union[StreamHandler, tuple[()]]:
         """
         Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.
 
@@ -127,17 +126,21 @@ class OpenAIService:
             and frequency_penalty.
 
         Returns:
-            StreamHandler: A handler for the stream of blocks of sentences forming the response from the OpenAI API.
+            Union[StreamHandler, tuple[()]]: A handler for the stream of blocks of sentences forming the response from
+                the OpenAI API or an empty tuple if the stream was interrupted.
         """
         # Record the time at which the stream was initialized pre-lock, in order to account for future interruptions.
         init_time = time.perf_counter_ns() if init_time is None else init_time
-        if self._interrupt < init_time:
+
+        if self._interrupt >= init_time:
+            return tuple()
+        else:
             # Obtain a response from the OpenAI ChatCompletion API
             stream = self._request(messages=messages, stream=True, **kwargs)
             handler = self._stream_manager.stream(
                 iterable=stream,
-                close_stream=stream.response.close,
-                init_shared_data={"text": "", "sentences": []},
+                # close_stream=stream.response.close,
+                init_shared_data={"text": "", "sentences": [], "init_time": init_time},
             )
             with self._stream_handlers_lock:
                 self._stream_handlers.append(handler)
@@ -167,18 +170,21 @@ class OpenAIService:
         Returns:
             list[str]: A list of sentences parsed from the chunk.
         """
-        if log[index].value.choices[0].delta.content is not None:
-            shared_data["text"] += log[index].value.choices[0].delta.content
+        if shared_data["interrupt"] >= shared_data["init_time"]:
+            raise StopIteration
+        else:
+            if log[index].value.choices[0].delta.content is not None:
+                shared_data["text"] += log[index].value.choices[0].delta.content
 
-        shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])
+            shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])
 
-        # If the current chunk is not the final chunk of data from the OpenAI API response, parse the chunk.
-        if len(shared_data["sentences"]) > 1:
-            shared_data["text"] = shared_data["sentences"][-1]
-            logging.debug(f"OpenAIService yielded sentences: {shared_data['sentences'][:-1]}")
-            return shared_data["sentences"][:-1]
+            # If the current chunk is not the final chunk of data from the OpenAI API response, parse the chunk.
+            if len(shared_data["sentences"]) > 1:
+                shared_data["text"] = shared_data["sentences"][-1]
+                logging.debug(f"OpenAIService yielded sentences: {shared_data['sentences'][:-1]}")
+                return shared_data["sentences"][:-1]
 
-    def _completion_handler(self, log: list[StreamLogEntry], shared_data: dict) -> None:
+    def _completion_handler(self, log: list[StreamLogEntry], shared_data: dict) -> list[str]:
         """
         Handles the completion of the OpenAI API response.
 
@@ -186,12 +192,18 @@ class OpenAIService:
             log (list[StreamLogEntry]): A list of `StreamLogEntry` instances containing the data from the OpenAI API
             response.
             shared_data (dict): A dictionary containing shared data between the stream handler and the processor.
+
+        Returns:
+            list[str]: A list of sentences parsed from the chunk.
         """
-        # If the current chunk is the final chunk of data from the OpenAI API response, parse the final chunk.
-        shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])
-        logging.debug(f"OpenAIService yielded final sentences: {shared_data['sentences'][:-1]}")
-        logging.debug("OpenAIService stream stopped")
-        return shared_data["sentences"]
+        if shared_data["interrupt"] >= shared_data["init_time"]:
+            raise StopIteration
+        else:
+            # If the current chunk is the final chunk of data from the OpenAI API response, parse the final chunk.
+            shared_data["sentences"] = NLP.segment_sentences(shared_data["text"])
+            logging.debug(f"OpenAIService yielded final sentences: {shared_data['sentences'][:-1]}")
+            logging.debug("OpenAIService stream stopped")
+            return shared_data["sentences"]
 
     def _request(self, messages: list[Message], stream: bool, **kwargs) -> Union[Iterator, str]:
         """
@@ -207,7 +219,7 @@ class OpenAIService:
             and frequency_penalty.
 
         Returns:
-            Union[Iterator, str]: The response from the OpenAI API, either as a stream (Iterator) or text (str).
+            Union[Iterator, str]: The stream from the OpenAI API, either as a stream (Iterator) or text (str).
         """
         kwargs["model"] = self._model.model
         kwargs["n"] = 1
@@ -221,29 +233,30 @@ class OpenAIService:
                 success = True
                 break
 
-            except openai.APIError:
-                retry_time = 0.25
-                retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=retry_time)
-                retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
-                error_message = (
-                    f"OpenAIService encountered an OpenAI API Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
-                    f"{retry_time} seconds until {retry_timestamp} to retry."
-                )
-                logging.info(error_message)
-                time.sleep(retry_time)
+            except (openai.APIError, openai.RateLimitError) as e:
+                if isinstance(e, openai.APIError):
+                    retry_time = 0.25
+                    retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=retry_time)
+                    retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
+                    error_message = (
+                        f"OpenAIService encountered an OpenAI API Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
+                        f"{retry_time} seconds until {retry_timestamp} to retry."
+                    )
+                    logging.info(error_message)
+                    time.sleep(retry_time)
 
-            except openai.RateLimitError:
-                retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
-                retry_timestamp = datetime.datetime.strftime(retry_timestamp, "%H:%M:%S")
-                error_message = (
-                    f"OpenAIService encountered an OpenAI Rate Limiting Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
-                    f"{RETRY_TIME} seconds until {retry_timestamp} to retry."
-                )
-                logging.info(error_message)
-                time.sleep(RETRY_TIME)
+                elif isinstance(e, openai.RateLimitError):
+                    retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
+                    retry_timestamp = datetime.datetime.strftime(retry_timestamp, "%H:%M:%S")
+                    error_message = (
+                        f"OpenAIService encountered an OpenAI Rate Limiting Error - Attempt {i+1}/{RETRY_LIMIT}."
+                        f" Waiting {RETRY_TIME} seconds until {retry_timestamp} to retry."
+                    )
+                    logging.info(error_message)
+                    time.sleep(RETRY_TIME)
 
         if not success:
-            logging.info(f"OpenAIService encountered too many OpenAI Errors - exiting program.")
+            logging.info(f"OpenAIService encountered too many OpenAI API Errors; exiting program.")
             raise openai.APIError
 
         return response if stream else response.choices[0].message.content.strip()

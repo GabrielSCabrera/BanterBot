@@ -77,17 +77,21 @@ class SpeechSynthesisService:
             StreamHandler: A handler for the stream of synthesized words.
         """
         # Record the time at which the synthesis was initialized pre-lock, in order to account for future interruptions.
+        # Record the time at which the stream was initialized pre-lock, in order to account for future interruptions.
         init_time = time.perf_counter_ns() if init_time is None else init_time
 
         with self.__class__._synthesis_lock:
-            self._queue = CloseableQueue()
-            self._first_word = True
+            if self._interrupt >= init_time:
+                return tuple()
+            else:
+                self._queue = CloseableQueue()
+                self._first_word = True
 
-            iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queue)
-            handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
-            with self._stream_handlers_lock:
-                self._stream_handlers.append(handler)
-            return handler
+                iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queue)
+                handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
+                with self._stream_handlers_lock:
+                    self._stream_handlers.append(handler)
+                return handler
 
     def _init_synthesizer(self, output_format: SpeechSynthesisOutputFormat) -> None:
         """
@@ -168,7 +172,8 @@ class SpeechSynthesisService:
                     source=SpeechProcessingType.TTS,
                 ),
             })
-            self._first_word = False
+            if self._first_word:
+                self._first_word = False
 
     def _callbacks_connect(self):
         """

@@ -67,6 +67,8 @@ class Interface(ABC):
         self._log_lock = threading.Lock()
         self._log_path = chat_logs / f"chat_{datetime.datetime.now().strftime('%Y%m%dT%H%M%S')}.txt"
         self._listening_toggle = False
+        self._listening_active_lock = threading.Lock()
+        self._listening_inactive_lock = threading.Lock()
 
         # Initialize thread management components
         self._thread_queue = ThreadQueue()
@@ -127,23 +129,10 @@ class Interface(ABC):
         """
         logging.debug(f"Interface Interrupted")
         self._openai_service.interrupt()
+        self._openai_service_tone.interrupt()
         self._speech_recognition_service.interrupt()
         self._speech_synthesis_service.interrupt()
         self._interrupt = time.perf_counter_ns() if not shutdown_time else shutdown_time
-
-    def listener_toggle(self, name: Optional[str] = None) -> None:
-        """
-        Toggle the listening state of the bot. If the bot is currently listening, it will stop listening for user input
-        using speech-to-text. If the bot is not currently listening, it will start listening for user input using
-        speech-to-text.
-
-        Args:
-            name (Optional[str]): The name of the user sending the message. Defaults to None.
-        """
-        if self._listening_toggle:
-            self.listener_deactivate()
-        else:
-            self.listener_activate(name=name)
 
     def listener_activate(self, name: Optional[str] = None) -> None:
         """
@@ -152,26 +141,28 @@ class Interface(ABC):
         Args:
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
-        if not self._listening_toggle:
-            self._listening_toggle = True
-            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            self.interrupt()
-            init_time = time.perf_counter_ns()
-            self._listen_thread = threading.Thread(
-                target=self._listen,
-                kwargs={"init_time": init_time, "name": name},
-                daemon=True,
-            )
-            self._listen_thread.start()
+        # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+        self.interrupt()
+        init_time = time.perf_counter_ns()
+
+        with self._listening_active_lock:
+            if self._interrupt < init_time:
+                self._listen_thread = threading.Thread(
+                    target=self._listen,
+                    kwargs={"init_time": init_time, "name": name},
+                    daemon=True,
+                )
+                self._listen_thread.start()
 
     def listener_deactivate(self) -> None:
         """
         Deactivate the speech-to-text listener.
         """
-        if self._listening_toggle:
-            self._listening_toggle = False
-            shutdown_time = time.perf_counter_ns()
-            self._speech_recognition_service.interrupt(soft=True, interrupt_ns=shutdown_time)
+        # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+        init_time = time.perf_counter_ns()
+        with self._listening_inactive_lock:
+            if self._interrupt < init_time:
+                self._speech_recognition_service.interrupt()
 
     def prompt(self, message: str, name: Optional[str] = None) -> None:
         """
@@ -181,22 +172,14 @@ class Interface(ABC):
             message (str): The message content from the user.
             name (Optional[str]): The name of the user sending the message. Defaults to None.
         """
-        init_time = time.perf_counter_ns()
+        # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
+        self.interrupt()
+
         # Do not send the message if it is empty.
         if message.strip():
-            # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
-            self.interrupt()
-
-            message_thread = threading.Thread(
-                target=self.send_message,
-                args=(
-                    message,
-                    ChatCompletionRoles.USER,
-                    name,
-                ),
-                daemon=True,
-            )
-            self._thread_queue.add_task(message_thread, unskippable=True)
+            # Record the time at which the message was initialized in order to account for future interruptions.
+            init_time = time.perf_counter_ns()
+            self.send_message(message, ChatCompletionRoles.USER, name)
             self._thread_queue.add_task(
                 threading.Thread(target=self.respond, kwargs={"init_time": init_time}, daemon=True)
             )
@@ -231,20 +214,11 @@ class Interface(ABC):
         Args:
             message (str): The message content from the user.
         """
-        init_time = time.perf_counter_ns()
         # Do not send the message if it is empty.
         if message.strip():
-            message_thread = threading.Thread(
-                target=self.send_message,
-                args=(
-                    message,
-                    ChatCompletionRoles.SYSTEM,
-                    None,
-                    True,
-                ),
-                daemon=True,
-            )
-            self._thread_queue.add_task(message_thread, unskippable=True)
+            # Record the time at which the message was initialized in order to account for future interruptions.
+            init_time = time.perf_counter_ns()
+            self.send_message(message, ChatCompletionRoles.USER, None, True)
             self._thread_queue.add_task(
                 threading.Thread(target=self.respond, kwargs={"init_time": init_time}, daemon=True)
             )
@@ -266,6 +240,7 @@ class Interface(ABC):
         Run the frontend application.
         This method should be implemented by subclasses to handle the main event loop of the specific GUI framework.
         """
+        ...
 
     @abstractmethod
     def _init_gui(self) -> None:
@@ -273,6 +248,7 @@ class Interface(ABC):
         Initialize the graphical user interface for the frontend.
         This method should be implemented by subclasses to create the specific GUI components.
         """
+        ...
 
     def _append_to_chat_log(self, word: str) -> None:
         """
@@ -292,36 +268,32 @@ class Interface(ABC):
         the bot's response using the OpenAIService and updating the conversation area with the response text using
         text-to-speech synthesis.
         """
-        prefixed = False
         content = []
         context = []
 
         # Add the name of the assistant to the conversation area.
         self.update_conversation_area(f"{self._assistant_name}: ")
 
-        open_ai_stream = self._openai_service.prompt_stream(messages=self._messages, init_time=init_time)
-        if open_ai_stream is not None:
-            # Initialize the generator for asynchronous yielding of sentence blocks
-            for block in open_ai_stream:
-                phrases, context = self._prosody_selector.select(sentences=block, context=content, system=self._system)
-                if phrases is None:
-                    raise FormatMismatchError()
+        # Initialize the generator for asynchronous yielding of sentence blocks
+        for block in self._openai_service.prompt_stream(messages=self._messages, init_time=init_time):
+            phrases, context = self._prosody_selector.select(sentences=block, context=content, system=self._system)
+            if phrases is None:
+                raise FormatMismatchError()
 
-                for item in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
-                    print("SYNTHESIS: ", item.value.word)
-                    self.update_conversation_area(item.value.word)
-                    content.append(item.value.word)
+            for item in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
+                self.update_conversation_area(item.value.word)
+                content.append(item.value.word)
 
-                self.update_conversation_area(" ")
-                content.append(" ")
+            self.update_conversation_area(" ")
+            content.append(" ")
 
-            content = "".join(content)
+        content = "".join(content)
 
-            if content.strip():
-                message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
-                self._messages.append(message)
+        if content.strip():
+            message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
+            self._messages.append(message)
 
-            self.update_conversation_area("\n\n")
+        self.update_conversation_area("\n\n")
 
     def _listen(self, init_time: int, name: Optional[str] = None) -> None:
         """
@@ -335,7 +307,8 @@ class Interface(ABC):
         input_detected = False
 
         # Listen for user input using speech-to-text
-        for sentence in self._speech_recognition_service.recognize(init_time=init_time):
+        for item in self._speech_recognition_service.recognize(init_time=init_time):
+            sentence = str(item.value)
             # Do not send the message if it is empty.
             if sentence.strip():
                 # Set the flag to True since a new user input was detected.

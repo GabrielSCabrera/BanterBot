@@ -112,9 +112,9 @@ class StreamManager:
                     "The key `interrupt` is reserved in the dict argument `init_shared_data` for method `stream` in"
                     " class StreamManager."
                 )
-            shared_data = deepcopy(init_shared_data)
+            shared_data = deepcopy(init_shared_data) | {"interrupt": Number(0)}
         else:
-            shared_data = dict()
+            shared_data = {"interrupt": Number(0)}
 
         # Creating the stream thread with the `_wrap_stream` method as the target function.
         stream_thread = threading.Thread(
@@ -217,10 +217,9 @@ class StreamManager:
             iterable (Iterable[Any]): The iterable to stream data from.
         """
         for value in iterable:
-            print("STREAM: ", value)
             log.append(StreamLogEntry(value=value))
             indexed_event.increment()
-            time.sleep(0.05)
+            time.sleep(0)
         kill_event.set()
         indexed_event.increment()
 
