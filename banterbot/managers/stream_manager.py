@@ -220,7 +220,7 @@ class StreamManager:
             print("STREAM: ", value)
             log.append(StreamLogEntry(value=value))
             indexed_event.increment()
-            time.sleep(0.01)
+            time.sleep(0.05)
         kill_event.set()
         indexed_event.increment()
 

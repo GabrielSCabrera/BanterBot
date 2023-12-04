@@ -23,16 +23,9 @@ class IndexedEvent(threading.Event):
         Raises:
             ValueError: If the initial counter is set to a negative value.
         """
-        if initial_counter < 0 or not isinstance(initial_counter, int):
-            raise ValueError(
-                "Argument `initial_counter` in initialization of class `IndexedEvent` must be a non-negative integer."
-            )
-
         super().__init__()
         self._lock: threading.Lock = threading.Lock()
-
-        with self._lock:
-            self._counter: int = initial_counter
+        self._counter: int = initial_counter
 
     @property
     def counter(self) -> int:
@@ -42,8 +35,7 @@ class IndexedEvent(threading.Event):
         Returns:
             int: The current number of unprocessed data chunks.
         """
-        with self._lock:
-            return self._counter
+        return self._counter
 
     @counter.setter
     def counter(self, N: int) -> None:
@@ -77,11 +69,6 @@ class IndexedEvent(threading.Event):
         Raises:
             ValueError: If N is less than 1 or N is not a number.
         """
-        if N < 0 or not isinstance(N, int):
-            raise ValueError(
-                "Argument `N` in class `IndexedEvent` method `increment(N: int)` must be a non-negative integer."
-            )
-
         with self._lock:
             self._counter += N
             if self._counter > 0:
@@ -94,22 +81,8 @@ class IndexedEvent(threading.Event):
 
         Args:
             N (int): The amount to decrement the counter by. Must be non-negative.
-
-        Raises:
-            ValueError: If N is less than 1 or N is not a number.
         """
-        if N < 0 or not isinstance(N, int):
-            raise ValueError(
-                "Argument `N` in class `IndexedEvent` method `decrement(N: int)` must be a non-negative integer."
-            )
-
         with self._lock:
-            if self._counter - N < 0:
-                raise ValueError(
-                    "Argument `N` in class `IndexedEvent` method `decrement(N: int)` must be less than or equal to the"
-                    f" current counter value ({self._counter})."
-                )
-
             self._counter -= N
             if self._counter > 0:
                 super().set()
@@ -136,11 +109,7 @@ class IndexedEvent(threading.Event):
             ValueError: If N is less than 1 or N is not a number.
         """
         with self._lock:
-            if N < 0 or not isinstance(N, int):
-                raise ValueError(
-                    "Argument `N` in class `IndexedEvent` method `set(N: int)` must be a non-negative integer."
-                )
-            elif N > 0:
+            if N > 0:
                 super().set()
             else:
                 super().clear()

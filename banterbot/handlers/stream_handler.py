@@ -48,6 +48,7 @@ class StreamHandler:
         print("Iterating")
         for item in self._queue:
             yield item
+            time.sleep(0.05)
 
     def is_alive(self) -> bool:
         """

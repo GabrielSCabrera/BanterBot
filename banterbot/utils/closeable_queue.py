@@ -1,5 +1,6 @@
 import queue
 import threading
+import time
 from typing import Any, Optional
 
 from typing_extensions import Self
