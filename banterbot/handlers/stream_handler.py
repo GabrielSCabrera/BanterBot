@@ -47,7 +47,6 @@ class StreamHandler:
         # Return the queue for iteration as a generator.
         for item in self._queue:
             yield item
-            time.sleep(0)
 
     def is_alive(self) -> bool:
         """

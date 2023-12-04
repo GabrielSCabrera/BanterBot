@@ -27,54 +27,28 @@ class CloseableQueue(queue.Queue):
     def __init__(self, maxsize: int = 0) -> None:
         super().__init__(maxsize=maxsize)
         self._closed = False
-        self._in_context = False
-        self._iterating_lock = threading.Lock()
-        self._context_lock = threading.Lock()
         self._indexed_event = IndexedEvent()
-        self._iterating = False
 
     def close(self) -> None:
         self._closed = True
         self._indexed_event.increment()
 
     def put(self, item: Any, block: bool = True, timeout: Optional[float] = None) -> None:
-        if self._closed:
-            raise RuntimeError(
-                "Method `put(item: Any, block: bool, timeout: Optional[float])` in class `CloseableQueue` was"
-                " called after the instance was closed."
-            )
-        else:
-            super().put(item, block, timeout)
-            self._indexed_event.increment()
+        super().put(item, block, timeout)
+        self._indexed_event.increment()
 
     def finished(self) -> bool:
         return self._closed and self.empty()
 
     def __iter__(self) -> Self:
-        with self._iterating_lock:
-            if self._iterating:
-                raise RuntimeError(
-                    "Method `__iter__()` in class `CloseableQueue` was called while the instance was already iterating."
-                )
-            self._iterating = True
-
         while not self.finished():
-            time.sleep(0)
             self._indexed_event.wait()
             self._indexed_event.decrement()
             if not self.empty():
                 yield super().get()
 
     def __enter__(self) -> Self:
-        with self._context_lock:
-            if self._in_context:
-                raise RuntimeError(
-                    "Method `__enter__()` in class `CloseableQueue` was called while the instance was already in a"
-                    " context."
-                )
-            self._in_context = True
-            return self
+        return self
 
     def __exit__(self) -> None:
-        self._in_context = False
         self.close()

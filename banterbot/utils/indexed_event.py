@@ -54,9 +54,9 @@ class IndexedEvent(threading.Event):
         """
         Resets the event and the counter, typically used to signify that no data is currently available for processing.
         """
-        with self._lock:
-            super().clear()
-            self._counter = 0
+        # with self._lock:
+        super().clear()
+        self._counter = 0
 
     def increment(self, N: int = 1) -> None:
         """
@@ -69,10 +69,10 @@ class IndexedEvent(threading.Event):
         Raises:
             ValueError: If N is less than 1 or N is not a number.
         """
-        with self._lock:
-            self._counter += N
-            if self._counter > 0:
-                super().set()
+        # with self._lock:
+        self._counter += N
+        if self._counter > 0:
+            super().set()
 
     def decrement(self, N: int = 1) -> None:
         """
@@ -82,12 +82,12 @@ class IndexedEvent(threading.Event):
         Args:
             N (int): The amount to decrement the counter by. Must be non-negative.
         """
-        with self._lock:
-            self._counter -= N
-            if self._counter > 0:
-                super().set()
-            else:
-                super().clear()
+        # with self._lock:
+        self._counter -= N
+        if self._counter > 0:
+            super().set()
+        else:
+            super().clear()
 
     def is_set(self) -> bool:
         """
@@ -108,9 +108,9 @@ class IndexedEvent(threading.Event):
         Raises:
             ValueError: If N is less than 1 or N is not a number.
         """
-        with self._lock:
-            if N > 0:
-                super().set()
-            else:
-                super().clear()
-            self._counter = N
+        # with self._lock:
+        if N > 0:
+            super().set()
+        else:
+            super().clear()
+        self._counter = N

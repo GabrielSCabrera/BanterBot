@@ -219,7 +219,6 @@ class StreamManager:
         for value in iterable:
             log.append(StreamLogEntry(value=value))
             indexed_event.increment()
-            time.sleep(0)
         kill_event.set()
         indexed_event.increment()
 

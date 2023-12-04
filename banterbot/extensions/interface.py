@@ -146,13 +146,14 @@ class Interface(ABC):
         init_time = time.perf_counter_ns()
 
         with self._listening_active_lock:
-            if self._interrupt < init_time:
+            if self._listening_toggle and self._interrupt < init_time:
                 self._listen_thread = threading.Thread(
                     target=self._listen,
                     kwargs={"init_time": init_time, "name": name},
                     daemon=True,
                 )
                 self._listen_thread.start()
+                self._listening_toggle = False
 
     def listener_deactivate(self) -> None:
         """
@@ -161,8 +162,9 @@ class Interface(ABC):
         # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
         init_time = time.perf_counter_ns()
         with self._listening_inactive_lock:
-            if self._interrupt < init_time:
+            if not self._listening_toggle and self._interrupt < init_time:
                 self._speech_recognition_service.interrupt()
+                self._listening_toggle = True
 
     def prompt(self, message: str, name: Optional[str] = None) -> None:
         """
@@ -281,15 +283,19 @@ class Interface(ABC):
                 raise FormatMismatchError()
 
             for item in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
+                if self._interrupt >= init_time:
+                    break
                 self.update_conversation_area(item.value.word)
                 content.append(item.value.word)
+
+            if self._interrupt >= init_time:
+                break
 
             self.update_conversation_area(" ")
             content.append(" ")
 
-        content = "".join(content)
-
-        if content.strip():
+        if self._interrupt < init_time and content.strip():
+            content = "".join(content)
             message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
             self._messages.append(message)
 
