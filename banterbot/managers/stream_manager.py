@@ -267,7 +267,7 @@ class StreamManager:
                 break
             index += 1
         else:
-            if timestamp < interrupt and completion_handler:
+            if interrupt < timestamp and completion_handler:
                 output = completion_handler(log=log, shared_data=shared_data)
                 if output is not None:
                     queue.put(output)
@@ -281,4 +281,5 @@ class StreamManager:
                 except StopIteration:
                     break
                 index += 1
+
         queue.close()

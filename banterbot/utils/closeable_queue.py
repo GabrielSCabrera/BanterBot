@@ -1,6 +1,5 @@
 import queue
-import threading
-import time
+from collections.abc import Generator
 from typing import Any, Optional
 
 from typing_extensions import Self
@@ -27,9 +26,15 @@ class CloseableQueue(queue.Queue):
     def __init__(self, maxsize: int = 0) -> None:
         super().__init__(maxsize=maxsize)
         self._closed = False
+        self._killed = False
         self._indexed_event = IndexedEvent()
 
     def close(self) -> None:
+        self._closed = True
+        self._indexed_event.increment()
+
+    def kill(self) -> None:
+        self._killed = True
         self._closed = True
         self._indexed_event.increment()
 
@@ -40,12 +45,15 @@ class CloseableQueue(queue.Queue):
     def finished(self) -> bool:
         return self._closed and self.empty()
 
-    def __iter__(self) -> Self:
+    def __iter__(self) -> Generator[Any, None, bool]:
         while not self.finished():
             self._indexed_event.wait()
             self._indexed_event.decrement()
-            if not self.empty():
+            if self._killed:
+                return False
+            elif not self.empty():
                 yield super().get()
+        return True
 
     def __enter__(self) -> Self:
         return self

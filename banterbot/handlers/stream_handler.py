@@ -57,11 +57,18 @@ class StreamHandler:
         """
         return not self._queue.finished()
 
-    def interrupt(self) -> None:
+    def interrupt(self, kill: bool = False) -> None:
         """
         Interrupt the active stream by setting the interrupt value to the current time and setting the kill event.
+
+        Args:
+            kill (bool): Whether to kill the queue or not. Defaults to False.
         """
         self._kill_event.set()
         self._interrupt.set(time.perf_counter_ns())
         self._shared_data["interrupt"] = self._interrupt.value
         logging.debug(f"StreamHandler interrupted")
+
+        if kill:
+            self._queue.kill()
+            logging.debug(f"StreamHandler killed")

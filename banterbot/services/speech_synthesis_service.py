@@ -54,14 +54,17 @@ class SpeechSynthesisService:
         self._stream_handlers = []
         self._stream_handlers_lock = threading.Lock()
 
-    def interrupt(self) -> None:
+    def interrupt(self, kill: bool = False) -> None:
         """
         Interrupts the current speech synthesis process.
+
+        Args:
+            kill (bool): Whether the interruption should kill the queues or not.
         """
         self._interrupt = time.perf_counter_ns()
         with self._stream_handlers_lock:
             for handler in self._stream_handlers:
-                handler.interrupt()
+                handler.interrupt(kill=kill)
             self._stream_handlers.clear()
         logging.debug(f"SpeechSynthesisService Interrupted")
 
