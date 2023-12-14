@@ -12,9 +12,6 @@ from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
 from banterbot.utils.nlp import NLP
 
-# Set the OpenAI API key
-openai.api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
-
 
 class OpenAIService:
     """
@@ -27,6 +24,9 @@ class OpenAIService:
     processing and generation.
     """
 
+    api_key_set = False
+    client = None
+
     def __init__(self, model: OpenAIModel) -> None:
         """
         Initializes an `OpenAIService` instance for a specific model.
@@ -36,6 +36,12 @@ class OpenAIService:
             contains information about the model, such as its name and maximum token limit.
         """
         logging.debug(f"OpenAIService initialized")
+
+        # Set the OpenAI API key
+        if not self.__class__.api_key_set:
+            api_key = os.environ.get(EnvVar.OPENAI_API_KEY.value)
+            self.__class__.client = openai.OpenAI(api_key=api_key)
+            self.__class__.api_key_set = True
 
         # The selected model that will be used in OpenAI ChatCompletion prompts.
         self._model = model
@@ -156,14 +162,13 @@ class OpenAIService:
         logging.debug("OpenAIService stream started")
 
         for chunk in response:
-            delta = chunk["choices"][0]["delta"]
 
             if self._interrupt >= init_time:
                 logging.debug(f"OpenAIService interrupted")
                 break
 
-            if "content" in delta.keys():
-                text += delta["content"]
+            if chunk.choices[0].delta.content:
+                text += chunk.choices[0].delta.content
 
             if len(sentences := NLP.segment_sentences(text)) > 1:
                 text = sentences[-1]
@@ -181,8 +186,8 @@ class OpenAIService:
         Sends a request to the OpenAI API and generates a response based on the specified parameters.
 
         Args:
-            messages (list[Message]): A list of messages. Each message should be an instance of the Message class, which
-            contains the content and role (user or assistant) of the message.
+            messages (list[Message]): A list of messages. Each message should be an instance of the `Message` class,
+            which contains the content and role (user or assistant) of the message.
 
             stream (bool): Whether the response should be returned as an iterable stream or a complete text.
 
@@ -190,7 +195,7 @@ class OpenAIService:
             and frequency_penalty.
 
         Returns:
-            Union[Iterator, str]: The response from the OpenAI API, either as a stream (Iterator) or text (str).
+            Union[Iterator, str]: The stream from the OpenAI API, either as a stream (Iterator) or text (str).
         """
         kwargs["model"] = self._model.model
         kwargs["n"] = 1
@@ -200,33 +205,34 @@ class OpenAIService:
         success = False
         for i in range(RETRY_LIMIT):
             try:
-                response = openai.ChatCompletion.create(**kwargs)
+                response = self.__class__.client.chat.completions.create(**kwargs)
                 success = True
                 break
 
-            except openai.error.APIError:
-                retry_time = 0.25
-                retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=retry_time)
-                retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
-                error_message = (
-                    f"OpenAIService encountered an OpenAI API Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
-                    f"{retry_time} seconds until {retry_timestamp} to retry."
-                )
-                logging.info(error_message)
-                time.sleep(retry_time)
+            except (openai.APIError, openai.RateLimitError) as e:
+                if isinstance(e, openai.APIError):
+                    retry_time = 0.25
+                    retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=retry_time)
+                    retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
+                    error_message = (
+                        f"OpenAIService encountered an OpenAI API Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
+                        f"{retry_time} seconds until {retry_timestamp} to retry."
+                    )
+                    logging.info(error_message)
+                    time.sleep(retry_time)
 
-            except openai.error.RateLimitError:
-                retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
-                retry_timestamp = datetime.datetime.strftime(retry_timestamp, "%H:%M:%S")
-                error_message = (
-                    f"OpenAIService encountered an OpenAI Rate Limiting Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
-                    f"{RETRY_TIME} seconds until {retry_timestamp} to retry."
-                )
-                logging.info(error_message)
-                time.sleep(RETRY_TIME)
+                elif isinstance(e, openai.RateLimitError):
+                    retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
+                    retry_timestamp = datetime.datetime.strftime(retry_timestamp, "%H:%M:%S")
+                    error_message = (
+                        f"OpenAIService encountered an OpenAI Rate Limiting Error - Attempt {i+1}/{RETRY_LIMIT}."
+                        f" Waiting {RETRY_TIME} seconds until {retry_timestamp} to retry."
+                    )
+                    logging.info(error_message)
+                    time.sleep(RETRY_TIME)
 
         if not success:
-            logging.info(f"OpenAIService encountered too many OpenAI Errors - exiting program.")
-            raise openai.error.APIError
+            logging.info(f"OpenAIService encountered too many OpenAI API Errors; exiting program.")
+            raise openai.APIError
 
         return response if stream else response.choices[0].message.content.strip()
