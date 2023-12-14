@@ -185,6 +185,9 @@ class NLP:
         except OSError:
             cls._download_model(name)
             model = spacy.load(name, **kwargs)
+
+        # if model.__version__.
+
         return model
 
 
