@@ -42,7 +42,7 @@ A class that provides an interface to convert spoken language into written text 
 
 ### Important Note
 
-BanterBot requires several SpaCy language models to run, and will automatically download them on first-time initialization, if they are missing -- this process can sometimes take a while.
+BanterBot requires several spaCy language models to run, and will automatically download them on first-time initialization, if they are missing -- this process can sometimes take a while.
 
 ### Pip (Recommended)
 

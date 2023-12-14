@@ -26,12 +26,13 @@ class ChatCompletionRoles(Enum):
 
 class SpaCyLangModel(Enum):
     """
-    Names of SpaCy languge models.
+    Names of spaCy languge models.
     """
 
     EN_CORE_WEB_SM = "en_core_web_sm"
     EN_CORE_WEB_MD = "en_core_web_md"
     EN_CORE_WEB_LG = "en_core_web_lg"
+    # EN_CORE_WEB_TRF = "en_core_web_trf"
 
 
 class SpeechProcessingType(Enum):
