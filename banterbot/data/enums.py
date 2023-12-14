@@ -32,16 +32,6 @@ class SpaCyLangModel(Enum):
     EN_CORE_WEB_SM = "en_core_web_sm"
     EN_CORE_WEB_MD = "en_core_web_md"
     EN_CORE_WEB_LG = "en_core_web_lg"
-    # EN_CORE_WEB_TRF = "en_core_web_trf"
-
-
-class SpeechProcessingType(Enum):
-    """
-    Speech processing category identifiers for the `Word` class.
-    """
-
-    TTS = "text-to-speech"
-    STT = "speech-to-text"
 
 
 class Prosody:
@@ -64,7 +54,7 @@ class Prosody:
         "unfriendly",
         "whispering",
     ]
-    STYLEDEGREES = {"x-weak": 0.85, "weak": 0.95, "normal": 1.0, "strong": 1.05, "x-strong": 1.15}
+    STYLEDEGREES = {"x-weak": 0.90, "weak": 0.95, "normal": 1.0, "strong": 1.05, "x-strong": 1.10}
     PITCHES = {"x-low": "-0.5%", "low": "-0.25%", "normal": "+0%", "high": "+0.25%", "x-high": "+0.5%"}
     RATES = {"x-slow": 0.85, "slow": 0.95, "normal": 1.0, "fast": 1.05, "x-fast": 1.15}
     EMPHASES = {"reduced": "reduced", "normal": "none", "exaggerated": "moderate"}

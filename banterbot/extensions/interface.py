@@ -13,7 +13,6 @@ from banterbot.managers.openai_model_manager import OpenAIModelManager
 from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.message import Message
 from banterbot.models.openai_model import OpenAIModel
-from banterbot.models.word import Word
 from banterbot.paths import chat_logs
 from banterbot.services.openai_service import OpenAIService
 from banterbot.services.speech_recognition_service import SpeechRecognitionService
@@ -270,11 +269,11 @@ class Interface(ABC):
         the bot's response using the OpenAIService and updating the conversation area with the response text using
         text-to-speech synthesis.
         """
-        content = []
+        content = ""
         context = []
 
         # Add the name of the assistant to the conversation area.
-        self.update_conversation_area(f"{self._assistant_name}: ")
+        self.update_conversation_area(f"{self._assistant_name}:")
 
         # Initialize the generator for asynchronous yielding of sentence blocks
         for block in self._openai_service.prompt_stream(messages=self._messages, init_time=init_time):
@@ -283,13 +282,9 @@ class Interface(ABC):
                 raise FormatMismatchError()
 
             for item in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
-                self.update_conversation_area(item.value.word)
-                content.append(item.value.word)
+                self.update_conversation_area(item.value.text)
+                content += item.value.text
 
-            self.update_conversation_area(" ")
-            content.append(" ")
-
-        content = "".join(content)
         if self._interrupt < init_time and content.strip():
             message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
             self._messages.append(message)
@@ -309,9 +304,8 @@ class Interface(ABC):
 
         # Listen for user input using speech-to-text
         for item in self._speech_recognition_service.recognize(init_time=init_time):
-            sentence = str(item.value)
             # Do not send the message if it is empty.
-            if sentence.strip():
+            if sentence := item.value.display.strip():
                 # Set the flag to True since a new user input was detected.
                 input_detected = True
 
@@ -319,16 +313,15 @@ class Interface(ABC):
                 message_thread = threading.Thread(
                     target=self.send_message,
                     args=(
-                        sentence.strip(),
+                        sentence,
                         ChatCompletionRoles.USER,
                         name,
                     ),
                     daemon=True,
                 )
                 self._thread_queue.add_task(message_thread, unskippable=True)
-        # Respond if the listening loop is not broken.
-        else:
-            if input_detected:
-                self._thread_queue.add_task(
-                    threading.Thread(target=self.respond, kwargs={"init_time": init_time}, daemon=True)
-                )
+
+        if input_detected:
+            self._thread_queue.add_task(
+                threading.Thread(target=self.respond, kwargs={"init_time": init_time}, daemon=True)
+            )

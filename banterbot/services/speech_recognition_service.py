@@ -46,7 +46,7 @@ class SpeechRecognitionService:
         self._init_recognizer(languages=languages, phrase_list=phrase_list)
 
         # Set the total offset to zero, which will increment as recognitions occur.
-        self._total_offset = datetime.timedelta(seconds=0)
+        self._total_offset = datetime.timedelta()
         self._last_total_offset = 0
 
         # Initialize the `StreamManager` for handling streaming processes.
@@ -228,7 +228,7 @@ class SpeechRecognitionService:
         if log[index].offset - self._total_offset > cutoff:
             raise StopIteration
         elif log[index].offset_end - self._total_offset > cutoff:
-            if (event := log[index].from_cutoff(upper_cutoff=cutoff)) is not None:
+            if (event := log[index].from_cutoff(cutoff=cutoff)) is not None:
                 log[index] = event
 
         return log[index]

@@ -4,6 +4,7 @@ import time
 from typing import Generator
 
 import azure.cognitiveservices.speech as speechsdk
+import numba as nb
 
 from banterbot.models.phrase import Phrase
 from banterbot.models.word import Word
@@ -70,14 +71,30 @@ class SpeechSynthesisHandler:
     def close(self):
         self._synthesizer.stop_speaking_async()
 
-    @classmethod
-    def _phrases_to_ssml(cls, phrases: list[Phrase]) -> str:
+    @staticmethod
+    @nb.njit(cache=True)
+    def _jit_phrases_to_ssml(
+        texts: list[str],
+        short_names: list[str],
+        pitches: list[str],
+        rates: list[str],
+        styles: list[str],
+        styledegrees: list[str],
+        emphases: list[str],
+    ) -> str:
         """
         Creates a more advanced SSML string from the specified list of `Phrase` instances, that customizes the emphasis,
-        style, pitch, and rate of speech on a sub-sentence level, including pitch contouring between phrases.
+        style, pitch, and rate of speech on a sub-sentence level, including pitch contouring between phrases. Uses Numba
+        to speed up the process.
 
         Args:
-            phrases (list[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.
+            texts (list[str]): The texts to be synthesized.
+            short_names (list[str]): The short names of the voices to use for each phrase.
+            pitches (list[str]): The pitches to use for each phrase.
+            rates (list[str]): The rates to use for each phrase.
+            styles (list[str]): The styles to use for each phrase.
+            styledegrees (list[str]): The style degrees to use for each phrase.
+            emphases (list[str]): The emphases to use for each phrase.
 
         Returns:
             str: The SSML string.
@@ -90,41 +107,77 @@ class SpeechSynthesisHandler:
             'xml:lang="en-US">'
         )
 
-        for n, phrase in enumerate(phrases):
+        # Iterate over the phrases and add the SSML tags
+        for n, (text, short_name, pitch, rate, style, styledegree, emphasis) in enumerate(
+            zip(texts, short_names, pitches, rates, styles, styledegrees, emphases)
+        ):
             # Add contour only if there is a pitch transition
-            if phrase.pitch is not None and phrase.pitch != phrases[min(n + 1, len(phrases) - 1)].pitch:
+            if pitch is not None and n < len(pitches) - 2 and pitch != pitches[n + 1]:
                 # Set the contour to begin transition at 50% of the current phrase to match the pitch of the next one.
-                contour = f"(50%,{phrase.pitch}) (80%,{phrases[n + 1].pitch})"
-                pitch = f' contour="{contour}"'
-            elif phrase.pitch is not None:
-                pitch = f' pitch="{phrase.pitch}"'
+                contour = "(50%," + pitch + ") (80%," + pitches[n + 1] + ")"
+                pitch = ' contour="' + contour + '"'
+            elif pitch is not None:
+                pitch = ' pitch="' + pitch + '"'
             else:
                 pitch = ""
 
             # Add the voice and other tags along with prosody
-            ssml += f'<voice name="{phrase.voice.short_name}">'
+            ssml += '<voice name="' + short_name + '">'
             ssml += '<mstts:silence type="comma-exact" value="10ms"/>'
             ssml += '<mstts:silence type="Tailing-exact" value="0ms"/>'
             ssml += '<mstts:silence type="Sentenceboundary-exact" value="5ms"/>'
             ssml += '<mstts:silence type="Leading-exact" value="0ms"/>'
 
-            if phrase.style and phrase.styledegree:
-                ssml += f'<mstts:express-as style="{phrase.style}" styledegree="{phrase.styledegree}">'
-            if pitch or phrase.rate:
-                ssml += f'<prosody{pitch} rate="{phrase.rate if phrase.rate else ""}">'
-            if phrase.emphasis:
-                ssml += f'<emphasis level="{phrase.emphasis}">'
+            # Add the express-as tag if style and styledegree are specified
+            if style and styledegree:
+                ssml += '<mstts:express-as style="' + style + '" styledegree="' + styledegree + '">'
+            if pitch or rate:
+                rate_value = rate if rate else ""
+                ssml += "<prosody" + pitch + ' rate="' + rate_value + '">'
+            if emphasis:
+                ssml += '<emphasis level="' + emphasis + '">'
 
-            ssml += f"{phrase.text}"
+            ssml += text
 
-            if phrase.emphasis:
+            # Close the tags
+            if emphasis:
                 ssml += "</emphasis>"
-            if pitch or phrase.rate:
+            if pitch or rate:
                 ssml += "</prosody>"
-            if phrase.style and phrase.styledegree:
+            if style and styledegree:
                 ssml += "</mstts:express-as>"
             ssml += "</voice>"
 
         # Close the voice and speak tags and return the SSML string
         ssml += "</speak>"
         return ssml
+
+    @classmethod
+    def _phrases_to_ssml(cls, phrases: list[Phrase]) -> str:
+        """
+        Creates a more advanced SSML string from the specified list of `Phrase` instances, that customizes the emphasis,
+        style, pitch, and rate of speech on a sub-sentence level, including pitch contouring between phrases. Calls the
+        'jit_phrases_to_ssml' method to speed up the process using Numba.
+
+        Args:
+            phrases (list[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.
+
+        Returns:
+            str: The SSML string.
+        """
+        texts, short_names, pitches, rates, styles, styledegrees, emphases = zip(
+            *[
+                (
+                    phrase.text,
+                    phrase.voice.short_name,
+                    phrase.pitch,
+                    str(phrase.rate),
+                    phrase.style,
+                    str(phrase.styledegree),
+                    phrase.emphasis,
+                )
+                for phrase in phrases
+            ]
+        )
+
+        return cls._jit_phrases_to_ssml(texts, short_names, pitches, rates, styles, styledegrees, emphases)

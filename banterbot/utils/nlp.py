@@ -24,7 +24,6 @@ class NLP:
         SpaCyLangModel.EN_CORE_WEB_SM: None,
         SpaCyLangModel.EN_CORE_WEB_MD: None,
         SpaCyLangModel.EN_CORE_WEB_LG: None,
-        # SpaCyLangModel.EN_CORE_WEB_TRF: None,
     }
 
     @classmethod

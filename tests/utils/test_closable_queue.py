@@ -1,5 +1,4 @@
 import threading
-import time
 import unittest
 
 from banterbot.utils.closeable_queue import CloseableQueue

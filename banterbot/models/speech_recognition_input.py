@@ -3,9 +3,10 @@ import json
 from typing import Iterator, Optional
 
 import azure.cognitiveservices.speech as speechsdk
+import numba as nb
 from typing_extensions import Self
 
-from banterbot.data.enums import SpaCyLangModel, SpeechProcessingType
+from banterbot.data.enums import SpaCyLangModel
 from banterbot.models.word import Word
 from banterbot.types.wordjson import WordJSON
 from banterbot.utils.nlp import NLP
@@ -30,7 +31,7 @@ class SpeechRecognitionInput:
             language (str, optional): The language used during the speech-to-text recognition, if not auto-detected.
         """
         data = json.loads(recognition_result.json)
-        language = language if language is not None else self._extract_language(recognition_result=recognition_result)
+        language = language if language is not None else cls._extract_language(recognition_result=recognition_result)
         return cls(data=data, language=language)
 
     @classmethod
@@ -60,6 +61,7 @@ class SpeechRecognitionInput:
         offset_end: Optional[datetime.timedelta] = None,
         sents: Optional[tuple[str, ...]] = None,
         words: Optional[list[Word]] = None,
+        display: Optional[str] = None,
     ) -> None:
         """
         Constructor for the `SpeechRecognitionInput` class. Designed to create lightweight instances with most
@@ -73,7 +75,7 @@ class SpeechRecognitionInput:
             duration (optional, datetime.timedelta): The duration of the output in milliseconds.
             sents (optional, tuple[str, ...]): The split sentences of the output as a tuple.
             words (optional, list[Word]): A list of words from the output.
-
+            display (optional, str): The display form of the output.
         """
         self._data = data
         self._language = language
@@ -82,59 +84,83 @@ class SpeechRecognitionInput:
         self._offset_end = offset_end
         self._sents = sents
         self._words = words
+        self._display = display
 
-    def from_cutoff(
-        self, lower_cutoff: Optional[datetime.timedelta] = None, upper_cutoff: Optional[datetime.timedelta] = None
-    ) -> Self:
+    @staticmethod
+    @nb.njit(cache=True)
+    def _get_words(
+        input_words: list[str], input_tokens: list[str], indices: list[int], offsets: list[int], cutoff: int
+    ) -> tuple[int, int]:
+        """
+        Private method that extracts the words from the input text that are within a cutoff interval of the recognized
+        speech. This is used to determine the words that were spoken during a specific interval of the audio stream.
+        Uses Numba to speed up the process.
+
+        Args:
+            input_words (list[str]): The words in the input text.
+            input_tokens (list[str]): The tokens in the input text.
+            indices (list[int]): The indices of the tokens in the input text.
+            offsets (list[int]): The offsets of the words in the input text.
+            cutoff (int): The cutoff interval in microseconds.
+
+        Returns:
+            tuple[int, int]: The index of the first word in the cutoff interval and the index of the last word in the
+                cutoff interval.
+        """
+        word_idx = 0
+        display_idx = 0
+        for token_word, index in zip(input_tokens, indices):
+            for display_word, offset in zip(input_words[word_idx:], offsets[word_idx:]):
+                if token_word == display_word and offset <= cutoff:
+                    word_idx += 1
+                    display_idx = index + len(token_word)
+                    break
+        return word_idx, display_idx
+
+    def from_cutoff(self, cutoff: datetime.timedelta) -> Self:
         """
         Create a new instance of class `SpeechRecognitionInput` that only contains the text spoken within a cutoff
         interval.
 
         Args:
-            lower_cutoff (datetime.timedelta): The lower cutoff time (or duration) of the new instance.
-            upper_cutoff (datetime.timedelta): The upper cutoff time (or duration) of the new instance.
+            cutoff (datetime.timedelta): The upper cutoff time (or duration) of the new instance.
 
         Returns:
             SpeechRecognitionInput: The new instance of `SpeechRecognitionInput`.
         """
-
         doc = NLP.model(SpaCyLangModel.EN_CORE_WEB_SM)(self.display)
 
-        words = []
-        last_token_end = 0
+        input_words = [word.text for word in self.words]
+        input_tokens = [token.text.lower() for token in doc]
+        indices = [token.idx for token in doc]
+        offsets = [word.offset.microseconds for word in self.words]
+        cutoff = cutoff.microseconds
 
-        for token in doc:
-            for word in self.words:
-                if (
-                    token.text.lower() == word.word
-                    and (upper_cutoff is None or word.offset <= upper_cutoff)
-                    and (lower_cutoff is None or word.offset >= lower_cutoff)
-                ):
-                    words.append(word)
-                    last_token_end = token.idx + len(token.text)
-                    break
+        word_idx, display_idx = self._get_words(
+            input_words=input_words, input_tokens=input_tokens, indices=indices, offsets=offsets, cutoff=cutoff
+        )
 
-        if len(words) > 0:
+        if word_idx:
+            duration = sum((i.duration for i in self.words[:word_idx]), datetime.timedelta())
             data = {
-                "Id": self._data["Id"],
-                "RecognitionStatus": self._data["RecognitionStatus"],
                 "Offset": self._data["Offset"],
-                "Duration": sum(i["Duration"] for i in self._data["NBest"][0]["Words"][: len(words)]),
-                "Channel": self._data["Channel"],
-                "DisplayText": self.display[:last_token_end],
+                "Duration": duration,
                 "NBest": [
                     {
-                        "Confidence": self._data["NBest"][0]["Confidence"],
-                        "Lexical": self._data["NBest"][0]["Lexical"],
-                        "ITN": self._data["NBest"][0]["ITN"],
-                        "MaskedITN": self._data["NBest"][0]["MaskedITN"],
-                        "Display": self._data["NBest"][0]["Display"],
-                        "Words": self._data["NBest"][0]["Words"][: len(words)],
+                        "Display": self._data["NBest"][0]["Display"][:display_idx],
+                        "Words": self._data["NBest"][0]["Words"][:word_idx],
                     }
                 ],
             }
 
-            return self.__class__(data=data, language=self._language)
+            return self.__class__(
+                data=data,
+                language=self._language,
+                offset=self.offset,
+                duration=duration,
+                words=self.words[:word_idx],
+                display=self.display[:display_idx],
+            )
 
         else:
             return None
@@ -154,12 +180,9 @@ class SpeechRecognitionInput:
         for word in words_raw:
             words.append(
                 Word(
-                    word=word["Word"],
+                    text=word["Word"],
                     offset=datetime.timedelta(microseconds=word["Offset"] / 10),
                     duration=datetime.timedelta(microseconds=word["Duration"] / 10),
-                    category=speechsdk.SpeechSynthesisBoundaryType.Word,
-                    source=SpeechProcessingType.STT,
-                    confidence=word["Confidence"],
                 )
             )
         return words
@@ -187,18 +210,8 @@ class SpeechRecognitionInput:
             list[str]: A list of sentences.
         """
         if self._sents is None:
-            self._sents = NLP.segment_sentences(string=self._data["NBest"][0]["Display"], whitespace=True)
+            self._sents = NLP.segment_sentences(string=self.display, whitespace=True)
         return self._sents
-
-    @property
-    def recognition_status(self) -> str:
-        """
-        A getter property that returns the recognition status.
-
-        Returns:
-            str: The recognition status.
-        """
-        return self._data["RecognitionStatus"]
 
     @property
     def offset(self) -> datetime.timedelta:
@@ -237,46 +250,6 @@ class SpeechRecognitionInput:
         return self._offset_end
 
     @property
-    def confidence(self) -> float:
-        """
-        A getter property that returns the confidence score of the recognized speech.
-
-        Returns:
-            float: The confidence score.
-        """
-        return self._data["NBest"][0]["Confidence"]
-
-    @property
-    def lexical(self) -> str:
-        """
-        A getter property that returns the lexical form of the recognized speech.
-
-        Returns:
-            str: The lexical form of the speech.
-        """
-        return self._data["NBest"][0]["Lexical"]
-
-    @property
-    def ITN(self) -> str:
-        """
-        A getter property that returns the ITN (Inverse Text Normalization) form of the recognized speech.
-
-        Returns:
-            str: The ITN form of the speech.
-        """
-        return self._data["NBest"][0]["ITN"]
-
-    @property
-    def maskedITN(self) -> str:
-        """
-        A getter property that returns the masked ITN (Inverse Text Normalization) form of the recognized speech.
-
-        Returns:
-            str: The masked ITN form of the speech.
-        """
-        return self._data["NBest"][0]["MaskedITN"]
-
-    @property
     def display(self) -> str:
         """
         A getter property that returns the display form of the recognized speech. The display form is fully processed
@@ -285,7 +258,9 @@ class SpeechRecognitionInput:
         Returns:
             str: The display form of the speech.
         """
-        return self._data["NBest"][0]["Display"]
+        if self._display is None:
+            self._display = self._data["NBest"][0]["Display"]
+        return self._display
 
     def __getitem__(self, idx: int) -> Word:
         """

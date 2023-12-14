@@ -1,4 +1,4 @@
-from banterbot.data.enums import ChatCompletionRoles, EnvVar, Prosody, SpaCyLangModel, SpeechProcessingType
+from banterbot.data.enums import ChatCompletionRoles, EnvVar, Prosody, SpaCyLangModel
 from banterbot.data.prompts import (
     Greetings,
     OptionPredictorPrompts,
@@ -19,5 +19,4 @@ __all__ = [
     "EnvVar",
     "Prosody",
     "SpaCyLangModel",
-    "SpeechProcessingType",
 ]

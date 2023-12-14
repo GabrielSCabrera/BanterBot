@@ -26,7 +26,7 @@ class Number:
         """
         Sets the value of the current instance.
         """
-        if isinstance(value, (int, float, complex)) or value is None:
+        if value is None or isinstance(value, (int, float, complex)):
             self.value = value
         else:
             raise TypeError(f"Unsupported type for class `{self.__class__.__name__}`: '{type(value).__name__}'")

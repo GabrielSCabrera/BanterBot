@@ -6,14 +6,14 @@ import time
 from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
+import numba as nb
 from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
-from banterbot.data.enums import EnvVar, SpeechProcessingType
+from banterbot.data.enums import EnvVar
 from banterbot.handlers.speech_synthesis_handler import SpeechSynthesisHandler
 from banterbot.handlers.stream_handler import StreamHandler
 from banterbot.managers.stream_manager import StreamManager
 from banterbot.models.phrase import Phrase
-from banterbot.models.stream_log_entry import StreamLogEntry
 from banterbot.models.word import Word
 from banterbot.utils.closeable_queue import CloseableQueue
 
@@ -43,9 +43,6 @@ class SpeechSynthesisService:
 
         # Initialize the StreamManager for handling streaming processes.
         self._stream_manager = StreamManager()
-
-        # Indicates whether the current instance of `SpeechSynthesisService` is speaking.
-        self._speaking = False
 
         # The latest interruption time.
         self._interrupt = 0
@@ -88,8 +85,6 @@ class SpeechSynthesisService:
                 return tuple()
             else:
                 self._queue = CloseableQueue()
-                self._first_word = True
-
                 iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queue)
                 handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
                 with self._stream_handlers_lock:
@@ -131,7 +126,6 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.
         """
         logging.debug("SpeechSynthesisService disconnected")
-        self._speaking = False
         self._queue.close()
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
@@ -144,6 +138,25 @@ class SpeechSynthesisService:
         logging.debug("SpeechSynthesisService connected")
         self._start_synthesis_time = time.perf_counter_ns()
 
+    @staticmethod
+    @nb.njit(cache=True)
+    def _calculate_offset(
+        start_synthesis_time: float, audio_offset: float, total_seconds: float, word_length: int
+    ) -> float:
+        """
+        Calculates the offset of the word in the stream.
+
+        Args:
+            start_synthesis_time (float): The time at which the synthesis started.
+            audio_offset (float): The audio offset of the word.
+            total_seconds (float): The total seconds of the word.
+            word_length (int): The length of the word.
+
+        Returns:
+            float: The offset of the word in the stream.
+        """
+        return start_synthesis_time + 5e8 + 100 * audio_offset + 1e9 * total_seconds / word_length
+
     def _callback_word_boundary(self, event: speechsdk.SessionEventArgs) -> None:
         """
         Callback function for word boundary event. Signals that a word boundary has been reached and provides the word
@@ -155,28 +168,26 @@ class SpeechSynthesisService:
         # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
             # Add the event and timing information to the list of events
-            self._queue.put({
-                "event": event,
-                "time": (
-                    self._start_synthesis_time
-                    + 5e8
-                    + 100 * event.audio_offset
-                    + 1e9 * event.duration.total_seconds() / event.word_length
-                ),
-                "word": Word(
-                    word=(
-                        event.text
-                        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation or self._first_word
-                        else " " + event.text
+            self._queue.put(
+                {
+                    "event": event,
+                    "time": self._calculate_offset(
+                        start_synthesis_time=self._start_synthesis_time,
+                        audio_offset=event.audio_offset,
+                        total_seconds=event.duration.total_seconds(),
+                        word_length=event.word_length,
                     ),
-                    offset=datetime.timedelta(microseconds=event.audio_offset / 10),
-                    duration=event.duration,
-                    category=event.boundary_type,
-                    source=SpeechProcessingType.TTS,
-                ),
-            })
-            if self._first_word:
-                self._first_word = False
+                    "word": Word(
+                        text=(
+                            event.text
+                            if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation
+                            else " " + event.text
+                        ),
+                        offset=datetime.timedelta(microseconds=event.audio_offset / 10),
+                        duration=event.duration,
+                    ),
+                }
+            )
 
     def _callbacks_connect(self):
         """
