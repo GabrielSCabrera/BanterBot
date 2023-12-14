@@ -9,15 +9,14 @@ import unittest
 from setuptools import find_packages, setup
 
 dependencies = [
-    "openai",
-    "tiktoken",
-    "requests",
-    "azure-cognitiveservices-speech",
-    "numpy",
-    "uuid6",
-    "protobuf==3.20.2",
-    "nltk",
-    "spacy",
+    "openai==1.3.9",
+    "tiktoken==0.5.2",
+    "requests==2.31.0",
+    "azure-cognitiveservices-speech==1.34.0",
+    "numpy==1.26.2",
+    "uuid6==2023.5.2",
+    "protobuf==4.25.1",
+    "spacy==3.7.2",
 ]
 
 description = (
