@@ -1,5 +1,4 @@
 from banterbot.extensions.interface import Interface
-from banterbot.extensions.persona import Persona
 from banterbot.gui.tk_interface import TKInterface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.memory_chain import MemoryChain
@@ -11,7 +10,6 @@ from banterbot.utils.nlp import NLP
 
 __all__ = [
     "Interface",
-    "Persona",
     "TKInterface",
     "AzureNeuralVoiceManager",
     "MemoryChain",

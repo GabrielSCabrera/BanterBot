@@ -1,8 +1,8 @@
 banterbot.models package
-=======================
+========================
 
 banterbot.models.azure\_neural\_voice\_profile module
---------------------------------------------
+-----------------------------------------------------
 
 .. automodule:: banterbot.models.azure_neural_voice_profile
     :members:
@@ -26,7 +26,7 @@ banterbot.models.message module
    :show-inheritance:
 
 banterbot.models.number module
------------------------------
+------------------------------
 
 .. automodule:: banterbot.models.number
    :members:
@@ -53,6 +53,14 @@ banterbot.models.speech\_recognition\_input module
 ---------------------------------------------------
 
 .. automodule:: banterbot.models.speech_recognition_input
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+banterbot.models.stream\_log\_entry module
+------------------------------------------
+
+.. automodule:: banterbot.models.stream_log_entry
    :members:
    :undoc-members:
    :show-inheritance:

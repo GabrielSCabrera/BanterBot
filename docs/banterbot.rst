@@ -41,7 +41,7 @@ Interface
    :show-inheritance:
 
 TKInterface
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 .. autoclass:: banterbot.gui.tk_interface.TKInterface
    :members:
@@ -52,14 +52,6 @@ TKInterface
 Subpackages
 -----------
 
-banterbot.config module
------------------------
-
-.. automodule:: banterbot.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. toctree::
    :maxdepth: 4
 
@@ -67,6 +59,7 @@ banterbot.config module
    banterbot.exceptions
    banterbot.extensions
    banterbot.gui
+   banterbot.handlers
    banterbot.managers
    banterbot.models
    banterbot.services

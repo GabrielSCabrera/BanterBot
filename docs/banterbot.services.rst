@@ -1,5 +1,5 @@
 banterbot.services package
-==============================
+==========================
 
 banterbot.services.openai\_service module
 -----------------------------------------
