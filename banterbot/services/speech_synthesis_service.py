@@ -51,6 +51,16 @@ class SpeechSynthesisService:
         self._stream_handlers = []
         self._stream_handlers_lock = threading.Lock()
 
+        # Initialize a blank result_id time data dictionary. This will be updated each time a synthesis starts/stops.
+        self._synthesis_data = {}
+
+        # Initialize a blank list of new result_ids. This will be updated each time a new stream is created.
+        self._new_result_ids = []
+        self._result_ids_lock = threading.Lock()
+
+        # Initialize a closeable queue for storing the words as they are synthesized.
+        self._queue = CloseableQueue()
+
     def interrupt(self, kill: bool = False) -> None:
         """
         Interrupts the current speech synthesis process.
@@ -59,6 +69,13 @@ class SpeechSynthesisService:
             kill (bool): Whether the interruption should kill the queues or not.
         """
         self._interrupt = time.perf_counter_ns()
+        for result_id in self._new_result_ids:
+            self._synthesis_data[result_id]["stop"] = (
+                time.perf_counter_ns()
+                if self._synthesis_data[result_id]["stop"] is None
+                else self._synthesis_data[result_id]["stop"]
+            )
+        self._new_result_ids.clear()
         with self._stream_handlers_lock:
             for handler in self._stream_handlers:
                 handler.interrupt(kill=kill)
@@ -79,17 +96,14 @@ class SpeechSynthesisService:
         # Record the time at which the synthesis was initialized pre-lock, in order to account for future interruptions.
         # Record the time at which the stream was initialized pre-lock, in order to account for future interruptions.
         init_time = time.perf_counter_ns() if init_time is None else init_time
-
-        with self.__class__._synthesis_lock:
-            if self._interrupt >= init_time:
-                return tuple()
-            else:
-                self._queue = CloseableQueue()
-                iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queue)
-                handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
-                with self._stream_handlers_lock:
-                    self._stream_handlers.append(handler)
-                return handler
+        if self._interrupt >= init_time:
+            return tuple()
+        else:
+            iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queue)
+            handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
+            with self._stream_handlers_lock:
+                self._stream_handlers.append(handler)
+            return handler
 
     def _init_synthesizer(self, output_format: SpeechSynthesisOutputFormat) -> None:
         """
@@ -116,7 +130,7 @@ class SpeechSynthesisService:
         self._connection = speechsdk.Connection.from_speech_synthesizer(self._synthesizer)
 
         # Preconnecting the speech synthesizer for reduced latency
-        self._connection.open(True)
+        self._connection.open(for_continuous_recognition=True)
 
     def _callback_completed(self, event: speechsdk.SessionEventArgs) -> None:
         """
@@ -126,6 +140,11 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.
         """
         logging.debug("SpeechSynthesisService disconnected")
+        self._synthesis_data[event._result.result_id]["stop"] = (
+            time.perf_counter_ns()
+            if self._synthesis_data[event._result.result_id]["stop"] is None
+            else self._synthesis_data[event._result.result_id]["stop"]
+        )
         self._queue.close()
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
@@ -136,7 +155,9 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
         """
         logging.debug("SpeechSynthesisService connected")
-        self._start_synthesis_time = time.perf_counter_ns()
+
+        self._synthesis_data[event._result._result_id] = {"start": time.perf_counter_ns(), "stop": None}
+        self._new_result_ids.append(event._result._result_id)
 
     @staticmethod
     @nb.njit(cache=True)
@@ -155,7 +176,7 @@ class SpeechSynthesisService:
         Returns:
             float: The offset of the word in the stream.
         """
-        return start_synthesis_time + 5e8 + 100 * audio_offset + 1e9 * total_seconds / word_length
+        return start_synthesis_time + 100 * audio_offset + 1e9 * total_seconds / word_length
 
     def _callback_word_boundary(self, event: speechsdk.SessionEventArgs) -> None:
         """
@@ -167,16 +188,20 @@ class SpeechSynthesisService:
         """
         # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
-            # Add the event and timing information to the list of events
-            self._queue.put(
-                {
-                    "event": event,
-                    "time": self._calculate_offset(
-                        start_synthesis_time=self._start_synthesis_time,
-                        audio_offset=event.audio_offset,
-                        total_seconds=event.duration.total_seconds(),
-                        word_length=event.word_length,
-                    ),
+
+            # Check if the result id matches the current result id
+            if (
+                self._synthesis_data[event.result_id]["stop"] is None
+                or self._synthesis_data[event.result_id]["stop"] > 100 * event.audio_offset
+            ):
+                time = self._calculate_offset(
+                    start_synthesis_time=self._synthesis_data[event._result_id]["start"],
+                    audio_offset=event.audio_offset,
+                    total_seconds=event.duration.total_seconds(),
+                    word_length=event.word_length,
+                )
+                data = {
+                    "time": time,
                     "word": Word(
                         text=(
                             event.text
@@ -187,7 +212,7 @@ class SpeechSynthesisService:
                         duration=event.duration,
                     ),
                 }
-            )
+                self._queue.put(data)
 
     def _callbacks_connect(self):
         """

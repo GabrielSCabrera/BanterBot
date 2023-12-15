@@ -127,11 +127,11 @@ class Interface(ABC):
             shutdown_time (Optional[int]): The time at which the listener was deactivated.
         """
         logging.debug(f"Interface Interrupted")
+        self._interrupt = time.perf_counter_ns() if not shutdown_time else shutdown_time
         self._openai_service.interrupt(kill=True)
         self._openai_service_tone.interrupt(kill=True)
         self._speech_recognition_service.interrupt(kill=False)
         self._speech_synthesis_service.interrupt(kill=True)
-        self._interrupt = time.perf_counter_ns() if not shutdown_time else shutdown_time
 
     def listener_activate(self, name: Optional[str] = None) -> None:
         """
@@ -145,14 +145,14 @@ class Interface(ABC):
         init_time = time.perf_counter_ns()
 
         with self._listening_active_lock:
-            if self._listening_toggle and self._interrupt < init_time:
+            if not self._listening_toggle and self._interrupt <= init_time:
                 self._listen_thread = threading.Thread(
                     target=self._listen,
                     kwargs={"init_time": init_time, "name": name},
                     daemon=True,
                 )
                 self._listen_thread.start()
-                self._listening_toggle = False
+                self._listening_toggle = True
 
     def listener_deactivate(self) -> None:
         """
@@ -161,9 +161,9 @@ class Interface(ABC):
         # Interrupt any currently active ChatCompletion, text-to-speech, or speech-to-text streams
         init_time = time.perf_counter_ns()
         with self._listening_inactive_lock:
-            if not self._listening_toggle and self._interrupt < init_time:
+            if self._listening_toggle and self._interrupt < init_time:
                 self._speech_recognition_service.interrupt()
-                self._listening_toggle = True
+                self._listening_toggle = False
 
     def prompt(self, message: str, name: Optional[str] = None) -> None:
         """

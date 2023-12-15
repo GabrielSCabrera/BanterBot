@@ -1,7 +1,7 @@
 import logging
 import threading
 import time
-from typing import Generator
+from typing import Generator, Optional
 
 import azure.cognitiveservices.speech as speechsdk
 import numba as nb
@@ -61,8 +61,7 @@ class SpeechSynthesisHandler:
             # Determine if a delay is needed to match the word's offset.
             dt = 1e-9 * (item["time"] - time.perf_counter_ns())
             # If a delay is needed, wait for the specified time.
-            if dt > 0:
-                time.sleep(dt if dt >= 0 else 0)
+            time.sleep(dt if dt >= 0 else 0)
 
             # Yield the word.
             yield item["word"]
@@ -74,13 +73,13 @@ class SpeechSynthesisHandler:
     @staticmethod
     @nb.njit(cache=True)
     def _jit_phrases_to_ssml(
-        texts: list[str],
-        short_names: list[str],
-        pitches: list[str],
-        rates: list[str],
-        styles: list[str],
-        styledegrees: list[str],
-        emphases: list[str],
+        texts: list[Optional[str]],
+        short_names: list[Optional[str]],
+        pitches: list[Optional[str]],
+        rates: list[Optional[str]],
+        styles: list[Optional[str]],
+        styledegrees: list[Optional[str]],
+        emphases: list[Optional[str]],
     ) -> str:
         """
         Creates a more advanced SSML string from the specified list of `Phrase` instances, that customizes the emphasis,
@@ -88,13 +87,13 @@ class SpeechSynthesisHandler:
         to speed up the process.
 
         Args:
-            texts (list[str]): The texts to be synthesized.
-            short_names (list[str]): The short names of the voices to use for each phrase.
-            pitches (list[str]): The pitches to use for each phrase.
-            rates (list[str]): The rates to use for each phrase.
-            styles (list[str]): The styles to use for each phrase.
-            styledegrees (list[str]): The style degrees to use for each phrase.
-            emphases (list[str]): The emphases to use for each phrase.
+            texts (list[Optional[str]]): The texts to be synthesized.
+            short_names (list[Optional[str]]): The short names of the voices to use for each phrase.
+            pitches (list[Optional[str]]): The pitches to use for each phrase.
+            rates (list[Optional[str]]): The rates to use for each phrase.
+            styles (list[Optional[str]]): The styles to use for each phrase.
+            styledegrees (list[Optional[str]]): The style degrees to use for each phrase.
+            emphases (list[Optional[str]]): The emphases to use for each phrase.
 
         Returns:
             str: The SSML string.
@@ -112,12 +111,12 @@ class SpeechSynthesisHandler:
             zip(texts, short_names, pitches, rates, styles, styledegrees, emphases)
         ):
             # Add contour only if there is a pitch transition
-            if pitch is not None and n < len(pitches) - 2 and pitch != pitches[n + 1]:
-                # Set the contour to begin transition at 50% of the current phrase to match the pitch of the next one.
-                contour = "(50%," + pitch + ") (80%," + pitches[n + 1] + ")"
-                pitch = ' contour="' + contour + '"'
-            elif pitch is not None:
-                pitch = ' pitch="' + pitch + '"'
+            if pitch:
+                if n < len(pitches) - 1 and pitches[n + 1] and pitch != pitches[n + 1]:
+                    # Set the contour to begin transition at 50% of the current phrase to match the pitch of the next one.
+                    pitch = ' contour="(50%,' + pitch + ") (80%," + pitches[n + 1] + ')"'
+                else:
+                    pitch = ' pitch="' + pitch + '"'
             else:
                 pitch = ""
 
@@ -165,19 +164,17 @@ class SpeechSynthesisHandler:
         Returns:
             str: The SSML string.
         """
-        texts, short_names, pitches, rates, styles, styledegrees, emphases = zip(
-            *[
-                (
-                    phrase.text,
-                    phrase.voice.short_name,
-                    phrase.pitch,
-                    str(phrase.rate),
-                    phrase.style,
-                    str(phrase.styledegree),
-                    phrase.emphasis,
-                )
-                for phrase in phrases
-            ]
-        )
+        texts, short_names, pitches, rates, styles, styledegrees, emphases = zip(*[
+            (
+                phrase.text,
+                phrase.voice.short_name,
+                phrase.pitch,
+                phrase.rate,
+                phrase.style,
+                phrase.styledegree,
+                phrase.emphasis,
+            )
+            for phrase in phrases
+        ])
 
         return cls._jit_phrases_to_ssml(texts, short_names, pitches, rates, styles, styledegrees, emphases)

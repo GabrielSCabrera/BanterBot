@@ -54,9 +54,9 @@ class Prosody:
         "unfriendly",
         "whispering",
     ]
-    STYLEDEGREES = {"x-weak": 0.90, "weak": 0.95, "normal": 1.0, "strong": 1.05, "x-strong": 1.10}
+    STYLEDEGREES = {"x-weak": "0.90", "weak": "0.95", "normal": "1.0", "strong": "1.05", "x-strong": "1.10"}
     PITCHES = {"x-low": "-0.5%", "low": "-0.25%", "normal": "+0%", "high": "+0.25%", "x-high": "+0.5%"}
-    RATES = {"x-slow": 0.85, "slow": 0.95, "normal": 1.0, "fast": 1.05, "x-fast": 1.15}
+    RATES = {"x-slow": "0.85", "slow": "0.95", "normal": "1.0", "fast": "1.05", "x-fast": "1.15"}
     EMPHASES = {"reduced": "reduced", "normal": "none", "exaggerated": "moderate"}
 
     # Compile a regex pattern using the delimiters specified in the config file, that are used to subdivide sentences.

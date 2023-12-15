@@ -7,7 +7,7 @@ from typing_extensions import Self
 from banterbot.utils.indexed_event import IndexedEvent
 
 
-class CloseableQueue(queue.Queue):
+class CloseableQueue:
     """
     A queue that can be closed to prevent further puts. This is useful for when you have a producer thread that you
     want to stop once it has finished producing items, but you don't want to stop the consumer thread from consuming
@@ -24,10 +24,8 @@ class CloseableQueue(queue.Queue):
     """
 
     def __init__(self, maxsize: int = 0) -> None:
-        super().__init__(maxsize=maxsize)
-        self._closed = False
-        self._killed = False
-        self._indexed_event = IndexedEvent()
+        self._maxsize = maxsize
+        self.reset()
 
     def close(self) -> None:
         self._closed = True
@@ -39,21 +37,30 @@ class CloseableQueue(queue.Queue):
         self._indexed_event.increment()
 
     def put(self, item: Any, block: bool = True, timeout: Optional[float] = None) -> None:
-        super().put(item, block, timeout)
+        self._queue.put(item, block, timeout)
         self._indexed_event.increment()
 
-    def finished(self) -> bool:
-        return self._closed and self.empty()
+    def get(self, block: bool = True, timeout: Optional[float] = None) -> Any:
+        return self._queue.get(block, timeout)
 
-    def __iter__(self) -> Generator[Any, None, bool]:
+    def finished(self) -> bool:
+        return self._closed and self._queue.empty()
+
+    def reset(self) -> None:
+        self._queue = queue.Queue(maxsize=self._maxsize)
+        self._closed = False
+        self._killed = False
+        self._indexed_event = IndexedEvent()
+
+    def __iter__(self) -> Generator[Any, None, None]:
         while not self.finished():
             self._indexed_event.wait()
             self._indexed_event.decrement()
             if self._killed:
-                return False
-            elif not self.empty():
-                yield super().get()
-        return True
+                break
+            elif not self._queue.empty():
+                yield self._queue.get()
+        self.reset()
 
     def __enter__(self) -> Self:
         return self
