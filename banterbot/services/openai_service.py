@@ -235,7 +235,7 @@ class OpenAIService:
                 response = self.__class__.client.chat.completions.create(**kwargs)
                 success = True
                 break
-
+                
             except openai.RateLimitError:
                 retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=RETRY_TIME)
                 retry_timestamp = datetime.datetime.strftime(retry_timestamp, "%H:%M:%S")
