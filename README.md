@@ -83,16 +83,20 @@ Start BanterBot with an enhanced graphical user interface by running the command
 Here is an example:
 
 ```bash
-banterbot --greet --model gpt-4-turbo --voice davis --prompt "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows." --name Grendel
+banterbot --greet --model gpt-4-turbo --voice davis --prompt "You are Grondle the Quiz Troll, a charismatic troll who loves to host quiz shows." --name Grondle
 ```
 
 Additionally, you can use `banterbot character` to select a pre-loaded character to interact with. For example:
 
 ```bash
-banterbot character android
+banterbot character therapist
 ```
 
-Will start a conversation with Marvin the Paranoid Android.
+Will start a conversation with Grendel the Therapy Troll. To list all available characters, run:
+
+```bash
+banterbot character -h
+```
 
 You can also use `banterbot voice-search` to search through all the available voices. For example:
 
