@@ -164,17 +164,19 @@ class SpeechSynthesisHandler:
         Returns:
             str: The SSML string.
         """
-        texts, short_names, pitches, rates, styles, styledegrees, emphases = zip(*[
-            (
-                phrase.text,
-                phrase.voice.short_name,
-                phrase.pitch,
-                phrase.rate,
-                phrase.style,
-                phrase.styledegree,
-                phrase.emphasis,
-            )
-            for phrase in phrases
-        ])
+        texts, short_names, pitches, rates, styles, styledegrees, emphases = zip(
+            *[
+                (
+                    phrase.text,
+                    phrase.voice.short_name,
+                    phrase.pitch,
+                    phrase.rate,
+                    phrase.style,
+                    phrase.styledegree,
+                    phrase.emphasis,
+                )
+                for phrase in phrases
+            ]
+        )
 
         return cls._jit_phrases_to_ssml(texts, short_names, pitches, rates, styles, styledegrees, emphases)

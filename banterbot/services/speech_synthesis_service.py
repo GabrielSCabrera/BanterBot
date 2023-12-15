@@ -188,7 +188,6 @@ class SpeechSynthesisService:
         """
         # Check if the type is not a sentence boundary
         if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
-
             # Check if the result id matches the current result id
             if (
                 self._synthesis_data[event.result_id]["stop"] is None
