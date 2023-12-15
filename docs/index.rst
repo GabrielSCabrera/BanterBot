@@ -91,16 +91,17 @@ Important Note
 
 BanterBot requires several spaCy language models to run, and will
 automatically download them on first-time initialization, if they
-are missing -- this process can sometimes take a while.
+are missing or incompatible -- this process can sometimes take a while.
 
 Pip (Recommended)
 ~~~~~~~~~~~~~~~~~
 
-BanterBot is installable using the Python Package Index (PyPi):
+BanterBot can be installed or updated using the Python Package Index (PyPi):
 
 .. code:: bash
 
-   python -m pip install banterbot
+   python -m pip install --upgrade banterbot
+
 
 Manual
 ~~~~~~
