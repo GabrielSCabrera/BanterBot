@@ -76,26 +76,17 @@ class ProsodySelector:
             Message(
                 role=ChatCompletionRoles.USER,
                 content=ProsodySelection.SUFFIX.value.format(
-                    style=len(self._voice.style_list),
-                    styledegree=len(Prosody.STYLEDEGREES),
-                    pitch=len(Prosody.PITCHES),
-                    rate=len(Prosody.RATES),
-                    emphasis=len(Prosody.EMPHASES),
+                    style=len(self._voice.style_list) - 1,
+                    styledegree=len(Prosody.STYLEDEGREES) - 1,
+                    pitch=len(Prosody.PITCHES) - 1,
+                    rate=len(Prosody.RATES) - 1,
+                    emphasis=len(Prosody.EMPHASES) - 1,
                 ),
             ),
             Message(role=ChatCompletionRoles.USER, content=ProsodySelection.EXAMPLE_USER.value),
             Message(role=ChatCompletionRoles.ASSISTANT, content=ProsodySelection.EXAMPLE_ASSISTANT_1.value),
             Message(role=ChatCompletionRoles.ASSISTANT, content=ProsodySelection.EXAMPLE_ASSISTANT_2.value),
         ]
-
-        # Given the possible ranges of Prosody settings, generate a regex pattern that asserts valid settings.
-        self._line_pattern = (
-            f"[0-{len(self._voice.style_list) // 10}][1-{min(len(self._voice.style_list), 9)}]"
-            f"[1-{len(Prosody.STYLEDEGREES)}]"
-            f"[1-{len(Prosody.PITCHES)}]"
-            f"[1-{len(Prosody.RATES)}]"
-            f"[1-{len(Prosody.EMPHASES)}]"
-        )
 
     def select(self, sentences: list[str], context: Optional[str] = None, system: Optional[str] = None) -> str:
         """
@@ -111,7 +102,6 @@ class ProsodySelector:
         Returns:
             str: The randomly selected option.
         """
-
         for i in range(RETRY_LIMIT):
             # Attempt several different sentence splits in order to modify the input on retry -- significantly reduces
             # the chance of raising a `FormatMismatchError` Exception. `RETRY_LIMIT` is defined in the config file.
@@ -178,7 +168,7 @@ class ProsodySelector:
         """
         # Compile a regex pattern that matches `N` lines of expected output from ChatCompletion's prosody evaluation.
         if N not in self._output_patterns:
-            self._output_patterns[N] = re.compile(f"{self._line_pattern}\n" * (N - 1) + self._line_pattern)
+            self._output_patterns[N] = re.compile(r"\d{6}\n" * (N - 1) + r"\d{6}")
 
         return self._output_patterns[N]
 
@@ -254,14 +244,38 @@ class ProsodySelector:
         Returns:
             Phrase: An instance of class `Phrase`.
         """
+        # style = self._voice.style_list[min(int(output[:2]), len(self._voice.style_list)) - 1]
+
+        indices = {
+            "style": [self._voice.style_list, str()],
+            "styledegree": [list(Prosody.STYLEDEGREES.values()), str()],
+            "pitch": [list(Prosody.PITCHES.values()), str()],
+            "rate": [list(Prosody.RATES.values()), str()],
+            "emphasis": [list(Prosody.EMPHASES.values()), str()],
+        }
+
+        kwargs = {}
+
+        for n, (key, value) in enumerate(indices.items()):
+            try:
+                if n == 0:
+                    idx = int(output[:2])
+                else:
+                    idx = int(output[n + 1])
+
+                if 0 <= idx < len(value[0]):
+                    value[1] = value[0][idx]
+                else:
+                    logging.debug(f"ProsodySelector failed to parse {key} from {output[n + 1]} as valid index")
+            except ValueError:
+                logging.debug(f"ProsodySelector failed to parse {key} from {output[n + 1]} as integer")
+
+            kwargs[key] = value[1]
+
         return Phrase(
             text=phrase,
             voice=self._voice,
-            style=self._voice.style_list[min(int(output[:2]), len(self._voice.style_list)) - 1],
-            styledegree=list(Prosody.STYLEDEGREES.values())[int(output[2]) - 1],
-            pitch=list(Prosody.PITCHES.values())[int(output[3]) - 1],
-            rate=list(Prosody.RATES.values())[int(output[4]) - 1],
-            emphasis=list(Prosody.EMPHASES.values())[int(output[5]) - 1],
+            **kwargs,
         )
 
     def _split_sentences(self, sentences: list[str]) -> tuple[list[str], int]:
@@ -281,7 +295,7 @@ class ProsodySelector:
         for sentence in sentences:
             result = re.split(Prosody.PHRASE_PATTERN, sentence)
             processed = []
-            for n, phrase in enumerate(result):
+            for phrase in result:
                 if phrase := phrase.strip():
                     if (not re.match(Prosody.PHRASE_PATTERN, phrase) and phrase.count(" ") > 1) or not processed:
                         processed.append(phrase)

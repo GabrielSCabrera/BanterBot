@@ -1,8 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
-
-from banterbot.data.enums import SpeechProcessingType, WordCategory
 
 
 @dataclass(frozen=True)
@@ -16,17 +13,11 @@ class Word:
         word (str): The word that has been synthesized/recognized.
         offset (datetime.timedelta): Time elapsed between initialization and synthesis/recognition.
         duration (datetime.timedelta): Amount of time required for the word to be fully spoken.
-        category (WordCategory): The category of the text contents.
-        confidence (Optional[int]): The confidence score (for speech-to-text) for the specified word.
-        source: SpeechProcessingType: Whether the word's source is text-to-speech (TTS) or speech-to-text (STT).
     """
 
-    word: str
+    text: str
     offset: datetime.timedelta
     duration: datetime.timedelta
-    category: WordCategory
-    source: SpeechProcessingType
-    confidence: Optional[float] = None
 
     def __len__(self) -> int:
         """
@@ -39,7 +30,7 @@ class Word:
         Returns:
             int: The length of the word.
         """
-        return len(self.word)
+        return len(self.text)
 
     def __str__(self) -> str:
         """
@@ -51,14 +42,7 @@ class Word:
         Returns:
             str: A string containing the word, the time elapsed since the beginning of speech synthesis, and its source.
         """
-        description = (
-            "<"
-            f"word: `{self.word}` "
-            f"| offset: {self.offset.seconds}s "
-            f"| duration: {self.duration.seconds}s "
-            f"| source: {self.source.name}"
-            ">"
-        )
+        description = f"<word: `{self.text}` | offset: {self.offset.seconds}s | duration: {self.duration.seconds}s>"
         return description
 
     def __repr__(self) -> str:
@@ -72,4 +56,4 @@ class Word:
         Returns:
             str: The word itself.
         """
-        return self.word
+        return self.text

@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Generator
 
 import spacy
@@ -9,7 +10,7 @@ from banterbot.data.enums import SpaCyLangModel
 class NLP:
     """
     A comprehensive toolkit that provides a set of Natural Language Processing utilities. It leverages the capabilities
-    of the SpaCy package. The toolkit is designed to automatically download the necessary models if they are not
+    of the spaCy package. The toolkit is designed to automatically download the necessary models if they are not
     available.
 
     One of the main features of this toolkit is the intelligent model selection mechanism. It is designed to select the
@@ -26,7 +27,7 @@ class NLP:
     }
 
     @classmethod
-    def install_all_models(cls) -> None:
+    def install_upgrade_all_models(cls) -> None:
         """
         Lazily checks if models are already installed, and installs any that are missing.
         """
@@ -46,14 +47,14 @@ class NLP:
     @classmethod
     def model(cls, name: str) -> spacy.language.Language:
         """
-        Returns the specified SpaCy model lazily by loading models the first time they are called, then storing them in
+        Returns the specified spaCy model lazily by loading models the first time they are called, then storing them in
         the `cls._models` dictionary.
 
         Args:
-            name (str): The name of the SpaCy model to return.
+            name (str): The name of the spaCy model to return.
 
         Returns:
-            spacy.language.Language: The requested SpaCy model.
+            spacy.language.Language: The requested spaCy model.
         """
         if name == "senter" and cls._models["senter"] is None:
             # Define a set of pipeline components to disable for the sentence senter.
@@ -94,7 +95,7 @@ class NLP:
     @classmethod
     def segment_sentences(cls, string: str, whitespace: bool = True) -> tuple[str, ...]:
         """
-        Splits a text string into individual sentences using a specialized SpaCy model. The model is a lightweight
+        Splits a text string into individual sentences using a specialized spaCy model. The model is a lightweight
         version of `en_core_web_sm` designed specifically for sentence segmentation.
 
         Args:
@@ -111,7 +112,7 @@ class NLP:
     @classmethod
     def segment_words(cls, string: str, whitespace: bool = True) -> tuple[str, ...]:
         """
-        Splits a text string into individual words using a specialized SpaCy model. The model is customized version of
+        Splits a text string into individual words using a specialized spaCy model. The model is customized version of
         `en_core_web_md` in which words are not split on apostrophes, in order to preserve contractions.
 
         Args:
@@ -132,7 +133,7 @@ class NLP:
     @classmethod
     def extract_keywords(cls, strings: list[str]) -> tuple[tuple[str, ...]]:
         """
-        Extracts keywords from a list of text strings using the `en_core_web_md` SpaCy model.
+        Extracts keywords from a list of text strings using the `en_core_web_md` spaCy model.
 
         Args:
             strings (list[str]): A list of strings.
@@ -159,34 +160,57 @@ class NLP:
     @classmethod
     def _download_model(cls, name: str) -> None:
         """
-        Downloads a SpaCy model by its name. It also provides information about the download process to the user.
+        Downloads a spaCy model by its name. It also provides information about the download process to the user.
 
         Args:
-            name (str): The name of the SpaCy model to download.
+            name (str): The name of the spaCy model to download.
         """
-        print(f'Downloading SpaCy language model: "{name}". This will only happen once.\n\n\n')
+        logging.info(f'Downloading spaCy language model "{name}". This will only happen once.\n\n\n')
         spacy.cli.download(name)
-        print(f'\n\n\nFinished download of SpaCy language model: "{name}".')
+        logging.info(f'\n\n\nFinished download of spaCy language model "{name}".')
+
+    @classmethod
+    def _update_model(cls, name: str) -> None:
+        """
+        Downloads a spaCy model by its name. It also provides information about the download process to the user.
+
+        Args:
+            name (str): The name of the spaCy model to download.
+        """
+        logging.info(f'Updating spaCy language model "{name}" for spaCy version {spacy.__version__}.\n\n\n')
+        spacy.cli.download(name)
+        logging.info(f'\n\n\nFinished update of spaCy language model "{name}" for spaCy version {spacy.__version__}.')
 
     @classmethod
     def _load_model(cls, *, name: str, **kwargs) -> spacy.language.Language:
         """
-        Loads a SpaCy model by its name. If the model is not available, it is downloaded automatically.
+        Loads a spaCy model by its name. If the model is not available, it is downloaded automatically.
 
         Args:
-            name (str): The name of the SpaCy model to load.
+            name (str): The name of the spaCy model to load.
             **kwargs: Additional keyword arguments for the spacy.load function.
 
         Returns:
-            spacy.language.Language: The loaded SpaCy model.
+            spacy.language.Language: The loaded spaCy model.
         """
+        # If the model is not available, download it.
         try:
             model = spacy.load(name, **kwargs)
         except OSError:
             cls._download_model(name)
             model = spacy.load(name, **kwargs)
+
+        # Version checking to ensure that the model is compatible with the installed version of spaCy.
+        model_version = re.match(r"(\d+\.\d+).\d+", model.meta["version"])[1]
+        spacy_version = re.match(r"(\d+\.\d+).\d+", spacy.__version__)[1]
+
+        # If the model is not compatible with the installed version of spaCy, update the model.
+        if model_version != spacy_version:
+            cls._update_model(name)
+            model = spacy.load(name, **kwargs)
+
         return model
 
 
 # Upon import, NLP downloads any missing required models.
-NLP.install_all_models()
+NLP.install_upgrade_all_models()

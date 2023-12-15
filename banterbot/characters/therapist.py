@@ -1,4 +1,4 @@
-from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKMultiplayerInterface, ToneMode
+from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKInterface
 
 
 def run() -> None:
@@ -6,6 +6,7 @@ def run() -> None:
     Runs the TKMultiplayerInterface for a custom-made character.
     """
     model = OpenAIModelManager.load("gpt-4-turbo")
+    tone_model = OpenAIModelManager.load("gpt-4-turbo")
     voice = AzureNeuralVoiceManager.load("Davis")
 
     style = "friendly"
@@ -17,17 +18,16 @@ def run() -> None:
         " anger amongst other emotions, and are extremely stupid and bad at your job, and have a tenuous grasp at"
         " English. You will do your best to help the patient with their problems. Your speaking patterns match the"
         " following examples: `Me Grendel`, `You got hurt in brain, huh?`, `How about: instead of do big thing, uh..."
-        " do little thing, every day.`, `No! Grendel not mean that!`. Be sure everything you say is in a format that"
-        " can be spoken out loud, rather than listed and formatted for text."
+        " do little thing, every day.`, `No! Grendel not mean that!`. Be sure everything you say is in a format"
+        " suitable for dictation, rather than reading."
     )
 
-    interface = TKMultiplayerInterface(
+    interface = TKInterface(
         model=model,
         voice=voice,
         style=style,
         system=system,
-        tone_mode=ToneMode.ADVANCED,
-        tone_mode_model=model,
+        tone_model=tone_model,
         languages="en-US",
         phrase_list=["Grendel"],
         assistant_name="Grendel",

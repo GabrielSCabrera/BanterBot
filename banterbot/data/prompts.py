@@ -74,9 +74,8 @@ class ProsodySelection(Enum):
         "there should be some variation across the output. The output should be in the following format (omit the "
         "spaces between the numbers):\n"
         "style styledegree pitch rate emphasis\n"
-        "Where style is a zero-padded number from 1 to {style}, styledegree is a digit from 1 to {styledegree}, pitch "
-        "is a digit from 1 to {pitch}, rate is a digit from 1 to {rate}, and emphasis is a digit from 1 to {emphasis}. "
-        "Invalid values include: zeros except for in the first digit (`011111` is ok, but `010111` is not)."
+        "Where style is a zero-padded number from 0 to {style}, styledegree is a digit from 0 to {styledegree}, pitch "
+        "is a digit from 0 to {pitch}, rate is a digit from 0 to {rate}, and emphasis is a digit from 0 to {emphasis}. "
         "Here is an example I want you to evaluate:"
     )
 
@@ -91,7 +90,7 @@ class ProsodySelection(Enum):
     )
 
     EXAMPLE_ASSISTANT_1 = DUMMY.format(6)
-    EXAMPLE_ASSISTANT_2 = "034532\n035443\n035543\n042321\n064233\n085123"
+    EXAMPLE_ASSISTANT_2 = "023421\n024332\n024432\n031210\n053122\n074012"
 
     CHARACTER = (
         "You will also need to consider character traits when crafting a response, taking care to select emotions that "

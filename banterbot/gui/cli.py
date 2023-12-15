@@ -3,8 +3,7 @@ import logging
 import textwrap
 
 from banterbot import characters
-from banterbot.data.enums import Prosody, ToneMode
-from banterbot.gui.tk_multiplayer_interface import TKMultiplayerInterface
+from banterbot.gui.tk_interface import TKInterface
 from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.openai_model_manager import OpenAIModelManager
 
@@ -168,7 +167,7 @@ def exec_main(args) -> None:
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    interface = TKMultiplayerInterface(**kwargs)
+    interface = TKInterface(**kwargs)
     interface.run(greet=args.greet)
 
 

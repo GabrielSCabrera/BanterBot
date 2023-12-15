@@ -23,7 +23,7 @@ Three environment variables are required for full functionality:
 
 ## Components
 
-### TKMultiplayerInterface
+### TKInterface
 
 A graphical user interface (GUI) establishes a multiplayer conversation environment where up to nine users can interact with the chatbot simultaneously. The GUI includes a conversation history area and user panels with 'Listen' buttons to process user input. It also supports key bindings for user convenience.
 
@@ -42,7 +42,7 @@ A class that provides an interface to convert spoken language into written text 
 
 ### Important Note
 
-BanterBot requires several SpaCy language models to run, and will automatically download them on first-time initialization, if they are missing -- this process can sometimes take a while.
+BanterBot requires several spaCy language models to run, and will automatically download them on first-time initialization, if they are missing -- this process can sometimes take a while.
 
 ### Pip (Recommended)
 
@@ -104,10 +104,10 @@ Will list all English (en) and French (fr) voice models. Run `banterbot voice-se
 
 ### Launch with a Python script
 
-To use BanterBot in a script, create an instance of the `TKMultiplayerInterface` class and call the `run` method:
+To use BanterBot in a script, create an instance of the `TKInterface` class and call the `run` method:
 
 ```python
-from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKMultiplayerInterface
+from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKInterface
 
 model = OpenAIModelManager.load("gpt-4-turbo")
 voice = AzureNeuralVoiceManager.load("Davis")
@@ -117,7 +117,7 @@ assistant_name = "Grendel"
 system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows."
 
 # The four arguments `model`, `voice`, `system`, and `assistant_name` are optional.
-interface = TKMultiplayerInterface(model=model, voice=voice, system=system, assistant_name=assistant_name)
+interface = TKInterface(model=model, voice=voice, system=system, assistant_name=assistant_name)
 
 # Setting `greet` to True instructs BanterBot to initiate the converstion. Otherwise, the user must initiate.
 interface.run(greet=True)

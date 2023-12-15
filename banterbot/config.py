@@ -15,8 +15,11 @@ SEED = 1337
 # The default language used in speech-to-text recognition
 DEFAULT_LANGUAGE = "en-US"
 
+# The default encoding format to use in reading/writing to file.
+ENCODING = "utf-8"
+
 # Set the log settings
-logging_level = logging.INFO
+logging_level = logging.CRITICAL
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging_level)
 
 # Define the type of UUID that should be used across all modules
@@ -26,4 +29,4 @@ generate_uuid = uuid6.uuid8
 PHRASE_DELIM = [",", ".", "?", "!", ":", ";", '"', "`", "|", "\n", "\t", "\r\n"]
 
 # The amount of time that should be added to a "soft interruption" as defined in class `SpeechToText`.
-INTERRUPTION_DELAY: datetime.timedelta = datetime.timedelta(seconds=0.75)
+INTERRUPTION_DELAY: datetime.timedelta = datetime.timedelta(seconds=1.0)

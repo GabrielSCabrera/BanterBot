@@ -13,6 +13,6 @@ banterbot.data.prompts module
 -----------------------------
 
 .. automodule:: banterbot.data.prompts
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

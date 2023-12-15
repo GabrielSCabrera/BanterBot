@@ -24,32 +24,14 @@ class ChatCompletionRoles(Enum):
     USER = "user"
 
 
-class WordCategory(Enum):
-    """
-    Word boundary categories for the Azure Speech API.
-    """
-
-    WORD = "word"
-    PUNCTUATION = "punctuation"
-
-
 class SpaCyLangModel(Enum):
     """
-    Names of SpaCy languge models.
+    Names of spaCy languge models.
     """
 
     EN_CORE_WEB_SM = "en_core_web_sm"
     EN_CORE_WEB_MD = "en_core_web_md"
     EN_CORE_WEB_LG = "en_core_web_lg"
-
-
-class SpeechProcessingType(Enum):
-    """
-    Speech processing category identifiers for the `Word` class.
-    """
-
-    TTS = "text-to-speech"
-    STT = "speech-to-text"
 
 
 class Prosody:
@@ -72,20 +54,10 @@ class Prosody:
         "unfriendly",
         "whispering",
     ]
-    STYLEDEGREES = {"x-weak": 0.85, "weak": 0.95, "normal": 1.0, "strong": 1.05, "x-strong": 1.15}
+    STYLEDEGREES = {"x-weak": "0.90", "weak": "0.95", "normal": "1.0", "strong": "1.05", "x-strong": "1.10"}
     PITCHES = {"x-low": "-0.5%", "low": "-0.25%", "normal": "+0%", "high": "+0.25%", "x-high": "+0.5%"}
-    RATES = {"x-slow": 0.85, "slow": 0.95, "normal": 1.0, "fast": 1.05, "x-fast": 1.15}
+    RATES = {"x-slow": "0.85", "slow": "0.95", "normal": "1.0", "fast": "1.05", "x-fast": "1.15"}
     EMPHASES = {"reduced": "reduced", "normal": "none", "exaggerated": "moderate"}
 
     # Compile a regex pattern using the delimiters specified in the config file, that are used to subdivide sentences.
     PHRASE_PATTERN = re.compile("([" + "".join(config.PHRASE_DELIM) + "]+)")
-
-
-class ToneMode:
-    """
-    Different possible settings for tones in class `Interface`.
-    """
-
-    NONE = None
-    BASIC = 1
-    ADVANCED = 2

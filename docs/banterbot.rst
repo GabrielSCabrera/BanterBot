@@ -40,19 +40,10 @@ Interface
    :special-members:
    :show-inheritance:
 
-TKMultiplayerInterface
-~~~~~~~~~~~~~~~~~~~~~~
+TKInterface
+~~~~~~~~~~~
 
-.. autoclass:: banterbot.gui.tk_multiplayer_interface.TKMultiplayerInterface
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
-
-TKSimpleInterface
-~~~~~~~~~~~~~~~~~
-
-.. autoclass:: banterbot.gui.tk_simple_interface.TKSimpleInterface
+.. autoclass:: banterbot.gui.tk_interface.TKInterface
    :members:
    :undoc-members:
    :special-members:
@@ -61,14 +52,6 @@ TKSimpleInterface
 Subpackages
 -----------
 
-banterbot.config module
------------------------
-
-.. automodule:: banterbot.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. toctree::
    :maxdepth: 4
 
@@ -76,6 +59,7 @@ banterbot.config module
    banterbot.exceptions
    banterbot.extensions
    banterbot.gui
+   banterbot.handlers
    banterbot.managers
    banterbot.models
    banterbot.services

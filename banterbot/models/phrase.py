@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 
@@ -13,8 +12,8 @@ class Phrase:
 
     text: str
     voice: AzureNeuralVoiceProfile
-    style: Optional[str] = None
-    styledegree: Optional[str] = None
-    pitch: Optional[str] = None
-    rate: Optional[str] = None
-    emphasis: Optional[str] = None
+    style: str = ""
+    styledegree: str = ""
+    pitch: str = ""
+    rate: str = ""
+    emphasis: str = ""

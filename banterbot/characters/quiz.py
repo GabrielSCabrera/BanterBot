@@ -1,4 +1,4 @@
-from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKMultiplayerInterface, ToneMode
+from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKInterface
 
 
 def run() -> None:
@@ -6,6 +6,7 @@ def run() -> None:
     Runs the TKMultiplayerInterface for a custom-made character.
     """
     model = OpenAIModelManager.load("gpt-4-turbo")
+    tone_model = OpenAIModelManager.load("gpt-4-turbo")
     voice = AzureNeuralVoiceManager.load("Davis")
 
     style = "excited"
@@ -25,13 +26,12 @@ def run() -> None:
         " out loud. Keep most of your responses brief if possible."
     )
 
-    interface = TKMultiplayerInterface(
+    interface = TKInterface(
         model=model,
         voice=voice,
         style=style,
         system=system,
-        tone_mode=ToneMode.ADVANCED,
-        tone_mode_model=model,
+        tone_model=tone_model,
         languages="en-US",
         phrase_list=["Grondle"],
         assistant_name="Grondle",
