@@ -1,6 +1,6 @@
 # For running tests: python -m unittest discover -s tests
 # For building: python setup.py sdist bdist_wheel
-# For formatting: autoflake --remove-all-unused-imports -r -i . | isort . | black --line-length 120 .
+# For formatting: autoflake --remove-all-unused-imports -r -i . | isort . | black --preview --line-length 120 .
 # For compiling protos: protoc --python_out=. memory.proto
 
 

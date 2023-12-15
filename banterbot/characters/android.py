@@ -3,7 +3,7 @@ from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKInterface
 
 def run() -> None:
     """
-    Runs the TKMultiplayerInterface for a custom-made character.
+    Runs the TKInterface for a custom-made character.
     """
     model = OpenAIModelManager.load("gpt-4-turbo")
     tone_model = OpenAIModelManager.load("gpt-4-turbo")

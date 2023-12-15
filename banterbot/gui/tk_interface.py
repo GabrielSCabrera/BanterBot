@@ -35,7 +35,7 @@ class TKInterface(tk.Tk, Interface):
         assistant_name: Optional[str] = None,
     ) -> None:
         """
-        Initialize the TKMultiplayerInterface class, which inherits from both tkinter.Tk and Interface.
+        Initialize the TKInterface class, which inherits from both tkinter.Tk and Interface.
 
         Args:
             model (OpenAIModel, optional): The OpenAI model to be used for generating responses.
@@ -46,7 +46,7 @@ class TKInterface(tk.Tk, Interface):
             tone_mode (bool): Which tone evaluation mode to use.
             phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
         """
-        logging.debug(f"TKMultiplayerInterface initialized")
+        logging.debug(f"TKInterface initialized")
 
         tk.Tk.__init__(self)
         Interface.__init__(
