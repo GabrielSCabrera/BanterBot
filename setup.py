@@ -11,14 +11,13 @@ from setuptools import find_packages, setup
 dependencies = [
     "azure-cognitiveservices-speech>=1.34.0",
     "numba>=0.58.1",
-    "numpy>=1.24.0,<1.25.0",
-    "openai>=1.3.0",
+    "numpy>=1.26.2",
+    "openai>=1.5.0",
     "protobuf==4.25.1",
     "requests>=2.31.0",
-    "spacy>=3.7.0",
-    "tiktoken>=0.5.0",
-    "torch>=1.12.0",
-    "uuid6>=2023.5.0",
+    "spacy>=3.7.2",
+    "tiktoken>=0.5.2",
+    "uuid6>=2023.5.2",
 ]
 
 description = (
@@ -38,7 +37,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.13"
+version = "0.0.14"
 setup(
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
@@ -47,7 +46,7 @@ setup(
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: End Users/Desktop",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Communications :: Chat",
         "Topic :: Multimedia :: Sound/Audio :: Speech",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
