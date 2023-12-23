@@ -78,6 +78,7 @@ setup(
     name="BanterBot",
     packages=find_packages(),
     package_data={"banterbot.protos": ["*.py"], "banterbot.resources": ["*"]},
+    python_requires=">=3.10",
     test_suite="setup.run_tests",
     url=url,
     version=version,

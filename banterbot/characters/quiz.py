@@ -9,8 +9,6 @@ def run() -> None:
     tone_model = OpenAIModelManager.load("gpt-4-turbo")
     voice = AzureNeuralVoiceManager.load("Davis")
 
-    style = "excited"
-
     # Optional system prompt to set up a custom character prior to initializing BanterBot.
     system = (
         "You are Grondle the Quiz Troll, an emotionally unstable troll who loves to host quiz shows. You have a"
@@ -29,7 +27,6 @@ def run() -> None:
     interface = TKInterface(
         model=model,
         voice=voice,
-        style=style,
         system=system,
         tone_model=tone_model,
         languages="en-US",

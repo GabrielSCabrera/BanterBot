@@ -31,7 +31,6 @@ class Interface(ABC):
         self,
         model: OpenAIModel,
         voice: AzureNeuralVoiceProfile,
-        style: str,
         languages: Optional[Union[str, list[str]]] = None,
         system: Optional[str] = None,
         tone_model: OpenAIModel = None,
@@ -39,17 +38,16 @@ class Interface(ABC):
         assistant_name: Optional[str] = None,
     ) -> None:
         """
-        Initialize the Interface with the specified model, voice, and style.
+        Initialize the Interface with the specified model and voice.
 
         Args:
             model (OpenAIModel): The OpenAI model to use for generating responses.
             voice (AzureNeuralVoice): The voice to use for text-to-speech synthesis.
-            style (str): The speaking style to use for text-to-speech synthesis.
             languages (Optional[Union[str, list[str]]]): The languages supported by the speech-to-text recognizer.
             system (Optional[str]): An initialization prompt that can be used to set the scene.
-            tone_mode (bool): Which tone evaluation mode to use.
-            tone_mode_model (OpenAIModel): The OpenAI ChatCompletion model to use for tone evaluation.
+            tone_model (OpenAIModel): The OpenAI ChatCompletion model to use for tone evaluation.
             phrase_list (list[str], optional): Optionally provide the recognizer with context to improve recognition.
+            assistant_name (str, optional): Optionally provide a name for the character.
         """
         logging.debug(f"Interface initialized")
         # Select the OpenAI ChatCompletion model for tone evaluation.
@@ -72,10 +70,9 @@ class Interface(ABC):
         # Initialize thread management components
         self._thread_queue = ThreadQueue()
 
-        # Initialize model, voice, style, and assistant name attributes
+        # Initialize model, voice, and assistant name attributes
         self._model = model
         self._voice = voice
-        self._style = style
         self._assistant_name = ChatCompletionRoles.ASSISTANT.value.title() if assistant_name is None else assistant_name
 
         # Initialize the ProsodySelector.

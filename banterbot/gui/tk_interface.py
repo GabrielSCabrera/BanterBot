@@ -27,7 +27,6 @@ class TKInterface(tk.Tk, Interface):
         self,
         model: OpenAIModel = OpenAIModelManager.load("gpt-3.5-turbo"),
         voice: AzureNeuralVoiceProfile = AzureNeuralVoiceManager.load("Aria"),
-        style: str = "chat",
         languages: Optional[Union[str, list[str]]] = None,
         tone_model: OpenAIModel = None,
         system: Optional[str] = None,
@@ -40,11 +39,11 @@ class TKInterface(tk.Tk, Interface):
         Args:
             model (OpenAIModel, optional): The OpenAI model to be used for generating responses.
             voice (AzureNeuralVoice, optional): The Azure Neural Voice to be used for text-to-speech.
-            style (str, optional): The style of the conversation (e.g., "cheerful", "sad", "chat").
             languages (Optional[Union[str, list[str]]]): The languages supported by the speech-to-text recognizer.
+            tone_model (OpenAIModel): The OpenAI ChatCompletion model to use for tone evaluation.
             system (Optional[str]): An initialization prompt that can be used to set the scene.
-            tone_mode (bool): Which tone evaluation mode to use.
             phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.
+            assistant_name (str, optional): Optionally provide a name for the character.
         """
         logging.debug(f"TKInterface initialized")
 
@@ -53,7 +52,6 @@ class TKInterface(tk.Tk, Interface):
             self,
             model=model,
             voice=voice,
-            style=style,
             languages=languages,
             system=system,
             tone_model=tone_model,

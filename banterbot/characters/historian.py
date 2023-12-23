@@ -9,8 +9,6 @@ def run() -> None:
     tone_model = OpenAIModelManager.load("gpt-4-turbo")
     voice = AzureNeuralVoiceManager.load("Tony")
 
-    style = "excited"
-
     # Optional system prompt to set up a custom character prior to initializing BanterBot.
     system = (
         "You are Blabberlore the Gnome Historian, a whimsically verbose and eccentric record-keeper of gnome lore. Your"
@@ -24,7 +22,6 @@ def run() -> None:
     interface = TKInterface(
         model=model,
         voice=voice,
-        style=style,
         system=system,
         tone_model=tone_model,
         languages="en-US",
