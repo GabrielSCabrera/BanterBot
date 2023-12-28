@@ -62,9 +62,20 @@ class TKInterface(tk.Tk, Interface):
         # Bind the `_quit` method to program exit, in order to guarantee the stopping of all running threads.
         self.protocol("WM_DELETE_WINDOW", self._quit)
 
+        # Flag and lock to indicate whether any keys are currently activating the listener.
+        self._key_down = False
+        self._key_down_lock = threading.Lock()
+
     def listener_activate(self, idx: int) -> None:
-        user_name = self.name_entries[idx].get().split(" ")[0].strip()
-        super().listener_activate(user_name)
+        with self._key_down_lock:
+            if not self._key_down:
+                self._key_down = True
+                user_name = self.name_entries[idx].get().split(" ")[0].strip()
+                return super().listener_activate(user_name)
+
+    def listener_deactivate(self) -> None:
+        self._key_down = False
+        return super().listener_deactivate()
 
     def request_response(self) -> None:
         if self._messages:
@@ -152,12 +163,12 @@ class TKInterface(tk.Tk, Interface):
 
             listen_button = ttk.Button(self.panel_frame, text="Listen", width=7)
             listen_button.grid(row=i, column=1, padx=(0, 5), pady=5, sticky="nsew")
-            listen_button.bind(f"<ButtonPress-1>", lambda event, i=i: self.listener_activate(i))
-            listen_button.bind(f"<ButtonRelease-1>", lambda event: self.listener_deactivate())
+            listen_button.bind(f"<ButtonPress-1>", lambda _, i=i: self.listener_activate(i))
+            listen_button.bind(f"<ButtonRelease-1>", lambda _: self.listener_deactivate())
             self.listen_buttons.append(listen_button)
 
-            self.bind(f"<KeyPress-{i+1}>", lambda event, i=i: self.listener_activate(i))
-            self.bind(f"<KeyRelease-{i+1}>", lambda event: self.listener_deactivate())
+            self.bind(f"<KeyPress-{i+1}>", lambda _, i=i: self.listener_activate(i))
+            self.bind(f"<KeyRelease-{i+1}>", lambda _: self.listener_deactivate())
 
         self.request_btn = ttk.Button(self.panel_frame, text="Respond", width=7)
         self.request_btn.grid(row=9, column=0, padx=(5, 0), pady=5, sticky="nsew")
