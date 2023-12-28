@@ -99,7 +99,9 @@ class SpeechSynthesisService:
                 uuid = uuid6.uuid8()
                 # Connect the speech synthesizer events to their corresponding callbacks
                 self._callbacks_connect(uuid=uuid)
-                iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queues[uuid])
+                iterable = SpeechSynthesisHandler(
+                    phrases=phrases, synthesizer=self._synthesizer, queue=self._queues[uuid]
+                )
                 handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
                 with self._stream_handlers_lock:
                     self._stream_handlers.append(handler)
@@ -151,7 +153,7 @@ class SpeechSynthesisService:
             logging.debug("SpeechSynthesisService disconnected")
             self._synthesis_data[uuid]["active"] = False
             self._queue.close()
-        
+
         return callback_completed
 
     def _callack_started_factory(self, uuid: uuid6.UUID):
@@ -246,7 +248,7 @@ class SpeechSynthesisService:
         """
         Connect the synthesis events to their corresponding callback methods.
         """
-        self._synthesizer.synthesis_started.connect(self._callback_started_factory(uuid=uuid)
+        self._synthesizer.synthesis_started.connect(self._callback_started_factory(uuid=uuid))
         self._synthesizer.synthesis_word_boundary.connect(self._callback_word_boundary_factory(uuid=uuid))
         self._synthesizer.synthesis_canceled.connect(self._callback_completed_factory(uuid=uuid))
         self._synthesizer.synthesis_completed.connect(self._callback_completed_factory(uuid=uuid))
