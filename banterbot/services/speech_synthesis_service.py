@@ -70,11 +70,7 @@ class SpeechSynthesisService:
         """
         self._interrupt = time.perf_counter_ns()
         for result_id in self._new_result_ids:
-            self._synthesis_data[result_id]["stop"] = (
-                time.perf_counter_ns()
-                if self._synthesis_data[result_id]["stop"] is None
-                else self._synthesis_data[result_id]["stop"]
-            )
+            self._synthesis_data[result_id]["active"] = False
         self._new_result_ids.clear()
         with self._stream_handlers_lock:
             for handler in self._stream_handlers:
@@ -140,11 +136,7 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.
         """
         logging.debug("SpeechSynthesisService disconnected")
-        self._synthesis_data[event._result.result_id]["stop"] = (
-            time.perf_counter_ns()
-            if self._synthesis_data[event._result.result_id]["stop"] is None
-            else self._synthesis_data[event._result.result_id]["stop"]
-        )
+        self._synthesis_data[event._result.result_id]["active"] = False
         self._queue.close()
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
@@ -156,7 +148,7 @@ class SpeechSynthesisService:
         """
         logging.debug("SpeechSynthesisService connected")
 
-        self._synthesis_data[event._result._result_id] = {"start": time.perf_counter_ns(), "stop": None}
+        self._synthesis_data[event._result._result_id] = {"start": time.perf_counter_ns(), "active": True}
         self._new_result_ids.append(event._result._result_id)
 
     @staticmethod
@@ -186,32 +178,27 @@ class SpeechSynthesisService:
         Args:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the word boundary.
         """
-        # Check if the type is not a sentence boundary
-        if event.boundary_type != speechsdk.SpeechSynthesisBoundaryType.Sentence:
-            # Check if the result id matches the current result id
-            if (
-                self._synthesis_data[event.result_id]["stop"] is None
-                or self._synthesis_data[event.result_id]["stop"] > 100 * event.audio_offset
-            ):
-                time = self._calculate_offset(
-                    start_synthesis_time=self._synthesis_data[event._result_id]["start"],
-                    audio_offset=event.audio_offset,
-                    total_seconds=event.duration.total_seconds(),
-                    word_length=event.word_length,
-                )
-                data = {
-                    "time": time,
-                    "word": Word(
-                        text=(
-                            event.text
-                            if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation
-                            else " " + event.text
-                        ),
-                        offset=datetime.timedelta(microseconds=event.audio_offset / 10),
-                        duration=event.duration,
+        # Check if the event is still active based on the result_id.
+        if self._synthesis_data[event.result_id]["active"]:
+            time = self._calculate_offset(
+                start_synthesis_time=self._synthesis_data[event._result_id]["start"],
+                audio_offset=event.audio_offset,
+                total_seconds=event.duration.total_seconds(),
+                word_length=event.word_length,
+            )
+            data = {
+                "time": time,
+                "word": Word(
+                    text=(
+                        event.text
+                        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation
+                        else " " + event.text
                     ),
-                }
-                self._queue.put(data)
+                    offset=datetime.timedelta(microseconds=event.audio_offset / 10),
+                    duration=event.duration,
+                ),
+            }
+            self._queue.put(data)
 
     def _callbacks_connect(self):
         """
