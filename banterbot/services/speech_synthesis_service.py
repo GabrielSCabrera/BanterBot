@@ -38,8 +38,11 @@ class SpeechSynthesisService:
             output_format (SpeechSynthesisOutputFormat, optional): The desired output format for the synthesized speech.
             Default is Audio16Khz32KBitRateMonoMp3.
         """
+        # Initialize the output format
+        self._output_format = output_format
+
         # Initialize the speech synthesizer with the specified output format
-        self._init_synthesizer(output_format=output_format)
+        self._init_synthesizer(output_format=self._output_format)
 
         # Initialize the queue for storing the words as they are synthesized
         self._queue = CloseableQueue()
@@ -58,7 +61,11 @@ class SpeechSynthesisService:
             kill (bool): Whether the interruption should kill the queues or not.
         """
         self._interrupt = time.perf_counter_ns()
-        self._queue.kill()
+        self._queue.close()
+        # Closing the connection to the speech synthesizer.
+        self._connection.close()
+        # Reinitialize the speech synthesizer with the default output format
+        self._init_synthesizer(output_format=self._output_format)
         logging.debug(f"SpeechSynthesisService Interrupted")
 
     def synthesize(self, phrases: list[Phrase], init_time: Optional[int] = None) -> Generator[Word, None, None]:
