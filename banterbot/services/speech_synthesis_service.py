@@ -3,6 +3,7 @@ import logging
 import os
 import threading
 import time
+from collections.abc import Generator
 from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
@@ -11,8 +12,6 @@ from azure.cognitiveservices.speech import SpeechSynthesisOutputFormat
 
 from banterbot.data.enums import EnvVar
 from banterbot.handlers.speech_synthesis_handler import SpeechSynthesisHandler
-from banterbot.handlers.stream_handler import StreamHandler
-from banterbot.managers.stream_manager import StreamManager
 from banterbot.models.phrase import Phrase
 from banterbot.models.word import Word
 from banterbot.utils.closeable_queue import CloseableQueue
@@ -39,29 +38,22 @@ class SpeechSynthesisService:
             output_format (SpeechSynthesisOutputFormat, optional): The desired output format for the synthesized speech.
             Default is Audio16Khz32KBitRateMonoMp3.
         """
-        self._init_synthesizer(output_format=output_format)
+        # Initialize the output format
+        self._output_format = output_format
 
-        # Initialize the StreamManager for handling streaming processes.
-        self._stream_manager = StreamManager()
+        # Initialize the speech synthesizer with the specified output format
+        self._init_synthesizer(output_format=self._output_format)
+
+        # Initialize the queue for storing the words as they are synthesized
+        self._queue = CloseableQueue()
+
+        # The iterable that is currently being iterated over
+        self._iterable: Optional[SpeechSynthesisHandler] = None
 
         # The latest interruption time.
         self._interrupt = 0
 
-        # A list of active stream handlers.
-        self._stream_handlers = []
-        self._stream_handlers_lock = threading.Lock()
-
-        # Initialize a blank result_id time data dictionary. This will be updated each time a synthesis starts/stops.
-        self._synthesis_data = {}
-
-        # Initialize a blank list of new result_ids. This will be updated each time a new stream is created.
-        self._new_result_ids = []
-        self._result_ids_lock = threading.Lock()
-
-        # Initialize a closeable queue for storing the words as they are synthesized.
-        self._queue = CloseableQueue()
-
-    def interrupt(self, kill: bool = False) -> None:
+    def interrupt(self) -> None:
         """
         Interrupts the current speech synthesis process.
 
@@ -69,16 +61,14 @@ class SpeechSynthesisService:
             kill (bool): Whether the interruption should kill the queues or not.
         """
         self._interrupt = time.perf_counter_ns()
-        for result_id in self._new_result_ids:
-            self._synthesis_data[result_id]["active"] = False
-        self._new_result_ids.clear()
-        with self._stream_handlers_lock:
-            for handler in self._stream_handlers:
-                handler.interrupt(kill=kill)
-            self._stream_handlers.clear()
+        self._queue.close()
+        # Closing the connection to the speech synthesizer.
+        self._connection.close()
+        # Reinitialize the speech synthesizer with the default output format
+        self._init_synthesizer(output_format=self._output_format)
         logging.debug(f"SpeechSynthesisService Interrupted")
 
-    def synthesize(self, phrases: list[Phrase], init_time: Optional[int] = None) -> StreamHandler:
+    def synthesize(self, phrases: list[Phrase], init_time: Optional[int] = None) -> Generator[Word, None, None]:
         """
         Synthesizes the given phrases into speech and returns a handler for the stream of synthesized words.
 
@@ -90,16 +80,18 @@ class SpeechSynthesisService:
             StreamHandler: A handler for the stream of synthesized words.
         """
         # Record the time at which the synthesis was initialized pre-lock, in order to account for future interruptions.
-        # Record the time at which the stream was initialized pre-lock, in order to account for future interruptions.
         init_time = time.perf_counter_ns() if init_time is None else init_time
-        if self._interrupt >= init_time:
-            return tuple()
-        else:
-            iterable = SpeechSynthesisHandler(phrases=phrases, synthesizer=self._synthesizer, queue=self._queue)
-            handler = self._stream_manager.stream(iterable=iterable, close_stream=iterable.close)
-            with self._stream_handlers_lock:
-                self._stream_handlers.append(handler)
-            return handler
+        with self.__class__._synthesis_lock:
+            if self._interrupt >= init_time:
+                return tuple()
+            else:
+                self._queue.reset()
+                self._iterable = SpeechSynthesisHandler(
+                    phrases=phrases, synthesizer=self._synthesizer, queue=self._queue
+                )
+
+                for i in self._iterable:
+                    yield i
 
     def _init_synthesizer(self, output_format: SpeechSynthesisOutputFormat) -> None:
         """
@@ -136,7 +128,6 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.
         """
         logging.debug("SpeechSynthesisService disconnected")
-        self._synthesis_data[event.result.result_id]["active"] = False
         self._queue.close()
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
@@ -147,9 +138,7 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.
         """
         logging.debug("SpeechSynthesisService connected")
-
-        self._synthesis_data[event.result.result_id] = {"start": time.perf_counter_ns(), "active": True}
-        self._new_result_ids.append(event._result._result_id)
+        self._synthesis_start = time.perf_counter_ns()
 
     @staticmethod
     @nb.njit(cache=True)
@@ -179,26 +168,25 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the word boundary.
         """
         # Check if the event is still active based on the result_id.
-        if self._synthesis_data[event.result_id]["active"]:
-            time = self._calculate_offset(
-                start_synthesis_time=self._synthesis_data[event._result_id]["start"],
-                audio_offset=event.audio_offset,
-                total_seconds=event.duration.total_seconds(),
-                word_length=event.word_length,
-            )
-            data = {
-                "time": time,
-                "word": Word(
-                    text=(
-                        event.text
-                        if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation
-                        else " " + event.text
-                    ),
-                    offset=datetime.timedelta(microseconds=event.audio_offset / 10),
-                    duration=event.duration,
+        time = self._calculate_offset(
+            start_synthesis_time=self._synthesis_start,
+            audio_offset=event.audio_offset,
+            total_seconds=event.duration.total_seconds(),
+            word_length=event.word_length,
+        )
+        data = {
+            "time": time,
+            "word": Word(
+                text=(
+                    event.text
+                    if event.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Punctuation
+                    else " " + event.text
                 ),
-            }
-            self._queue.put(data)
+                offset=datetime.timedelta(microseconds=event.audio_offset / 10),
+                duration=event.duration,
+            ),
+        }
+        self._queue.put(data)
 
     def _callbacks_connect(self):
         """

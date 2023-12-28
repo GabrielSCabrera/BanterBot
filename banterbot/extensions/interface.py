@@ -93,28 +93,6 @@ class Interface(ABC):
         # Initialize the subclass GUI
         self._init_gui()
 
-    @property
-    def listening(self) -> bool:
-        """
-        If the current instance of `SpeechSynthesisService` is in the process of listening, returns True. Otherwise,
-        returns False.
-
-        Args:
-            bool: The listening state of the current instance.
-        """
-        return self._speech_recognition_service._listening
-
-    @property
-    def speaking(self) -> bool:
-        """
-        If the current instance of `SpeechRecognitionService` is in the process of speaking, returns True. Otherwise,
-        returns False.
-
-        Args:
-            bool: The speaking state of the current instance.
-        """
-        return self._speech_synthesis_service.speaking
-
     def interrupt(self, shutdown_time: Optional[int] = None) -> None:
         """
         Interrupts all speech-to-text recognition, text-to-speech synthesis, and OpenAI API streams.
@@ -127,8 +105,8 @@ class Interface(ABC):
         self._interrupt = time.perf_counter_ns() if not shutdown_time else shutdown_time
         self._openai_service.interrupt(kill=True)
         self._openai_service_tone.interrupt(kill=True)
-        self._speech_recognition_service.interrupt(kill=False)
-        self._speech_synthesis_service.interrupt(kill=True)
+        self._speech_recognition_service.interrupt()
+        self._speech_synthesis_service.interrupt()
 
     def listener_activate(self, name: Optional[str] = None) -> None:
         """
@@ -279,8 +257,8 @@ class Interface(ABC):
                 raise FormatMismatchError()
 
             for item in self._speech_synthesis_service.synthesize(phrases=phrases, init_time=init_time):
-                self.update_conversation_area(item.value.text)
-                content += item.value.text
+                self.update_conversation_area(item.text)
+                content += item.text
 
         if self._interrupt < init_time and content.strip():
             message = Message(role=ChatCompletionRoles.ASSISTANT, content=content.strip())
