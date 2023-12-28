@@ -28,5 +28,5 @@ generate_uuid = uuid6.uuid8
 # Define the punctuation marks that can be used to split sentences into phrases for prosody selection.
 PHRASE_DELIM = [",", ".", "?", "!", ":", ";", '"', "`", "|", "\n", "\t", "\r\n"]
 
-# The amount of time that should be added to a "soft interruption" as defined in class `SpeechToText`.
-INTERRUPTION_DELAY: datetime.timedelta = datetime.timedelta(seconds=1.0)
+# The amount of time that should be added to a "soft interruption" as defined in class `SpeechRecognitionService`.
+INTERRUPTION_DELAY: datetime.timedelta = datetime.timedelta(seconds=0.5)

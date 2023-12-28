@@ -3,7 +3,7 @@ import random
 from typing_extensions import Self
 
 from banterbot.managers.resource_manager import ResourceManager
-from repo.banterbot.paths import primary_traits
+from banterbot.paths import primary_traits
 
 
 class PrimaryTrait:
