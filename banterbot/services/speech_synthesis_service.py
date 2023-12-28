@@ -136,7 +136,7 @@ class SpeechSynthesisService:
             event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.
         """
         logging.debug("SpeechSynthesisService disconnected")
-        self._synthesis_data[event._result.result_id]["active"] = False
+        self._synthesis_data[event.result.result_id]["active"] = False
         self._queue.close()
 
     def _callback_started(self, event: speechsdk.SessionEventArgs) -> None:
@@ -148,7 +148,7 @@ class SpeechSynthesisService:
         """
         logging.debug("SpeechSynthesisService connected")
 
-        self._synthesis_data[event._result._result_id] = {"start": time.perf_counter_ns(), "active": True}
+        self._synthesis_data[event.result.result_id] = {"start": time.perf_counter_ns(), "active": True}
         self._new_result_ids.append(event._result._result_id)
 
     @staticmethod
