@@ -67,8 +67,7 @@ class SpeechSynthesisHandler:
             yield item["word"]
             logging.debug(f"SpeechSynthesisHandler yielded word: `{item['word']}`")
 
-    def close(self):
-        self._synthesizer.stop_speaking_async()
+        self._synthesizer.stop_speaking()
 
     @staticmethod
     @nb.njit(cache=True)
