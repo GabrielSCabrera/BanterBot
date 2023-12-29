@@ -123,7 +123,7 @@ system = "You are Grendel the Quiz Troll, a charismatic troll who loves to host 
 # The four arguments `model`, `voice`, `system`, and `assistant_name` are optional.
 interface = TKInterface(model=model, voice=voice, system=system, assistant_name=assistant_name)
 
-# Setting `greet` to True instructs BanterBot to initiate the converstion. Otherwise, the user must initiate.
+# Setting `greet` to True instructs BanterBot to initiate the conversation. Otherwise, the user must initiate.
 interface.run(greet=True)
 ```
 
