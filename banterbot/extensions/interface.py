@@ -9,6 +9,7 @@ from banterbot import config
 from banterbot.data.enums import ChatCompletionRoles
 from banterbot.exceptions.format_mismatch_error import FormatMismatchError
 from banterbot.extensions.prosody_selector import ProsodySelector
+from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
 from banterbot.managers.openai_model_manager import OpenAIModelManager
 from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.message import Message
@@ -50,8 +51,13 @@ class Interface(ABC):
             assistant_name (str, optional): Optionally provide a name for the character.
         """
         logging.debug(f"Interface initialized")
-        # Select the OpenAI ChatCompletion model for tone evaluation.
-        tone_model = OpenAIModelManager.load("gpt-3.5-turbo") if tone_model is None else tone_model
+
+        # Select the default Azure Neural Voice model if not provided.
+        self._voice = AzureNeuralVoiceManager.load("Aria") if voice is None else voice
+        # Select the default OpenAI ChatCompletion model.
+        self._model = OpenAIModelManager.load("gpt-3.5-turbo") if model is None else model
+        # Select the default OpenAI ChatCompletion model for tone evaluation.
+        self._tone_model = OpenAIModelManager.load("gpt-3.5-turbo") if tone_model is None else tone_model
 
         # Initialize OpenAI ChatCompletion, Azure Speech-to-Text, and Azure Text-to-Speech components
         self._openai_service = OpenAIService(model=model)
@@ -70,9 +76,7 @@ class Interface(ABC):
         # Initialize thread management components
         self._thread_queue = ThreadQueue()
 
-        # Initialize model, voice, and assistant name attributes
-        self._model = model
-        self._voice = voice
+        # Initialize assistant name attribute
         self._assistant_name = ChatCompletionRoles.ASSISTANT.value.title() if assistant_name is None else assistant_name
 
         # Initialize the ProsodySelector.

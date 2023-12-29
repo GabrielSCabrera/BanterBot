@@ -10,7 +10,7 @@ banterbot.services.openai\_service module
    :show-inheritance:
 
 banterbot.services.speech\_synthesis\_service module
----------------------------------------------------
+----------------------------------------------------
 
 .. automodule:: banterbot.services.speech_synthesis_service
    :members:

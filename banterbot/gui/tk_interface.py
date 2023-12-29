@@ -8,8 +8,6 @@ from typing import Optional, Union
 
 from banterbot.data.prompts import Greetings
 from banterbot.extensions.interface import Interface
-from banterbot.managers.azure_neural_voice_manager import AzureNeuralVoiceManager
-from banterbot.managers.openai_model_manager import OpenAIModelManager
 from banterbot.models.azure_neural_voice_profile import AzureNeuralVoiceProfile
 from banterbot.models.openai_model import OpenAIModel
 
@@ -26,8 +24,8 @@ class TKInterface(tk.Tk, Interface):
 
     def __init__(
         self,
-        model: OpenAIModel = OpenAIModelManager.load("gpt-3.5-turbo"),
-        voice: AzureNeuralVoiceProfile = AzureNeuralVoiceManager.load("Aria"),
+        model: Optional[OpenAIModel] = None,
+        voice: Optional[AzureNeuralVoiceProfile] = None,
         languages: Optional[Union[str, list[str]]] = None,
         tone_model: OpenAIModel = None,
         system: Optional[str] = None,
