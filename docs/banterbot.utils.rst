@@ -32,11 +32,3 @@ banterbot.utils.thread\_queue module
    :members:
    :undoc-members:
    :show-inheritance:
-
-banterbot.utils.time\_resolver module
--------------------------------------
-
-.. automodule:: banterbot.utils.time_resolver
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -33,11 +33,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -v sphinx cython sphinx_rtd_theme
-          pip install -v openai tiktoken requests azure-cognitiveservices-speech spacy uuid6 protobuf
+          pip install -v azure-cognitiveservices-speech numba numpy openai protobuf requests spacy tiktoken uuid6
           # Ensure you have the correct URLs for the models, if they're needed
-          pip install -v en_core_web_lg@https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.5.0/en_core_web_lg-3.5.0.tar.gz
-          pip install -v en_core_web_md@https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.5.0/en_core_web_md-3.5.0.tar.gz
-          pip install -v en_core_web_sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0.tar.gz
+          pip install -v en_core_web_lg@https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1.tar.gz
+          pip install -v en_core_web_md@https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.7.1/en_core_web_md-3.7.1.tar.gz
+          pip install -v en_core_web_sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
       
       - name: Sphinx build
         run: |
