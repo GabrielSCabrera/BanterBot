@@ -1,0 +1,646 @@
+{
+    "018cb6ab-908e-83a7-bbc4-484976e2a4ea": {
+        "name": "Innate Diplomacy",
+        "description": "Naturally adept at navigating complex social situations and mediating disputes.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                4,
+                5
+            ],
+            "018cb674-43d2-811e-aeb3-c125df6f3ded": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908e-83a7-bc0a-ba719af4744a": {
+        "name": "Exceptional Resilience",
+        "description": "Remarkably recovers from setbacks and stress, maintaining a positive outlook even under severe conditions.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908e-83a7-bc77-9843cb6e7d0a": {
+        "name": "Cultural Chameleon",
+        "description": "Can blend into almost any cultural setting, understanding and adopting new norms and languages with ease.",
+        "derived_from": {
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                4,
+                5
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                3,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908e-83a7-bca2-1e5d5608c5c7": {
+        "name": "Natural Networker",
+        "description": "Exceptionally skilled at forming and maintaining wide social networks.",
+        "derived_from": {
+            "018cb674-43d2-811e-ae62-963ec62474d0": [
+                3,
+                5
+            ],
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                3,
+                4
+            ]
+        }
+    },
+    "018cb6ab-908e-83a7-bcdf-c17f0575a664": {
+        "name": "Practical Problem-Solver",
+        "description": "Known for their pragmatic approach to solving problems.",
+        "derived_from": {
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                3,
+                4
+            ],
+            "018cb674-43d2-891d-bb3a-44d953d66e4d": [
+                2,
+                3
+            ]
+        }
+    },
+    "018cb6ab-908e-8ba6-ad45-1fe6a621389e": {
+        "name": "Reliable Friend",
+        "description": "Notably dependable and trustworthy in personal relationships.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                3,
+                4
+            ],
+            "018cb674-43d2-811e-ae62-963ec62474d0": [
+                3,
+                4
+            ]
+        }
+    },
+    "018cb6ab-908e-8ba6-adbc-57db4a17f929": {
+        "name": "Calm Under Pressure",
+        "description": "Remains composed and effective during stressful situations.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                4,
+                5
+            ],
+            "018cb674-43d2-811e-aeb3-c125df6f3ded": [
+                3,
+                4
+            ]
+        }
+    },
+    "018cb6ab-908e-8ba6-adf1-bc4082307ada": {
+        "name": "Procrastinator",
+        "description": "Tends to delay or postpone tasks habitually.",
+        "derived_from": {
+            "018cb674-43d2-891d-bb3a-44d953d66e4d": [
+                1,
+                2
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908e-8ba6-ae1e-86559890947b": {
+        "name": "Impulsive Buyer",
+        "description": "Makes purchases on a whim without considering long-term consequences.",
+        "derived_from": {
+            "018cb674-43d2-891d-bb3a-44d953d66e4d": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908e-8ba6-ae53-e0fdbff00501": {
+        "name": "Chronic Complainer",
+        "description": "Frequently focuses on the negative aspects of situations.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                1,
+                2
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908e-8ba6-aeab-1bc9bcc48837": {
+        "name": "Astute Observer",
+        "description": "Exceptionally perceptive about minute details others often miss.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                4,
+                5
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908e-8ba6-aee4-306fe1ea9e73": {
+        "name": "Effortless Charmer",
+        "description": "Naturally charismatic, effortlessly draws people in.",
+        "derived_from": {
+            "018cb674-43d2-811e-ae62-963ec62474d0": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-8767-ca6004691908": {
+        "name": "Innovative Thinker",
+        "description": "Consistently comes up with novel and effective solutions.",
+        "derived_from": {
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-87b8-8f5f2f13a111": {
+        "name": "Unyielding Integrity",
+        "description": "Holds to their moral and ethical standards under all circumstances.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-bb3a-44d953d66e4d": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-87fe-5cfc6d271c3a": {
+        "name": "Unwavering Focus",
+        "description": "Maintains concentration and avoids distractions, even in chaotic environments.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                4,
+                5
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                3,
+                4
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-8853-24a495817a11": {
+        "name": "Perpetual Optimist",
+        "description": "Always sees the positive side, no matter the circumstances.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-88a2-1406102edbfa": {
+        "name": "Razor-Sharp Wit",
+        "description": "Quickly and cleverly responds or comments, often humorously.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                3,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-88fb-29ae6660ef49": {
+        "name": "Meticulous Planner",
+        "description": "Exceptionally good at planning and forecasting, down to the smallest detail.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba2b-7ca494e026af": [
+                4,
+                5
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-8913-0d07ee8135e3": {
+        "name": "Instinctive Protector",
+        "description": "Innately senses threats and acts to protect themselves and others.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-894b-9bf48b3bd880": {
+        "name": "Disarming Honesty",
+        "description": "Speaks the truth plainly and openly, often breaking tension or conflict.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                3,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-89ac-f4494c58dbf3": {
+        "name": "Stoic Endurance",
+        "description": "Endures hardships without complaint or visible discomfort.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                4,
+                5
+            ],
+            "018cb674-43d2-811e-aeb3-c125df6f3ded": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-89fc-a8b196dbeca6": {
+        "name": "Habitual Doubter",
+        "description": "Constantly questions or doubts decisions and intentions, both their own and others'.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                2
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-8a30-aa2add8c8ef2": {
+        "name": "Overindulgent",
+        "description": "Regularly gives in to temptations and overindulges in pleasures.",
+        "derived_from": {
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                4,
+                5
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                4,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-8a65-2cfccd49d29b": {
+        "name": "Cautious to a Fault",
+        "description": "Excessively cautious, often to the point of paralysis or missed opportunities.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                1,
+                2
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-8a8e-3021938134c0": {
+        "name": "Blunt Critic",
+        "description": "Often overly critical and blunt, hurting feelings without intending to.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                1,
+                2
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908f-83a7-8ae3-52eb01f59692": {
+        "name": "Reluctant Leader",
+        "description": "Takes charge only when absolutely necessary and prefers not to lead.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba2b-7ca494e026af": [
+                1,
+                2
+            ],
+            "018cb674-43d2-811e-ae62-963ec62474d0": [
+                1,
+                2
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a4c5-8ae02184869a": {
+        "name": "Absolute Memory",
+        "description": "Possesses a flawless and precise memory, recalling every detail perfectly.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                5,
+                5
+            ],
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a534-fbbb470f551a": {
+        "name": "Emotional Void",
+        "description": "Completely lacks emotional response, appearing detached from all situations.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                1
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a56d-b9ffc2fe3259": {
+        "name": "Hyper-Intuition",
+        "description": "Has an uncanny ability to 'feel' the right choice or path, often without logical explanation.",
+        "derived_from": {
+            "018cb674-43d2-811e-ae62-963ec62474d0": [
+                5,
+                5
+            ],
+            "018cb674-43d2-811e-aeb3-c125df6f3ded": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a599-9a5266066985": {
+        "name": "Inhuman Endurance",
+        "description": "Can withstand extreme physical and mental challenges beyond normal human limits.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                5,
+                5
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a5f7-988b62ae89c4": {
+        "name": "Supreme Charisma",
+        "description": "Exerts an almost supernatural charm and influence over others.",
+        "derived_from": {
+            "018cb674-43d2-811e-ae62-963ec62474d0": [
+                5,
+                5
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a619-ad881a126879": {
+        "name": "Mind's Fortress",
+        "description": "Impervious to psychological stress or manipulation, maintains mental integrity at all times.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                5,
+                5
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a661-689130731644": {
+        "name": "Transcendent Insight",
+        "description": "Possesses a deep understanding and awareness of the world, almost as if seeing beyond the material.",
+        "derived_from": {
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                5,
+                5
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a686-3f541373ab92": {
+        "name": "Master Manipulator",
+        "description": "Exercises control and influence over others in an almost imperceptible manner.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                5,
+                5
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                1
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a6d7-2da9769ff8dd": {
+        "name": "Absolute Rationality",
+        "description": "Makes decisions based purely on logic and reason, entirely devoid of emotional influence.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                1,
+                1
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a709-1e36ad6d3db3": {
+        "name": "Boundless Creativity",
+        "description": "Continually generates highly original and innovative ideas, concepts, and solutions.",
+        "derived_from": {
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                5,
+                5
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a760-fbc3600a14d4": {
+        "name": "Pathological Liar",
+        "description": "Incapable of telling the truth, constantly fabricates realities.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                1
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a79c-e136a2aa63b5": {
+        "name": "Malevolent Sadist",
+        "description": "Derives pleasure from inflicting pain, suffering, or humiliation on others.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-908f-8ba9-a7c6-c7f99b35b324": {
+        "name": "Unhinged Aggression",
+        "description": "Exhibits uncontrollable rage and aggression, often violent and unpredictable.",
+        "derived_from": {
+            "018cb674-43d2-811e-aeb3-c125df6f3ded": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-9090-83a7-a18c-710ee30b41f0": {
+        "name": "Cold Indifference",
+        "description": "Shows a complete lack of concern or interest in others' well-being or feelings.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                1,
+                1
+            ]
+        }
+    },
+    "018cb6ab-9090-83a7-a1fc-a2713504bda3": {
+        "name": "Destructive Paranoia",
+        "description": "Suffers from severe paranoia, believing others are constantly deceiving or exploiting them.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                1,
+                1
+            ]
+        }
+    },
+    "018cb6ab-9090-83a7-a239-922a2da877c5": {
+        "name": "Machiavellian Deceiver",
+        "description": "Engages in cunning, scheming, and unscrupulous behavior for personal gain.",
+        "derived_from": {
+            "018cb674-43d2-891d-b9eb-5d9f2164c40d": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-bb3a-44d953d66e4d": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-9090-83a7-a24e-109ec6978a9e": {
+        "name": "Obsessive Fixation",
+        "description": "Displays an unhealthy obsession with a particular person, object, or idea, often leading to detrimental behavior.",
+        "derived_from": {
+            "018cb674-43d2-891d-bac0-c043151ad8fa": [
+                1,
+                1
+            ],
+            "018cb674-43d2-811e-ae36-78e2b25912fb": [
+                1,
+                1
+            ]
+        }
+    },
+    "018cb6ab-9090-83a7-a2b2-4668bff1354c": {
+        "name": "Toxic Narcissism",
+        "description": "Exhibits extreme narcissism, exploiting others to maintain an inflated sense of self-importance.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                5,
+                5
+            ],
+            "018cb674-43d2-891d-bb3a-44d953d66e4d": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-9090-83a7-a33f-f3749cee3e57": {
+        "name": "Ruthless Exploiter",
+        "description": "Actively seeks to exploit and manipulate others for personal advantage, without remorse.",
+        "derived_from": {
+            "018cb674-43d2-891d-ba67-52df9f729469": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-bb3a-44d953d66e4d": [
+                5,
+                5
+            ]
+        }
+    },
+    "018cb6ab-9090-83a7-a373-f6dd46deef9f": {
+        "name": "Delusional Grandeur",
+        "description": "Holds grandiose and unrealistic beliefs about personal power, importance, or abilities.",
+        "derived_from": {
+            "018cb674-43d2-891d-b99a-7fc24d3ca8ed": [
+                1,
+                1
+            ],
+            "018cb674-43d2-891d-ba87-0f81f4bf5318": [
+                5,
+                5
+            ]
+        }
+    }
+}

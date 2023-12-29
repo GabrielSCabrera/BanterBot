@@ -1,0 +1,452 @@
+{
+    "018cb674-43d2-811e-ae36-78e2b25912fb": {
+        "name": "Adaptability",
+        "description": "Reflects how easily a character adapts to hierarchical structures and new ideas",
+        "derived_from": [
+            "018cb673-53c9-8e71-b7ae-0b99dd0cf9d4",
+            "018cb673-53ca-8673-a19f-788d87a8d1fb"
+        ],
+        "levels": [
+            [
+                "Resistant",
+                "Slightly Adaptable",
+                "Moderate",
+                "Adaptable",
+                "Highly Adaptable"
+            ],
+            [
+                "Traditional",
+                "Conventional",
+                "Flexible",
+                "Open-Minded",
+                "Innovative"
+            ],
+            [
+                "Stubborn",
+                "Hesitant",
+                "Versatile",
+                "Eager",
+                "Pioneering"
+            ],
+            [
+                "Rigid",
+                "Cautious",
+                "Dynamic",
+                "Creative",
+                "Visionary"
+            ],
+            [
+                "Conservative",
+                "Slow to Change",
+                "Resourceful",
+                "Progressive",
+                "Revolutionary"
+            ]
+        ]
+    },
+    "018cb674-43d2-811e-ae62-963ec62474d0": {
+        "name": "Social Engagement",
+        "description": "Represents the character's tendency to engage in social activities, influenced by both personal and cultural preferences for group or individual interactions",
+        "derived_from": [
+            "018cb673-53c9-8e71-b83e-9d4a28c92e7b",
+            "018cb673-53ca-8673-a07e-1496ddd6a30e"
+        ],
+        "levels": [
+            [
+                "Hermit",
+                "Reserved",
+                "Sociable",
+                "Outgoing",
+                "Party Animal"
+            ],
+            [
+                "Loner",
+                "Occasionally Social",
+                "Friendly",
+                "Extroverted",
+                "Life of the Party"
+            ],
+            [
+                "Aloof",
+                "Cordial",
+                "Amiable",
+                "Engaging",
+                "Charismatic"
+            ],
+            [
+                "Unsocial",
+                "Private",
+                "Accessible",
+                "Charming",
+                "Magnetic"
+            ],
+            [
+                "Introverted",
+                "Quiet",
+                "Conversational",
+                "Talkative",
+                "Gregarious"
+            ]
+        ]
+    },
+    "018cb674-43d2-811e-aeb3-c125df6f3ded": {
+        "name": "Conflict Management",
+        "description": "Determines how a character deals with conflict, balancing agreeableness with their cultural comfort with ambiguity",
+        "derived_from": [
+            "018cb673-53c9-8e71-b851-5778b411ca96",
+            "018cb673-53ca-8673-a0fe-3c8b49282ef1"
+        ],
+        "levels": [
+            [
+                "Combative",
+                "Defensive",
+                "Avoidant",
+                "Accommodating",
+                "Mediator"
+            ],
+            [
+                "Aggressive",
+                "Argumentative",
+                "Cautious",
+                "Peacemaker",
+                "Consensus Builder"
+            ],
+            [
+                "Hostile",
+                "Stubborn",
+                "Neutral",
+                "Cooperative",
+                "Harmonizer"
+            ],
+            [
+                "Confrontational",
+                "Resistant",
+                "Balanced",
+                "Conciliatory",
+                "Unifier"
+            ],
+            [
+                "Volatile",
+                "Guarded",
+                "Diplomatic",
+                "Sympathetic",
+                "Empathetic"
+            ]
+        ]
+    },
+    "018cb674-43d2-891d-b99a-7fc24d3ca8ed": {
+        "name": "Emotional Resilience",
+        "description": "Reflects the character's ability to handle emotional challenges, influenced by personal emotional stability and cultural norms around emotional expression",
+        "derived_from": [
+            "018cb673-53c9-8e71-b884-d785082186ee",
+            "018cb673-53ca-8673-a1da-b8840b072a0c"
+        ],
+        "levels": [
+            [
+                "Fragile",
+                "Sensitive",
+                "Steady",
+                "Resilient",
+                "Unshakeable"
+            ],
+            [
+                "Volatile",
+                "Touchy",
+                "Stable",
+                "Tough",
+                "Stoic"
+            ],
+            [
+                "Overwhelmed",
+                "Reactive",
+                "Controlled",
+                "Adaptable",
+                "Imperturbable"
+            ],
+            [
+                "Hysterical",
+                "Moody",
+                "Composed",
+                "Robust",
+                "Zen"
+            ],
+            [
+                "Anxious",
+                "Worried",
+                "Calm",
+                "Assured",
+                "Confident"
+            ]
+        ]
+    },
+    "018cb674-43d2-891d-b9eb-5d9f2164c40d": {
+        "name": "Communication Style",
+        "description": "Dictates how the character communicates with others, influenced by their level of extraversion and the cultural norm of communication",
+        "derived_from": [
+            "018cb673-53c9-8e71-b83e-9d4a28c92e7b",
+            "018cb673-53ca-8673-a210-eb647aeafa67"
+        ],
+        "levels": [
+            [
+                "Cryptic",
+                "Vague",
+                "Clear",
+                "Explicit",
+                "Articulate"
+            ],
+            [
+                "Taciturn",
+                "Laconic",
+                "Conversational",
+                "Talkative",
+                "Verbose"
+            ],
+            [
+                "Incoherent",
+                "Indirect",
+                "Direct",
+                "Eloquent",
+                "Persuasive"
+            ],
+            [
+                "Reserved",
+                "Brief",
+                "Informative",
+                "Descriptive",
+                "Loquacious"
+            ],
+            [
+                "Reticent",
+                "Understated",
+                "Plain",
+                "Expressive",
+                "Garrulous"
+            ]
+        ]
+    },
+    "018cb674-43d2-891d-ba2b-7ca494e026af": {
+        "name": "Leadership Approach",
+        "description": "Determines the character's leadership style, balancing their organizational skills with the cultural acceptance of hierarchy",
+        "derived_from": [
+            "018cb673-53c9-8e71-b7d2-80a7419b94e0",
+            "018cb673-53ca-8673-a084-4f66edd3c64d"
+        ],
+        "levels": [
+            [
+                "Tyrannical",
+                "Authoritarian",
+                "Democratic",
+                "Inspirational",
+                "Visionary"
+            ],
+            [
+                "Dominating",
+                "Strict",
+                "Structured",
+                "Motivating",
+                "Empowering"
+            ],
+            [
+                "Dictatorial",
+                "Firm",
+                "Fair",
+                "Encouraging",
+                "Transformative"
+            ],
+            [
+                "Controlling",
+                "Commanding",
+                "Balanced",
+                "Supportive",
+                "Charismatic"
+            ],
+            [
+                "Overbearing",
+                "Conventional",
+                "Progressive",
+                "Innovative",
+                "Pioneering"
+            ]
+        ]
+    },
+    "018cb674-43d2-891d-ba67-52df9f729469": {
+        "name": "Empathy Level",
+        "description": "Reflects the character’s ability to empathize with others, influenced by their inherent agreeableness and the cultural value placed on group harmony vs. individual needs",
+        "derived_from": [
+            "018cb673-53c9-8e71-b851-5778b411ca96",
+            "018cb673-53ca-8673-a113-3728e13ca616"
+        ],
+        "levels": [
+            [
+                "Apathetic",
+                "Detached",
+                "Considerate",
+                "Understanding",
+                "Altruistic"
+            ],
+            [
+                "Cold",
+                "Indifferent",
+                "Sympathetic",
+                "Compassionate",
+                "Selfless"
+            ],
+            [
+                "Unsympathetic",
+                "Neutral",
+                "Empathic",
+                "Caring",
+                "Nurturing"
+            ],
+            [
+                "Insensitive",
+                "Reserved",
+                "Kind",
+                "Empathetic",
+                "Benevolent"
+            ],
+            [
+                "Callous",
+                "Disinterested",
+                "Aware",
+                "Sensitive",
+                "Humanitarian"
+            ]
+        ]
+    },
+    "018cb674-43d2-891d-ba87-0f81f4bf5318": {
+        "name": "Risk Tolerance",
+        "description": "Measures the character's propensity to take risks, combining personal anxiety levels with cultural attitudes towards uncertainty and risk-taking",
+        "derived_from": [
+            "018cb673-53c9-8e71-b884-d785082186ee",
+            "018cb673-53ca-8673-a0fe-3c8b49282ef1"
+        ],
+        "levels": [
+            [
+                "Timid",
+                "Cautious",
+                "Daring",
+                "Bold",
+                "Reckless"
+            ],
+            [
+                "Fearful",
+                "Wary",
+                "Adventurous",
+                "Audacious",
+                "Foolhardy"
+            ],
+            [
+                "Risk-Averse",
+                "Prudent",
+                "Willing",
+                "Brave",
+                "Thrill-Seeker"
+            ],
+            [
+                "Nervous",
+                "Hesitant",
+                "Ready",
+                "Courageous",
+                "Death-Defying"
+            ],
+            [
+                "Anxious",
+                "Guarded",
+                "Enterprising",
+                "Venturesome",
+                "Daredevil"
+            ]
+        ]
+    },
+    "018cb674-43d2-891d-bac0-c043151ad8fa": {
+        "name": "Cultural Openness",
+        "description": "Reflects the character's openness to new experiences and their attitude towards cultural traditions and heritage",
+        "derived_from": [
+            "018cb673-53c9-8e71-b7ae-0b99dd0cf9d4",
+            "018cb673-53ca-8673-a07e-1496ddd6a30e"
+        ],
+        "levels": [
+            [
+                "Xenophobic",
+                "Skeptical",
+                "Curious",
+                "Appreciative",
+                "Embracing"
+            ],
+            [
+                "Parochial",
+                "Cautious",
+                "Open-Minded",
+                "Adventurous",
+                "Worldly"
+            ],
+            [
+                "Conservative",
+                "Traditional",
+                "Experimental",
+                "Innovative",
+                "Avant-Garde"
+            ],
+            [
+                "Provincial",
+                "Reserved",
+                "Receptive",
+                "Enthusiastic",
+                "Cosmopolitan"
+            ],
+            [
+                "Insular",
+                "Hesitant",
+                "Willing",
+                "Eager",
+                "Global Citizen"
+            ]
+        ]
+    },
+    "018cb674-43d2-891d-bb3a-44d953d66e4d": {
+        "name": "Economic Attitude",
+        "description": "Determines the character's approach to economic matters, balancing personal organization and diligence with cultural economic norms",
+        "derived_from": [
+            "018cb673-53c9-8e71-b7d2-80a7419b94e0",
+            "018cb673-53ca-8673-a113-3728e13ca616"
+        ],
+        "levels": [
+            [
+                "Miserly",
+                "Thrifty",
+                "Spendthrift",
+                "Generous",
+                "Lavish"
+            ],
+            [
+                "Greedy",
+                "Economical",
+                "Balanced",
+                "Philanthropic",
+                "Prodigal"
+            ],
+            [
+                "Penny-Pinching",
+                "Frugal",
+                "Investive",
+                "Extravagant",
+                "Squanderer"
+            ],
+            [
+                "Scrooge-like",
+                "Prudent",
+                "Pragmatic",
+                "Liberal",
+                "Big Spender"
+            ],
+            [
+                "Hoarding",
+                "Careful",
+                "Budgeter",
+                "Opulent",
+                "Wasteful"
+            ]
+        ]
+    }
+}
