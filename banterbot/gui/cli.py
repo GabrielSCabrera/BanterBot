@@ -13,6 +13,8 @@ character_choices = {
     "chef": (characters.chef, "Boyardine the Angry Chef"),
     "historian": (characters.historian, "Blabberlore the Gnome Historian"),
     "quiz": (characters.quiz, "Grondle the Quiz Troll"),
+    "teacher-french": (characters.teacher_french, "Henri the French Teacher"),
+    "teacher-mandarin": (characters.teacher_mandarin, "Chen Lao Shi the Mandarin Chinese Teacher"),
     "therapist": (characters.therapist, "Grendel the Therapy Troll"),
 }
 
