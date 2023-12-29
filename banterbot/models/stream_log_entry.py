@@ -2,8 +2,6 @@ import time
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from banterbot.utils.time_resolver import TimeResolver
-
 
 @dataclass
 class StreamLogEntry:
@@ -27,7 +25,7 @@ class StreamLogEntry:
         Returns:
             str: Metadata about the current entry.
         """
-        return f"<StreamLogEntry at {TimeResolver.resolve(self.timestamp)} of type `{type(self.value).__name__}`>"
+        return self.__repr__()
 
     def __repr__(self) -> str:
         """
