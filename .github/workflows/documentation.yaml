@@ -42,6 +42,10 @@ jobs:
       - name: Sphinx build
         run: |
           sphinx-build docs _build
+        env:
+          OPENAI_API_KEY: dummy
+          AZURE_SPEECH_KEY: dummy
+          AZURE_SPEECH_REGION: dummy
       
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
