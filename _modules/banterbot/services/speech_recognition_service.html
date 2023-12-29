@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.services.speech_recognition_service &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.services.speech_recognition_service</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.services.speech_recognition_service</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">azure.cognitiveservices.speech</span> <span class="k">as</span> <span class="nn">speechsdk</span>
+
+<span class="kn">from</span> <span class="nn">banterbot.config</span> <span class="kn">import</span> <span class="n">DEFAULT_LANGUAGE</span><span class="p">,</span> <span class="n">INTERRUPTION_DELAY</span>
+<span class="kn">from</span> <span class="nn">banterbot.data.enums</span> <span class="kn">import</span> <span class="n">EnvVar</span>
+<span class="kn">from</span> <span class="nn">banterbot.handlers.speech_recognition_handler</span> <span class="kn">import</span> <span class="n">SpeechRecognitionHandler</span>
+<span class="kn">from</span> <span class="nn">banterbot.handlers.stream_handler</span> <span class="kn">import</span> <span class="n">StreamHandler</span>
+<span class="kn">from</span> <span class="nn">banterbot.managers.stream_manager</span> <span class="kn">import</span> <span class="n">StreamManager</span>
+<span class="kn">from</span> <span class="nn">banterbot.models.speech_recognition_input</span> <span class="kn">import</span> <span class="n">SpeechRecognitionInput</span>
+<span class="kn">from</span> <span class="nn">banterbot.models.stream_log_entry</span> <span class="kn">import</span> <span class="n">StreamLogEntry</span>
+<span class="kn">from</span> <span class="nn">banterbot.utils.closeable_queue</span> <span class="kn">import</span> <span class="n">CloseableQueue</span>
+
+
+<div class="viewcode-block" id="SpeechRecognitionService">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService">[docs]</a>
+<span class="k">class</span> <span class="nc">SpeechRecognitionService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `SpeechRecognitionService` class provides an interface to convert spoken language into written text using Azure</span>
+<span class="sd">    Cognitive Speech Services. It allows continuous speech recognition and provides real-time results as sentences are</span>
+<span class="sd">    recognized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Create a lock that prevents race conditions when recognizing speech</span>
+    <span class="n">_recognition_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SpeechRecognitionService.__init__">
+<a class="viewcode-back" href="../../../banterbot.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">languages</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">phrase_list</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the `SpeechRecognitionService` instance by setting up the Azure Cognitive Services speech</span>
+<span class="sd">        configuration and recognizer. Argument `recognition_language` can take one or more values, each representing a</span>
+<span class="sd">        language the recognizer can expect to receive as an input. The recognizer will attempt to auto-detect the</span>
+<span class="sd">        language if multiple are provided.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            languages (Union[str, list[str]): The language(s) the speech-to-text recognizer expects to hear.</span>
+<span class="sd">            phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize the `SpeechRecognizer`.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_recognizer</span><span class="p">(</span><span class="n">languages</span><span class="o">=</span><span class="n">languages</span><span class="p">,</span> <span class="n">phrase_list</span><span class="o">=</span><span class="n">phrase_list</span><span class="p">)</span>
+
+        <span class="c1"># Set the total offset to zero, which will increment as recognitions occur.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_offset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_total_offset</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Initialize the `StreamManager` for handling streaming processes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_manager</span> <span class="o">=</span> <span class="n">StreamManager</span><span class="p">()</span>
+
+        <span class="c1"># The latest interruption time.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># A list of active stream handlers.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_handlers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_handlers_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SpeechRecognitionService.interrupt">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.interrupt">[docs]</a>
+    <span class="k">def</span> <span class="nf">interrupt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kill</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Interrupts the current speech recognition process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kill (bool): Whether the interruption should kill the queues or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_handlers_lock</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_handlers</span><span class="p">:</span>
+                <span class="n">handler</span><span class="o">.</span><span class="n">interrupt</span><span class="p">(</span><span class="n">kill</span><span class="o">=</span><span class="n">kill</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stream_handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SpeechRecognitionService Interrupted&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpeechRecognitionService.phrases_add">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_add">[docs]</a>
+    <span class="k">def</span> <span class="nf">phrases_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phrases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new phrase to the PhraseListGrammar instance, which implements a bias towards the specified words/phrases</span>
+<span class="sd">        that can help improve speech recognition in circumstances where there may be potential ambiguity.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            phrases(list[str]): Provide the recognizer with additional text context to improve recognition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">phrases</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_phrase_list_grammar</span><span class="o">.</span><span class="n">addPhrase</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpeechRecognitionService.phrases_clear">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_clear">[docs]</a>
+    <span class="k">def</span> <span class="nf">phrases_clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear all phrases from the PhraseListGrammar instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phrase_list_grammar</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SpeechRecognitionService.recognize">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.recognize">[docs]</a>
+    <span class="k">def</span> <span class="nf">recognize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">StreamHandler</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[()]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recognizes speech and returns a generator that yields the recognized sentences as they are processed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            init_time (Optional[int]): The time at which the recognition was initialized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[StreamHandler, tuple[()]: A handler for the stream of recognized sentences, or an empty tuple if the</span>
+<span class="sd">                recognition was interrupted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Record the time at which the recognition was initialized pre-lock, in order to account for future interruptions.</span>
+        <span class="n">init_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span> <span class="k">if</span> <span class="n">init_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">init_time</span>
+
+        <span class="c1"># Only allow one listener to be active at once.</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_recognition_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span> <span class="o">&gt;=</span> <span class="n">init_time</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">CloseableQueue</span><span class="p">()</span>
+
+                <span class="n">iterable</span> <span class="o">=</span> <span class="n">SpeechRecognitionHandler</span><span class="p">(</span><span class="n">recognizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">)</span>
+                <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_manager</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+                    <span class="n">iterable</span><span class="o">=</span><span class="n">iterable</span><span class="p">,</span> <span class="n">close_stream</span><span class="o">=</span><span class="n">iterable</span><span class="o">.</span><span class="n">close</span><span class="p">,</span> <span class="n">init_shared_data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;init_time&quot;</span><span class="p">:</span> <span class="n">init_time</span><span class="p">}</span>
+                <span class="p">)</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_handlers_lock</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_stream_handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">handler</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_init_recognizer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phrase_list</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize an instance of the the Microsoft Azure Cognitive Services Speech SDK `SpeechRecognizer` class and</span>
+<span class="sd">        configure it with any user-provided custom settings, or alternatively its package defaults, then open a</span>
+<span class="sd">        connection to reduce overhead.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            languages (Union[str, list[str]): The language(s) the speech-to-text recognizer expects to hear.</span>
+<span class="sd">            phrase_list(list[str], optional): Optionally provide the recognizer with context to improve recognition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SpeechRecognitionService initialized&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the speech configuration with the Azure subscription and region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechConfig</span><span class="p">(</span>
+            <span class="n">subscription</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EnvVar</span><span class="o">.</span><span class="n">AZURE_SPEECH_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EnvVar</span><span class="o">.</span><span class="n">AZURE_SPEECH_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Allowing the speech configuration to recognize profane words</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span><span class="o">.</span><span class="n">set_profanity</span><span class="p">(</span><span class="n">speechsdk</span><span class="o">.</span><span class="n">ProfanityOption</span><span class="o">.</span><span class="n">Raw</span><span class="p">)</span>
+
+        <span class="c1"># Activate the receipt of data pertaining to word timings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span><span class="o">.</span><span class="n">request_word_level_timestamps</span><span class="p">()</span>
+
+        <span class="c1"># Initialize the speech recognizer with the speech configuration and language settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechRecognizer</span><span class="p">(</span>
+            <span class="n">speech_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_language_kwargs</span><span class="p">(</span><span class="n">languages</span><span class="o">=</span><span class="n">languages</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Initialize an instance of `PhraseListGrammar` which is used to provide context to improve speech recognition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phrase_list_grammar</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">PhraseListGrammar</span><span class="o">.</span><span class="n">from_recognizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span><span class="p">)</span>
+
+        <span class="c1"># Add any phrases in `phrase_list` to the `PhraseListGrammar`.</span>
+        <span class="k">if</span> <span class="n">phrase_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phrases_add</span><span class="p">(</span><span class="n">phrase_list</span><span class="p">)</span>
+
+        <span class="c1"># Connect the speech recognizer events to their corresponding callbacks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks_connect</span><span class="p">()</span>
+
+        <span class="c1"># Creating a new instance of Connection class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">Connection</span><span class="o">.</span><span class="n">from_recognizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span><span class="p">)</span>
+
+        <span class="c1"># Pre-connecting the speech recognizer for reduced latency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_language_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the language(s) being recognized by the Speech-to-Text recognizer in two modes: if a string is given to</span>
+<span class="sd">        argument `languages` in the __init__ method, then set the language explicitly in the Azure speech SDK</span>
+<span class="sd">        `SpeechRecognizer` object in this `SpeechRecognitionService` instance. If a list of languages is given, use the</span>
+<span class="sd">        `AutoDetectSourceLanguageConfig` object from the speech SDK to allow the `SpeechRecognizer` to automatically</span>
+<span class="sd">        choose the input language from one of those provided.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            languages (Union[str, list[str]): The language(s) the speech-to-text recognizer expects to hear.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary of keywords arguments for the Speech Recognizer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Determine whether language auto-detection should be activated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="o">=</span> <span class="n">DEFAULT_LANGUAGE</span> <span class="k">if</span> <span class="n">languages</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">languages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auto_detection</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_detection</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span>
+                <span class="n">property_id</span><span class="o">=</span><span class="n">speechsdk</span><span class="o">.</span><span class="n">PropertyId</span><span class="o">.</span><span class="n">SpeechServiceConnection_LanguageIdMode</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;Continuous&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">AutoDetectSourceLanguageConfig</span><span class="p">(</span><span class="n">languages</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">)</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;auto_detect_source_language_config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SourceLanguageConfig</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">)</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;source_language_config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">_callback_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SessionEventArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detects when the speech recognizer has disconnected, triggering a `threading.Event` instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (speechsdk.SessionEventArgs): Event arguments containing information about the recognition stopped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;SpeechRecognitionService disconnected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_callback_started</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SessionEventArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback function for recognition started event. Signals that the recognition process has started.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (speechsdk.SessionEventArgs): Event arguments containing information about the recognition started.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;SpeechRecognitionService connected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_recognition_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SpeechRecognitionService.exception_handler">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.exception_handler">[docs]</a>
+    <span class="k">def</span> <span class="nf">exception_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">shared_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles exceptions that occur during the processing of the stream log.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cutoff</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="mf">1e-3</span> <span class="o">*</span> <span class="p">(</span><span class="n">shared_data</span><span class="p">[</span><span class="s2">&quot;interrupt&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">shared_data</span><span class="p">[</span><span class="s2">&quot;init_time&quot;</span><span class="p">]))</span>
+            <span class="o">+</span> <span class="n">INTERRUPTION_DELAY</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">log</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_offset</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="k">elif</span> <span class="n">log</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">offset_end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_offset</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">event</span> <span class="o">:=</span> <span class="n">log</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">from_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">log</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span>
+
+        <span class="k">return</span> <span class="n">log</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_callback_recognized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechRecognitionEventArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the recognized speech event by appending it to the list of events and setting the `new_events` flag.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (speechsdk.SpeechRecognitionEventArgs): The recognized speech event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_recognition_time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_total_offset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_total_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_recognition_time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_total_offset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">offset</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+            <span class="n">SpeechRecognitionInput</span><span class="o">.</span><span class="n">from_recognition_result</span><span class="p">(</span>
+                <span class="n">event</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_detection</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_callbacks_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connects the recognizer events to their corresponding callback methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span><span class="o">.</span><span class="n">session_started</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_started</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span><span class="o">.</span><span class="n">recognized</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_recognized</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span><span class="o">.</span><span class="n">canceled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_completed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recognizer</span><span class="o">.</span><span class="n">session_stopped</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_completed</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

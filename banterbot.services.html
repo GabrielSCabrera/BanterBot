@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.services package &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="banterbot.types package" href="banterbot.types.html" />
+    <link rel="prev" title="banterbot.models package" href="banterbot.models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">BanterBot</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="banterbot.html">BanterBot Package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#classes">Classes</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="banterbot.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.exceptions.html">banterbot.exceptions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html">banterbot.handlers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html">banterbot.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html">banterbot.models package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">banterbot.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html">banterbot.types package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">BanterBot</a></li>
+          <li class="breadcrumb-item"><a href="banterbot.html">BanterBot Package</a></li>
+      <li class="breadcrumb-item active">banterbot.services package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/banterbot.services.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="banterbot-services-package">
+<h1>banterbot.services package<a class="headerlink" href="#banterbot-services-package" title="Link to this heading"></a></h1>
+<section id="module-banterbot.services.openai_service">
+<span id="banterbot-services-openai-service-module"></span><h2>banterbot.services.openai_service module<a class="headerlink" href="#module-banterbot.services.openai_service" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.services.openai_service.</span></span><span class="sig-name descname"><span class="pre">OpenAIService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that handles the interaction with the OpenAI ChatCompletion API. It provides functionality to generate
+responses from the API based on the input messages. It supports generating responses as a whole or as a stream of
+response blocks.</p>
+<p>The main purpose of this class is to facilitate the communication with the OpenAI API and handle the responses
+generated by the API. It can be used to create chatbots or other applications that require natural language
+processing and generation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.api_key_set">
+<span class="sig-name descname"><span class="pre">api_key_set</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.api_key_set" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.client">
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.client" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.count_tokens">
+<span class="sig-name descname"><span class="pre">count_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.count_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.count_tokens" title="Link to this definition"></a></dt>
+<dd><p>Counts the number of tokens in the provided string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) – A string provided by the user where the number of tokens are to be counted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of tokens in the string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.interrupt" title="Link to this definition"></a></dt>
+<dd><p>Interrupts the current OpenAI ChatCompletion process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kill</strong> (<em>bool</em>) – Whether the interruption should kill the queues or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.model" title="Link to this definition"></a></dt>
+<dd><p>Return the <cite>OpenAIModel</cite> associated with the current instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>OpenAIModel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.prompt" title="Link to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>list</em><em>[</em><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the <cite>Message</cite> class,</p></li>
+<li><p><strong>role</strong> (<em>which contains the content and</em>) – </p></li>
+<li><p><strong>split</strong> (<em>bool</em>) – Whether the response should be split into sentences.</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of sentences forming the response from the OpenAI API. This can be used to
+display the generated response to the user or for further processing. If <cite>split</cite> is False, returns a string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[list[str], str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.prompt_stream">
+<span class="sig-name descname"><span class="pre">prompt_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler"><span class="pre">StreamHandler</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.prompt_stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.prompt_stream" title="Link to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>list</em><em>[</em><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the <cite>Message</cite> class,</p></li>
+<li><p><strong>role</strong> (<em>which contains the content and</em>) – </p></li>
+<li><p><strong>init_time</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The time at which the stream was initialized.</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A handler for the stream of blocks of sentences forming the response from</dt><dd><p>the OpenAI API or an empty tuple if the stream was interrupted.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler">StreamHandler</a>, tuple[()]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.services.speech_synthesis_service">
+<span id="banterbot-services-speech-synthesis-service-module"></span><h2>banterbot.services.speech_synthesis_service module<a class="headerlink" href="#module-banterbot.services.speech_synthesis_service" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.services.speech_synthesis_service.</span></span><span class="sig-name descname"><span class="pre">SpeechSynthesisService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SpeechSynthesisOutputFormat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/speech_synthesis_service.html#SpeechSynthesisService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>SpeechSynthesisService</cite> class provides an interface to convert text into speech using Azure’s Cognitive
+Services. It supports various output formats, voices, and speaking styles. The synthesized speech can be
+interrupted, and the progress can be monitored in real-time.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_synthesis_service.html#SpeechSynthesisService.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.interrupt" title="Link to this definition"></a></dt>
+<dd><p>Interrupts the current speech synthesis process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kill</strong> (<em>bool</em>) – Whether the interruption should kill the queues or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.synthesize">
+<span class="sig-name descname"><span class="pre">synthesize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phrases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase" title="banterbot.models.phrase.Phrase"><span class="pre">Phrase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word" title="banterbot.models.word.Word"><span class="pre">Word</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_synthesis_service.html#SpeechSynthesisService.synthesize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.synthesize" title="Link to this definition"></a></dt>
+<dd><p>Synthesizes the given phrases into speech and returns a handler for the stream of synthesized words.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phrases</strong> (<em>list</em><em>[</em><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase" title="banterbot.models.phrase.Phrase"><em>Phrase</em></a><em>]</em>) – The input phrases that are to be converted into speech.</p></li>
+<li><p><strong>init_time</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The time at which the synthesis was initialized.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A handler for the stream of synthesized words.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler">StreamHandler</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.services.speech_recognition_service">
+<span id="banterbot-services-speech-recognition-service-module"></span><h2>banterbot.services.speech_recognition_service module<a class="headerlink" href="#module-banterbot.services.speech_recognition_service" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.services.speech_recognition_service.</span></span><span class="sig-name descname"><span class="pre">SpeechRecognitionService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phrase_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>SpeechRecognitionService</cite> class provides an interface to convert spoken language into written text using Azure
+Cognitive Speech Services. It allows continuous speech recognition and provides real-time results as sentences are
+recognized.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.exception_handler">
+<span class="sig-name descname"><span class="pre">exception_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry" title="banterbot.models.stream_log_entry.StreamLogEntry"><span class="pre">StreamLogEntry</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.exception_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.exception_handler" title="Link to this definition"></a></dt>
+<dd><p>Handles exceptions that occur during the processing of the stream log.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.interrupt" title="Link to this definition"></a></dt>
+<dd><p>Interrupts the current speech recognition process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kill</strong> (<em>bool</em>) – Whether the interruption should kill the queues or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_add">
+<span class="sig-name descname"><span class="pre">phrases_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phrases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.phrases_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_add" title="Link to this definition"></a></dt>
+<dd><p>Add a new phrase to the PhraseListGrammar instance, which implements a bias towards the specified words/phrases
+that can help improve speech recognition in circumstances where there may be potential ambiguity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phrases</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Provide the recognizer with additional text context to improve recognition.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_clear">
+<span class="sig-name descname"><span class="pre">phrases_clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.phrases_clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_clear" title="Link to this definition"></a></dt>
+<dd><p>Clear all phrases from the PhraseListGrammar instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.recognize">
+<span class="sig-name descname"><span class="pre">recognize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler"><span class="pre">StreamHandler</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.recognize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.recognize" title="Link to this definition"></a></dt>
+<dd><p>Recognizes speech and returns a generator that yields the recognized sentences as they are processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>init_time</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The time at which the recognition was initialized.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A handler for the stream of recognized sentences, or an empty tuple if the</dt><dd><p>recognition was interrupted.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler">StreamHandler</a>, tuple[()]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="banterbot.models.html" class="btn btn-neutral float-left" title="banterbot.models package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="banterbot.types.html" class="btn btn-neutral float-right" title="banterbot.types package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

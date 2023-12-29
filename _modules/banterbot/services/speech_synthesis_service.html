@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.services.speech_synthesis_service &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.services.speech_synthesis_service</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.services.speech_synthesis_service</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Generator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">azure.cognitiveservices.speech</span> <span class="k">as</span> <span class="nn">speechsdk</span>
+<span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
+<span class="kn">from</span> <span class="nn">azure.cognitiveservices.speech</span> <span class="kn">import</span> <span class="n">SpeechSynthesisOutputFormat</span>
+
+<span class="kn">from</span> <span class="nn">banterbot.data.enums</span> <span class="kn">import</span> <span class="n">EnvVar</span>
+<span class="kn">from</span> <span class="nn">banterbot.handlers.speech_synthesis_handler</span> <span class="kn">import</span> <span class="n">SpeechSynthesisHandler</span>
+<span class="kn">from</span> <span class="nn">banterbot.models.phrase</span> <span class="kn">import</span> <span class="n">Phrase</span>
+<span class="kn">from</span> <span class="nn">banterbot.models.word</span> <span class="kn">import</span> <span class="n">Word</span>
+<span class="kn">from</span> <span class="nn">banterbot.utils.closeable_queue</span> <span class="kn">import</span> <span class="n">CloseableQueue</span>
+
+
+<div class="viewcode-block" id="SpeechSynthesisService">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_synthesis_service.SpeechSynthesisService">[docs]</a>
+<span class="k">class</span> <span class="nc">SpeechSynthesisService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `SpeechSynthesisService` class provides an interface to convert text into speech using Azure&#39;s Cognitive</span>
+<span class="sd">    Services. It supports various output formats, voices, and speaking styles. The synthesized speech can be</span>
+<span class="sd">    interrupted, and the progress can be monitored in real-time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Create a lock that prevents race conditions when synthesizing speech</span>
+    <span class="n">_synthesis_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SpeechSynthesisService.__init__">
+<a class="viewcode-back" href="../../../banterbot.html#banterbot.services.speech_synthesis_service.SpeechSynthesisService.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">output_format</span><span class="p">:</span> <span class="n">SpeechSynthesisOutputFormat</span> <span class="o">=</span> <span class="n">SpeechSynthesisOutputFormat</span><span class="o">.</span><span class="n">Audio16Khz32KBitRateMonoMp3</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes an instance of the `SpeechSynthesisService` class with a specified output format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output_format (SpeechSynthesisOutputFormat, optional): The desired output format for the synthesized speech.</span>
+<span class="sd">            Default is Audio16Khz32KBitRateMonoMp3.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize the output format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">=</span> <span class="n">output_format</span>
+
+        <span class="c1"># Initialize the speech synthesizer with the specified output format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_synthesizer</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the queue for storing the words as they are synthesized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">CloseableQueue</span><span class="p">()</span>
+
+        <span class="c1"># The iterable that is currently being iterated over</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iterable</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SpeechSynthesisHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># The latest interruption time.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="SpeechSynthesisService.interrupt">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_synthesis_service.SpeechSynthesisService.interrupt">[docs]</a>
+    <span class="k">def</span> <span class="nf">interrupt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Interrupts the current speech synthesis process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kill (bool): Whether the interruption should kill the queues or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1"># Closing the connection to the speech synthesizer.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1"># Reinitialize the speech synthesizer with the default output format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_synthesizer</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SpeechSynthesisService Interrupted&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpeechSynthesisService.synthesize">
+<a class="viewcode-back" href="../../../banterbot.services.html#banterbot.services.speech_synthesis_service.SpeechSynthesisService.synthesize">[docs]</a>
+    <span class="k">def</span> <span class="nf">synthesize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phrases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Phrase</span><span class="p">],</span> <span class="n">init_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Word</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Synthesizes the given phrases into speech and returns a handler for the stream of synthesized words.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            phrases (list[Phrase]): The input phrases that are to be converted into speech.</span>
+<span class="sd">            init_time (Optional[int]): The time at which the synthesis was initialized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            StreamHandler: A handler for the stream of synthesized words.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Record the time at which the synthesis was initialized pre-lock, in order to account for future interruptions.</span>
+        <span class="n">init_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span> <span class="k">if</span> <span class="n">init_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">init_time</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_synthesis_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span> <span class="o">&gt;=</span> <span class="n">init_time</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_iterable</span> <span class="o">=</span> <span class="n">SpeechSynthesisHandler</span><span class="p">(</span>
+                    <span class="n">phrases</span><span class="o">=</span><span class="n">phrases</span><span class="p">,</span> <span class="n">synthesizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span>
+                <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterable</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">i</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_init_synthesizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="n">SpeechSynthesisOutputFormat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the speech synthesizer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SpeechSynthesisService initialized&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the speech configuration with the Azure subscription and region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechConfig</span><span class="p">(</span>
+            <span class="n">subscription</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EnvVar</span><span class="o">.</span><span class="n">AZURE_SPEECH_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EnvVar</span><span class="o">.</span><span class="n">AZURE_SPEECH_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Initialize the speech synthesizer with the speech configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechSynthesizer</span><span class="p">(</span><span class="n">speech_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span><span class="p">)</span>
+
+        <span class="c1"># Set the speech synthesis output format to the specified output format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_speech_config</span><span class="o">.</span><span class="n">set_speech_synthesis_output_format</span><span class="p">(</span><span class="n">output_format</span><span class="p">)</span>
+
+        <span class="c1"># Connect the speech synthesizer events to their corresponding callbacks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks_connect</span><span class="p">()</span>
+
+        <span class="c1"># Creating a new instance of Connection class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">Connection</span><span class="o">.</span><span class="n">from_speech_synthesizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="p">)</span>
+
+        <span class="c1"># Preconnecting the speech synthesizer for reduced latency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">for_continuous_recognition</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_callback_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SessionEventArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback function for synthesis completed event. Signals that the synthesis process has been stopped/canceled.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;SpeechSynthesisService disconnected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_callback_started</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SessionEventArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback function for synthesis started event. Signals that the synthesis process has started.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (speechsdk.SessionEventArgs): Event arguments containing information about the synthesis started.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;SpeechSynthesisService connected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesis_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_calculate_offset</span><span class="p">(</span>
+        <span class="n">start_synthesis_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">audio_offset</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">total_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">word_length</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the offset of the word in the stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            start_synthesis_time (float): The time at which the synthesis started.</span>
+<span class="sd">            audio_offset (float): The audio offset of the word.</span>
+<span class="sd">            total_seconds (float): The total seconds of the word.</span>
+<span class="sd">            word_length (int): The length of the word.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The offset of the word in the stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">start_synthesis_time</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">audio_offset</span> <span class="o">+</span> <span class="mf">1e9</span> <span class="o">*</span> <span class="n">total_seconds</span> <span class="o">/</span> <span class="n">word_length</span>
+
+    <span class="k">def</span> <span class="nf">_callback_word_boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SessionEventArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback function for word boundary event. Signals that a word boundary has been reached and provides the word</span>
+<span class="sd">        and timing information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (speechsdk.SessionEventArgs): Event arguments containing information about the word boundary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the event is still active based on the result_id.</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_offset</span><span class="p">(</span>
+            <span class="n">start_synthesis_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synthesis_start</span><span class="p">,</span>
+            <span class="n">audio_offset</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">audio_offset</span><span class="p">,</span>
+            <span class="n">total_seconds</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(),</span>
+            <span class="n">word_length</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">word_length</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
+            <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="n">Word</span><span class="p">(</span>
+                <span class="n">text</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">text</span>
+                    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">boundary_type</span> <span class="o">==</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechSynthesisBoundaryType</span><span class="o">.</span><span class="n">Punctuation</span>
+                    <span class="k">else</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">text</span>
+                <span class="p">),</span>
+                <span class="n">offset</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">audio_offset</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="n">duration</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_callbacks_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connect the synthesis events to their corresponding callback methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="o">.</span><span class="n">synthesis_started</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_started</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="o">.</span><span class="n">synthesis_word_boundary</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_word_boundary</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="o">.</span><span class="n">synthesis_canceled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_completed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="o">.</span><span class="n">synthesis_completed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_completed</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

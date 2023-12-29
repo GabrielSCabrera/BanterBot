@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.managers.stream_manager &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.managers.stream_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.managers.stream_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">banterbot.handlers.stream_handler</span> <span class="kn">import</span> <span class="n">StreamHandler</span>
+<span class="kn">from</span> <span class="nn">banterbot.models.number</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span> <span class="nn">banterbot.models.stream_log_entry</span> <span class="kn">import</span> <span class="n">StreamLogEntry</span>
+<span class="kn">from</span> <span class="nn">banterbot.utils.closeable_queue</span> <span class="kn">import</span> <span class="n">CloseableQueue</span>
+<span class="kn">from</span> <span class="nn">banterbot.utils.indexed_event</span> <span class="kn">import</span> <span class="n">IndexedEvent</span>
+
+
+<div class="viewcode-block" id="StreamManager">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.stream_manager.StreamManager">[docs]</a>
+<span class="k">class</span> <span class="nc">StreamManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Manages streaming of data through threads and allows hard or soft interruption of the streamed data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the StreamManager with default values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IndexedEvent</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">log</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">shared_data</span><span class="p">:</span> <span class="n">log</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exception_handler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">IndexedEvent</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_completion_handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IndexedEvent</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="StreamManager.connect_processor">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.connect_processor">[docs]</a>
+    <span class="k">def</span> <span class="nf">connect_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connects a processor function for processing each streamed item. The stream processor function should take a</span>
+<span class="sd">        list of `StreamLogEntry` instances, the current index of the log, and a dictionary which will contain shared</span>
+<span class="sd">        data between the connected functions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func (Callable[[list[StreamLogEntry], int, dict], Any]): The stream processor function to be used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sig</span> <span class="o">:=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)))</span> <span class="o">!=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;shared_data&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `func` in method `connect_processor` of class `StreamManager` expects the following&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; signature: `func(log: list[StreamLogEntry], index: int, shared_data: dict) -&gt; Any`. Got </span><span class="si">{</span><span class="n">sig</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span> <span class="o">=</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="StreamManager.connect_completion_handler">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.connect_completion_handler">[docs]</a>
+    <span class="k">def</span> <span class="nf">connect_completion_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connects an optional completion handler function for handling the final result of the parser. The handler</span>
+<span class="sd">        function should take a list of `StreamLogEntry` instances and a dictionary which will contain shared data</span>
+<span class="sd">        between the connected functions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func (Callable[[list[StreamLogEntry], dict], Any]): The completion handler function to be used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sig</span> <span class="o">:=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)))</span> <span class="o">!=</span> <span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;shared_data&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `func` in method `connect_completion_handler` of class `StreamManager`  expects the following&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; signature: `func(log: list[StreamLogEntry], shared_data: dict) -&gt; Any`. Got </span><span class="si">{</span><span class="n">sig</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_completion_handler</span> <span class="o">=</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="StreamManager.connect_exception_handler">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.connect_exception_handler">[docs]</a>
+    <span class="k">def</span> <span class="nf">connect_exception_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connects an optional exception handler function for the parser, to be used when the stream iterable is</span>
+<span class="sd">        interrupted. The stream exception handler function is provided with the log and the current index for all</span>
+<span class="sd">        remaining items in the stream. The handler function should take a list of `StreamLogEntry` instances, the</span>
+<span class="sd">        current index of the log, and a dictionary which will contain shared data between the connected functions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func (Callable[[list[StreamLogEntry], int, dict], Any]): The finalizer function to be used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sig</span> <span class="o">:=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)))</span> <span class="o">!=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;shared_data&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `func` in method `connect_exception_handler` of class `StreamManager`  expects the following&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; signature: `func(log: list[StreamLogEntry], index: int, shared_data: dict) -&gt; Any`. Got </span><span class="si">{</span><span class="n">sig</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exception_handler</span> <span class="o">=</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="StreamManager.stream">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.stream">[docs]</a>
+    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">close_stream</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">init_shared_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamHandler</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts streaming data from an iterable source in a separate thread.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            iterable (Iterable[Any]): The iterable to stream data from.</span>
+<span class="sd">            close_stream (Optional[str]): The method to use for closing the iterable.</span>
+<span class="sd">            init_shared_data (Optional[dict[str, Any]]): The initial shared data to use (key `interrupt` is reserved.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;StreamManager initializing stream.&quot;</span><span class="p">)</span>
+        <span class="c1"># Getting the timestamp of the stream.</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">()</span>
+
+        <span class="c1"># Creating the indexed event and kill event to be used.</span>
+        <span class="n">indexed_event</span> <span class="o">=</span> <span class="n">IndexedEvent</span><span class="p">()</span>
+        <span class="n">kill_event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+
+        <span class="c1"># Creating the interrupt, index, and index_max values to be used.</span>
+        <span class="n">interrupt</span> <span class="o">=</span> <span class="n">Number</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Creating the queue and log to be used.</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="n">CloseableQueue</span><span class="p">()</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Creating the shared data to be used.</span>
+        <span class="k">if</span> <span class="n">init_shared_data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;interrupt&quot;</span> <span class="ow">in</span> <span class="n">init_shared_data</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The key `interrupt` is reserved in the dict argument `init_shared_data` for method `stream` in&quot;</span>
+                    <span class="s2">&quot; class StreamManager.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">shared_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">init_shared_data</span><span class="p">)</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;interrupt&quot;</span><span class="p">:</span> <span class="n">Number</span><span class="p">(</span><span class="mi">0</span><span class="p">)}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shared_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;interrupt&quot;</span><span class="p">:</span> <span class="n">Number</span><span class="p">(</span><span class="mi">0</span><span class="p">)}</span>
+
+        <span class="c1"># Creating the stream thread with the `_wrap_stream` method as the target function.</span>
+        <span class="n">stream_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrap_stream</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;indexed_event&quot;</span><span class="p">:</span> <span class="n">indexed_event</span><span class="p">,</span>
+                <span class="s2">&quot;kill_event&quot;</span><span class="p">:</span> <span class="n">kill_event</span><span class="p">,</span>
+                <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="n">log</span><span class="p">,</span>
+                <span class="s2">&quot;iterable&quot;</span><span class="p">:</span> <span class="n">iterable</span><span class="p">,</span>
+                <span class="s2">&quot;close_stream&quot;</span><span class="p">:</span> <span class="n">close_stream</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">daemon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Creating the stream processor thread with the `_wrap_stream_processor` method as the target function.</span>
+        <span class="n">processor_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrap_processor</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
+                <span class="s2">&quot;interrupt&quot;</span><span class="p">:</span> <span class="n">interrupt</span><span class="p">,</span>
+                <span class="s2">&quot;indexed_event&quot;</span><span class="p">:</span> <span class="n">indexed_event</span><span class="p">,</span>
+                <span class="s2">&quot;kill_event&quot;</span><span class="p">:</span> <span class="n">kill_event</span><span class="p">,</span>
+                <span class="s2">&quot;queue&quot;</span><span class="p">:</span> <span class="n">queue</span><span class="p">,</span>
+                <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="n">log</span><span class="p">,</span>
+                <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">,</span>
+                <span class="s2">&quot;completion_handler&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_completion_handler</span><span class="p">,</span>
+                <span class="s2">&quot;exception_handler&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_handler</span><span class="p">,</span>
+                <span class="s2">&quot;shared_data&quot;</span><span class="p">:</span> <span class="n">shared_data</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Starting the stream processor and stream threads.</span>
+        <span class="n">stream_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="c1"># Return an instance of StreamHandler</span>
+        <span class="k">return</span> <span class="n">StreamHandler</span><span class="p">(</span>
+            <span class="n">interrupt</span><span class="o">=</span><span class="n">interrupt</span><span class="p">,</span>
+            <span class="n">kill_event</span><span class="o">=</span><span class="n">kill_event</span><span class="p">,</span>
+            <span class="n">queue</span><span class="o">=</span><span class="n">queue</span><span class="p">,</span>
+            <span class="n">processor_thread</span><span class="o">=</span><span class="n">processor_thread</span><span class="p">,</span>
+            <span class="n">shared_data</span><span class="o">=</span><span class="n">shared_data</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_wrap_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">indexed_event</span><span class="p">:</span> <span class="n">IndexedEvent</span><span class="p">,</span>
+        <span class="n">kill_event</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">,</span>
+        <span class="n">log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span>
+        <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">close_stream</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps the `_stream` thread to allow for instant interruption using the `kill` event.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            indexed_event (IndexedEvent): The indexed event to use for tracking the current index.</span>
+<span class="sd">            kill_event (threading.Event): The event to use for interrupting the stream.</span>
+<span class="sd">            log (list[StreamLogEntry]): The log to store streamed data in.</span>
+<span class="sd">            iterable (Iterable[Any]): The iterable to stream data from.</span>
+<span class="sd">            close_stream (Optional[str]): The method to use for closing the iterable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Instantiating the stream thread with the `_stream` method as the target function.</span>
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;indexed_event&quot;</span><span class="p">:</span> <span class="n">indexed_event</span><span class="p">,</span>
+                <span class="s2">&quot;kill_event&quot;</span><span class="p">:</span> <span class="n">kill_event</span><span class="p">,</span>
+                <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="n">log</span><span class="p">,</span>
+                <span class="s2">&quot;iterable&quot;</span><span class="p">:</span> <span class="n">iterable</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Starting the stream thread.</span>
+        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="c1"># Waiting for the kill event to be set.</span>
+        <span class="n">kill_event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="c1"># Closing the iterable if the stream thread is still alive and a callable that closes the stream is defined.</span>
+        <span class="k">if</span> <span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="ow">and</span> <span class="n">close_stream</span><span class="p">:</span>
+            <span class="c1"># Close the iterable using the provided method-closing callable.</span>
+            <span class="n">close_stream</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">indexed_event</span><span class="p">:</span> <span class="n">IndexedEvent</span><span class="p">,</span>
+        <span class="n">kill_event</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">,</span>
+        <span class="n">log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span>
+        <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps the streaming process for the given iterable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index_max (Number): The maximum index to stream to.</span>
+<span class="sd">            indexed_event (IndexedEvent): The indexed event to use for tracking the current index.</span>
+<span class="sd">            kill_event (threading.Event): The event to use for interrupting the stream.</span>
+<span class="sd">            log (list[StreamLogEntry]): The log to store streamed data in.</span>
+<span class="sd">            iterable (Iterable[Any]): The iterable to stream data from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">StreamLogEntry</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">indexed_event</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+        <span class="n">kill_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="n">indexed_event</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_wrap_processor</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">interrupt</span><span class="p">:</span> <span class="n">Number</span><span class="p">,</span>
+        <span class="n">indexed_event</span><span class="p">:</span> <span class="n">IndexedEvent</span><span class="p">,</span>
+        <span class="n">kill_event</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">,</span>
+        <span class="n">queue</span><span class="p">:</span> <span class="n">CloseableQueue</span><span class="p">,</span>
+        <span class="n">log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span>
+        <span class="n">processor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">completion_handler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">exception_handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">StreamLogEntry</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">shared_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps the parser function to process each item in the stream log.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timestamp (float): The timestamp of the stream.</span>
+<span class="sd">            interrupt (Number): The interrupt time of the stream.</span>
+<span class="sd">            indexed_event (IndexedEvent): The indexed event to use for tracking the current index.</span>
+<span class="sd">            kill_event (threading.Event): The event to use for interrupting the stream.</span>
+<span class="sd">            queue (CloseableQueue): The queue to store processed data in.</span>
+<span class="sd">            log (list[StreamLogEntry]): The log to store streamed data in.</span>
+<span class="sd">            stream_processor (Callable[[list[StreamLogEntry], int, dict], Any]): The stream processor function to</span>
+<span class="sd">                be used.</span>
+<span class="sd">            stream_completion_handler (Optional[Callable[[list[StreamLogEntry], dict], Any]]): The completion</span>
+<span class="sd">                handler function to be used.</span>
+<span class="sd">            stream_exception_handler (Callable[[list[StreamLogEntry], int, dict], Any]): The exception handler</span>
+<span class="sd">                function to be used.</span>
+<span class="sd">            shared_data (Optional[dict[str, Any]]): The shared data to be used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">interrupt</span> <span class="o">&lt;</span> <span class="n">timestamp</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">kill_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">)):</span>
+            <span class="n">indexed_event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">indexed_event</span><span class="o">.</span><span class="n">decrement</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">kill_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span> <span class="ow">and</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">shared_data</span><span class="o">=</span><span class="n">shared_data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">interrupt</span> <span class="o">&lt;</span> <span class="n">timestamp</span> <span class="ow">and</span> <span class="n">completion_handler</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">completion_handler</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">shared_data</span><span class="o">=</span><span class="n">shared_data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">exception_handler</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">exception_handler</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">shared_data</span><span class="o">=</span><span class="n">shared_data</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">queue</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BanterBot Package &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="banterbot.data package" href="banterbot.data.html" />
+    <link rel="prev" title="BanterBot" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">BanterBot</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">BanterBot Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#openaiservice">OpenAIService</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#speechsynthesisservice">SpeechSynthesisService</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#speechrecognitionservice">SpeechRecognitionService</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interface">Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tkinterface">TKInterface</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.exceptions.html">banterbot.exceptions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html">banterbot.handlers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html">banterbot.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html">banterbot.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html">banterbot.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html">banterbot.types package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">BanterBot</a></li>
+      <li class="breadcrumb-item active">BanterBot Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/banterbot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="banterbot-package">
+<h1>BanterBot Package<a class="headerlink" href="#banterbot-package" title="Link to this heading"></a></h1>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<section id="openaiservice">
+<h3>OpenAIService<a class="headerlink" href="#openaiservice" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.services.openai_service.</span></span><span class="sig-name descname"><span class="pre">OpenAIService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that handles the interaction with the OpenAI ChatCompletion API. It provides functionality to generate
+responses from the API based on the input messages. It supports generating responses as a whole or as a stream of
+response blocks.</p>
+<p>The main purpose of this class is to facilitate the communication with the OpenAI API and handle the responses
+generated by the API. It can be used to create chatbots or other applications that require natural language
+processing and generation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.__dict__">
+<span class="sig-name descname"><span class="pre">__dict__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">mappingproxy({'__module__':</span> <span class="pre">'banterbot.services.openai_service',</span> <span class="pre">'__doc__':</span> <span class="pre">'\n</span>&#160;&#160;&#160; <span class="pre">A</span> <span class="pre">class</span> <span class="pre">that</span> <span class="pre">handles</span> <span class="pre">the</span> <span class="pre">interaction</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">OpenAI</span> <span class="pre">ChatCompletion</span> <span class="pre">API.</span> <span class="pre">It</span> <span class="pre">provides</span> <span class="pre">functionality</span> <span class="pre">to</span> <span class="pre">generate\n</span>&#160;&#160;&#160; <span class="pre">responses</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">API</span> <span class="pre">based</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">input</span> <span class="pre">messages.</span> <span class="pre">It</span> <span class="pre">supports</span> <span class="pre">generating</span> <span class="pre">responses</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">whole</span> <span class="pre">or</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">stream</span> <span class="pre">of\n</span>&#160;&#160;&#160; <span class="pre">response</span> <span class="pre">blocks.\n\n</span>&#160;&#160;&#160; <span class="pre">The</span> <span class="pre">main</span> <span class="pre">purpose</span> <span class="pre">of</span> <span class="pre">this</span> <span class="pre">class</span> <span class="pre">is</span> <span class="pre">to</span> <span class="pre">facilitate</span> <span class="pre">the</span> <span class="pre">communication</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">OpenAI</span> <span class="pre">API</span> <span class="pre">and</span> <span class="pre">handle</span> <span class="pre">the</span> <span class="pre">responses\n</span>&#160;&#160;&#160; <span class="pre">generated</span> <span class="pre">by</span> <span class="pre">the</span> <span class="pre">API.</span> <span class="pre">It</span> <span class="pre">can</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">chatbots</span> <span class="pre">or</span> <span class="pre">other</span> <span class="pre">applications</span> <span class="pre">that</span> <span class="pre">require</span> <span class="pre">natural</span> <span class="pre">language\n</span>&#160;&#160;&#160; <span class="pre">processing</span> <span class="pre">and</span> <span class="pre">generation.\n</span>&#160;&#160;&#160; <span class="pre">',</span> <span class="pre">'api_key_set':</span> <span class="pre">False,</span> <span class="pre">'client':</span> <span class="pre">None,</span> <span class="pre">'__init__':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService.__init__&gt;,</span> <span class="pre">'interrupt':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService.interrupt&gt;,</span> <span class="pre">'count_tokens':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService.count_tokens&gt;,</span> <span class="pre">'prompt':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService.prompt&gt;,</span> <span class="pre">'prompt_stream':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService.prompt_stream&gt;,</span> <span class="pre">'model':</span> <span class="pre">&lt;property</span> <span class="pre">object&gt;,</span> <span class="pre">'_processor':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService._processor&gt;,</span> <span class="pre">'_completion_handler':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService._completion_handler&gt;,</span> <span class="pre">'_request':</span> <span class="pre">&lt;function</span> <span class="pre">OpenAIService._request&gt;,</span> <span class="pre">'__dict__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__dict__'</span> <span class="pre">of</span> <span class="pre">'OpenAIService'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__weakref__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__weakref__'</span> <span class="pre">of</span> <span class="pre">'OpenAIService'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__annotations__':</span> <span class="pre">{}})</span></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.__dict__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes an <cite>OpenAIService</cite> instance for a specific model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>contains information about the</em>) – The OpenAI model to be used. This should be an instance of the OpenAIModel class, which</p></li>
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>limit.</strong> (<em>such as its name and maximum token</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'banterbot.services.openai_service'</span></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.__module__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.__weakref__" title="Link to this definition"></a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.api_key_set">
+<span class="sig-name descname"><span class="pre">api_key_set</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.api_key_set" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.client">
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.client" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.count_tokens">
+<span class="sig-name descname"><span class="pre">count_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.count_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.count_tokens" title="Link to this definition"></a></dt>
+<dd><p>Counts the number of tokens in the provided string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) – A string provided by the user where the number of tokens are to be counted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of tokens in the string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.interrupt" title="Link to this definition"></a></dt>
+<dd><p>Interrupts the current OpenAI ChatCompletion process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kill</strong> (<em>bool</em>) – Whether the interruption should kill the queues or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></em><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.model" title="Link to this definition"></a></dt>
+<dd><p>Return the <cite>OpenAIModel</cite> associated with the current instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>OpenAIModel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.prompt" title="Link to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI ChatCompletion API and retrieves the response as a list of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>list</em><em>[</em><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the <cite>Message</cite> class,</p></li>
+<li><p><strong>role</strong> (<em>which contains the content and</em>) – </p></li>
+<li><p><strong>split</strong> (<em>bool</em>) – Whether the response should be split into sentences.</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of sentences forming the response from the OpenAI API. This can be used to
+display the generated response to the user or for further processing. If <cite>split</cite> is False, returns a string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[list[str], str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.openai_service.OpenAIService.prompt_stream">
+<span class="sig-name descname"><span class="pre">prompt_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><span class="pre">Message</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler"><span class="pre">StreamHandler</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/services/openai_service.html#OpenAIService.prompt_stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.openai_service.OpenAIService.prompt_stream" title="Link to this definition"></a></dt>
+<dd><p>Sends messages to the OpenAI API and retrieves the response as a stream of blocks of sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>list</em><em>[</em><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message" title="banterbot.models.message.Message"><em>Message</em></a><em>]</em>) – A list of messages. Each message should be an instance of the <cite>Message</cite> class,</p></li>
+<li><p><strong>role</strong> (<em>which contains the content and</em>) – </p></li>
+<li><p><strong>init_time</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The time at which the stream was initialized.</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters for the API request. These can include settings such as temperature, top_p,</p></li>
+<li><p><strong>frequency_penalty.</strong> (<em>and</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A handler for the stream of blocks of sentences forming the response from</dt><dd><p>the OpenAI API or an empty tuple if the stream was interrupted.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler">StreamHandler</a>, tuple[()]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="speechsynthesisservice">
+<h3>SpeechSynthesisService<a class="headerlink" href="#speechsynthesisservice" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.services.speech_synthesis_service.</span></span><span class="sig-name descname"><span class="pre">SpeechSynthesisService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SpeechSynthesisOutputFormat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/speech_synthesis_service.html#SpeechSynthesisService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>SpeechSynthesisService</cite> class provides an interface to convert text into speech using Azure’s Cognitive
+Services. It supports various output formats, voices, and speaking styles. The synthesized speech can be
+interrupted, and the progress can be monitored in real-time.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.__dict__">
+<span class="sig-name descname"><span class="pre">__dict__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">mappingproxy({'__module__':</span> <span class="pre">'banterbot.services.speech_synthesis_service',</span> <span class="pre">'__doc__':</span> <span class="pre">&quot;\n</span>&#160;&#160;&#160; <span class="pre">The</span> <span class="pre">`SpeechSynthesisService`</span> <span class="pre">class</span> <span class="pre">provides</span> <span class="pre">an</span> <span class="pre">interface</span> <span class="pre">to</span> <span class="pre">convert</span> <span class="pre">text</span> <span class="pre">into</span> <span class="pre">speech</span> <span class="pre">using</span> <span class="pre">Azure's</span> <span class="pre">Cognitive\n</span>&#160;&#160;&#160; <span class="pre">Services.</span> <span class="pre">It</span> <span class="pre">supports</span> <span class="pre">various</span> <span class="pre">output</span> <span class="pre">formats,</span> <span class="pre">voices,</span> <span class="pre">and</span> <span class="pre">speaking</span> <span class="pre">styles.</span> <span class="pre">The</span> <span class="pre">synthesized</span> <span class="pre">speech</span> <span class="pre">can</span> <span class="pre">be\n</span>&#160;&#160;&#160; <span class="pre">interrupted,</span> <span class="pre">and</span> <span class="pre">the</span> <span class="pre">progress</span> <span class="pre">can</span> <span class="pre">be</span> <span class="pre">monitored</span> <span class="pre">in</span> <span class="pre">real-time.\n</span>&#160;&#160;&#160; <span class="pre">&quot;,</span> <span class="pre">'_synthesis_lock':</span> <span class="pre">&lt;unlocked</span> <span class="pre">_thread.lock</span> <span class="pre">object&gt;,</span> <span class="pre">'__init__':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService.__init__&gt;,</span> <span class="pre">'interrupt':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService.interrupt&gt;,</span> <span class="pre">'synthesize':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService.synthesize&gt;,</span> <span class="pre">'_init_synthesizer':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService._init_synthesizer&gt;,</span> <span class="pre">'_callback_completed':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService._callback_completed&gt;,</span> <span class="pre">'_callback_started':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService._callback_started&gt;,</span> <span class="pre">'_calculate_offset':</span> <span class="pre">&lt;staticmethod(CPUDispatcher(&lt;function</span> <span class="pre">SpeechSynthesisService._calculate_offset&gt;))&gt;,</span> <span class="pre">'_callback_word_boundary':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService._callback_word_boundary&gt;,</span> <span class="pre">'_callbacks_connect':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechSynthesisService._callbacks_connect&gt;,</span> <span class="pre">'__dict__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__dict__'</span> <span class="pre">of</span> <span class="pre">'SpeechSynthesisService'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__weakref__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__weakref__'</span> <span class="pre">of</span> <span class="pre">'SpeechSynthesisService'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__annotations__':</span> <span class="pre">{'_iterable':</span> <span class="pre">'Optional[SpeechSynthesisHandler]'}})</span></em><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.__dict__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SpeechSynthesisOutputFormat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_synthesis_service.html#SpeechSynthesisService.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes an instance of the <cite>SpeechSynthesisService</cite> class with a specified output format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_format</strong> (<em>SpeechSynthesisOutputFormat</em><em>, </em><em>optional</em>) – The desired output format for the synthesized speech.</p></li>
+<li><p><strong>Audio16Khz32KBitRateMonoMp3.</strong> (<em>Default is</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'banterbot.services.speech_synthesis_service'</span></em><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.__module__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.__weakref__" title="Link to this definition"></a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_synthesis_service.html#SpeechSynthesisService.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.interrupt" title="Link to this definition"></a></dt>
+<dd><p>Interrupts the current speech synthesis process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kill</strong> (<em>bool</em>) – Whether the interruption should kill the queues or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_synthesis_service.SpeechSynthesisService.synthesize">
+<span class="sig-name descname"><span class="pre">synthesize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phrases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase" title="banterbot.models.phrase.Phrase"><span class="pre">Phrase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word" title="banterbot.models.word.Word"><span class="pre">Word</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_synthesis_service.html#SpeechSynthesisService.synthesize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_synthesis_service.SpeechSynthesisService.synthesize" title="Link to this definition"></a></dt>
+<dd><p>Synthesizes the given phrases into speech and returns a handler for the stream of synthesized words.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phrases</strong> (<em>list</em><em>[</em><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase" title="banterbot.models.phrase.Phrase"><em>Phrase</em></a><em>]</em>) – The input phrases that are to be converted into speech.</p></li>
+<li><p><strong>init_time</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The time at which the synthesis was initialized.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A handler for the stream of synthesized words.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler">StreamHandler</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="speechrecognitionservice">
+<h3>SpeechRecognitionService<a class="headerlink" href="#speechrecognitionservice" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.services.speech_recognition_service.</span></span><span class="sig-name descname"><span class="pre">SpeechRecognitionService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phrase_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>SpeechRecognitionService</cite> class provides an interface to convert spoken language into written text using Azure
+Cognitive Speech Services. It allows continuous speech recognition and provides real-time results as sentences are
+recognized.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.__dict__">
+<span class="sig-name descname"><span class="pre">__dict__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">mappingproxy({'__module__':</span> <span class="pre">'banterbot.services.speech_recognition_service',</span> <span class="pre">'__doc__':</span> <span class="pre">'\n</span>&#160;&#160;&#160; <span class="pre">The</span> <span class="pre">`SpeechRecognitionService`</span> <span class="pre">class</span> <span class="pre">provides</span> <span class="pre">an</span> <span class="pre">interface</span> <span class="pre">to</span> <span class="pre">convert</span> <span class="pre">spoken</span> <span class="pre">language</span> <span class="pre">into</span> <span class="pre">written</span> <span class="pre">text</span> <span class="pre">using</span> <span class="pre">Azure\n</span>&#160;&#160;&#160; <span class="pre">Cognitive</span> <span class="pre">Speech</span> <span class="pre">Services.</span> <span class="pre">It</span> <span class="pre">allows</span> <span class="pre">continuous</span> <span class="pre">speech</span> <span class="pre">recognition</span> <span class="pre">and</span> <span class="pre">provides</span> <span class="pre">real-time</span> <span class="pre">results</span> <span class="pre">as</span> <span class="pre">sentences</span> <span class="pre">are\n</span>&#160;&#160;&#160; <span class="pre">recognized.\n</span>&#160;&#160;&#160; <span class="pre">',</span> <span class="pre">'_recognition_lock':</span> <span class="pre">&lt;unlocked</span> <span class="pre">_thread.lock</span> <span class="pre">object&gt;,</span> <span class="pre">'__init__':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService.__init__&gt;,</span> <span class="pre">'interrupt':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService.interrupt&gt;,</span> <span class="pre">'phrases_add':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService.phrases_add&gt;,</span> <span class="pre">'phrases_clear':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService.phrases_clear&gt;,</span> <span class="pre">'recognize':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService.recognize&gt;,</span> <span class="pre">'_init_recognizer':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService._init_recognizer&gt;,</span> <span class="pre">'_language_kwargs':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService._language_kwargs&gt;,</span> <span class="pre">'_callback_completed':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService._callback_completed&gt;,</span> <span class="pre">'_callback_started':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService._callback_started&gt;,</span> <span class="pre">'exception_handler':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService.exception_handler&gt;,</span> <span class="pre">'_callback_recognized':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService._callback_recognized&gt;,</span> <span class="pre">'_callbacks_connect':</span> <span class="pre">&lt;function</span> <span class="pre">SpeechRecognitionService._callbacks_connect&gt;,</span> <span class="pre">'__dict__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__dict__'</span> <span class="pre">of</span> <span class="pre">'SpeechRecognitionService'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__weakref__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__weakref__'</span> <span class="pre">of</span> <span class="pre">'SpeechRecognitionService'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__annotations__':</span> <span class="pre">{}})</span></em><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.__dict__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phrase_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes the <cite>SpeechRecognitionService</cite> instance by setting up the Azure Cognitive Services speech
+configuration and recognizer. Argument <cite>recognition_language</cite> can take one or more values, each representing a
+language the recognizer can expect to receive as an input. The recognizer will attempt to auto-detect the
+language if multiple are provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>languages</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>list</em><em>[</em><em>str</em><em>]</em>) – The language(s) the speech-to-text recognizer expects to hear.</p></li>
+<li><p><strong>phrase_list</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Optionally provide the recognizer with context to improve recognition.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'banterbot.services.speech_recognition_service'</span></em><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.__module__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.__weakref__" title="Link to this definition"></a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.exception_handler">
+<span class="sig-name descname"><span class="pre">exception_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry" title="banterbot.models.stream_log_entry.StreamLogEntry"><span class="pre">StreamLogEntry</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.exception_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.exception_handler" title="Link to this definition"></a></dt>
+<dd><p>Handles exceptions that occur during the processing of the stream log.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.interrupt" title="Link to this definition"></a></dt>
+<dd><p>Interrupts the current speech recognition process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kill</strong> (<em>bool</em>) – Whether the interruption should kill the queues or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_add">
+<span class="sig-name descname"><span class="pre">phrases_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phrases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.phrases_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_add" title="Link to this definition"></a></dt>
+<dd><p>Add a new phrase to the PhraseListGrammar instance, which implements a bias towards the specified words/phrases
+that can help improve speech recognition in circumstances where there may be potential ambiguity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phrases</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Provide the recognizer with additional text context to improve recognition.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_clear">
+<span class="sig-name descname"><span class="pre">phrases_clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.phrases_clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_clear" title="Link to this definition"></a></dt>
+<dd><p>Clear all phrases from the PhraseListGrammar instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.services.speech_recognition_service.SpeechRecognitionService.recognize">
+<span class="sig-name descname"><span class="pre">recognize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler"><span class="pre">StreamHandler</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/services/speech_recognition_service.html#SpeechRecognitionService.recognize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.services.speech_recognition_service.SpeechRecognitionService.recognize" title="Link to this definition"></a></dt>
+<dd><p>Recognizes speech and returns a generator that yields the recognized sentences as they are processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>init_time</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The time at which the recognition was initialized.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A handler for the stream of recognized sentences, or an empty tuple if the</dt><dd><p>recognition was interrupted.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler" title="banterbot.handlers.stream_handler.StreamHandler">StreamHandler</a>, tuple[()]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="interface">
+<h3>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.extensions.interface.</span></span><span class="sig-name descname"><span class="pre">Interface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">voice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><span class="pre">AzureNeuralVoiceProfile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tone_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phrase_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assistant_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Interface is an abstract base class for creating frontends for the BanterBot application. It provides a high-level
+interface for managing conversation with the bot, including sending messages, receiving responses, and updating a
+conversation area. The interface supports both text and speech-to-text input for user messages.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.__abstractmethods__">
+<span class="sig-name descname"><span class="pre">__abstractmethods__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'_init_gui',</span> <span class="pre">'run',</span> <span class="pre">'update_conversation_area'})</span></em><a class="headerlink" href="#banterbot.extensions.interface.Interface.__abstractmethods__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.__dict__">
+<span class="sig-name descname"><span class="pre">__dict__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">mappingproxy({'__module__':</span> <span class="pre">'banterbot.extensions.interface',</span> <span class="pre">'__doc__':</span> <span class="pre">'\n</span>&#160;&#160;&#160; <span class="pre">Interface</span> <span class="pre">is</span> <span class="pre">an</span> <span class="pre">abstract</span> <span class="pre">base</span> <span class="pre">class</span> <span class="pre">for</span> <span class="pre">creating</span> <span class="pre">frontends</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">BanterBot</span> <span class="pre">application.</span> <span class="pre">It</span> <span class="pre">provides</span> <span class="pre">a</span> <span class="pre">high-level\n</span>&#160;&#160;&#160; <span class="pre">interface</span> <span class="pre">for</span> <span class="pre">managing</span> <span class="pre">conversation</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">bot,</span> <span class="pre">including</span> <span class="pre">sending</span> <span class="pre">messages,</span> <span class="pre">receiving</span> <span class="pre">responses,</span> <span class="pre">and</span> <span class="pre">updating</span> <span class="pre">a\n</span>&#160;&#160;&#160; <span class="pre">conversation</span> <span class="pre">area.</span> <span class="pre">The</span> <span class="pre">interface</span> <span class="pre">supports</span> <span class="pre">both</span> <span class="pre">text</span> <span class="pre">and</span> <span class="pre">speech-to-text</span> <span class="pre">input</span> <span class="pre">for</span> <span class="pre">user</span> <span class="pre">messages.\n</span>&#160;&#160;&#160; <span class="pre">',</span> <span class="pre">'__init__':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.__init__&gt;,</span> <span class="pre">'interrupt':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.interrupt&gt;,</span> <span class="pre">'listener_activate':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.listener_activate&gt;,</span> <span class="pre">'listener_deactivate':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.listener_deactivate&gt;,</span> <span class="pre">'prompt':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.prompt&gt;,</span> <span class="pre">'send_message':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.send_message&gt;,</span> <span class="pre">'system_prompt':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.system_prompt&gt;,</span> <span class="pre">'update_conversation_area':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.update_conversation_area&gt;,</span> <span class="pre">'run':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.run&gt;,</span> <span class="pre">'_init_gui':</span> <span class="pre">&lt;function</span> <span class="pre">Interface._init_gui&gt;,</span> <span class="pre">'_append_to_chat_log':</span> <span class="pre">&lt;function</span> <span class="pre">Interface._append_to_chat_log&gt;,</span> <span class="pre">'respond':</span> <span class="pre">&lt;function</span> <span class="pre">Interface.respond&gt;,</span> <span class="pre">'_listen':</span> <span class="pre">&lt;function</span> <span class="pre">Interface._listen&gt;,</span> <span class="pre">'__dict__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__dict__'</span> <span class="pre">of</span> <span class="pre">'Interface'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__weakref__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__weakref__'</span> <span class="pre">of</span> <span class="pre">'Interface'</span> <span class="pre">objects&gt;,</span> <span class="pre">'__abstractmethods__':</span> <span class="pre">frozenset({'update_conversation_area',</span> <span class="pre">'_init_gui',</span> <span class="pre">'run'}),</span> <span class="pre">'_abc_impl':</span> <span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;,</span> <span class="pre">'__annotations__':</span> <span class="pre">{'_messages':</span> <span class="pre">'list[Message]'}})</span></em><a class="headerlink" href="#banterbot.extensions.interface.Interface.__dict__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">voice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><span class="pre">AzureNeuralVoiceProfile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tone_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phrase_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assistant_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the Interface with the specified model and voice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><em>OpenAIModel</em></a>) – The OpenAI model to use for generating responses.</p></li>
+<li><p><strong>voice</strong> (<em>AzureNeuralVoice</em>) – The voice to use for text-to-speech synthesis.</p></li>
+<li><p><strong>languages</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em><em>]</em>) – The languages supported by the speech-to-text recognizer.</p></li>
+<li><p><strong>system</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – An initialization prompt that can be used to set the scene.</p></li>
+<li><p><strong>tone_model</strong> (<a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><em>OpenAIModel</em></a>) – The OpenAI ChatCompletion model to use for tone evaluation.</p></li>
+<li><p><strong>phrase_list</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Optionally provide the recognizer with context to improve recognition.</p></li>
+<li><p><strong>assistant_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Optionally provide a name for the character.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'banterbot.extensions.interface'</span></em><a class="headerlink" href="#banterbot.extensions.interface.Interface.__module__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#banterbot.extensions.interface.Interface.__weakref__" title="Link to this definition"></a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.interrupt">
+<span class="sig-name descname"><span class="pre">interrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shutdown_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.interrupt" title="Link to this definition"></a></dt>
+<dd><p>Interrupts all speech-to-text recognition, text-to-speech synthesis, and OpenAI API streams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>soft</strong> (<em>bool</em>) – If True, allows the recognizer to keep processing data that was recorded prior to interruption.</p></li>
+<li><p><strong>shutdown_time</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The time at which the listener was deactivated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.listener_activate">
+<span class="sig-name descname"><span class="pre">listener_activate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.listener_activate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.listener_activate" title="Link to this definition"></a></dt>
+<dd><p>Activate the speech-to-text listener.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The name of the user sending the message. Defaults to None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.listener_deactivate">
+<span class="sig-name descname"><span class="pre">listener_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.listener_deactivate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.listener_deactivate" title="Link to this definition"></a></dt>
+<dd><p>Deactivate the speech-to-text listener.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.prompt" title="Link to this definition"></a></dt>
+<dd><p>Prompt the bot with the specified user message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – The message content from the user.</p></li>
+<li><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The name of the user sending the message. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.respond">
+<span class="sig-name descname"><span class="pre">respond</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.respond"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.respond" title="Link to this definition"></a></dt>
+<dd><p>Get a response from the bot and update the conversation area with the response. This method handles generating
+the bot’s response using the OpenAIService and updating the conversation area with the response text using
+text-to-speech synthesis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.run">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.run" title="Link to this definition"></a></dt>
+<dd><p>Run the frontend application.
+This method should be implemented by subclasses to handle the main event loop of the specific GUI framework.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.send_message">
+<span class="sig-name descname"><span class="pre">send_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles" title="banterbot.data.enums.ChatCompletionRoles"><span class="pre">ChatCompletionRoles</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">ChatCompletionRoles.USER</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.send_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.send_message" title="Link to this definition"></a></dt>
+<dd><p>Send a message from the user to the conversation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – The message content from the user.</p></li>
+<li><p><strong>role</strong> (<a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles" title="banterbot.data.enums.ChatCompletionRoles"><em>ChatCompletionRoles</em></a>) – The role (USER, ASSISTANT, SYSTEM) associated with the content.</p></li>
+<li><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The name of the user sending the message. Defaults to None.</p></li>
+<li><p><strong>hidden</strong> (<em>bool</em>) – If True, does not display the message in the interface.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.system_prompt">
+<span class="sig-name descname"><span class="pre">system_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.system_prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.system_prompt" title="Link to this definition"></a></dt>
+<dd><p>Prompt the bot with the specified message, issuing a command which is not displayed in the conversation area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – The message content from the user.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.extensions.interface.Interface.update_conversation_area">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_conversation_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/extensions/interface.html#Interface.update_conversation_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.extensions.interface.Interface.update_conversation_area" title="Link to this definition"></a></dt>
+<dd><p>Update the conversation area with the specified word, and add the word to the chat log.
+This method should be implemented by subclasses to handle updating the specific GUI components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>word</strong> (<em>str</em>) – The word to add to the conversation area.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="tkinterface">
+<h3>TKInterface<a class="headerlink" href="#tkinterface" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.gui.tk_interface.</span></span><span class="sig-name descname"><span class="pre">TKInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><span class="pre">AzureNeuralVoiceProfile</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tone_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phrase_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assistant_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Tk</span></code>, <a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface" title="banterbot.extensions.interface.Interface"><code class="xref py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a></p>
+<p>A graphical user interface (GUI) class that enables interaction with the BanterBot chatbot in a multiplayer mode.
+It supports functionalities such as text input, text-to-speech and speech-to-text capabilities for up to 9 users
+simultaneously, based on OpenAI and Azure services.</p>
+<p>This class inherits from tkinter’s Tk class and a custom Interface class, allowing it to be displayed as a
+standalone window and follow a specific chatbot interaction protocol respectively.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.__abstractmethods__">
+<span class="sig-name descname"><span class="pre">__abstractmethods__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({})</span></em><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.__abstractmethods__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'_messages':</span> <span class="pre">'list[Message]'}</span></em><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.__annotations__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><span class="pre">AzureNeuralVoiceProfile</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tone_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phrase_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assistant_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the TKInterface class, which inherits from both tkinter.Tk and Interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><em>OpenAIModel</em></a><em>, </em><em>optional</em>) – The OpenAI model to be used for generating responses.</p></li>
+<li><p><strong>voice</strong> (<em>AzureNeuralVoice</em><em>, </em><em>optional</em>) – The Azure Neural Voice to be used for text-to-speech.</p></li>
+<li><p><strong>languages</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em><em>]</em>) – The languages supported by the speech-to-text recognizer.</p></li>
+<li><p><strong>tone_model</strong> (<a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><em>OpenAIModel</em></a>) – The OpenAI ChatCompletion model to use for tone evaluation.</p></li>
+<li><p><strong>system</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – An initialization prompt that can be used to set the scene.</p></li>
+<li><p><strong>phrase_list</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Optionally provide the recognizer with context to improve recognition.</p></li>
+<li><p><strong>assistant_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Optionally provide a name for the character.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'banterbot.gui.tk_interface'</span></em><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.__module__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.listener_activate">
+<span class="sig-name descname"><span class="pre">listener_activate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.listener_activate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.listener_activate" title="Link to this definition"></a></dt>
+<dd><p>Activate the speech-to-text listener.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The name of the user sending the message. Defaults to None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.listener_deactivate">
+<span class="sig-name descname"><span class="pre">listener_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.listener_deactivate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.listener_deactivate" title="Link to this definition"></a></dt>
+<dd><p>Deactivate the speech-to-text listener.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.request_response">
+<span class="sig-name descname"><span class="pre">request_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.request_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.request_response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.reset_focus">
+<span class="sig-name descname"><span class="pre">reset_focus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.reset_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.reset_focus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">greet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.run" title="Link to this definition"></a></dt>
+<dd><p>Run the BanterBot application. This method starts the main event loop of the tkinter application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>greet</strong> (<em>bool</em>) – If True, greets the user unprompted on initialization.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.select_all_on_focus">
+<span class="sig-name descname"><span class="pre">select_all_on_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.select_all_on_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.select_all_on_focus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.update_conversation_area">
+<span class="sig-name descname"><span class="pre">update_conversation_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.update_conversation_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.update_conversation_area" title="Link to this definition"></a></dt>
+<dd><p>Update the conversation area with the specified word, and add the word to the chat log.
+This method should be implemented by subclasses to handle updating the specific GUI components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>word</strong> (<em>str</em>) – The word to add to the conversation area.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.gui.tk_interface.TKInterface.update_name">
+<span class="sig-name descname"><span class="pre">update_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/gui/tk_interface.html#TKInterface.update_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.gui.tk_interface.TKInterface.update_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.data.html#module-banterbot.data.enums">banterbot.data.enums module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles.ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles.ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles.SYSTEM"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles.SYSTEM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles.USER"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles.USER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar"><code class="docutils literal notranslate"><span class="pre">EnvVar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar.AZURE_SPEECH_KEY"><code class="docutils literal notranslate"><span class="pre">EnvVar.AZURE_SPEECH_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar.AZURE_SPEECH_REGION"><code class="docutils literal notranslate"><span class="pre">EnvVar.AZURE_SPEECH_REGION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar.OPENAI_API_KEY"><code class="docutils literal notranslate"><span class="pre">EnvVar.OPENAI_API_KEY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody"><code class="docutils literal notranslate"><span class="pre">Prosody</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.EMPHASES"><code class="docutils literal notranslate"><span class="pre">Prosody.EMPHASES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.PHRASE_PATTERN"><code class="docutils literal notranslate"><span class="pre">Prosody.PHRASE_PATTERN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.PITCHES"><code class="docutils literal notranslate"><span class="pre">Prosody.PITCHES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.RATES"><code class="docutils literal notranslate"><span class="pre">Prosody.RATES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.STYLEDEGREES"><code class="docutils literal notranslate"><span class="pre">Prosody.STYLEDEGREES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.STYLES"><code class="docutils literal notranslate"><span class="pre">Prosody.STYLES</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_LG"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel.EN_CORE_WEB_LG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_MD"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel.EN_CORE_WEB_MD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_SM"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel.EN_CORE_WEB_SM</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.data.html#module-banterbot.data.prompts">banterbot.data.prompts module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.Greetings"><code class="docutils literal notranslate"><span class="pre">Greetings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.Greetings.UNPROMPTED_GREETING"><code class="docutils literal notranslate"><span class="pre">Greetings.UNPROMPTED_GREETING</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.DUMMY"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.DUMMY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.PREFIX"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.PREFIX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.PROB_VAR"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.PROB_VAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.SUFFIX"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.SUFFIX</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts"><code class="docutils literal notranslate"><span class="pre">OptionSelectorPrompts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts.DUMMY"><code class="docutils literal notranslate"><span class="pre">OptionSelectorPrompts.DUMMY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts.PREFIX"><code class="docutils literal notranslate"><span class="pre">OptionSelectorPrompts.PREFIX</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection"><code class="docutils literal notranslate"><span class="pre">ProsodySelection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.CHARACTER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.CHARACTER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.CONTEXT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.CONTEXT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.DUMMY"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.DUMMY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EMPHASIS_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EMPHASIS_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EMPHASIS_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EMPHASIS_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EXAMPLE_ASSISTANT_1"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EXAMPLE_ASSISTANT_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EXAMPLE_ASSISTANT_2"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EXAMPLE_ASSISTANT_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EXAMPLE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EXAMPLE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PITCH_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PITCH_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PITCH_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PITCH_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PREFIX"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PREFIX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PROMPT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PROMPT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.RATE_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.RATE_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.RATE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.RATE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLEDEGREE_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLEDEGREE_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLEDEGREE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLEDEGREE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLE_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLE_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.SUFFIX"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.SUFFIX</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing.EXAMPLE_1"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing.EXAMPLE_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing.EXAMPLE_2"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing.EXAMPLE_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing.SYSTEM"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing.SYSTEM</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ToneSelection"><code class="docutils literal notranslate"><span class="pre">ToneSelection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ToneSelection.PROMPT"><code class="docutils literal notranslate"><span class="pre">ToneSelection.PROMPT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ToneSelection.SYSTEM"><code class="docutils literal notranslate"><span class="pre">ToneSelection.SYSTEM</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.exceptions.html">banterbot.exceptions package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.exceptions.html#module-banterbot.exceptions.format_mismatch_error">banterbot.exceptions.format_mismatch_error module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.exceptions.html#banterbot.exceptions.format_mismatch_error.FormatMismatchError"><code class="docutils literal notranslate"><span class="pre">FormatMismatchError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.extensions.html#module-banterbot.extensions.interface">banterbot.extensions.interface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface"><code class="docutils literal notranslate"><span class="pre">Interface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.interrupt"><code class="docutils literal notranslate"><span class="pre">Interface.interrupt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.listener_activate"><code class="docutils literal notranslate"><span class="pre">Interface.listener_activate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.listener_deactivate"><code class="docutils literal notranslate"><span class="pre">Interface.listener_deactivate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.prompt"><code class="docutils literal notranslate"><span class="pre">Interface.prompt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.respond"><code class="docutils literal notranslate"><span class="pre">Interface.respond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.run"><code class="docutils literal notranslate"><span class="pre">Interface.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.send_message"><code class="docutils literal notranslate"><span class="pre">Interface.send_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.system_prompt"><code class="docutils literal notranslate"><span class="pre">Interface.system_prompt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.interface.Interface.update_conversation_area"><code class="docutils literal notranslate"><span class="pre">Interface.update_conversation_area()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.extensions.html#module-banterbot.extensions.option_selector">banterbot.extensions.option_selector module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.option_selector.OptionSelector"><code class="docutils literal notranslate"><span class="pre">OptionSelector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.option_selector.OptionSelector.select"><code class="docutils literal notranslate"><span class="pre">OptionSelector.select()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.extensions.html#module-banterbot.extensions.prosody_selector">banterbot.extensions.prosody_selector module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector"><code class="docutils literal notranslate"><span class="pre">ProsodySelector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._model"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._openai_manager"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._openai_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._voice"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._voice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._valid"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._valid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._token_counts"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._token_counts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._output_patterns"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._output_patterns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._system"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._line_pattern"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._line_pattern</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector.select"><code class="docutils literal notranslate"><span class="pre">ProsodySelector.select()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.gui.html#module-banterbot.gui.tk_interface">banterbot.gui.tk_interface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface"><code class="docutils literal notranslate"><span class="pre">TKInterface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.listener_activate"><code class="docutils literal notranslate"><span class="pre">TKInterface.listener_activate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.listener_deactivate"><code class="docutils literal notranslate"><span class="pre">TKInterface.listener_deactivate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.request_response"><code class="docutils literal notranslate"><span class="pre">TKInterface.request_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.reset_focus"><code class="docutils literal notranslate"><span class="pre">TKInterface.reset_focus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.run"><code class="docutils literal notranslate"><span class="pre">TKInterface.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.select_all_on_focus"><code class="docutils literal notranslate"><span class="pre">TKInterface.select_all_on_focus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.update_conversation_area"><code class="docutils literal notranslate"><span class="pre">TKInterface.update_conversation_area()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html#banterbot.gui.tk_interface.TKInterface.update_name"><code class="docutils literal notranslate"><span class="pre">TKInterface.update_name()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.handlers.html">banterbot.handlers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.handlers.html#module-banterbot.handlers.speech_recognition_handler">banterbot.handlers.speech_recognition_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.speech_recognition_handler.SpeechRecognitionHandler"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.speech_recognition_handler.SpeechRecognitionHandler.close"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionHandler.close()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.handlers.html#module-banterbot.handlers.speech_synthesis_handler">banterbot.handlers.speech_synthesis_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.speech_synthesis_handler.SpeechSynthesisHandler"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisHandler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.handlers.html#module-banterbot.handlers.stream_handler">banterbot.handlers.stream_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler"><code class="docutils literal notranslate"><span class="pre">StreamHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler.interrupt"><code class="docutils literal notranslate"><span class="pre">StreamHandler.interrupt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.stream_handler.StreamHandler.is_alive"><code class="docutils literal notranslate"><span class="pre">StreamHandler.is_alive()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.managers.html">banterbot.managers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.azure_neural_voice_manager">banterbot.managers.azure_neural_voice_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.data"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_countries"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_countries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_genders"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_genders()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_languages"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_languages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_locales"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_locales()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_regions"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_regions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_styles"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_styles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.load"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.search"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.memory_chain">banterbot.managers.memory_chain module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain"><code class="docutils literal notranslate"><span class="pre">MemoryChain</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.append"><code class="docutils literal notranslate"><span class="pre">MemoryChain.append()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.create"><code class="docutils literal notranslate"><span class="pre">MemoryChain.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.delete"><code class="docutils literal notranslate"><span class="pre">MemoryChain.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.extend"><code class="docutils literal notranslate"><span class="pre">MemoryChain.extend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.load"><code class="docutils literal notranslate"><span class="pre">MemoryChain.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.search"><code class="docutils literal notranslate"><span class="pre">MemoryChain.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.openai_model_manager">banterbot.managers.openai_model_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.openai_model_manager.OpenAIModelManager"><code class="docutils literal notranslate"><span class="pre">OpenAIModelManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.openai_model_manager.OpenAIModelManager.list"><code class="docutils literal notranslate"><span class="pre">OpenAIModelManager.list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.openai_model_manager.OpenAIModelManager.load"><code class="docutils literal notranslate"><span class="pre">OpenAIModelManager.load()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.resource_manager">banterbot.managers.resource_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager"><code class="docutils literal notranslate"><span class="pre">ResourceManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.load_csv"><code class="docutils literal notranslate"><span class="pre">ResourceManager.load_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.load_json"><code class="docutils literal notranslate"><span class="pre">ResourceManager.load_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.load_raw"><code class="docutils literal notranslate"><span class="pre">ResourceManager.load_raw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_cache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_csv_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_csv_cache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_json_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_json_cache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_raw_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_raw_cache()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.stream_manager">banterbot.managers.stream_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.stream_manager.StreamManager"><code class="docutils literal notranslate"><span class="pre">StreamManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.connect_completion_handler"><code class="docutils literal notranslate"><span class="pre">StreamManager.connect_completion_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.connect_exception_handler"><code class="docutils literal notranslate"><span class="pre">StreamManager.connect_exception_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.connect_processor"><code class="docutils literal notranslate"><span class="pre">StreamManager.connect_processor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.stream_manager.StreamManager.stream"><code class="docutils literal notranslate"><span class="pre">StreamManager.stream()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.models.html">banterbot.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.azure_neural_voice_profile">banterbot.models.azure_neural_voice_profile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.country"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.country</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.description"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.gender"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.gender</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.language"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.language</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.locale"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.locale</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.name"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.region"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.region</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.short_name"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.short_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.style_list"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.style_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id0"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.country</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id1"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id2"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.gender</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id3"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.language</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id4"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.locale</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id5"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id6"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.region</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id7"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.short_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id8"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.style_list</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.memory">banterbot.models.memory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory"><code class="docutils literal notranslate"><span class="pre">Memory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.deserialize"><code class="docutils literal notranslate"><span class="pre">Memory.deserialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.from_protobuf"><code class="docutils literal notranslate"><span class="pre">Memory.from_protobuf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.impact"><code class="docutils literal notranslate"><span class="pre">Memory.impact</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.keywords"><code class="docutils literal notranslate"><span class="pre">Memory.keywords</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.messages"><code class="docutils literal notranslate"><span class="pre">Memory.messages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.serialize"><code class="docutils literal notranslate"><span class="pre">Memory.serialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.summary"><code class="docutils literal notranslate"><span class="pre">Memory.summary</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.timestamp"><code class="docutils literal notranslate"><span class="pre">Memory.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.to_protobuf"><code class="docutils literal notranslate"><span class="pre">Memory.to_protobuf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.uuid"><code class="docutils literal notranslate"><span class="pre">Memory.uuid</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.message">banterbot.models.message module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message"><code class="docutils literal notranslate"><span class="pre">Message</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.role"><code class="docutils literal notranslate"><span class="pre">Message.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.content"><code class="docutils literal notranslate"><span class="pre">Message.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.name"><code class="docutils literal notranslate"><span class="pre">Message.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id9"><code class="docutils literal notranslate"><span class="pre">Message.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.count_tokens"><code class="docutils literal notranslate"><span class="pre">Message.count_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.from_protobuf"><code class="docutils literal notranslate"><span class="pre">Message.from_protobuf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id10"><code class="docutils literal notranslate"><span class="pre">Message.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id11"><code class="docutils literal notranslate"><span class="pre">Message.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.to_protobuf"><code class="docutils literal notranslate"><span class="pre">Message.to_protobuf()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.number">banterbot.models.number module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.number.Number"><code class="docutils literal notranslate"><span class="pre">Number</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.number.Number.is_null"><code class="docutils literal notranslate"><span class="pre">Number.is_null()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.number.Number.set"><code class="docutils literal notranslate"><span class="pre">Number.set()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.openai_model">banterbot.models.openai_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel"><code class="docutils literal notranslate"><span class="pre">OpenAIModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.model"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.max_tokens"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.max_tokens</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.generation"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.generation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.rank"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.rank</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.tokenizer"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.tokenizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id12"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.generation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id13"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.max_tokens</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id14"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id15"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.rank</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.phrase">banterbot.models.phrase module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase"><code class="docutils literal notranslate"><span class="pre">Phrase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.emphasis"><code class="docutils literal notranslate"><span class="pre">Phrase.emphasis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.pitch"><code class="docutils literal notranslate"><span class="pre">Phrase.pitch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.rate"><code class="docutils literal notranslate"><span class="pre">Phrase.rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.style"><code class="docutils literal notranslate"><span class="pre">Phrase.style</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.styledegree"><code class="docutils literal notranslate"><span class="pre">Phrase.styledegree</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.text"><code class="docutils literal notranslate"><span class="pre">Phrase.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.voice"><code class="docutils literal notranslate"><span class="pre">Phrase.voice</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.speech_recognition_input">banterbot.models.speech_recognition_input module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.display"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.duration"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.from_cutoff"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.from_cutoff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.from_recognition_result"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.from_recognition_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.offset"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.offset_end"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.offset_end</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.sents"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.sents</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.words"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.words</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.stream_log_entry">banterbot.models.stream_log_entry module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry"><code class="docutils literal notranslate"><span class="pre">StreamLogEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry.timestamp"><code class="docutils literal notranslate"><span class="pre">StreamLogEntry.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry.value"><code class="docutils literal notranslate"><span class="pre">StreamLogEntry.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.word">banterbot.models.word module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.word"><code class="docutils literal notranslate"><span class="pre">Word.word</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.offset"><code class="docutils literal notranslate"><span class="pre">Word.offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.duration"><code class="docutils literal notranslate"><span class="pre">Word.duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id16"><code class="docutils literal notranslate"><span class="pre">Word.duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id17"><code class="docutils literal notranslate"><span class="pre">Word.offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.text"><code class="docutils literal notranslate"><span class="pre">Word.text</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.services.html">banterbot.services package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.services.html#module-banterbot.services.openai_service">banterbot.services.openai_service module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService"><code class="docutils literal notranslate"><span class="pre">OpenAIService</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService.api_key_set"><code class="docutils literal notranslate"><span class="pre">OpenAIService.api_key_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService.client"><code class="docutils literal notranslate"><span class="pre">OpenAIService.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService.count_tokens"><code class="docutils literal notranslate"><span class="pre">OpenAIService.count_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService.interrupt"><code class="docutils literal notranslate"><span class="pre">OpenAIService.interrupt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService.model"><code class="docutils literal notranslate"><span class="pre">OpenAIService.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService.prompt"><code class="docutils literal notranslate"><span class="pre">OpenAIService.prompt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.openai_service.OpenAIService.prompt_stream"><code class="docutils literal notranslate"><span class="pre">OpenAIService.prompt_stream()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.services.html#module-banterbot.services.speech_synthesis_service">banterbot.services.speech_synthesis_service module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_synthesis_service.SpeechSynthesisService"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisService</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_synthesis_service.SpeechSynthesisService.interrupt"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisService.interrupt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_synthesis_service.SpeechSynthesisService.synthesize"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisService.synthesize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.services.html#module-banterbot.services.speech_recognition_service">banterbot.services.speech_recognition_service module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionService</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.exception_handler"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionService.exception_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.interrupt"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionService.interrupt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_add"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionService.phrases_add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.phrases_clear"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionService.phrases_clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html#banterbot.services.speech_recognition_service.SpeechRecognitionService.recognize"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionService.recognize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.types.html">banterbot.types package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.types.html#module-banterbot.types.wordjson">banterbot.types.wordjson module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON"><code class="docutils literal notranslate"><span class="pre">WordJSON</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Word"><code class="docutils literal notranslate"><span class="pre">WordJSON.Word</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Offset"><code class="docutils literal notranslate"><span class="pre">WordJSON.Offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Duration"><code class="docutils literal notranslate"><span class="pre">WordJSON.Duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Confidence"><code class="docutils literal notranslate"><span class="pre">WordJSON.Confidence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id0"><code class="docutils literal notranslate"><span class="pre">WordJSON.Confidence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id1"><code class="docutils literal notranslate"><span class="pre">WordJSON.Duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id2"><code class="docutils literal notranslate"><span class="pre">WordJSON.Offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id3"><code class="docutils literal notranslate"><span class="pre">WordJSON.Word</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.closeable_queue">banterbot.utils.closeable_queue module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue"><code class="docutils literal notranslate"><span class="pre">CloseableQueue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.close"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.finished"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.finished()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.get"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.kill"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.kill()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.put"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.put()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.reset"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.reset()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.indexed_event">banterbot.utils.indexed_event module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent"><code class="docutils literal notranslate"><span class="pre">IndexedEvent</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.clear"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.counter"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.counter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.decrement"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.decrement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.increment"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.increment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.is_set"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.is_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.set"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.set()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.nlp">banterbot.utils.nlp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP"><code class="docutils literal notranslate"><span class="pre">NLP</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.extract_keywords"><code class="docutils literal notranslate"><span class="pre">NLP.extract_keywords()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.install_upgrade_all_models"><code class="docutils literal notranslate"><span class="pre">NLP.install_upgrade_all_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.load_all_models"><code class="docutils literal notranslate"><span class="pre">NLP.load_all_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.model"><code class="docutils literal notranslate"><span class="pre">NLP.model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.segment_sentences"><code class="docutils literal notranslate"><span class="pre">NLP.segment_sentences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.segment_words"><code class="docutils literal notranslate"><span class="pre">NLP.segment_words()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.tokenize"><code class="docutils literal notranslate"><span class="pre">NLP.tokenize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.thread_queue">banterbot.utils.thread_queue module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.thread_queue.ThreadQueue"><code class="docutils literal notranslate"><span class="pre">ThreadQueue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.thread_queue.ThreadQueue.add_task"><code class="docutils literal notranslate"><span class="pre">ThreadQueue.add_task()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.thread_queue.ThreadQueue.is_alive"><code class="docutils literal notranslate"><span class="pre">ThreadQueue.is_alive()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="BanterBot" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="banterbot.data.html" class="btn btn-neutral float-right" title="banterbot.data package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
