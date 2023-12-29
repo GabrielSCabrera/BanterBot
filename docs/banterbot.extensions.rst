@@ -18,7 +18,7 @@ banterbot.extensions.option\_selector module
     :show-inheritance:
 
 banterbot.extensions.prosody\_selector module
---------------------------------------------
+---------------------------------------------
 
 .. automodule:: banterbot.extensions.prosody_selector
     :members:
