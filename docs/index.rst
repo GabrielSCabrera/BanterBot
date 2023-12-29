@@ -18,8 +18,8 @@ Features
 -  Utilizes OpenAI models to generate context-aware responses
 -  Leverages Azure Neural Voices for premium text-to-speech
    synthesis
--  Offers a wide range of output formats, voices, and speaking
-   styles
+-  Offers a wide range of output formats, multilingual voices,
+   and speaking styles
 -  Allows real-time monitoring of the chatbot's responses
 -  Supports asynchronous speech-to-text microphone input
 -  Includes an abstract base class for creating custom frontends
