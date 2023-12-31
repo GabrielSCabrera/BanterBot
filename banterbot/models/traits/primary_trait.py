@@ -90,7 +90,7 @@ class PrimaryTrait:
         Returns:
             dict: The data for the specified trait.
         """
-        traits_data = ResourceManager.load_json(filename=primary_traits, cache=True, reset=False)
+        traits_data = ResourceManager.load_json(resource=primary_traits, cache=True, reset=False)
 
         # Search for the trait data based on UUID
         if uuid in traits_data:

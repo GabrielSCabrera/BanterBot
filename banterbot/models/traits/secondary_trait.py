@@ -10,24 +10,27 @@ class SecondaryTrait:
     specified parameters using data from instances of class `PrimaryTrait` or the `resources.secondary_traits` resource.
     """
 
-    def __init__(self, name: str, value: np.ndarray, description: str) -> None:
+    def __init__(self, uuid: str, name: str, description: str, value: int, value_description: str):
         """
         Initialize a SecondaryTrait instance.
 
         Args:
+            uuid (str): The unique identifier of the secondary trait.
             name (str): The name of the secondary trait.
-            value (np.ndarray): The numerical value of the secondary trait.
             description (str): A textual description of the secondary trait.
+            value (int): The specific value of the secondary trait.
+            value_description (str): Description of the trait at the specific value.
         """
+        self.uuid = uuid
         self.name = name
-        self.value = value
         self.description = description
+        self.value = value
+        self.value_description = value_description
 
     @classmethod
     def from_primary_traits(
         cls,
-        name: str,
-        grid: list[list[str]],
+        uuid: str,
         primary_trait_1: PrimaryTrait,
         primary_trait_2: PrimaryTrait,
         cov: float = 0.95,
@@ -37,8 +40,7 @@ class SecondaryTrait:
         select a value from the provided grid.
 
         Args:
-            name (str): The name of the secondary trait.
-            grid (list[list[str]]): A 5x5 nested list of strings representing potential trait values.
+            uuid (str): The unique identifier of the secondary trait.
             primary_trait_1 (PrimaryTrait): The first primary trait influencing the secondary trait.
             primary_trait_2 (PrimaryTrait): The second primary trait influencing the secondary trait.
             cov (float): The covariance for the Gaussian distribution, defaults to 0.95.

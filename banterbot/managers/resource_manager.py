@@ -2,7 +2,7 @@ import csv
 import importlib.resources
 import json
 from io import StringIO
-from typing import Any
+from typing import Any, Optional
 
 import banterbot.resources
 from banterbot import config
@@ -51,42 +51,44 @@ class ResourceManager:
         cls._json_data.clear()
 
     @classmethod
-    def load_raw(cls, filename: str, cache: bool = True, reset: bool = False, encoding: str = "utf-8") -> str:
+    def load_raw(cls, resource: str, cache: bool = True, reset: bool = False, encoding: Optional[str] = None) -> str:
         """
         Load a specified file by filename and return its contents as a string.
 
         Args:
-            filename (str): The name of the resource file — should including its suffix.
+            resource (str): The name of the resource file — should including its suffix.
             cache (bool): If True, cache the loaded data to reduce overhead the next time its loaded.
             reset (bool): If set to True, reloads the contents from file, disregarding the current state of the cache.
-            encoding (str): The type of encoding to use when loading the resource.
+            encoding (str, optional): The type of encoding to use when loading the resource.
 
         Returns:
             str: The resource file's contents as a string.
         """
-        if reset or filename not in cls._raw_data:
-            path = importlib.resources.files(banterbot.resources).joinpath(filename)
+        encoding = config.ENCODING if encoding is None else encoding
+
+        if reset or resource not in cls._raw_data:
+            path = importlib.resources.files(banterbot.resources).joinpath(resource)
             try:
-                with open(file=path, mode="r", encoding=config.ENCODING) as fs:
+                with open(file=path, mode="r", encoding=encoding) as fs:
                     data = fs.read()
             except FileNotFoundError:
-                message = f"Class `ResourceLoader` found no such resource: `{filename}`"
+                message = f"Class `ResourceLoader` found no such resource: `{resource}`"
                 raise FileNotFoundError(message)
 
             if cache:
-                cls._raw_data[filename] = data
+                cls._raw_data[resource] = data
         else:
-            data = cls._raw_data[filename]
+            data = cls._raw_data[resource]
 
         return data
 
     @classmethod
-    def load_json(cls, filename: str, cache: bool = True, reset: bool = False, encoding: str = "utf-8") -> dict[Any]:
+    def load_json(cls, resource: str, cache: bool = True, reset: bool = False, encoding: str = "utf-8") -> dict[Any]:
         """
         Load a specified JSON file by filename and return its contents as a dictionary.
 
         Args:
-            filename (str): The name of the resource file — should be a JSON file.
+            resource (str): The name of the resource file — should be a JSON file.
             cache (bool): If True, cache the loaded data to reduce overhead the next time its loaded.
             reset (bool): If set to True, reloads the contents from file, disregarding the current state of the cache.
             encoding (str): The type of encoding to use when loading the resource.
@@ -94,25 +96,25 @@ class ResourceManager:
         Returns:
             dict[Any]: The JSON data formatted as a dictionary.
         """
-        if reset or filename not in cls._json_data:
-            raw_data = cls.load_raw(filename=filename, cache=False, encoding=encoding)
+        if reset or resource not in cls._json_data:
+            raw_data = cls.load_raw(resource=resource, cache=False, encoding=encoding)
             try:
                 data = json.loads(raw_data)
             except json.decoder.JSONDecodeError as e:
-                message = f"Class `ResourceLoader` unable to interpret resource as JSON: `{filename}`. {e.args[0]}"
+                message = f"Class `ResourceLoader` unable to interpret resource as JSON: `{resource}`. {e.args[0]}"
                 raise json.decoder.JSONDecodeError(message)
 
             if cache:
-                cls._json_data[filename] = data
+                cls._json_data[resource] = data
         else:
-            data = cls._json_data[filename]
+            data = cls._json_data[resource]
 
         return data
 
     @classmethod
     def load_csv(
         cls,
-        filename: str,
+        resource: str,
         cache: bool = True,
         reset: bool = False,
         encoding: str = "utf-8",
@@ -125,7 +127,7 @@ class ResourceManager:
         Load a specified CSV file by filename and return its contents as a nested list of strings.
 
         Args:
-            filename (str): The name of the resource file — should be a CSV file.
+            resource (str): The name of the resource file — should be a CSV file.
             cache (bool): If True, cache the loaded data to reduce overhead the next time its loaded.
             reset (bool): If set to True, reloads the contents from file, disregarding the current state of the cache.
             encoding (str): The type of encoding to use when loading the resource.
@@ -137,8 +139,8 @@ class ResourceManager:
         Returns:
             list[list[str]]: The CSV data formatted as a nested list of strings.
         """
-        if reset or filename not in cls._csv_data:
-            raw_data = cls.load_raw(filename=filename, cache=False, encoding=encoding)
+        if reset or resource not in cls._csv_data:
+            raw_data = cls.load_raw(resource=resource, cache=False, encoding=encoding)
             try:
                 data = []
                 with StringIO(raw_data, newline="") as fs:
@@ -146,12 +148,12 @@ class ResourceManager:
                     for row in reader:
                         data.append(row)
             except csv.Error as e:
-                message = f"Class `ResourceLoader` unable to interpret resource as CSV: `{filename}`, {e.args[0]}"
+                message = f"Class `ResourceLoader` unable to interpret resource as CSV: `{resource}`, {e.args[0]}"
                 raise csv.Error(message)
 
             if cache:
-                cls._csv_data[filename] = data
+                cls._csv_data[resource] = data
         else:
-            data = cls._csv_data[filename]
+            data = cls._csv_data[resource]
 
         return data

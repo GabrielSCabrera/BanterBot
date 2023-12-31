@@ -21,7 +21,7 @@ class OpenAIModelManager:
         Returns:
             list[str]: A list of names.
         """
-        openai_models = ResourceManager.load_json(filename=paths.openai_models)
+        openai_models = ResourceManager.load_json(resource=paths.openai_models)
         return list(openai_models.keys())
 
     @classmethod
@@ -39,7 +39,7 @@ class OpenAIModelManager:
             KeyError: If the specified name is not found in the resource file defined by `config.openai_models`.
         """
         if name.lower() not in cls._data:
-            openai_models = ResourceManager.load_json(filename=paths.openai_models)
+            openai_models = ResourceManager.load_json(resource=paths.openai_models)
 
             if name.lower() not in openai_models:
                 available_models = ", ".join(f"`{name}`" for name in openai_models)
