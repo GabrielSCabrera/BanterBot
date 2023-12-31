@@ -9,19 +9,21 @@ from banterbot.paths import primary_traits
 class PrimaryTrait:
     """
     Primary trait loading and management, with options for random generation or specified parameters using data from the
-    `paths.primary_traits` resource.
+    `resources.primary_traits` resource.
     """
 
-    def __init__(self, name: str, description: str, value: int, value_description: str):
+    def __init__(self, uuid: str, name: str, description: str, value: int, value_description: str):
         """
         Initialize a PrimaryTrait instance.
 
         Args:
+            uuid (str): The unique identifier of the primary trait.
             name (str): The name of the primary trait.
             description (str): A textual description of the primary trait.
             value (int): The specific value of the primary trait.
             value_description (str): Description of the trait at the specific value.
         """
+        self.uuid = uuid
         self.name = name
         self.description = description
         self.value = value
@@ -42,11 +44,15 @@ class PrimaryTrait:
             PrimaryTrait: An instance of PrimaryTrait with a randomly selected value.
         """
         data = cls._load_uuid(uuid)
-
         value = random.randrange(len(data["levels"]))
 
-        value_description = data["levels"][value]
-        return cls(data["name"], data["description"], value, value_description)
+        return cls(
+            uuid=uuid,
+            name=data["name"],
+            description=data["description"],
+            value=value,
+            value_description=data["levels"][value],
+        )
 
     @classmethod
     def load_select(cls, uuid: str, value: int) -> Self:
@@ -65,8 +71,13 @@ class PrimaryTrait:
         if not isinstance(value, int) or 0 > value >= len(data["levels"]):
             raise ValueError(f"Specified value `{value}` is out of the valid range for trait `{uuid}`.")
 
-        value_description = data["levels"][value]
-        return cls(data["name"], data["description"], value, value_description)
+        return cls(
+            uuid=uuid,
+            name=data["name"],
+            description=data["description"],
+            value=value,
+            value_description=data["levels"][value],
+        )
 
     @classmethod
     def _load_uuid(cls, uuid: str):
