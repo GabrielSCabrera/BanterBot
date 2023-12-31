@@ -63,9 +63,9 @@ class PrimaryTrait:
         data = cls._load_uuid(uuid)
 
         if not isinstance(value, int) or 0 > value >= len(data["levels"]):
-            raise ValueError("Specified value is out of the valid range for this trait.")
+            raise ValueError(f"Specified value `{value}` is out of the valid range for trait `{uuid}`.")
 
-        value_description = data["levels"][value - data["range"][0]]
+        value_description = data["levels"][value]
         return cls(data["name"], data["description"], value, value_description)
 
     @classmethod
@@ -82,8 +82,8 @@ class PrimaryTrait:
         traits_data = ResourceManager.load_json(filename=primary_traits, cache=True, reset=False)
 
         # Search for the trait data based on UUID
-        if uuid in traits_data["primary_traits"]:
-            return traits_data["primary_traits"][uuid]
+        if uuid in traits_data:
+            return traits_data[uuid]
         else:
             message = f"The specified UUID `{uuid}` is not a known Primary Trait in `resources/{primary_traits}`"
             raise KeyError(message)

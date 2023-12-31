@@ -37,7 +37,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.15"
+version = "0.0.16"
 setup(
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
@@ -77,7 +77,7 @@ setup(
     ],
     long_description=long_description,
     long_description_content_type="text/markdown",
-    name="BanterBot",
+    name="banterbot",
     packages=find_packages(),
     package_data={"banterbot.protos": ["*.py"], "banterbot.resources": ["*"]},
     python_requires=">=3.9",

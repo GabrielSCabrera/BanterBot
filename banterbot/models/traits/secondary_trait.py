@@ -47,10 +47,9 @@ class SecondaryTrait:
             The values of the primary traits are treated as indices for the Gaussian distribution, thus no increment is
             needed.
 
-            The final value is adjusted (+1) to match the 1-7 range of tertiary traits in the character trait generation
+            The final value is adjusted (+1) to match the 1-5 range of tertiary traits in the character trait generation
             system.
         """
-
         # Mean (mu) for the Gaussian distribution; primary_trait values become indices, so incrementing is unneeded.
         mu = [primary_trait1.value, primary_trait2.value]
 
