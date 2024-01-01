@@ -8,7 +8,53 @@ from banterbot.models.traits.secondary_trait import SecondaryTrait
 
 
 class TestSecondaryTrait(unittest.TestCase):
-    def test_from_primary_traits(self):
+    def test_from_primary_traits_flexible(self):
+        uuid = "018cb674-43d2-811e-ae36-78e2b25912fb"
+        name = "Adaptability"
+        description = "Reflects how easily a character adapts to hierarchical structures and new ideas"
+        value_min = np.array([-1, -1])
+        value_max = np.array([5, 5])
+        levels = [
+            "Resistant",
+            "Slightly Adaptable",
+            "Moderate",
+            "Adaptable",
+            "Highly Adaptable",
+            "Traditional",
+            "Conventional",
+            "Flexible",
+            "Open-Minded",
+            "Innovative",
+            "Stubborn",
+            "Hesitant",
+            "Versatile",
+            "Eager",
+            "Pioneering",
+            "Rigid",
+            "Cautious",
+            "Dynamic",
+            "Creative",
+            "Visionary",
+            "Conservative",
+            "Slow to Change",
+            "Resourceful",
+            "Progressive",
+            "Revolutionary",
+        ]
+
+        primary_trait_1 = PrimaryTrait.load_select(uuid="018cb673-53c9-8e71-b7ae-0b99dd0cf9d4", value=2)
+        primary_trait_2 = PrimaryTrait.load_select(uuid="018cb673-53ca-8673-a19f-788d87a8d1fb", value=1)
+
+        secondary_trait = SecondaryTrait.from_primary_traits(uuid, primary_trait_1, primary_trait_2)
+
+        self.assertEqual(secondary_trait.uuid, uuid)
+        self.assertEqual(secondary_trait.name, name)
+        self.assertEqual(secondary_trait.description, description)
+        np.testing.assert_array_less(secondary_trait.value, value_max)
+        np.testing.assert_array_less(value_min, secondary_trait.value)
+        self.assertIn(secondary_trait.value_description, levels)
+
+    def test_from_primary_traits_strict(self):
         uuid = "018cb674-43d2-811e-ae36-78e2b25912fb"
         name = "Adaptability"
         description = "Reflects how easily a character adapts to hierarchical structures and new ideas"

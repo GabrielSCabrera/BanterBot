@@ -101,7 +101,7 @@ class SpeechRecognitionService:
             Union[StreamHandler, tuple[()]: A handler for the stream of recognized sentences, or an empty tuple if the
                 recognition was interrupted.
         """
-        # Record the time at which the recognition was initialized pre-lock, in order to account for future interruptions.
+        # Record the time at which the recognition was initialized pre-lock, to account for future interruptions.
         init_time = time.perf_counter_ns() if init_time is None else init_time
 
         # Only allow one listener to be active at once.

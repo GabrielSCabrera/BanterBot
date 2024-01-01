@@ -1,4 +1,5 @@
 import random
+from typing import Union
 
 from typing_extensions import Self
 
@@ -9,6 +10,13 @@ class PrimaryTrait(Trait):
     """
     Primary trait loading and management, with options for random generation or specified parameters using data from the
     `resources.primary_traits` resource.
+
+    Attributes:
+        uuid (str): The unique identifier for the trait.
+        name (str): The name of the trait.
+        description (str): The description of the trait.
+        value (int): The value of the trait.
+        value_description (str): The description of the trait value.
     """
 
     @classmethod
@@ -59,14 +67,14 @@ class PrimaryTrait(Trait):
         )
 
     @classmethod
-    def _load_uuid(cls, uuid: str):
+    def _load_uuid(cls, uuid: str) -> dict[str, dict[str, Union[str, list[str]]]]:
         """
         Helper method to load trait data from the `primary_traits` JSON based on UUID.
 
         Args:
-            uuid (str): The UUID of the trait.
+            uuid (str): The UUID of the primary trait.
 
         Returns:
-            dict: The data for the specified trait.
+            dict[str, dict[str, Union[str, list[str]]]]: The data for the specified trait.
         """
         return super()._load_uuid(uuid, "primary_traits.json")

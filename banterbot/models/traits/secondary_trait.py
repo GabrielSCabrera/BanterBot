@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 from typing_extensions import Self
 
@@ -9,6 +11,13 @@ class SecondaryTrait(Trait):
     """
     Secondary trait loading and management, with options for random generation, generation from primary traits, or
     specified parameters using data from instances of class `PrimaryTrait` or the `resources.secondary_traits` resource.
+
+    Attributes:
+        uuid (str): The unique identifier for the trait.
+        name (str): The name of the trait.
+        description (str): The description of the trait.
+        value (np.ndarray): The value of the trait.
+        value_description (str): The description of the trait value.
     """
 
     @classmethod
@@ -33,9 +42,10 @@ class SecondaryTrait(Trait):
             SecondaryTrait: An instance of SecondaryTrait with selected value and description.
         """
         data = cls._load_uuid(uuid)
+        primary_traits = cls._sort_traits(data=data, primary_trait_1=primary_trait_1, primary_trait_2=primary_trait_2)
 
         # Mean (mu) for the Gaussian distribution.
-        mu = [primary_trait_1.value + 1, primary_trait_2.value + 1]
+        mu = [primary_trait.value + 1 for primary_trait in primary_traits]
 
         # Draw a sample from a multivariate normal distribution.
         sample = np.random.multivariate_normal(mu, [[cov, 0], [0, cov]])
@@ -55,14 +65,53 @@ class SecondaryTrait(Trait):
         )
 
     @classmethod
-    def _load_uuid(cls, uuid: str):
+    def _sort_traits(
+        cls,
+        data: dict[str, dict[str, Union[str, list[str], list[list[str]]]]],
+        primary_trait_1: PrimaryTrait,
+        primary_trait_2: PrimaryTrait,
+    ) -> list[PrimaryTrait]:
+        """
+        Helper method to sort primary traits based on the order they are specified in the `derived_from` list. This
+        ensures that the correct primary traits are used to generate the secondary trait, and sorts them in the correct
+        order for the multivariate Gaussian distribution.
+
+        Args:
+            data (dict): The data for the secondary trait.
+            primary_trait_1 (PrimaryTrait): The first primary trait influencing the secondary trait.
+            primary_trait_2 (PrimaryTrait): The second primary trait influencing the secondary trait.
+
+        Returns:
+            list: The sorted list of primary traits.
+        """
+
+        if primary_trait_1.uuid == primary_trait_2.uuid:
+            raise ValueError(
+                f"Primary trait `{primary_trait_1.uuid}` cannot be used twice for secondary trait `{data['uuid']}`."
+            )
+        elif primary_trait_1.uuid not in data["derived_from"]:
+            raise ValueError(
+                f"Primary trait `{primary_trait_1.uuid}` is not a valid primary trait for secondary trait"
+                f" `{data['uuid']}`."
+            )
+        elif primary_trait_2.uuid not in data["derived_from"]:
+            raise ValueError(
+                f"Primary trait `{primary_trait_2.uuid}` is not a valid primary trait for secondary trait"
+                f" `{data['uuid']}`."
+            )
+        else:
+            traits = [primary_trait_1, primary_trait_2]
+            return sorted(traits, key=lambda trait: data["derived_from"].index(trait.uuid))
+
+    @classmethod
+    def _load_uuid(cls, uuid: str) -> dict[str, dict[str, Union[str, list[str], list[list[str]]]]]:
         """
         Helper method to load trait data from the `secondary_traits` JSON based on UUID.
 
         Args:
-            uuid (str): The UUID of the trait.
+            uuid (str): The UUID of the secondary trait.
 
         Returns:
-            dict: The data for the specified trait.
+            dict[str, dict[str, Union[str, list[str], list[list[str]]]]]: The data for the specified trait.
         """
         return super()._load_uuid(uuid=uuid, resource="secondary_traits.json")
