@@ -1,18 +1,14 @@
-import random
-
-from typing_extensions import Self
-
 from banterbot.managers.resource_manager import ResourceManager
 
 
 class Trait:
     """
-    A superclass for PrimaryTrait and SecondaryTrait, with shared methods for loading and managing traits.
+    A superclass for traits, with shared methods for loading, visualizing, and managing data.
     """
 
     def __init__(self, uuid: str, name: str, description: str, value: int, value_description: str):
         """
-        Initialize a PrimaryTrait instance.
+        Initialize a Trait instance.
 
         Args:
             uuid (str): The unique identifier of the trait.

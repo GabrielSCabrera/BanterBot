@@ -2,35 +2,14 @@ import random
 
 from typing_extensions import Self
 
-from banterbot.managers.resource_manager import ResourceManager
-from banterbot.paths import primary_traits
+from banterbot.models.traits.trait import Trait
 
 
-class PrimaryTrait:
+class PrimaryTrait(Trait):
     """
     Primary trait loading and management, with options for random generation or specified parameters using data from the
     `resources.primary_traits` resource.
     """
-
-    def __init__(self, uuid: str, name: str, description: str, value: int, value_description: str):
-        """
-        Initialize a PrimaryTrait instance.
-
-        Args:
-            uuid (str): The unique identifier of the primary trait.
-            name (str): The name of the primary trait.
-            description (str): A textual description of the primary trait.
-            value (int): The specific value of the primary trait.
-            value_description (str): Description of the trait at the specific value.
-        """
-        self.uuid = uuid
-        self.name = name
-        self.description = description
-        self.value = value
-        self.value_description = value_description
-
-    def __str__(self):
-        return f"{self.name} (Value: {self.value}): {self.value_description}"
 
     @classmethod
     def load_random(cls, uuid: str) -> Self:
@@ -90,11 +69,4 @@ class PrimaryTrait:
         Returns:
             dict: The data for the specified trait.
         """
-        traits_data = ResourceManager.load_json(resource=primary_traits, cache=True, reset=False)
-
-        # Search for the trait data based on UUID
-        if uuid in traits_data:
-            return traits_data[uuid]
-        else:
-            message = f"The specified UUID `{uuid}` is not a known Primary Trait in `resources/{primary_traits}`"
-            raise KeyError(message)
+        return super()._load_uuid(uuid, "primary_traits.json")

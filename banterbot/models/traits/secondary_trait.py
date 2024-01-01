@@ -2,30 +2,14 @@ import numpy as np
 from typing_extensions import Self
 
 from banterbot.models.traits.primary_trait import PrimaryTrait
+from banterbot.models.traits.trait import Trait
 
 
-class SecondaryTrait:
+class SecondaryTrait(Trait):
     """
     Secondary trait loading and management, with options for random generation, generation from primary traits, or
     specified parameters using data from instances of class `PrimaryTrait` or the `resources.secondary_traits` resource.
     """
-
-    def __init__(self, uuid: str, name: str, description: str, value: int, value_description: str):
-        """
-        Initialize a SecondaryTrait instance.
-
-        Args:
-            uuid (str): The unique identifier of the secondary trait.
-            name (str): The name of the secondary trait.
-            description (str): A textual description of the secondary trait.
-            value (int): The specific value of the secondary trait.
-            value_description (str): Description of the trait at the specific value.
-        """
-        self.uuid = uuid
-        self.name = name
-        self.description = description
-        self.value = value
-        self.value_description = value_description
 
     @classmethod
     def from_primary_traits(
@@ -48,6 +32,8 @@ class SecondaryTrait:
         Returns:
             SecondaryTrait: An instance of SecondaryTrait with selected value and description.
         """
+        data = cls._load_uuid(uuid)
+
         # Mean (mu) for the Gaussian distribution.
         mu = [primary_trait_1.value + 1, primary_trait_2.value + 1]
 
@@ -55,12 +41,28 @@ class SecondaryTrait:
         sample = np.random.multivariate_normal(mu, [[cov, 0], [0, cov]])
 
         # Round the sample to the nearest integer and clip to grid limits (0 to 4).
-        sample_rounded = np.clip(np.round(sample).astype(int), 0, 4)
+        value = np.clip(np.round(sample).astype(int), 0, 4)
 
         # Get the corresponding value from the grid.
-        selected_value = grid[sample_rounded[0]][sample_rounded[1]]
+        value_description = data["levels"][value[0]][value[1]]
 
-        return cls(name, sample_rounded, selected_value)
+        return cls(
+            uuid=uuid,
+            name=data["name"],
+            description=data["description"],
+            value=value,
+            value_description=value_description,
+        )
 
-    def __str__(self) -> str:
-        return f"{self.name}: {self.value} - {self.description}"
+    @classmethod
+    def _load_uuid(cls, uuid: str):
+        """
+        Helper method to load trait data from the `secondary_traits` JSON based on UUID.
+
+        Args:
+            uuid (str): The UUID of the trait.
+
+        Returns:
+            dict: The data for the specified trait.
+        """
+        return super()._load_uuid(uuid=uuid, resource="secondary_traits.json")
