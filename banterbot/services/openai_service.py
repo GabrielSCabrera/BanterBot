@@ -228,7 +228,6 @@ class OpenAIService:
         kwargs["n"] = 1
         kwargs["stream"] = stream
         kwargs["messages"] = [message() for message in messages]
-
         success = False
         for i in range(RETRY_LIMIT):
             try:
@@ -249,7 +248,7 @@ class OpenAIService:
             except openai.APIError:
                 retry_time = 0.25
                 retry_timestamp = datetime.datetime.now() + datetime.timedelta(seconds=retry_time)
-                retry_timestamp = retry_timestamp.strptime("%H:%M:%S")
+                retry_timestamp = retry_timestamp.strftime("%H:%M:%S")
                 error_message = (
                     f"OpenAIService encountered an OpenAI API Error - Attempt {i+1}/{RETRY_LIMIT}. Waiting "
                     f"{retry_time} seconds until {retry_timestamp} to retry."
@@ -258,6 +257,6 @@ class OpenAIService:
                 time.sleep(retry_time)
 
         if not success:
-            raise openai.APIError(f"OpenAIService encountered too many OpenAI API Errors; exiting program.")
+            raise RuntimeError(f"OpenAIService encountered too many OpenAI API Errors; exiting program.")
 
         return response if stream else response.choices[0].message.content.strip()

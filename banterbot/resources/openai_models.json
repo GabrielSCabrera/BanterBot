@@ -1,19 +1,7 @@
 {
     "gpt-3.5-turbo": {
         "model": "gpt-3.5-turbo",
-        "max_tokens": 4097,
-        "generation": 3.5,
-        "rank": 7
-    },
-    "gpt-3.5-turbo-16k": {
-        "model": "gpt-3.5-turbo-16k",
         "max_tokens": 16383,
-        "generation": 3.5,
-        "rank": 6
-    },
-    "gpt-3.5-turbo-1106": {
-        "model": "gpt-3.5-turbo-1106",
-        "max_tokens": 16384,
         "generation": 3.5,
         "rank": 5
     },
@@ -29,16 +17,16 @@
         "generation": 4,
         "rank": 3
     },
-    "gpt-4-1106-preview": {
-        "model": "gpt-4-1106-preview",
+    "gpt-4-turbo": {
+        "model": "gpt-4-turbo",
         "max_tokens": 127999,
         "generation": 4.5,
         "rank": 2
     },
-    "gpt-4-turbo": {
-        "model": "gpt-4-1106-preview",
+    "gpt-4o": {
+        "model": "gpt-4o",
         "max_tokens": 127999,
-        "generation": 4.5,
+        "generation": 4.6,
         "rank": 1
     }
 }

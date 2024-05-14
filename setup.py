@@ -16,7 +16,7 @@ dependencies = [
     "protobuf==4.25.1",
     "requests>=2.31.0",
     "spacy>=3.7.2",
-    "tiktoken>=0.5.2",
+    "tiktoken>=0.7.0",
     "uuid6>=2023.5.2",
 ]
 
