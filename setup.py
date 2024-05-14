@@ -9,15 +9,15 @@ import unittest
 from setuptools import find_packages, setup
 
 dependencies = [
-    "azure-cognitiveservices-speech>=1.34.0",
-    "numba>=0.58.1",
+    "azure-cognitiveservices-speech>=1.37.0",
+    "numba>=0.59.1",
     "numpy>=1.26.2",
-    "openai>=1.5.0",
+    "openai>=1.23.2",
     "protobuf==4.25.1",
     "requests>=2.31.0",
-    "spacy>=3.7.2",
+    "spacy>=3.7.4",
     "tiktoken>=0.7.0",
-    "uuid6>=2023.5.2",
+    "uuid6>=2024.1.12",
 ]
 
 description = (
@@ -37,7 +37,7 @@ def run_tests():
     return test_suite
 
 
-version = "0.0.15"
+version = "0.0.16"
 setup(
     author="Gabriel S. Cabrera",
     author_email="gabriel.sigurd.cabrera@gmail.com",
