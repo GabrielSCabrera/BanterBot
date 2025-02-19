@@ -1,6 +1,7 @@
 import logging
 import threading
 import time
+from typing import Generator
 
 from banterbot.models.number import Number
 from banterbot.utils.closeable_queue import CloseableQueue
@@ -36,7 +37,7 @@ class StreamHandler:
         self._shared_data = shared_data
         self._processor_thread = processor_thread
 
-    def __iter__(self) -> CloseableQueue:
+    def __iter__(self) -> Generator[CloseableQueue]:
         """
         Inherits the `__iter__` method from the `CloseableQueue` class to allow for iteration over the stream handler.
         """
