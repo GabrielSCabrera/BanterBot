@@ -52,7 +52,7 @@ def init_parser(subparser) -> None:
         "--model",
         choices=OpenAIModelManager.list(),
         action=ModelChoice,
-        default=OpenAIModelManager.load("gpt-4o"),
+        default=OpenAIModelManager.load("gpt-4o-mini"),
         dest="model",
         help="Select the OpenAI model the bot should use.",
     )

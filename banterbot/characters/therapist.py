@@ -5,8 +5,8 @@ def run() -> None:
     """
     Runs the TKInterface for a custom-made character.
     """
-    model = OpenAIModelManager.load("gpt-4o")
-    tone_model = OpenAIModelManager.load("gpt-4o")
+    model = OpenAIModelManager.load("gpt-4o-mini")
+    tone_model = OpenAIModelManager.load("gpt-4o-mini")
     voice = AzureNeuralVoiceManager.load("Davis")
 
     # Optional system prompt to set up a custom character prior to initializing BanterBot.

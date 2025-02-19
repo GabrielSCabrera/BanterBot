@@ -183,7 +183,7 @@ To use BanterBot in a script, create an instance of the ``TKInterface`` class an
    
    from banterbot import AzureNeuralVoiceManager, OpenAIModelManager, TKInterface
 
-   model = OpenAIModelManager.load("gpt-4o")
+   model = OpenAIModelManager.load("gpt-4o-mini")
    voice = AzureNeuralVoiceManager.load("Davis")
    assistant_name = "Grendel"
 
