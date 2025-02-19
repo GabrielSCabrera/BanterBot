@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.models.message &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.models.message</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.models.message</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.data.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatCompletionRoles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.openai_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAIModel</span>
+
+<span class="c1"># File `memory_pb2.py` is automatically generated from protoc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.protos</span><span class="w"> </span><span class="kn">import</span> <span class="n">memory_pb2</span>
+
+
+<div class="viewcode-block" id="Message">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.message.Message">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Message</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a message that can be sent to the OpenAI ChatCompletion API.</span>
+
+<span class="sd">    The purpose of this class is to create a structured representation of a message that can be easily converted into a</span>
+<span class="sd">    format compatible with the OpenAI API. This class is designed to be used in conjunction with the OpenAI</span>
+<span class="sd">    ChatCompletion API to generate context-aware responses from an AI model.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        role (ChatCompletionRoles): The role of the message sender.</span>
+<span class="sd">            - ASSISTANT: Represents a message sent by the AI assistant.</span>
+<span class="sd">            - SYSTEM: Represents a message sent by the system, usually containing instructions or context.</span>
+<span class="sd">            - USER: Represents a message sent by the user interacting with the AI assistant.</span>
+
+<span class="sd">        content (str): The content of the message.</span>
+
+<span class="sd">        name (Optional[str]): The name of the message sender. This is an optional field and can be used to provide a</span>
+<span class="sd">        more personalized experience by addressing the sender by their name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">role</span><span class="p">:</span> <span class="n">ChatCompletionRoles</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Message.to_protobuf">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.message.Message.to_protobuf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_protobuf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">Message</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts this Message instance into a protobuf object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: The instance of the Message class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            memory_pb2.Message: The protobuf object equivalent of the Message instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Message.from_protobuf">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.message.Message.from_protobuf">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_protobuf</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message_proto</span><span class="p">:</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">Message</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a Message instance from a protobuf object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message_proto (memory_pb2.Message): The protobuf object to convert.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Message: The constructed Message instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The Message instance is created with the same attributes as the protobuf object.</span>
+        <span class="c1"># Note: The name is set to None if it&#39;s an empty string in the protobuf object.</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="p">[</span><span class="n">message_proto</span><span class="o">.</span><span class="n">role</span><span class="p">],</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">message_proto</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">message_proto</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">message_proto</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Message&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equality magic method, to allow equality checks between different instances of class Message with the same</span>
+<span class="sd">        contents.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message (Message): An instance of class Message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="n">message</span><span class="o">.</span><span class="n">role</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">message</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="Message.count_tokens">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.message.Message.count_tokens">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">count_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">OpenAIModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Counts the number of tokens in the current message.</span>
+
+<span class="sd">        This method is useful for keeping track of the total number of tokens used in a conversation, as the OpenAI API</span>
+<span class="sd">        has a maximum token limit per request. By counting tokens, you can ensure that your conversation stays within</span>
+<span class="sd">        the API&#39;s token limit.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model (OpenAIModel): The model for which the tokenizer should count tokens. This is an instance of the</span>
+<span class="sd">            OpenAIModel class, which contains the tokenizer and other model-specific information.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The number of tokens in the specified messages. Please note that this count includes tokens for message</span>
+<span class="sd">            metadata and may vary based on the specific tokenizer used by the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Add 4 tokens to account for message metadata</span>
+        <span class="n">num_tokens</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="c1"># Count the number of tokens in the role string, ensuring role is converted to a string</span>
+        <span class="n">num_tokens</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="c1"># Count the number of tokens in the content string</span>
+        <span class="n">num_tokens</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+        <span class="c1"># Count the number of tokens in the name string, if a name is provided</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_tokens</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">num_tokens</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates and returns a dictionary that is compatible with the OpenAI ChatCompletion API.</span>
+
+<span class="sd">        Converts the Message object into a dictionary format that can be used as input for the OpenAI ChatCompletion</span>
+<span class="sd">        API.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict[str, str]: A dictionary containing the role (converted to string), content, and optionally the name of</span>
+<span class="sd">            the message sender.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.managers.azure_neural_voice_manager &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.managers.azure_neural_voice_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.managers.azure_neural_voice_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">azure.cognitiveservices.speech</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">speechsdk</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.data.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.azure_neural_voice_profile</span><span class="w"> </span><span class="kn">import</span> <span class="n">AzureNeuralVoiceProfile</span>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AzureNeuralVoiceManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Management utility for loading Microsoft Azure Cognitive Services Neural Voice models from the Speech SDK. Only one</span>
+<span class="sd">    instance per name is permitted to exist at a time, and loading occurs lazily, meaning that when the voices are</span>
+<span class="sd">    downloaded, they are subsequently stored in cache as instances of class `AzureNeuralVoice`, and all future calls</span>
+<span class="sd">    refer to these same cached instances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_download</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Download all the Neural Voices to cache as instances of class `AzureNeuralVoice` using the `get_voices_async`</span>
+<span class="sd">        method from the Microsoft Azure Cognitive Services Speech SDK class `SpeechSynthesizer`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">speech_config</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechConfig</span><span class="p">(</span>
+            <span class="n">subscription</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EnvVar</span><span class="o">.</span><span class="n">AZURE_SPEECH_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EnvVar</span><span class="o">.</span><span class="n">AZURE_SPEECH_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">result_future</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechSynthesizer</span><span class="p">(</span><span class="n">speech_config</span><span class="o">=</span><span class="n">speech_config</span><span class="p">)</span><span class="o">.</span><span class="n">get_voices_async</span><span class="p">()</span>
+        <span class="n">synthesis_voices_result</span> <span class="o">=</span> <span class="n">result_future</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="c1"># Regex pattern that extracts language, country, region, and a key from each voice&#39;s `short_name` attribute,</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([a-z]+)\-([A-Z]+)\-(?:(\w+)\-)?(\w+?)Neural&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="n">synthesis_voices_result</span><span class="o">.</span><span class="n">voices</span><span class="p">:</span>
+            <span class="c1"># Specify that we only want to store Neural Voices.</span>
+            <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">voice_type</span> <span class="o">==</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SynthesisVoiceType</span><span class="o">.</span><span class="n">OnlineNeural</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">voice</span><span class="o">.</span><span class="n">short_name</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to parse Azure Cognitive Services Neural Voice: </span><span class="si">{</span><span class="n">voice</span><span class="o">.</span><span class="n">short_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">language</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">country</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">region</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">region</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">name</span>
+
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="n">AzureNeuralVoiceProfile</span><span class="p">(</span>
+                        <span class="n">country</span><span class="o">=</span><span class="n">country</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="n">voice</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">gender</span><span class="o">=</span><span class="n">voice</span><span class="o">.</span><span class="n">gender</span><span class="p">,</span>
+                        <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">,</span>
+                        <span class="n">locale</span><span class="o">=</span><span class="n">voice</span><span class="o">.</span><span class="n">locale</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">short_name</span><span class="o">=</span><span class="n">voice</span><span class="o">.</span><span class="n">short_name</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                        <span class="n">style_list</span><span class="o">=</span><span class="n">voice</span><span class="o">.</span><span class="n">style_list</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">style_list</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.data">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.data">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AzureNeuralVoiceProfile</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Access the data dictionary, downloading it first using the `_download` classmethod if necessary.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict[str, AzureNeuralVoiceProfile]: A dict containing the downloaded `AzureNeuralVoiceProfile` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_download</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_data</span></div>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_preprocess_search_arg</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">arg</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare an arbitrary argument given to the `search` method by lowering its value(s).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            arg (Optional[Union[list[str], str]]): A string, list of strings, or None value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[Union[list[str], str]]: The same input but lowered, if applicable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">arg</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">])</span>
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.search">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.search">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">gender</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">language</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">country</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">region</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AzureNeuralVoiceProfile</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search through all the available Microsoft Azure Cognitive Services Neural Voice models using any combination</span>
+<span class="sd">        of the provided arguments to get a list of relevant `AzureNeuralVoiceProfile` instances. For information on</span>
+<span class="sd">        searchable languages, countries, and regions, visit:</span>
+
+<span class="sd">        https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts#supported-languages</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gender (Optional[Union[list[str], str]]): Can take the values MALE, FEMALE, and/or UNKNOWN.</span>
+<span class="sd">            language (Optional[Union[list[str], str]]): Can take any language abbreviations (e.g., en, fr, etc.)</span>
+<span class="sd">            country (Optional[Union[list[str], str]]): Can take any country abbreviations (e.g., US, FR, etc.)</span>
+<span class="sd">            region (Optional[Union[list[str], str]]): Can take any region names (e.g., shaanxi, sichuan, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[AzureNeuralVoiceProfile]: A list of `AzureNeuralVoiceProfile` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">search_results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Convert any provided string values to lowercase if applicable.</span>
+        <span class="n">gender</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_preprocess_search_arg</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="n">gender</span><span class="p">)</span>
+        <span class="n">language</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_preprocess_search_arg</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">country</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_preprocess_search_arg</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="n">country</span><span class="p">)</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_preprocess_search_arg</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="n">region</span><span class="p">)</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_preprocess_search_arg</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="c1"># Convert the voice attributes to lowercase if applicable.</span>
+            <span class="n">voice_gender</span> <span class="o">=</span> <span class="n">voice</span><span class="o">.</span><span class="n">gender</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">gender</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">voice_language</span> <span class="o">=</span> <span class="n">voice</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">language</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">voice_country</span> <span class="o">=</span> <span class="n">voice</span><span class="o">.</span><span class="n">country</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">country</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">voice_region</span> <span class="o">=</span> <span class="n">voice</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">region</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">voice_styles</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">voice</span><span class="o">.</span><span class="n">style_list</span><span class="p">])</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">style_list</span> <span class="k">else</span> <span class="p">[]</span>
+
+            <span class="c1"># Prepare a set of search conditions.</span>
+            <span class="n">condition_gender</span> <span class="o">=</span> <span class="n">gender</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">voice_gender</span> <span class="ow">in</span> <span class="n">gender</span>
+            <span class="n">condition_language</span> <span class="o">=</span> <span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">voice_language</span> <span class="ow">in</span> <span class="n">language</span>
+            <span class="n">condition_country</span> <span class="o">=</span> <span class="n">country</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">voice_country</span> <span class="ow">in</span> <span class="n">country</span>
+            <span class="n">condition_region</span> <span class="o">=</span> <span class="n">region</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">voice_region</span> <span class="ow">in</span> <span class="n">region</span>
+            <span class="n">condition_styles</span> <span class="o">=</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span> <span class="ow">in</span> <span class="n">voice_styles</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">style</span><span class="p">)</span>
+
+            <span class="c1"># If all conditions are met, add the voice to the search results.</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">condition_gender</span><span class="p">,</span> <span class="n">condition_language</span><span class="p">,</span> <span class="n">condition_country</span><span class="p">,</span> <span class="n">condition_region</span><span class="p">,</span> <span class="n">condition_styles</span><span class="p">]):</span>
+                <span class="n">search_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">voice</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">search_results</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.list_countries">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_countries">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_countries</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of two-character country codes (e.g., us, fr, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of country codes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voices</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">voice</span><span class="o">.</span><span class="n">country</span> <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="n">voices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">country</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.list_genders">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_genders">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_genders</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of available voice genders</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of genders.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voices</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">voice</span><span class="o">.</span><span class="n">gender</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="n">voices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">gender</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.list_languages">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_languages">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_languages</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of two-character language codes (e.g., en, fr, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of language codes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voices</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">voice</span><span class="o">.</span><span class="n">language</span> <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="n">voices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">language</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.list_locales">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_locales">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_locales</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of locales, which are language codes followed by countries, in some cases followed by a region,</span>
+<span class="sd">        (e.g., en-US fr-FR, etc.).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of locales.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voices</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">voice</span><span class="o">.</span><span class="n">locale</span> <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="n">voices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">locale</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.list_regions">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_regions">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_regions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of regions (e.g., sichuan, shandong, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of regions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voices</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">voice</span><span class="o">.</span><span class="n">region</span> <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="n">voices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">region</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.list_styles">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_styles">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_styles</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of styles (e.g., sichuan, shandong, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of styles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voices</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">voice</span><span class="o">.</span><span class="n">style_list</span> <span class="k">for</span> <span class="n">voice</span> <span class="ow">in</span> <span class="n">voices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">voice</span><span class="o">.</span><span class="n">style_list</span><span class="p">))))</span></div>
+
+
+<div class="viewcode-block" id="AzureNeuralVoiceManager.load">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.load">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AzureNeuralVoiceProfile</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve or initialize an `AzureNeuralVoice` instance by a name in the Neural Voices resource JSON.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the voice profile.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AzureNeuralVoice: An `AzureNeuralVoice` instance loaded with data from the specified name.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the specified name is not found in the resource file defined by `config.azure_neural_voices`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voices</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">name</span> <span class="o">:=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">voices</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;BanterBot was unable to locate a Microsoft Azure Cognitive Services Neural Voice model named: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">`. Use AzureNeuralVoiceManager.search(gender, language, country, region) to search for a &quot;</span>
+                <span class="s2">&quot;specified gender, language, country, and/or region. These arguments can be strings, lists of strings, &quot;</span>
+                <span class="s2">&quot;or None.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">voices</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

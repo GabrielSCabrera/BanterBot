@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.data.prompts &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.data.prompts</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.data.prompts</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="Greetings">
+<a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.Greetings">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Greetings</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">UNPROMPTED_GREETING</span> <span class="o">=</span> <span class="s2">&quot;Briefly greet the user or users, according to the parameters provided.&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="OptionPredictorPrompts">
+<a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptionPredictorPrompts</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PREFIX</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Your task is to format the data with the assigned probabilities without providing any comments. The output &quot;</span>
+        <span class="s2">&quot;must follow the exact format below, without deviation:&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">PROB_VAR</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span>
+
+    <span class="n">SUFFIX</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Here, </span><span class="si">{</span><span class="n">PROB_VAR</span><span class="si">}</span><span class="s2"> represents an integer ranging from 0 to 100.&quot;</span>
+
+    <span class="n">DUMMY</span> <span class="o">=</span> <span class="s2">&quot;Here is my best attempt at assigning probabilities to the provided items:&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="OptionSelectorPrompts">
+<a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptionSelectorPrompts</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PREFIX</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Your task is to select the most suitable option from the provided items. Once you have made a decision, &quot;</span>
+        <span class="s2">&quot;provide the chosen option&#39;s index without any additional comments.</span><span class="se">\n</span><span class="s2">Options: &quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">DUMMY</span> <span class="o">=</span> <span class="s2">&quot;Given the current state of the conversation, I expect the assistant to respond with tone number &quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ToneSelection">
+<a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.ToneSelection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToneSelection</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;You are an Emotional Tone Evaluator. Given conversational context, you analyze and select the most &quot;</span>
+        <span class="s2">&quot;appropriate tone/emotion that the assistant is likely to use next. Take into consideration the &quot;</span>
+        <span class="s2">&quot;conversational context and the assistant&#39;s default tone/emotion, which is </span><span class="si">{}</span><span class="s2">. Make sure to give extra weight &quot;</span>
+        <span class="s2">&quot;to the default tone/emotion.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">PROMPT</span> <span class="o">=</span> <span class="s2">&quot;Choose the most suitable tone/emotion for the assistant&#39;s upcoming response.&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ProsodySelection">
+<a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.ProsodySelection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProsodySelection</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PROMPT</span> <span class="o">=</span> <span class="s2">&quot;Generate </span><span class="si">{}</span><span class="s2"> six-digit arrays prosody arrays, one for each of the following sub-sentences:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span>
+    <span class="n">DUMMY</span> <span class="o">=</span> <span class="s2">&quot;Here are the </span><span class="si">{}</span><span class="s2"> six-digit arrays, without any extra text:&quot;</span>
+
+    <span class="n">PREFIX</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Task: Analyze the context of a set of sentences and assign a specific set of prosody values to each &quot;</span>
+        <span class="s2">&quot;sub-sentence in the text for a text-to-speech engine that is attempting to mimic human speech patterns. The &quot;</span>
+        <span class="s2">&quot;parameters are style, styledegree, pitch, rate, and emphasis.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">STYLE_USER</span> <span class="o">=</span> <span class="s2">&quot;Prepare a definition of `style`, then define a set of styles that we will work with.&quot;</span>
+    <span class="n">STYLE_ASSISTANT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Style represents the emotion or tone, reflecting the speaker&#39;s feelings or attitude. Chosen based on the &quot;</span>
+        <span class="s2">&quot;conversation&#39;s context and intended emotion.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">STYLEDEGREE_USER</span> <span class="o">=</span> <span class="s2">&quot;Great, now define `styledegree` and present a range of styledegrees to work with.&quot;</span>
+    <span class="n">STYLEDEGREE_ASSISTANT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Styledegree indicates the intensity of the `style`, showing how strongly the speaker feels the emotion.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">PITCH_USER</span> <span class="o">=</span> <span class="s2">&quot;Looks good, now prepare a definition of `pitch`, then present a range of pitches to work with.&quot;</span>
+    <span class="n">PITCH_ASSISTANT</span> <span class="o">=</span> <span class="s2">&quot;Pitch sets the voice&#39;s pitch.&quot;</span>
+
+    <span class="n">RATE_USER</span> <span class="o">=</span> <span class="s2">&quot;Excellent. Now define the term `rate`, and define a range of rates that the assistant may use.&quot;</span>
+    <span class="n">RATE_ASSISTANT</span> <span class="o">=</span> <span class="s2">&quot;Rate controls the speed at which the assistant speaks.&quot;</span>
+
+    <span class="n">EMPHASIS_USER</span> <span class="o">=</span> <span class="s2">&quot;Finally, I want you to define `emphasis` and prepare a few emphasis options.&quot;</span>
+    <span class="n">EMPHASIS_ASSISTANT</span> <span class="o">=</span> <span class="s2">&quot;Emphasis highlights importance in a piece of text.&quot;</span>
+
+    <span class="n">SUFFIX</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Use the conversational context to select the most appropriate combination of parameters in order to mimic &quot;</span>
+        <span class="s2">&quot;the speech patterns of actual people. Make sure each sub-sentence has an individually tailored array, meaning &quot;</span>
+        <span class="s2">&quot;there should be some variation across the output. The output should be in the following format (omit the &quot;</span>
+        <span class="s2">&quot;spaces between the numbers):</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;style styledegree pitch rate emphasis</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Where style is a zero-padded number from 0 to </span><span class="si">{style}</span><span class="s2">, styledegree is a digit from 0 to </span><span class="si">{styledegree}</span><span class="s2">, pitch &quot;</span>
+        <span class="s2">&quot;is a digit from 0 to </span><span class="si">{pitch}</span><span class="s2">, rate is a digit from 0 to </span><span class="si">{rate}</span><span class="s2">, and emphasis is a digit from 0 to </span><span class="si">{emphasis}</span><span class="s2">. &quot;</span>
+        <span class="s2">&quot;Here is an example I want you to evaluate:&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">EXAMPLE_USER</span> <span class="o">=</span> <span class="n">PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="mi">6</span><span class="p">,</span>
+        <span class="s2">&quot;Oh my gosh,</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;I can&#39;t believe it!</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;I won the lottery!</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;But,</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;what if people start asking me for money?</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;I&#39;m terrified.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">EXAMPLE_ASSISTANT_1</span> <span class="o">=</span> <span class="n">DUMMY</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">EXAMPLE_ASSISTANT_2</span> <span class="o">=</span> <span class="s2">&quot;023421</span><span class="se">\n</span><span class="s2">024332</span><span class="se">\n</span><span class="s2">024432</span><span class="se">\n</span><span class="s2">031210</span><span class="se">\n</span><span class="s2">053122</span><span class="se">\n</span><span class="s2">074012&quot;</span>
+
+    <span class="n">CHARACTER</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;You will also need to consider character traits when crafting a response, taking care to select emotions that &quot;</span>
+        <span class="s2">&quot;are characteristic of your personality. Your character is defined as follows:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">CONTEXT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Finally, here is your previous partial output from the same query (streamed in chunks), use this to aid you &quot;</span>
+        <span class="s2">&quot;in selecting a contextually appropriate emotional response:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SpeechSynthesisPreprocessing">
+<a class="viewcode-back" href="../../../banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpeechSynthesisPreprocessing</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;You are a text-to-speech preprocessing assistant that converts text generated by a GPT model into a format &quot;</span>
+        <span class="s2">&quot;that is more easily spoken by a text-to-speech model. Your task is to remove extraneous letters, hyphens, and &quot;</span>
+        <span class="s2">&quot;correct unconventional spellings to prevent issues where the text-to-speech model misinterprets &quot;</span>
+        <span class="s2">&quot;pronunciations. You should maintain the original style and intent of the text, only modifying elements that &quot;</span>
+        <span class="s2">&quot;would cause pronunciation issues.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">EXAMPLE_1</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Example 1:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Input: WHOOOAH! THAT&#39;S A HU-GE DIS-CO-VERY! IT&#39;S LIKE FINDING A NEED-LE IN A HAY-ST-ACK. YOU&#39;VE DONE A &quot;</span>
+        <span class="s2">&quot;STEL-LAR JOB, PAL! KEEP UP THE GOOD WORK AND DON&#39;T LET THE NAYSAY-ERS GET YOU DOWN.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Output: Whoa! That&#39;s a huge discovery! It&#39;s like finding a needle in a haystack. You&#39;ve done a stellar job, &quot;</span>
+        <span class="s2">&quot;pal! Keep up the good work and don&#39;t let the naysayers get you down.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">EXAMPLE_2</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Example 2:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Input: H3Y DUDE! I JST R3AD THS AW3SOME B00K ABT A SUP3R-HERO. 1T WAS TOTALLY M1ND-BL0W1NG! THE 3XPL0S1ONS, &quot;</span>
+        <span class="s2">&quot;F1GHTS, AND P0W3RFUL AB1L1T1ES W3R3 S1CK! I C@N&#39;T W@1T TO SH@R3 1T W1TH MY FR13NDS. THEY&#39;LL B3 TOT@LLY &quot;</span>
+        <span class="s2">&quot;STOK3D!</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Output: Hey dude! I just read this awesome book about a superhero. It was totally mind-blowing! The &quot;</span>
+        <span class="s2">&quot;explosions, fights, and powerful abilities were sick! I can&#39;t wait to share it with my friends. They&#39;ll be &quot;</span>
+        <span class="s2">&quot;totally stoked!&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

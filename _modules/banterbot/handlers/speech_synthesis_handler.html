@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.handlers.speech_synthesis_handler &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.handlers.speech_synthesis_handler</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.handlers.speech_synthesis_handler</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">azure.cognitiveservices.speech</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">speechsdk</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nb</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.phrase</span><span class="w"> </span><span class="kn">import</span> <span class="n">Phrase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.word</span><span class="w"> </span><span class="kn">import</span> <span class="n">Word</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.utils.closeable_queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">CloseableQueue</span>
+
+
+<div class="viewcode-block" id="SpeechSynthesisHandler">
+<a class="viewcode-back" href="../../../banterbot.handlers.html#banterbot.handlers.speech_synthesis_handler.SpeechSynthesisHandler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpeechSynthesisHandler</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A single-use class that handles the speech synthesis process. It is typically returned by the `speak` method of the</span>
+<span class="sd">    `SpeechSynthesisService` class. It can be iterated over to yield the words as they are synthesized. It can also be</span>
+<span class="sd">    closed to stop the speech synthesis process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phrases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Phrase</span><span class="p">],</span> <span class="n">synthesizer</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechSynthesizer</span><span class="p">,</span> <span class="n">queue</span><span class="p">:</span> <span class="n">CloseableQueue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a `SpeechSynthesisHandler` instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            synthesizer (speechsdk.SpeechSynthesizer): The speech synthesizer to use for speech synthesis.</span>
+<span class="sd">            queue (CloseableQueue): The queue to use for storing the words as they are synthesized.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span> <span class="o">=</span> <span class="n">synthesizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">queue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iterating</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iterating_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+        <span class="c1"># Convert the phrases into SSML</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ssml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phrases_to_ssml</span><span class="p">(</span><span class="n">phrases</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Word</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterates over the words as they are synthesized, yielding each word as it is synthesized.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            phrases (list[Phrase]): The phrases to be synthesized.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Generator[Word, None, None]: The words as they are synthesized.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterating_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterating</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot iterate over an already iterating instance of class `SpeechSynthesisHandler`&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iterating</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Start synthesizing.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="o">.</span><span class="n">start_speaking_ssml_async</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ssml</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;SpeechSynthesisHandler synthesizer started&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Process the words as they are synthesized.</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">:</span>
+            <span class="c1"># Determine if a delay is needed to match the word&#39;s offset.</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-9</span> <span class="o">*</span> <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter_ns</span><span class="p">())</span>
+            <span class="c1"># If a delay is needed, wait for the specified time.</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">dt</span> <span class="k">if</span> <span class="n">dt</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># Yield the word.</span>
+            <span class="k">yield</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;word&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SpeechSynthesisHandler yielded word: `</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;word&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synthesizer</span><span class="o">.</span><span class="n">stop_speaking_async</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_jit_phrases_to_ssml</span><span class="p">(</span>
+        <span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">short_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">pitches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">rates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">styles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">styledegrees</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">emphases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a more advanced SSML string from the specified list of `Phrase` instances, that customizes the emphasis,</span>
+<span class="sd">        style, pitch, and rate of speech on a sub-sentence level, including pitch contouring between phrases. Uses Numba</span>
+<span class="sd">        to speed up the process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            texts (list[Optional[str]]): The texts to be synthesized.</span>
+<span class="sd">            short_names (list[Optional[str]]): The short names of the voices to use for each phrase.</span>
+<span class="sd">            pitches (list[Optional[str]]): The pitches to use for each phrase.</span>
+<span class="sd">            rates (list[Optional[str]]): The rates to use for each phrase.</span>
+<span class="sd">            styles (list[Optional[str]]): The styles to use for each phrase.</span>
+<span class="sd">            styledegrees (list[Optional[str]]): The style degrees to use for each phrase.</span>
+<span class="sd">            emphases (list[Optional[str]]): The emphases to use for each phrase.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The SSML string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Start the SSML string with the required header</span>
+        <span class="n">ssml</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;&lt;speak version=&quot;1.0&quot; &#39;</span>
+            <span class="s1">&#39;xmlns=&quot;http://www.w3.org/2001/10/synthesis&quot; &#39;</span>
+            <span class="s1">&#39;xmlns:mstts=&quot;https://www.w3.org/2001/mstts&quot; &#39;</span>
+            <span class="s1">&#39;xml:lang=&quot;en-US&quot;&gt;&#39;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Iterate over the phrases and add the SSML tags</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">short_name</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">styledegree</span><span class="p">,</span> <span class="n">emphasis</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">short_names</span><span class="p">,</span> <span class="n">pitches</span><span class="p">,</span> <span class="n">rates</span><span class="p">,</span> <span class="n">styles</span><span class="p">,</span> <span class="n">styledegrees</span><span class="p">,</span> <span class="n">emphases</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># Add contour only if there is a pitch transition</span>
+            <span class="k">if</span> <span class="n">pitch</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pitches</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pitches</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">pitch</span> <span class="o">!=</span> <span class="n">pitches</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="c1"># Set the contour to begin transition at 50% of the current phrase to match the pitch of the next one.</span>
+                    <span class="n">pitch</span> <span class="o">=</span> <span class="s1">&#39; contour=&quot;(50%,&#39;</span> <span class="o">+</span> <span class="n">pitch</span> <span class="o">+</span> <span class="s2">&quot;) (80%,&quot;</span> <span class="o">+</span> <span class="n">pitches</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&quot;&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pitch</span> <span class="o">=</span> <span class="s1">&#39; pitch=&quot;&#39;</span> <span class="o">+</span> <span class="n">pitch</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pitch</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># Add the voice and other tags along with prosody</span>
+            <span class="n">ssml</span> <span class="o">+=</span> <span class="s1">&#39;&lt;voice name=&quot;&#39;</span> <span class="o">+</span> <span class="n">short_name</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span>
+            <span class="n">ssml</span> <span class="o">+=</span> <span class="s1">&#39;&lt;mstts:silence type=&quot;comma-exact&quot; value=&quot;10ms&quot;/&gt;&#39;</span>
+            <span class="n">ssml</span> <span class="o">+=</span> <span class="s1">&#39;&lt;mstts:silence type=&quot;Tailing-exact&quot; value=&quot;0ms&quot;/&gt;&#39;</span>
+            <span class="n">ssml</span> <span class="o">+=</span> <span class="s1">&#39;&lt;mstts:silence type=&quot;Sentenceboundary-exact&quot; value=&quot;5ms&quot;/&gt;&#39;</span>
+            <span class="n">ssml</span> <span class="o">+=</span> <span class="s1">&#39;&lt;mstts:silence type=&quot;Leading-exact&quot; value=&quot;0ms&quot;/&gt;&#39;</span>
+
+            <span class="c1"># Add the express-as tag if style and styledegree are specified</span>
+            <span class="k">if</span> <span class="n">style</span> <span class="ow">and</span> <span class="n">styledegree</span><span class="p">:</span>
+                <span class="n">ssml</span> <span class="o">+=</span> <span class="s1">&#39;&lt;mstts:express-as style=&quot;&#39;</span> <span class="o">+</span> <span class="n">style</span> <span class="o">+</span> <span class="s1">&#39;&quot; styledegree=&quot;&#39;</span> <span class="o">+</span> <span class="n">styledegree</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span>
+            <span class="k">if</span> <span class="n">pitch</span> <span class="ow">or</span> <span class="n">rate</span><span class="p">:</span>
+                <span class="n">rate_value</span> <span class="o">=</span> <span class="n">rate</span> <span class="k">if</span> <span class="n">rate</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">ssml</span> <span class="o">+=</span> <span class="s2">&quot;&lt;prosody&quot;</span> <span class="o">+</span> <span class="n">pitch</span> <span class="o">+</span> <span class="s1">&#39; rate=&quot;&#39;</span> <span class="o">+</span> <span class="n">rate_value</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span>
+            <span class="k">if</span> <span class="n">emphasis</span><span class="p">:</span>
+                <span class="n">ssml</span> <span class="o">+=</span> <span class="s1">&#39;&lt;emphasis level=&quot;&#39;</span> <span class="o">+</span> <span class="n">emphasis</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span>
+
+            <span class="n">ssml</span> <span class="o">+=</span> <span class="n">text</span>
+
+            <span class="c1"># Close the tags</span>
+            <span class="k">if</span> <span class="n">emphasis</span><span class="p">:</span>
+                <span class="n">ssml</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/emphasis&gt;&quot;</span>
+            <span class="k">if</span> <span class="n">pitch</span> <span class="ow">or</span> <span class="n">rate</span><span class="p">:</span>
+                <span class="n">ssml</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/prosody&gt;&quot;</span>
+            <span class="k">if</span> <span class="n">style</span> <span class="ow">and</span> <span class="n">styledegree</span><span class="p">:</span>
+                <span class="n">ssml</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/mstts:express-as&gt;&quot;</span>
+            <span class="n">ssml</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/voice&gt;&quot;</span>
+
+        <span class="c1"># Close the voice and speak tags and return the SSML string</span>
+        <span class="n">ssml</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/speak&gt;&quot;</span>
+        <span class="k">return</span> <span class="n">ssml</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_phrases_to_ssml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">phrases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Phrase</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a more advanced SSML string from the specified list of `Phrase` instances, that customizes the emphasis,</span>
+<span class="sd">        style, pitch, and rate of speech on a sub-sentence level, including pitch contouring between phrases. Calls the</span>
+<span class="sd">        &#39;jit_phrases_to_ssml&#39; method to speed up the process using Numba.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            phrases (list[Phrase]): Instances of class `Phrase` that contain data that can be converted into speech.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The SSML string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">texts</span><span class="p">,</span> <span class="n">short_names</span><span class="p">,</span> <span class="n">pitches</span><span class="p">,</span> <span class="n">rates</span><span class="p">,</span> <span class="n">styles</span><span class="p">,</span> <span class="n">styledegrees</span><span class="p">,</span> <span class="n">emphases</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">phrase</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                <span class="n">phrase</span><span class="o">.</span><span class="n">voice</span><span class="o">.</span><span class="n">short_name</span><span class="p">,</span>
+                <span class="n">phrase</span><span class="o">.</span><span class="n">pitch</span><span class="p">,</span>
+                <span class="n">phrase</span><span class="o">.</span><span class="n">rate</span><span class="p">,</span>
+                <span class="n">phrase</span><span class="o">.</span><span class="n">style</span><span class="p">,</span>
+                <span class="n">phrase</span><span class="o">.</span><span class="n">styledegree</span><span class="p">,</span>
+                <span class="n">phrase</span><span class="o">.</span><span class="n">emphasis</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">phrases</span>
+        <span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_jit_phrases_to_ssml</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">short_names</span><span class="p">,</span> <span class="n">pitches</span><span class="p">,</span> <span class="n">rates</span><span class="p">,</span> <span class="n">styles</span><span class="p">,</span> <span class="n">styledegrees</span><span class="p">,</span> <span class="n">emphases</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

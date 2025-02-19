@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.managers.memory_chain &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.managers.memory_chain</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.managers.memory_chain</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">banterbot.paths</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">Memory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.protos</span><span class="w"> </span><span class="kn">import</span> <span class="n">memory_pb2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.utils.nlp</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLP</span>
+
+
+<div class="viewcode-block" id="MemoryChain">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryChain</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MemoryChain is a class responsible for managing and handling arrays of memories using Protocol Buffers. It provides</span>
+<span class="sd">    functionality to save memories to a binary file, load memories from a binary file, and retrieve memories based on</span>
+<span class="sd">    keywords. The MemoryChain class is designed to efficiently store and retrieve memories based on keywords, allowing</span>
+<span class="sd">    for quick access to relevant information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MemoryChain.create">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.create">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a new empty set of memories and associated UUID.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            MemoryChain: A new instance of MemoryChain with an empty set of memories and a unique UUID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">generate_uuid</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+
+        <span class="c1"># Create new directory for the new UUID and memory files</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">personae</span> <span class="o">/</span> <span class="n">uuid</span> <span class="o">/</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">memories</span>
+        <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Create new memory index file</span>
+        <span class="n">memory_index</span> <span class="o">=</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">MemoryIndex</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">personae</span> <span class="o">/</span> <span class="n">uuid</span> <span class="o">/</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">memory_index</span><span class="p">,</span> <span class="s2">&quot;wb+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+            <span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">memory_index</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MemoryChain created new UUID: `</span><span class="si">{</span><span class="n">uuid</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span> <span class="n">memory_index</span><span class="o">=</span><span class="p">{})</span></div>
+
+
+<div class="viewcode-block" id="MemoryChain.load">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.load">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the memories from a binary file using Protocol Buffers deserialization and creates a MemoryChain instance.</span>
+<span class="sd">        This method is used to load an existing set of memories from a file, allowing for the continuation of a previous</span>
+<span class="sd">        session or the sharing of memories between different instances.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uuid (str): The UUID of the memory files to load.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            MemoryChain: A new instance of MemoryChain with loaded memories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MemoryChain loading UUID: `</span><span class="si">{</span><span class="n">uuid</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Read memory index file</span>
+        <span class="n">memory_index_object</span> <span class="o">=</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">MemoryIndex</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">personae</span> <span class="o">/</span> <span class="n">uuid</span> <span class="o">/</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">memory_index</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+            <span class="n">memory_index_object</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="c1"># Parse the memory index file into a dictionary</span>
+        <span class="n">memory_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">entry</span><span class="o">.</span><span class="n">keyword</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">memory_uuids</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">memory_index_object</span><span class="o">.</span><span class="n">entries</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">memory_index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MemoryChain.delete">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.delete">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete the directory associated with a MemoryChain instance. This method is used to clean up the file system</span>
+<span class="sd">        by removing the directory and all its contents, including memory files and the memory index file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uuid (str): The UUID associated with this set of memories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">personae</span> <span class="o">/</span> <span class="n">uuid</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">memory_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new instance of MemoryChain.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uuid (str): The UUID associated with this set of memories.</span>
+
+<span class="sd">            memory_index (dict[str, list[str]]): The dictionary mapping from keyword to list of memory UUIDs. This index</span>
+<span class="sd">            is used to efficiently look up memories based on keywords.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MemoryChain initialized with UUID: `</span><span class="si">{</span><span class="n">uuid</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">=</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">personae</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">/</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">memories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span> <span class="o">=</span> <span class="n">memory_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memories</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_similarity_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_token_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_token_cache</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_find_memories</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MemoryChain.append">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.append">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Memory</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append a memory to the current set of memories. This method is used to add a single memory to the MemoryChain,</span>
+<span class="sd">        allowing for the storage of new information. All changes are saved to file as soon as they are made.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (Memory): The memory to append.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memories</span><span class="p">[</span><span class="n">memory</span><span class="o">.</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">memory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_memory</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_index</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_index</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MemoryChain.extend">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.extend">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memories</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Memory</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extend the current set of memories with a list of memories. This method is used to add multiple memories to the</span>
+<span class="sd">        MemoryChain at once, allowing for the storage of new information in bulk. All changes are saved to file as soon</span>
+<span class="sd">        as they are made.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memories (list[Memory]): The list of memories to append.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">memory</span> <span class="ow">in</span> <span class="n">memories</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_memories</span><span class="p">[</span><span class="n">memory</span><span class="o">.</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">memory</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_memory</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_index</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_index</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MemoryChain.search">
+<a class="viewcode-back" href="../../../banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.search">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">fuzzy_threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Memory</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Look up memories based on keywords. This method is used to retrieve memories that are relevant to the specified</span>
+<span class="sd">        keywords. It can also perform fuzzy matching, allowing for the retrieval of memories that are similar to the</span>
+<span class="sd">        given keywords based on a similarity threshold.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keywords (list[str]): The list of keywords to look up.</span>
+
+<span class="sd">            fuzzy_threshold (Optional[float]): The threshold for fuzzy matching. If None, only returns exact matches. If</span>
+<span class="sd">            a value is provided, memories with keywords that have a similarity score greater than or equal to the</span>
+<span class="sd">            threshold will also be returned.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Memory]: The list of matching memories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">memory_uuids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">memories</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">fuzzy_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_similarity_cache</span><span class="p">(</span><span class="n">keywords</span><span class="o">=</span><span class="n">keywords</span><span class="p">)</span>
+
+            <span class="c1"># Find additional keywords that are similar to the specified keywords</span>
+            <span class="n">keywords_extension</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cache_filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">keyword_indexed</span> <span class="ow">in</span> <span class="n">cache_filtered</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similarity_cache</span><span class="p">[(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">keyword_indexed</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">fuzzy_threshold</span><span class="p">:</span>
+                        <span class="n">keywords_extension</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyword_indexed</span><span class="p">)</span>
+            <span class="n">keywords</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">keywords_extension</span><span class="p">)</span>
+
+        <span class="c1"># Add memory UUIDs to the result set</span>
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">memory_uuid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="p">[</span><span class="n">keyword</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memories</span><span class="p">[</span><span class="n">memory_uuid</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_load_memory</span><span class="p">(</span><span class="n">memory_uuid</span><span class="o">=</span><span class="n">memory_uuid</span><span class="p">)</span>
+                    <span class="n">memory_uuids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">memory_uuid</span><span class="p">)</span>
+
+        <span class="c1"># Write all the Memory objects into a list</span>
+        <span class="k">for</span> <span class="n">memory_uuid</span> <span class="ow">in</span> <span class="n">memory_uuids</span><span class="p">:</span>
+            <span class="n">memories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_memories</span><span class="p">[</span><span class="n">memory_uuid</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">memories</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Memory</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save an instance of class Memory to file using protocol buffers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">uuid</span> <span class="o">+</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">protobuf_extension</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+            <span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the current state of the memory index to file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">memory_index</span> <span class="o">=</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">MemoryIndex</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">memory_uuids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">memory_index_entry</span> <span class="o">=</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">MemoryIndexEntry</span><span class="p">()</span>
+            <span class="n">memory_index_entry</span><span class="o">.</span><span class="n">keyword</span> <span class="o">=</span> <span class="n">keyword</span>
+            <span class="n">memory_index_entry</span><span class="o">.</span><span class="n">memory_uuids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">memory_uuids</span><span class="p">)</span>
+            <span class="n">memory_index</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">memory_index_entry</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">personae</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">/</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">memory_index</span><span class="p">,</span> <span class="s2">&quot;wb+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+            <span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">memory_index</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_memories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find all memory files associated with this UUID and store them in _memories dictionary. This method is used to</span>
+<span class="sd">        locate all memory files that belong to the current MemoryChain instance, allowing for the efficient loading and</span>
+<span class="sd">        retrieval of memories when needed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memories</span> <span class="o">=</span> <span class="p">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">directory</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">protobuf_extension</span><span class="p">)}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Memory</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the memory index with a new memory. This method is used to keep the memory index up-to-date when new</span>
+<span class="sd">        memories are added to the MemoryChain. The index allows for efficient look-up of memories based on keywords.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (Memory): The memory to update the index with.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">memory</span><span class="o">.</span><span class="n">keywords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keyword</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_token_cache</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">keywords</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory_uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a memory from a memory file. This method is used to load a specific memory from a file when it is needed,</span>
+<span class="sd">        allowing for efficient memory usage by only loading memories when they are required.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory_uuid (str): The UUID of the memory to load.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">memory_uuid</span> <span class="o">+</span> <span class="n">banterbot</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">protobuf_extension</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_memories</span><span class="p">[</span><span class="n">memory_uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memory</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_token_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the token cache with new keywords. This method is used to keep the token cache up-to-date when new</span>
+<span class="sd">        keywords are added to the MemoryChain. The token cache allows for efficient computation of similarity scores</span>
+<span class="sd">        between keywords.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keywords (list[str]): The new keywords to update the cache with.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_keywords</span> <span class="o">=</span> <span class="p">[</span><span class="n">keyword</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span> <span class="k">if</span> <span class="n">keyword</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">token</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">new_keywords</span><span class="p">,</span> <span class="n">NLP</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">strings</span><span class="o">=</span><span class="n">new_keywords</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_token_cache</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_similarity_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the similarity cache with new keywords. This method is used to keep the similarity cache up-to-date when</span>
+<span class="sd">        new keywords are added to the MemoryChain. The similarity cache allows for efficient computation of similarity</span>
+<span class="sd">        scores between keywords, enabling fuzzy matching in the search method.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keywords (list[str]): The new keywords to update the cache with.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_token_cache</span><span class="p">(</span><span class="n">keywords</span><span class="o">=</span><span class="n">keywords</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">keyword_indexed</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+                <span class="n">pair</span> <span class="o">=</span> <span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">keyword_indexed</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pair</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similarity_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">similarity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_cache</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_token_cache</span><span class="p">[</span><span class="n">keyword_indexed</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_similarity_cache</span><span class="p">[</span><span class="n">pair</span><span class="p">]</span> <span class="o">=</span> <span class="n">similarity</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
