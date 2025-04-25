@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.utils.nlp &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.utils.nlp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.utils.nlp</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">spacy</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.data.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaCyLangModel</span>
+
+
+<div class="viewcode-block" id="NLP">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NLP</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A comprehensive toolkit that provides a set of Natural Language Processing utilities. It leverages the capabilities</span>
+<span class="sd">    of the spaCy package. The toolkit is designed to automatically download the necessary models if they are not</span>
+<span class="sd">    available.</span>
+
+<span class="sd">    One of the main features of this toolkit is the intelligent model selection mechanism. It is designed to select the</span>
+<span class="sd">    most appropriate and lightweight model for each specific task, balancing between computational efficiency and task</span>
+<span class="sd">    performance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_models</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;senter&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;splitter&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_LG</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="NLP.install_upgrade_all_models">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP.install_upgrade_all_models">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install_upgrade_all_models</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lazily checks if models are already installed, and installs any that are missing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">installed</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_installed_models</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">SpaCyLangModel</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">installed</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_download_model</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NLP.load_all_models">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP.load_all_models">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_all_models</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Preloads all available models.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NLP.model">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP.model">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">spacy</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">Language</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the specified spaCy model lazily by loading models the first time they are called, then storing them in</span>
+<span class="sd">        the `cls._models` dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the spaCy model to return.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            spacy.language.Language: The requested spaCy model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;senter&quot;</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="s2">&quot;senter&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Define a set of pipeline components to disable for the sentence senter.</span>
+            <span class="n">senter_disable</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tok2vec&quot;</span><span class="p">,</span> <span class="s2">&quot;tagger&quot;</span><span class="p">,</span> <span class="s2">&quot;parser&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute_ruler&quot;</span><span class="p">,</span> <span class="s2">&quot;lemmatizer&quot;</span><span class="p">,</span> <span class="s2">&quot;ner&quot;</span><span class="p">]</span>
+            <span class="n">senter</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">senter_disable</span><span class="p">)</span>
+            <span class="c1"># Enable the sentence segmentation pipeline component for the senter model.</span>
+            <span class="n">senter</span><span class="o">.</span><span class="n">enable_pipe</span><span class="p">(</span><span class="s2">&quot;senter&quot;</span><span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;NLP initializing model: `senter`&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="s2">&quot;senter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">senter</span>
+
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;splitter&quot;</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="s2">&quot;splitter&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rules</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="c1"># Customize the tokenization rules for the word splitter in order to prevent splitting of contractions.</span>
+            <span class="n">ignore</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;’&quot;</span><span class="p">,</span> <span class="s2">&quot;‘&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">splitter</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">rules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ignore</span><span class="p">):</span>
+                    <span class="n">rules</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">splitter</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">rules</span> <span class="o">=</span> <span class="n">rules</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;NLP initializing model: `splitter`&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="s2">&quot;splitter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">splitter</span>
+
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NLP initializing model: `</span><span class="si">{</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NLP initializing model: `</span><span class="si">{</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_LG</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_LG</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NLP initializing model: `</span><span class="si">{</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_LG</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_LG</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_LG</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NLP.segment_sentences">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP.segment_sentences">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segment_sentences</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">whitespace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits a text string into individual sentences using a specialized spaCy model. The model is a lightweight</span>
+<span class="sd">        version of `en_core_web_sm` designed specifically for sentence segmentation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            string (str): The input text string.</span>
+<span class="sd">            whitespace (str): If True, keep whitespace at the beginning/end of sentences; if False, strip it.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[str, ...]: A tuple of individual sentences as strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">sentence</span><span class="o">.</span><span class="n">text_with_ws</span> <span class="k">if</span> <span class="n">whitespace</span> <span class="k">else</span> <span class="n">sentence</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s2">&quot;senter&quot;</span><span class="p">)(</span><span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">sents</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NLP.segment_words">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP.segment_words">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segment_words</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">whitespace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits a text string into individual words using a specialized spaCy model. The model is customized version of</span>
+<span class="sd">        `en_core_web_md` in which words are not split on apostrophes, in order to preserve contractions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            string (str): The input text string.</span>
+<span class="sd">            whitespace (str): If True, include whitespace characters between words; if False, omit it.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[str, ...]: A tuple of individual words as strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s2">&quot;splitter&quot;</span><span class="p">)(</span><span class="n">string</span><span class="p">):</span>
+            <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">whitespace</span> <span class="ow">and</span> <span class="n">word</span><span class="o">.</span><span class="n">whitespace_</span><span class="p">:</span>
+                <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">whitespace_</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">words</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NLP.extract_keywords">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP.extract_keywords">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_keywords</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">strings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts keywords from a list of text strings using the `en_core_web_md` spaCy model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            strings (list[str]): A list of strings.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[str, ...]: A tuple of extracted keywords as strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_MD</span><span class="p">)</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span> <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">ents</span><span class="p">)</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NLP.tokenize">
+<a class="viewcode-back" href="../../../banterbot.utils.html#banterbot.utils.nlp.NLP.tokenize">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tokenize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">strings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">spacy</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">Doc</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a string or list of strings, returns tokenized versions of the strings as a generator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            strings (list[str]): A list of strings.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Generator[spacy.tokens.doc.Doc, None, None]: A stream of `spacy.tokens.doc.Doc` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_LG</span><span class="p">)</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span></div>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_download_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Downloads a spaCy model by its name. It also provides information about the download process to the user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the spaCy model to download.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Downloading spaCy language model &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;. This will only happen once.</span><span class="se">\n\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">spacy</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\n\n</span><span class="s1">Finished download of spaCy language model &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Downloads a spaCy model by its name. It also provides information about the download process to the user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the spaCy model to download.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Updating spaCy language model &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot; for spaCy version </span><span class="si">{</span><span class="n">spacy</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">.</span><span class="se">\n\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">spacy</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\n\n</span><span class="s1">Finished update of spaCy language model &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot; for spaCy version </span><span class="si">{</span><span class="n">spacy</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">spacy</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">Language</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a spaCy model by its name. If the model is not available, it is downloaded automatically.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the spaCy model to load.</span>
+<span class="sd">            **kwargs: Additional keyword arguments for the spacy.load function.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            spacy.language.Language: The loaded spaCy model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If the model is not available, download it.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_download_model</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Version checking to ensure that the model is compatible with the installed version of spaCy.</span>
+        <span class="n">model_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d+\.\d+).\d+&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">spacy_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d+\.\d+).\d+&quot;</span><span class="p">,</span> <span class="n">spacy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># If the model is not compatible with the installed version of spaCy, update the model.</span>
+        <span class="k">if</span> <span class="n">model_version</span> <span class="o">!=</span> <span class="n">spacy_version</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_update_model</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">model</span></div>
+
+
+
+<span class="c1"># Upon import, NLP downloads any missing required models.</span>
+<span class="n">NLP</span><span class="o">.</span><span class="n">install_upgrade_all_models</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

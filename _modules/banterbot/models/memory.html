@@ -1,0 +1,235 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.models.memory &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.models.memory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.models.memory</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="c1"># File `memory_pb2.py` is automatically generated from protoc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.message</span><span class="w"> </span><span class="kn">import</span> <span class="n">Message</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.protos</span><span class="w"> </span><span class="kn">import</span> <span class="n">memory_pb2</span>
+
+
+<div class="viewcode-block" id="Memory">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.memory.Memory">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Memory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a single memory of a persona in the form of a dataclass. A memory is defined by keywords, a</span>
+<span class="sd">    summary, an impact score, a timestamp, and associated messages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        keywords (list[str]): The list of keywords that summarize the memory.</span>
+<span class="sd">        summary (str): A brief summary of the memory.</span>
+<span class="sd">        impact (float): A score to indicate the impact of the memory on the persona (accepts values 1 to 100).</span>
+<span class="sd">        timestamp (datetime.datetime): The time when the memory occurred.</span>
+<span class="sd">        messages (list[Message]): The list of messages associated with the memory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">impact</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Message</span><span class="p">]</span>
+    <span class="n">uuid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a UUID for the current instance if one is not provided andtruncates microseconds from the provided</span>
+<span class="sd">        timestamp.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">generate_uuid</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="s2">&quot;Memory&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equality magic method, to allow equality checks between different instances of class `Memory` with the same</span>
+<span class="sd">        contents.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (Memory): An instance of class Memory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">==</span> <span class="n">memory</span><span class="o">.</span><span class="n">keywords</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">==</span> <span class="n">memory</span><span class="o">.</span><span class="n">summary</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">impact</span> <span class="o">==</span> <span class="n">memory</span><span class="o">.</span><span class="n">impact</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">==</span> <span class="n">memory</span><span class="o">.</span><span class="n">timestamp</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">==</span> <span class="n">memory</span><span class="o">.</span><span class="n">messages</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">==</span> <span class="n">memory</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Memory.to_protobuf">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.memory.Memory.to_protobuf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_protobuf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">Memory</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts this `Memory` instance into a protobuf object.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: The instance of the `Memory` class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            memory_pb2.Memory: The protobuf object equivalent of the `Memory` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">Memory</span><span class="p">()</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="p">)</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">impact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impact</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">message</span><span class="o">.</span><span class="n">to_protobuf</span><span class="p">()</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">])</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span>
+
+        <span class="k">return</span> <span class="n">memory</span></div>
+
+
+<div class="viewcode-block" id="Memory.serialize">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.memory.Memory.serialize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a serialized bytes string version of the current `Memory` instance.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A string containing binary bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_protobuf</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Memory.deserialize">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.memory.Memory.deserialize">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deserialize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a `Memory` instance from a serialized string of binary bytes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Memory: The constructed `Memory` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">Memory</span><span class="p">()</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_protobuf</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Memory.from_protobuf">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.memory.Memory.from_protobuf">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_protobuf</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">memory_pb2</span><span class="o">.</span><span class="n">Memory</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Memory&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a `Memory` instance from a protobuf object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (memory_pb2.Memory): The protobuf object to convert.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Memory: The constructed `Memory` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The `Memory` instance is created with the same attributes as the protobuf object.</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">keywords</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span>
+            <span class="n">summary</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span>
+            <span class="n">impact</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">impact</span><span class="p">,</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">timestamp</span><span class="p">),</span>
+            <span class="n">messages</span><span class="o">=</span><span class="p">[</span><span class="n">Message</span><span class="o">.</span><span class="n">from_protobuf</span><span class="p">(</span><span class="n">message_proto</span><span class="p">)</span> <span class="k">for</span> <span class="n">message_proto</span> <span class="ow">in</span> <span class="n">memory</span><span class="o">.</span><span class="n">messages</span><span class="p">],</span>
+            <span class="n">uuid</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

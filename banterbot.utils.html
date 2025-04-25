@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.utils package &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="banterbot.types package" href="banterbot.types.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">BanterBot</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="banterbot.html">BanterBot Package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#classes">Classes</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="banterbot.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.exceptions.html">banterbot.exceptions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html">banterbot.handlers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html">banterbot.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html">banterbot.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html">banterbot.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html">banterbot.types package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">banterbot.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">BanterBot</a></li>
+          <li class="breadcrumb-item"><a href="banterbot.html">BanterBot Package</a></li>
+      <li class="breadcrumb-item active">banterbot.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/banterbot.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="banterbot-utils-package">
+<h1>banterbot.utils package<a class="headerlink" href="#banterbot-utils-package" title="Link to this heading"></a></h1>
+<section id="module-banterbot.utils.closeable_queue">
+<span id="banterbot-utils-closeable-queue-module"></span><h2>banterbot.utils.closeable_queue module<a class="headerlink" href="#module-banterbot.utils.closeable_queue" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.utils.closeable_queue.CloseableQueue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.utils.closeable_queue.</span></span><span class="sig-name descname"><span class="pre">CloseableQueue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maxsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/utils/closeable_queue.html#CloseableQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.closeable_queue.CloseableQueue" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A queue that can be closed to prevent further puts. This is useful for when you have a producer thread that you
+want to stop once it has finished producing items, but you don’t want to stop the consumer thread from consuming
+items that have already been produced. Must be used as a context manager on the producer thread to ensure that the
+queue is closed when the producer thread exits.</p>
+<p>The intended use case is that the producer thread will put items into the queue until it is finished, then close the
+queue and exit. The consumer thread will then consume the items in the queue until it is empty, ideally using a
+<cite>for</cite> loop to ensure that it exits when the queue is empty and closed.</p>
+<p>If a <cite>for</cite> loop is not used by the consumer thread, then the consumer thread can also use a <cite>while</cite> loop to consume
+items from the queue. In this case, the <cite>while</cite> loop’s condition should be <cite>while not queue.closed()</cite> to ensure that
+the consumer thread exits when the queue is empty and closed.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.closeable_queue.CloseableQueue.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/closeable_queue.html#CloseableQueue.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.closeable_queue.CloseableQueue.close" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.closeable_queue.CloseableQueue.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/banterbot/utils/closeable_queue.html#CloseableQueue.finished"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.closeable_queue.CloseableQueue.finished" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.closeable_queue.CloseableQueue.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/banterbot/utils/closeable_queue.html#CloseableQueue.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.closeable_queue.CloseableQueue.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.closeable_queue.CloseableQueue.kill">
+<span class="sig-name descname"><span class="pre">kill</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/closeable_queue.html#CloseableQueue.kill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.closeable_queue.CloseableQueue.kill" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.closeable_queue.CloseableQueue.put">
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/closeable_queue.html#CloseableQueue.put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.closeable_queue.CloseableQueue.put" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.closeable_queue.CloseableQueue.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/closeable_queue.html#CloseableQueue.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.closeable_queue.CloseableQueue.reset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.utils.indexed_event">
+<span id="banterbot-utils-indexed-event-module"></span><h2>banterbot.utils.indexed_event module<a class="headerlink" href="#module-banterbot.utils.indexed_event" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.utils.indexed_event.IndexedEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.utils.indexed_event.</span></span><span class="sig-name descname"><span class="pre">IndexedEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/utils/indexed_event.html#IndexedEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.indexed_event.IndexedEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></p>
+<p>A thread synchronization event that uses a counter to manage iterations in a producer-consumer scenario. This class
+is ideal for situations where a consumer thread processes data chunks provided by a producer thread. The counter
+ensures that the consumer processes each chunk of data exactly once and waits when no more data is available.</p>
+<p>This class extends threading.Event, adding a counter to control the number of times the event allows passage before
+resetting. It is useful for controlled processing of data chunks in multi-threaded applications, preventing the
+consumer from proceeding until new data is available.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.indexed_event.IndexedEvent.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/indexed_event.html#IndexedEvent.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.indexed_event.IndexedEvent.clear" title="Link to this definition"></a></dt>
+<dd><p>Resets the event and the counter, typically used to signify that no data is currently available for processing.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="banterbot.utils.indexed_event.IndexedEvent.counter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">counter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#banterbot.utils.indexed_event.IndexedEvent.counter" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the current value of the counter, indicating the number of data chunks available for processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current number of unprocessed data chunks.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.indexed_event.IndexedEvent.decrement">
+<span class="sig-name descname"><span class="pre">decrement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/indexed_event.html#IndexedEvent.decrement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.indexed_event.IndexedEvent.decrement" title="Link to this definition"></a></dt>
+<dd><p>Decrements the counter by a specified amount. It also clears the event if zero is reached, blocking the
+consumer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – The amount to decrement the counter by. Must be non-negative.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.indexed_event.IndexedEvent.increment">
+<span class="sig-name descname"><span class="pre">increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/indexed_event.html#IndexedEvent.increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.indexed_event.IndexedEvent.increment" title="Link to this definition"></a></dt>
+<dd><p>Increments the counter by a specified amount, indicating that new data chunks are available. It also sets the
+event, allowing the consumer to resume processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – The number of new data chunks added. Must be non-negative.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If N is less than 1 or N is not a number.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.indexed_event.IndexedEvent.is_set">
+<span class="sig-name descname"><span class="pre">is_set</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/banterbot/utils/indexed_event.html#IndexedEvent.is_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.indexed_event.IndexedEvent.is_set" title="Link to this definition"></a></dt>
+<dd><p>Checks if the event is set, meaning data is available for processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if data is available, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.indexed_event.IndexedEvent.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/indexed_event.html#IndexedEvent.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.indexed_event.IndexedEvent.set" title="Link to this definition"></a></dt>
+<dd><p>Directly sets the counter to a specified value, indicating the exact number of data chunks available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – The number of data chunks available. Must be non-negative.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If N is less than 1 or N is not a number.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.utils.nlp">
+<span id="banterbot-utils-nlp-module"></span><h2>banterbot.utils.nlp module<a class="headerlink" href="#module-banterbot.utils.nlp" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.utils.nlp.</span></span><span class="sig-name descname"><span class="pre">NLP</span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A comprehensive toolkit that provides a set of Natural Language Processing utilities. It leverages the capabilities
+of the spaCy package. The toolkit is designed to automatically download the necessary models if they are not
+available.</p>
+<p>One of the main features of this toolkit is the intelligent model selection mechanism. It is designed to select the
+most appropriate and lightweight model for each specific task, balancing between computational efficiency and task
+performance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP.extract_keywords">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_keywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP.extract_keywords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP.extract_keywords" title="Link to this definition"></a></dt>
+<dd><p>Extracts keywords from a list of text strings using the <cite>en_core_web_md</cite> spaCy model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strings</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – A list of strings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of extracted keywords as strings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[str, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP.install_upgrade_all_models">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">install_upgrade_all_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP.install_upgrade_all_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP.install_upgrade_all_models" title="Link to this definition"></a></dt>
+<dd><p>Lazily checks if models are already installed, and installs any that are missing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP.load_all_models">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_all_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP.load_all_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP.load_all_models" title="Link to this definition"></a></dt>
+<dd><p>Preloads all available models.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP.model">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Language</span></span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP.model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP.model" title="Link to this definition"></a></dt>
+<dd><p>Returns the specified spaCy model lazily by loading models the first time they are called, then storing them in
+the <cite>cls._models</cite> dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the spaCy model to return.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The requested spaCy model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>spacy.language.Language</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP.segment_sentences">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">segment_sentences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whitespace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP.segment_sentences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP.segment_sentences" title="Link to this definition"></a></dt>
+<dd><p>Splits a text string into individual sentences using a specialized spaCy model. The model is a lightweight
+version of <cite>en_core_web_sm</cite> designed specifically for sentence segmentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> (<em>str</em>) – The input text string.</p></li>
+<li><p><strong>whitespace</strong> (<em>str</em>) – If True, keep whitespace at the beginning/end of sentences; if False, strip it.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of individual sentences as strings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[str, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP.segment_words">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">segment_words</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whitespace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP.segment_words"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP.segment_words" title="Link to this definition"></a></dt>
+<dd><p>Splits a text string into individual words using a specialized spaCy model. The model is customized version of
+<cite>en_core_web_md</cite> in which words are not split on apostrophes, in order to preserve contractions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> (<em>str</em>) – The input text string.</p></li>
+<li><p><strong>whitespace</strong> (<em>str</em>) – If True, include whitespace characters between words; if False, omit it.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of individual words as strings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[str, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.nlp.NLP.tokenize">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Doc</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/utils/nlp.html#NLP.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.nlp.NLP.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Given a string or list of strings, returns tokenized versions of the strings as a generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strings</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – A list of strings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A stream of <cite>spacy.tokens.doc.Doc</cite> instances.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Generator[spacy.tokens.doc.Doc, None, None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.utils.thread_queue">
+<span id="banterbot-utils-thread-queue-module"></span><h2>banterbot.utils.thread_queue module<a class="headerlink" href="#module-banterbot.utils.thread_queue" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.utils.thread_queue.ThreadQueue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.utils.thread_queue.</span></span><span class="sig-name descname"><span class="pre">ThreadQueue</span></span><a class="reference internal" href="_modules/banterbot/utils/thread_queue.html#ThreadQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.thread_queue.ThreadQueue" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for managing and executing tasks in separate threads.</p>
+<p>This class maintains a queue of tasks to be executed. Each task is a Thread object, which is executed in its own
+thread. If there is a task in the queue that hasn’t started executing yet, it will be prevented from running when a
+new task is added unless it is declared unskippable.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.thread_queue.ThreadQueue.add_task">
+<span class="sig-name descname"><span class="pre">add_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Thread</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unskippable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/utils/thread_queue.html#ThreadQueue.add_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.thread_queue.ThreadQueue.add_task" title="Link to this definition"></a></dt>
+<dd><p>Add a new task to the queue.</p>
+<p>This method adds a new task to the queue and starts a wrapper thread to manage its execution. The wrapper thread
+is responsible for waiting for the previous task to complete, executing the current task if it is unskippable or
+the last task in the queue, and setting the event for the next task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread</strong> (<em>threading.Thread</em>) – The thread to be added to the queue.</p></li>
+<li><p><strong>unskippable</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the thread should be executed even if a new task is queued.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.utils.thread_queue.ThreadQueue.is_alive">
+<span class="sig-name descname"><span class="pre">is_alive</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/banterbot/utils/thread_queue.html#ThreadQueue.is_alive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.utils.thread_queue.ThreadQueue.is_alive" title="Link to this definition"></a></dt>
+<dd><p>Check if the last task in the queue is still running.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the last task is still running, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="banterbot.types.html" class="btn btn-neutral float-left" title="banterbot.types package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

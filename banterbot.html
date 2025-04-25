@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BanterBot Package &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="banterbot.data package" href="banterbot.data.html" />
+    <link rel="prev" title="BanterBot" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">BanterBot</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">BanterBot Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#openaiservice">OpenAIService</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#speechsynthesisservice">SpeechSynthesisService</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#speechrecognitionservice">SpeechRecognitionService</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interface">Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tkinterface">TKInterface</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.exceptions.html">banterbot.exceptions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html">banterbot.handlers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html">banterbot.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html">banterbot.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html">banterbot.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html">banterbot.types package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">BanterBot</a></li>
+      <li class="breadcrumb-item active">BanterBot Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/banterbot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="banterbot-package">
+<h1>BanterBot Package<a class="headerlink" href="#banterbot-package" title="Link to this heading"></a></h1>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<section id="openaiservice">
+<h3>OpenAIService<a class="headerlink" href="#openaiservice" title="Link to this heading"></a></h3>
+</section>
+<section id="speechsynthesisservice">
+<h3>SpeechSynthesisService<a class="headerlink" href="#speechsynthesisservice" title="Link to this heading"></a></h3>
+</section>
+<section id="speechrecognitionservice">
+<h3>SpeechRecognitionService<a class="headerlink" href="#speechrecognitionservice" title="Link to this heading"></a></h3>
+</section>
+<section id="interface">
+<h3>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h3>
+</section>
+<section id="tkinterface">
+<h3>TKInterface<a class="headerlink" href="#tkinterface" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.data.html#module-banterbot.data.enums">banterbot.data.enums module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles.ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles.ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles.SYSTEM"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles.SYSTEM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.ChatCompletionRoles.USER"><code class="docutils literal notranslate"><span class="pre">ChatCompletionRoles.USER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar"><code class="docutils literal notranslate"><span class="pre">EnvVar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar.AZURE_SPEECH_KEY"><code class="docutils literal notranslate"><span class="pre">EnvVar.AZURE_SPEECH_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar.AZURE_SPEECH_REGION"><code class="docutils literal notranslate"><span class="pre">EnvVar.AZURE_SPEECH_REGION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.EnvVar.OPENAI_API_KEY"><code class="docutils literal notranslate"><span class="pre">EnvVar.OPENAI_API_KEY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody"><code class="docutils literal notranslate"><span class="pre">Prosody</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.EMPHASES"><code class="docutils literal notranslate"><span class="pre">Prosody.EMPHASES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.PHRASE_PATTERN"><code class="docutils literal notranslate"><span class="pre">Prosody.PHRASE_PATTERN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.PITCHES"><code class="docutils literal notranslate"><span class="pre">Prosody.PITCHES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.RATES"><code class="docutils literal notranslate"><span class="pre">Prosody.RATES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.STYLEDEGREES"><code class="docutils literal notranslate"><span class="pre">Prosody.STYLEDEGREES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.Prosody.STYLES"><code class="docutils literal notranslate"><span class="pre">Prosody.STYLES</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_LG"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel.EN_CORE_WEB_LG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_MD"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel.EN_CORE_WEB_MD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.enums.SpaCyLangModel.EN_CORE_WEB_SM"><code class="docutils literal notranslate"><span class="pre">SpaCyLangModel.EN_CORE_WEB_SM</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.data.html#module-banterbot.data.prompts">banterbot.data.prompts module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.Greetings"><code class="docutils literal notranslate"><span class="pre">Greetings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.Greetings.UNPROMPTED_GREETING"><code class="docutils literal notranslate"><span class="pre">Greetings.UNPROMPTED_GREETING</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.DUMMY"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.DUMMY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.PREFIX"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.PREFIX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.PROB_VAR"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.PROB_VAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionPredictorPrompts.SUFFIX"><code class="docutils literal notranslate"><span class="pre">OptionPredictorPrompts.SUFFIX</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts"><code class="docutils literal notranslate"><span class="pre">OptionSelectorPrompts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts.DUMMY"><code class="docutils literal notranslate"><span class="pre">OptionSelectorPrompts.DUMMY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.OptionSelectorPrompts.PREFIX"><code class="docutils literal notranslate"><span class="pre">OptionSelectorPrompts.PREFIX</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection"><code class="docutils literal notranslate"><span class="pre">ProsodySelection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.CHARACTER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.CHARACTER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.CONTEXT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.CONTEXT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.DUMMY"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.DUMMY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EMPHASIS_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EMPHASIS_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EMPHASIS_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EMPHASIS_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EXAMPLE_ASSISTANT_1"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EXAMPLE_ASSISTANT_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EXAMPLE_ASSISTANT_2"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EXAMPLE_ASSISTANT_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.EXAMPLE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.EXAMPLE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PITCH_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PITCH_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PITCH_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PITCH_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PREFIX"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PREFIX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.PROMPT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.PROMPT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.RATE_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.RATE_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.RATE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.RATE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLEDEGREE_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLEDEGREE_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLEDEGREE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLEDEGREE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLE_ASSISTANT"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLE_ASSISTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.STYLE_USER"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.STYLE_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ProsodySelection.SUFFIX"><code class="docutils literal notranslate"><span class="pre">ProsodySelection.SUFFIX</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing.EXAMPLE_1"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing.EXAMPLE_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing.EXAMPLE_2"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing.EXAMPLE_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.SpeechSynthesisPreprocessing.SYSTEM"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisPreprocessing.SYSTEM</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ToneSelection"><code class="docutils literal notranslate"><span class="pre">ToneSelection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ToneSelection.PROMPT"><code class="docutils literal notranslate"><span class="pre">ToneSelection.PROMPT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html#banterbot.data.prompts.ToneSelection.SYSTEM"><code class="docutils literal notranslate"><span class="pre">ToneSelection.SYSTEM</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.exceptions.html">banterbot.exceptions package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.exceptions.html#module-banterbot.exceptions.format_mismatch_error">banterbot.exceptions.format_mismatch_error module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.exceptions.html#banterbot.exceptions.format_mismatch_error.FormatMismatchError"><code class="docutils literal notranslate"><span class="pre">FormatMismatchError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.extensions.html#banterbot-extensions-interface-module">banterbot.extensions.interface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.extensions.html#banterbot-extensions-option-selector-module">banterbot.extensions.option_selector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.extensions.html#module-banterbot.extensions.prosody_selector">banterbot.extensions.prosody_selector module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector"><code class="docutils literal notranslate"><span class="pre">ProsodySelector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._model"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._openai_manager"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._openai_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._voice"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._voice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._valid"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._valid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._token_counts"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._token_counts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._output_patterns"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._output_patterns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._system"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector._line_pattern"><code class="docutils literal notranslate"><span class="pre">ProsodySelector._line_pattern</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector.select"><code class="docutils literal notranslate"><span class="pre">ProsodySelector.select()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.gui.html#banterbot-gui-tk-interface-module">banterbot.gui.tk_interface module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.handlers.html">banterbot.handlers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.handlers.html#module-banterbot.handlers.speech_recognition_handler">banterbot.handlers.speech_recognition_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.speech_recognition_handler.SpeechRecognitionHandler"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.speech_recognition_handler.SpeechRecognitionHandler.close"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionHandler.close()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.handlers.html#module-banterbot.handlers.speech_synthesis_handler">banterbot.handlers.speech_synthesis_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.handlers.html#banterbot.handlers.speech_synthesis_handler.SpeechSynthesisHandler"><code class="docutils literal notranslate"><span class="pre">SpeechSynthesisHandler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.handlers.html#banterbot-handlers-stream-handler-module">banterbot.handlers.stream_handler module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.managers.html">banterbot.managers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.azure_neural_voice_manager">banterbot.managers.azure_neural_voice_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.data"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_countries"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_countries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_genders"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_genders()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_languages"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_languages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_locales"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_locales()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_regions"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_regions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_styles"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.list_styles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.load"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.search"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceManager.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.memory_chain">banterbot.managers.memory_chain module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain"><code class="docutils literal notranslate"><span class="pre">MemoryChain</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.append"><code class="docutils literal notranslate"><span class="pre">MemoryChain.append()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.create"><code class="docutils literal notranslate"><span class="pre">MemoryChain.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.delete"><code class="docutils literal notranslate"><span class="pre">MemoryChain.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.extend"><code class="docutils literal notranslate"><span class="pre">MemoryChain.extend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.load"><code class="docutils literal notranslate"><span class="pre">MemoryChain.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.memory_chain.MemoryChain.search"><code class="docutils literal notranslate"><span class="pre">MemoryChain.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.openai_model_manager">banterbot.managers.openai_model_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.openai_model_manager.OpenAIModelManager"><code class="docutils literal notranslate"><span class="pre">OpenAIModelManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.openai_model_manager.OpenAIModelManager.list"><code class="docutils literal notranslate"><span class="pre">OpenAIModelManager.list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.openai_model_manager.OpenAIModelManager.load"><code class="docutils literal notranslate"><span class="pre">OpenAIModelManager.load()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#module-banterbot.managers.resource_manager">banterbot.managers.resource_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager"><code class="docutils literal notranslate"><span class="pre">ResourceManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.load_csv"><code class="docutils literal notranslate"><span class="pre">ResourceManager.load_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.load_json"><code class="docutils literal notranslate"><span class="pre">ResourceManager.load_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.load_raw"><code class="docutils literal notranslate"><span class="pre">ResourceManager.load_raw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_cache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_csv_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_csv_cache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_json_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_json_cache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.managers.html#banterbot.managers.resource_manager.ResourceManager.reset_raw_cache"><code class="docutils literal notranslate"><span class="pre">ResourceManager.reset_raw_cache()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.managers.html#banterbot-managers-stream-manager-module">banterbot.managers.stream_manager module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.models.html">banterbot.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.azure_neural_voice_profile">banterbot.models.azure_neural_voice_profile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.country"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.country</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.description"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.gender"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.gender</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.language"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.language</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.locale"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.locale</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.name"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.region"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.region</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.short_name"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.short_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile.style_list"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.style_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id0"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.country</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id1"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id2"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.gender</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id3"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.language</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id4"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.locale</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id5"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id6"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.region</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id7"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.short_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id8"><code class="docutils literal notranslate"><span class="pre">AzureNeuralVoiceProfile.style_list</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.memory">banterbot.models.memory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory"><code class="docutils literal notranslate"><span class="pre">Memory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.deserialize"><code class="docutils literal notranslate"><span class="pre">Memory.deserialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.from_protobuf"><code class="docutils literal notranslate"><span class="pre">Memory.from_protobuf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.impact"><code class="docutils literal notranslate"><span class="pre">Memory.impact</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.keywords"><code class="docutils literal notranslate"><span class="pre">Memory.keywords</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.messages"><code class="docutils literal notranslate"><span class="pre">Memory.messages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.serialize"><code class="docutils literal notranslate"><span class="pre">Memory.serialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.summary"><code class="docutils literal notranslate"><span class="pre">Memory.summary</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.timestamp"><code class="docutils literal notranslate"><span class="pre">Memory.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.to_protobuf"><code class="docutils literal notranslate"><span class="pre">Memory.to_protobuf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory.uuid"><code class="docutils literal notranslate"><span class="pre">Memory.uuid</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.message">banterbot.models.message module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message"><code class="docutils literal notranslate"><span class="pre">Message</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.role"><code class="docutils literal notranslate"><span class="pre">Message.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.content"><code class="docutils literal notranslate"><span class="pre">Message.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.name"><code class="docutils literal notranslate"><span class="pre">Message.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id9"><code class="docutils literal notranslate"><span class="pre">Message.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.count_tokens"><code class="docutils literal notranslate"><span class="pre">Message.count_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.from_protobuf"><code class="docutils literal notranslate"><span class="pre">Message.from_protobuf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id10"><code class="docutils literal notranslate"><span class="pre">Message.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id11"><code class="docutils literal notranslate"><span class="pre">Message.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.message.Message.to_protobuf"><code class="docutils literal notranslate"><span class="pre">Message.to_protobuf()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.number">banterbot.models.number module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.number.Number"><code class="docutils literal notranslate"><span class="pre">Number</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.number.Number.is_null"><code class="docutils literal notranslate"><span class="pre">Number.is_null()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.number.Number.set"><code class="docutils literal notranslate"><span class="pre">Number.set()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.openai_model">banterbot.models.openai_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel"><code class="docutils literal notranslate"><span class="pre">OpenAIModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.model"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.max_tokens"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.max_tokens</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.generation"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.generation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.rank"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.rank</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel.tokenizer"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.tokenizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id12"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.generation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id13"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.max_tokens</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id14"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id15"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.rank</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.phrase">banterbot.models.phrase module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase"><code class="docutils literal notranslate"><span class="pre">Phrase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.emphasis"><code class="docutils literal notranslate"><span class="pre">Phrase.emphasis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.pitch"><code class="docutils literal notranslate"><span class="pre">Phrase.pitch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.rate"><code class="docutils literal notranslate"><span class="pre">Phrase.rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.style"><code class="docutils literal notranslate"><span class="pre">Phrase.style</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.styledegree"><code class="docutils literal notranslate"><span class="pre">Phrase.styledegree</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.text"><code class="docutils literal notranslate"><span class="pre">Phrase.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.phrase.Phrase.voice"><code class="docutils literal notranslate"><span class="pre">Phrase.voice</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.speech_recognition_input">banterbot.models.speech_recognition_input module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.display"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.duration"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.from_cutoff"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.from_cutoff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.from_recognition_result"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.from_recognition_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.offset"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.offset_end"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.offset_end</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.sents"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.sents</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.words"><code class="docutils literal notranslate"><span class="pre">SpeechRecognitionInput.words</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.stream_log_entry">banterbot.models.stream_log_entry module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry"><code class="docutils literal notranslate"><span class="pre">StreamLogEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry.timestamp"><code class="docutils literal notranslate"><span class="pre">StreamLogEntry.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.stream_log_entry.StreamLogEntry.value"><code class="docutils literal notranslate"><span class="pre">StreamLogEntry.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.models.html#module-banterbot.models.word">banterbot.models.word module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.word"><code class="docutils literal notranslate"><span class="pre">Word.word</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.offset"><code class="docutils literal notranslate"><span class="pre">Word.offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.duration"><code class="docutils literal notranslate"><span class="pre">Word.duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id16"><code class="docutils literal notranslate"><span class="pre">Word.duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#id17"><code class="docutils literal notranslate"><span class="pre">Word.offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html#banterbot.models.word.Word.text"><code class="docutils literal notranslate"><span class="pre">Word.text</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.services.html">banterbot.services package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.services.html#banterbot-services-openai-service-module">banterbot.services.openai_service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.services.html#banterbot-services-speech-synthesis-service-module">banterbot.services.speech_synthesis_service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.services.html#banterbot-services-speech-recognition-service-module">banterbot.services.speech_recognition_service module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.types.html">banterbot.types package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.types.html#module-banterbot.types.wordjson">banterbot.types.wordjson module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON"><code class="docutils literal notranslate"><span class="pre">WordJSON</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Word"><code class="docutils literal notranslate"><span class="pre">WordJSON.Word</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Offset"><code class="docutils literal notranslate"><span class="pre">WordJSON.Offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Duration"><code class="docutils literal notranslate"><span class="pre">WordJSON.Duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#banterbot.types.wordjson.WordJSON.Confidence"><code class="docutils literal notranslate"><span class="pre">WordJSON.Confidence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id0"><code class="docutils literal notranslate"><span class="pre">WordJSON.Confidence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id1"><code class="docutils literal notranslate"><span class="pre">WordJSON.Duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id2"><code class="docutils literal notranslate"><span class="pre">WordJSON.Offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html#id3"><code class="docutils literal notranslate"><span class="pre">WordJSON.Word</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.closeable_queue">banterbot.utils.closeable_queue module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue"><code class="docutils literal notranslate"><span class="pre">CloseableQueue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.close"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.finished"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.finished()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.get"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.kill"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.kill()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.put"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.put()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.closeable_queue.CloseableQueue.reset"><code class="docutils literal notranslate"><span class="pre">CloseableQueue.reset()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.indexed_event">banterbot.utils.indexed_event module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent"><code class="docutils literal notranslate"><span class="pre">IndexedEvent</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.clear"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.counter"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.counter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.decrement"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.decrement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.increment"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.increment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.is_set"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.is_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.indexed_event.IndexedEvent.set"><code class="docutils literal notranslate"><span class="pre">IndexedEvent.set()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.nlp">banterbot.utils.nlp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP"><code class="docutils literal notranslate"><span class="pre">NLP</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.extract_keywords"><code class="docutils literal notranslate"><span class="pre">NLP.extract_keywords()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.install_upgrade_all_models"><code class="docutils literal notranslate"><span class="pre">NLP.install_upgrade_all_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.load_all_models"><code class="docutils literal notranslate"><span class="pre">NLP.load_all_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.model"><code class="docutils literal notranslate"><span class="pre">NLP.model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.segment_sentences"><code class="docutils literal notranslate"><span class="pre">NLP.segment_sentences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.segment_words"><code class="docutils literal notranslate"><span class="pre">NLP.segment_words()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.nlp.NLP.tokenize"><code class="docutils literal notranslate"><span class="pre">NLP.tokenize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.utils.html#module-banterbot.utils.thread_queue">banterbot.utils.thread_queue module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.thread_queue.ThreadQueue"><code class="docutils literal notranslate"><span class="pre">ThreadQueue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.thread_queue.ThreadQueue.add_task"><code class="docutils literal notranslate"><span class="pre">ThreadQueue.add_task()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html#banterbot.utils.thread_queue.ThreadQueue.is_alive"><code class="docutils literal notranslate"><span class="pre">ThreadQueue.is_alive()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="BanterBot" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="banterbot.data.html" class="btn btn-neutral float-right" title="banterbot.data package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.extensions.prosody_selector &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.extensions.prosody_selector</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.extensions.prosody_selector</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">RETRY_LIMIT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.data.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatCompletionRoles</span><span class="p">,</span> <span class="n">Prosody</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.data.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProsodySelection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.azure_neural_voice_profile</span><span class="w"> </span><span class="kn">import</span> <span class="n">AzureNeuralVoiceProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.message</span><span class="w"> </span><span class="kn">import</span> <span class="n">Message</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.openai_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAIModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.phrase</span><span class="w"> </span><span class="kn">import</span> <span class="n">Phrase</span>
+
+
+<div class="viewcode-block" id="ProsodySelector">
+<a class="viewcode-back" href="../../../banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProsodySelector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The ProsodySelector class is responsible for managing prosody selection/extraction for specified instances of the</span>
+<span class="sd">    AzureNeuralVoice class. It uses the OpenAI ChatCompletion API to generate prosody settings for a list of sentences.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _model (OpenAIModel): The OpenAI model to be used for generating responses.</span>
+<span class="sd">        _openai_manager (OpenAIService): An instance of the OpenAIService class.</span>
+<span class="sd">        _voice (AzureNeuralVoice): An instance of the AzureNeuralVoice class.</span>
+<span class="sd">        _valid (bool): A flag indicating whether the voice styles are not None.</span>
+<span class="sd">        _token_counts (dict): A dictionary to cache the maximum number of tokens for a given number of rows.</span>
+<span class="sd">        _output_patterns (dict): A dictionary to cache the regex patterns matching the expected ChatCompletion output.</span>
+<span class="sd">        _system (list[Message]): A list of system and user messages to be used as a prompt for the ChatCompletion API.</span>
+<span class="sd">        _line_pattern (str): A regex pattern that matches one line of expected output for the current model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manager</span><span class="p">:</span> <span class="n">OpenAIModel</span><span class="p">,</span> <span class="n">voice</span><span class="p">:</span> <span class="n">AzureNeuralVoiceProfile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the ProsodySelector class with a specified OpenAI model and AzureNeuralVoice instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            manager (OpenAIService): An instance of class OpenAIService to be used for generating responses.</span>
+<span class="sd">            voice (AzureNeuralVoice): An instance of the AzureNeuralVoice class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ProsodySelector initialized&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span> <span class="o">=</span> <span class="n">manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_voice</span> <span class="o">=</span> <span class="n">voice</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_voice</span><span class="o">.</span><span class="n">style_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_token_counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_patterns</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_system</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_system</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare the system prompt on instantiation, which is customized on a model-to-model basis, since different</span>
+<span class="sd">        `OpenAIModel` instances vary in terms of available styles. Also prepares a regex pattern that matches one line</span>
+<span class="sd">        of expected output for the current model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Convert the different prosody options into</span>
+        <span class="n">styles</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_voice</span><span class="o">.</span><span class="n">style_list</span><span class="p">)])</span>
+        <span class="n">styledegrees</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">STYLEDEGREES</span><span class="p">)])</span>
+        <span class="n">pitches</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">PITCHES</span><span class="p">)])</span>
+        <span class="n">rates</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">RATES</span><span class="p">)])</span>
+        <span class="n">emphases</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">EMPHASES</span><span class="p">)])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_system</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">STYLE_USER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">STYLE_ASSISTANT</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">styles</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">STYLEDEGREE_USER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">STYLEDEGREE_ASSISTANT</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">styledegrees</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">PITCH_USER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">PITCH_ASSISTANT</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">pitches</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">RATE_USER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">RATE_ASSISTANT</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">rates</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">EMPHASIS_USER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">EMPHASIS_ASSISTANT</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">emphases</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span>
+                <span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">SUFFIX</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">style</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_voice</span><span class="o">.</span><span class="n">style_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">styledegree</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">STYLEDEGREES</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">pitch</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">PITCHES</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">rate</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">RATES</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">emphasis</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">EMPHASES</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">EXAMPLE_USER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">EXAMPLE_ASSISTANT_1</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">EXAMPLE_ASSISTANT_2</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="ProsodySelector.select">
+<a class="viewcode-back" href="../../../banterbot.extensions.html#banterbot.extensions.prosody_selector.ProsodySelector.select">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts prosody settings for a list of sentences by asking the OpenAI ChatCompletion API to pick a set of</span>
+<span class="sd">        options. The prompt is set up to force the model to return an exact number of tokens with dummy text preceding</span>
+<span class="sd">        it in order to yield consistent results efficiently.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sentences (list[str]): The list of sentences to be processed.</span>
+<span class="sd">            context (Optional[str]): Useful prior conversational context originating from the same response.</span>
+<span class="sd">            system (Optional[str]): A system prompt to assist the ChatCompletion in picking reactions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The randomly selected option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">RETRY_LIMIT</span><span class="p">):</span>
+            <span class="c1"># Attempt several different sentence splits in order to modify the input on retry -- significantly reduces</span>
+            <span class="c1"># the chance of raising a `FormatMismatchError` Exception. `RETRY_LIMIT` is defined in the config file.</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">phrases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_sentences</span><span class="p">(</span><span class="n">sentences</span><span class="o">=</span><span class="n">sentences</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">phrases</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">phrases</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)]</span>
+
+            <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_messages</span><span class="p">(</span><span class="n">phrases</span><span class="o">=</span><span class="n">phrases</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span>
+                <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+                <span class="n">split</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                <span class="n">top_p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                <span class="n">max_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_max_tokens</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phrases</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="n">processed</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_response</span><span class="p">(</span><span class="n">phrases</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">processed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">processed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">processed</span> <span class="o">=</span> <span class="p">[</span><span class="n">Phrase</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">sentence</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_voice</span><span class="p">)</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">ProsodySelection</span><span class="o">.</span><span class="n">PROMPT</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phrases</span><span class="p">),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">phrases</span><span class="p">)),</span>
+                <span class="n">ProsodySelection</span><span class="o">.</span><span class="n">DUMMY</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phrases</span><span class="p">)),</span>
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputs</span><span class="p">),</span>
+            <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">processed</span><span class="p">,</span> <span class="n">outputs</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_max_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the maximum number of tokens for the specified number of rows of six-digit numbers. Caches all</span>
+<span class="sd">        calculated values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            N (int): The number of rows.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The maximum number of tokens.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Count the number of tokens for the specified `N`.</span>
+        <span class="k">if</span> <span class="n">N</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_counts</span><span class="p">:</span>
+            <span class="n">dummy</span> <span class="o">=</span> <span class="s2">&quot;012345</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;012345&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_token_counts</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">count_tokens</span><span class="p">(</span><span class="n">dummy</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_counts</span><span class="p">[</span><span class="n">N</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_output_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a compiled regex pattern matching the expected ChatCompletion output for a given `N`, or number of</span>
+<span class="sd">        phrases. Caches all calculated values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            N (int): The number of phrases.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: A compiled regex pattern.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Compile a regex pattern that matches `N` lines of expected output from ChatCompletion&#39;s prosody evaluation.</span>
+        <span class="k">if</span> <span class="n">N</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_patterns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_patterns</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d</span><span class="si">{6}</span><span class="s2">\n&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\d</span><span class="si">{6}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_patterns</span><span class="p">[</span><span class="n">N</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_messages</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">phrases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">system</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Message</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inserts the system prompt, user prompt, prefix, suffix, and a dummy message mimicking a successful interaction</span>
+<span class="sd">        with the ChatCompletion API, into the list of messages.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            phrases (list[str]): The list of phrases to be processed.</span>
+<span class="sd">            context (Optional[str]): Useful prior conversational context originating from the same response.</span>
+<span class="sd">            system (Optional[str]): A system prompt to assist the ChatCompletion in picking reactions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Message]: The enhanced list of messages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_system</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">system</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">CHARACTER</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">system</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">CONTEXT</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">Message</span><span class="p">(</span>
+                <span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">PROMPT</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phrases</span><span class="p">),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">phrases</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">ChatCompletionRoles</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">ProsodySelection</span><span class="o">.</span><span class="n">DUMMY</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phrases</span><span class="p">)))</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">messages</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phrases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">response</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Phrase</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a response from the ChatCompletion API using the `_prompt` instance attribute, parses one sub-sentence and</span>
+<span class="sd">        returns an instance of class `Phrase`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            phrases (str): The string divided into sub-sentences (phrases).</span>
+<span class="sd">            response (str): The ChatCompletion response to be processed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Phrase]: A processed list of instances of class `Phrase`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">processed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_pattern</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phrases</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_output_pattern</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">response</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">phrases</span><span class="p">):</span>
+                <span class="n">processed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_phrase</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">phrase</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">processed</span><span class="p">,</span> <span class="n">outputs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_phrase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">phrase</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Phrase</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given an output from the ChatCompletion API and a phrase, creates an instance of class `Phrase`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output (str): The output from the ChatCompletion API.</span>
+<span class="sd">            phrase (str): The phrase to be processed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Phrase: An instance of class `Phrase`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># style = self._voice.style_list[min(int(output[:2]), len(self._voice.style_list)) - 1]</span>
+
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_voice</span><span class="o">.</span><span class="n">style_list</span><span class="p">,</span> <span class="nb">str</span><span class="p">()],</span>
+            <span class="s2">&quot;styledegree&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">STYLEDEGREES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">str</span><span class="p">()],</span>
+            <span class="s2">&quot;pitch&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">PITCHES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">str</span><span class="p">()],</span>
+            <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">RATES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">str</span><span class="p">()],</span>
+            <span class="s2">&quot;emphasis&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">EMPHASES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">str</span><span class="p">()],</span>
+        <span class="p">}</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ProsodySelector failed to parse </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> as valid index&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ProsodySelector failed to parse </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> as integer&quot;</span><span class="p">)</span>
+
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">Phrase</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">phrase</span><span class="p">,</span>
+            <span class="n">voice</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_voice</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_split_sentences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a list of sentences, splits them on certain types of punctuation (defined in `config.py`) into smaller</span>
+<span class="sd">        phrases.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sentences (list[Message]): The list of sentences to be processed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of sub-sentences divided on the specified punctuation delimiters.</span>
+<span class="sd">            int: The number of tokens expected in the ChatCompletion response.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">phrases</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">PHRASE_PATTERN</span><span class="p">,</span> <span class="n">sentence</span><span class="p">)</span>
+            <span class="n">processed</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">phrase</span> <span class="o">:=</span> <span class="n">phrase</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">Prosody</span><span class="o">.</span><span class="n">PHRASE_PATTERN</span><span class="p">,</span> <span class="n">phrase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">phrase</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">processed</span><span class="p">:</span>
+                        <span class="n">processed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">processed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">phrase</span>
+            <span class="n">phrases</span> <span class="o">+=</span> <span class="n">processed</span>
+
+        <span class="k">return</span> <span class="n">phrases</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
