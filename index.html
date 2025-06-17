@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to BanterBot’s documentation! &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="BanterBot" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to BanterBot’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-banterbot-s-documentation">
+<h1>Welcome to BanterBot’s documentation!<a class="headerlink" href="#welcome-to-banterbot-s-documentation" title="Link to this heading"></a></h1>
+<p>BanterBot is a user-friendly chatbot application that leverages OpenAI
+models for generating context-aware responses, Azure Neural Voices for
+text-to-speech synthesis, and Azure speech-to-text recognition. The
+package offers a comprehensive toolkit for building chatbot applications
+with an intuitive interface and a suite of utilities.</p>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Utilizes OpenAI models to generate context-aware responses</p></li>
+<li><p>Leverages Azure Neural Voices for premium text-to-speech
+synthesis</p></li>
+<li><p>Offers a wide range of output formats, multilingual voices,
+and speaking styles</p></li>
+<li><p>Allows real-time monitoring of the chatbot’s responses</p></li>
+<li><p>Supports asynchronous speech-to-text microphone input</p></li>
+<li><p>Includes an abstract base class for creating custom frontends
+for the BanterBot application</p></li>
+<li><p>Features a tkinter-based frontend implementation</p></li>
+<li><p>Automatically selects an appropriate emotion or tone based on
+the conversation context</p></li>
+</ul>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>Three environment variables are required for full functionality:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code>: A valid OpenAI API key</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AZURE_SPEECH_KEY</span></code>: A valid Azure Cognitive Services Speech API key
+for text-to-speech and speech-to-text functionality</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AZURE_SPEECH_REGION</span></code>: The region associated with your Azure
+Cognitive Services Speech API key</p></li>
+</ul>
+</section>
+<section id="components">
+<h2>Components<a class="headerlink" href="#components" title="Link to this heading"></a></h2>
+<section id="tkinterface">
+<h3>TKInterface<a class="headerlink" href="#tkinterface" title="Link to this heading"></a></h3>
+<p>A graphical user interface (GUI) establishes a multiplayer conversation
+environment where up to nine users can interact with the chatbot
+simultaneously. The GUI includes a conversation history area and user
+panels with ‘Listen’ buttons to process user input. It also supports key
+bindings for user convenience.</p>
+</section>
+<section id="openaiservice">
+<h3>OpenAIService<a class="headerlink" href="#openaiservice" title="Link to this heading"></a></h3>
+<p>A class responsible for managing interactions with the OpenAI
+ChatCompletion API. It offers functionality to generate responses from
+the API based on input messages. It supports generating responses in
+their entirety or as a stream of response blocks.</p>
+</section>
+<section id="speechsynthesisservice">
+<h3>SpeechSynthesisService<a class="headerlink" href="#speechsynthesisservice" title="Link to this heading"></a></h3>
+<p>A class that handles text-to-speech synthesis using Azure’s Cognitive
+Services. It supports a wide range of output formats, voices, and
+speaking styles. The synthesized speech can be interrupted, and the
+progress can be monitored in real-time.</p>
+</section>
+<section id="speechrecognitionservice">
+<h3>SpeechRecognitionService<a class="headerlink" href="#speechrecognitionservice" title="Link to this heading"></a></h3>
+<p>A class that provides an interface to convert spoken language into
+written text using Azure Cognitive Services. It allows continuous speech
+recognition and provides real-time results as sentences are recognized.</p>
+</section>
+<section id="interface">
+<h3>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h3>
+<p>An abstract base class for designing frontends for the BanterBot
+application. It provides a high-level interface for managing
+conversations with the bot, including sending messages, receiving
+responses, and updating the conversation area. Accepts both keyboard
+inputs and microphone voice inputs.</p>
+</section>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<section id="important-note">
+<h3>Important Note<a class="headerlink" href="#important-note" title="Link to this heading"></a></h3>
+<p>BanterBot requires several spaCy language models to run, and will
+automatically download them on first-time initialization, if they
+are missing or incompatible – this process can sometimes take a while.</p>
+</section>
+<section id="pip-recommended">
+<h3>Pip (Recommended)<a class="headerlink" href="#pip-recommended" title="Link to this heading"></a></h3>
+<p>BanterBot can be installed or updated using the Python Package Index (PyPi):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>banterbot
+</pre></div>
+</div>
+</section>
+<section id="manual">
+<h3>Manual<a class="headerlink" href="#manual" title="Link to this heading"></a></h3>
+<p>To install BanterBot, simply clone the repository and install the
+required dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/gabrielscabrera/banterbot.git
+<span class="nb">cd</span><span class="w"> </span>banterbot
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<section id="launch-with-command-line">
+<h3>Launch with Command Line<a class="headerlink" href="#launch-with-command-line" title="Link to this heading"></a></h3>
+<p>Start BanterBot with an enhanced graphical user interface by running the command <code class="docutils literal notranslate"><span class="pre">banterbot</span></code>
+in your terminal. This GUI allows multiple users to interact with the bot, each with a dedicated
+button for speech input and a display for responses.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--prompt</span></code>: Set a system prompt at the beginning of
+the conversation (e.g., <code class="docutils literal notranslate"><span class="pre">--prompt</span> <span class="pre">&quot;You</span> <span class="pre">are</span> <span class="pre">Grendel</span> <span class="pre">the</span>
+<span class="pre">Quiz</span> <span class="pre">Troll,</span> <span class="pre">a</span> <span class="pre">charismatic</span> <span class="pre">troll</span> <span class="pre">who</span> <span class="pre">loves</span> <span class="pre">to</span> <span class="pre">host</span> <span class="pre">quiz</span>
+<span class="pre">shows.&quot;</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--model</span></code>: Choose the OpenAI model for conversation
+generation. Defaults to GPT-4, but other versions can be
+selected if specified in the code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--voice</span></code>: Select a Microsoft Azure Cognitive Services
+text-to-speech voice. The default is “Aria,” but other voices
+can be specified if available.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--debug</span></code>: Enable debug mode to display additional
+information in the terminal for troubleshooting.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--greet</span></code>: Have the bot greet the user upon startup.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--name</span></code>: Assign a name to the assistant for aesthetic
+purposes. This does not inform the bot itself; to provide the bot
+with information, use the <code class="docutils literal notranslate"><span class="pre">--prompt</span></code> flag.</p></li>
+</ul>
+<p>Here is an example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>banterbot<span class="w"> </span>--greet<span class="w"> </span>--model<span class="w"> </span>gpt-4-turbo<span class="w"> </span>--voice<span class="w"> </span>davis<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;You are Grondle the Quiz Troll, a charismatic troll who loves to host quiz shows.&quot;</span><span class="w"> </span>--name<span class="w"> </span>Grondle
+</pre></div>
+</div>
+<p>Additionally, you can use <cite>banterbot character</cite> to select a pre-loaded character to interact with. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>banterbot<span class="w"> </span>character<span class="w"> </span>therapist
+</pre></div>
+</div>
+<p>Will start a conversation with <cite>Grendel the Therapy Troll</cite>. To list all available characters, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>banterbot<span class="w"> </span>character<span class="w"> </span>-h
+</pre></div>
+</div>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">banterbot</span> <span class="pre">voice-search</span></code> to search through all the available voices. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>banterbot<span class="w"> </span>voice-search<span class="w"> </span>--language<span class="w"> </span>en<span class="w"> </span>fr
+</pre></div>
+</div>
+<p>Will list all English (en) and French (fr) voice models. Run <code class="docutils literal notranslate"><span class="pre">banterbot</span> <span class="pre">voice-search</span> <span class="pre">-h</span></code> for more information.</p>
+</section>
+<section id="launch-with-a-python-script">
+<h3>Launch with a Python script<a class="headerlink" href="#launch-with-a-python-script" title="Link to this heading"></a></h3>
+<p>To use BanterBot in a script, create an instance of the <code class="docutils literal notranslate"><span class="pre">TKInterface</span></code> class and call its <code class="docutils literal notranslate"><span class="pre">run</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">banterbot</span><span class="w"> </span><span class="kn">import</span> <span class="n">AzureNeuralVoiceManager</span><span class="p">,</span> <span class="n">OpenAIModelManager</span><span class="p">,</span> <span class="n">TKInterface</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">OpenAIModelManager</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span>
+<span class="n">voice</span> <span class="o">=</span> <span class="n">AzureNeuralVoiceManager</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;Davis&quot;</span><span class="p">)</span>
+<span class="n">assistant_name</span> <span class="o">=</span> <span class="s2">&quot;Grendel&quot;</span>
+
+<span class="c1"># Optional system prompt to set up a custom character prior to initializing BanterBot.</span>
+<span class="n">system</span> <span class="o">=</span> <span class="s2">&quot;You are Grendel the Quiz Troll, a charismatic troll who loves to host quiz shows.&quot;</span>
+
+<span class="c1"># The four arguments `model`, `voice`, `system`, and `assistant_name` are optional.</span>
+<span class="n">interface</span> <span class="o">=</span> <span class="n">TKInterface</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="n">voice</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span> <span class="n">assistant_name</span><span class="o">=</span><span class="n">assistant_name</span><span class="p">)</span>
+
+<span class="c1"># Setting `greet` to True instructs BanterBot to initiate the conversation. Otherwise, the user must initiate.</span>
+<span class="n">interface</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">greet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="chat-logs">
+<h2>Chat Logs<a class="headerlink" href="#chat-logs" title="Link to this heading"></a></h2>
+<p>Chat logs are saved in the <code class="docutils literal notranslate"><span class="pre">$HOME/Documents/BanterBot/Conversations/</span></code>
+directory as individual <code class="docutils literal notranslate"><span class="pre">.txt</span></code> files.</p>
+</section>
+</section>
+<section id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">BanterBot</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="banterbot.html">BanterBot Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-right" title="BanterBot" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

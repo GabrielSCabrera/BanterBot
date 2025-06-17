@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.managers package &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="banterbot.models package" href="banterbot.models.html" />
+    <link rel="prev" title="banterbot.handlers package" href="banterbot.handlers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">BanterBot</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="banterbot.html">BanterBot Package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="banterbot.html#classes">Classes</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="banterbot.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="banterbot.data.html">banterbot.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.exceptions.html">banterbot.exceptions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.extensions.html">banterbot.extensions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.gui.html">banterbot.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.handlers.html">banterbot.handlers package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">banterbot.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.models.html">banterbot.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.services.html">banterbot.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.types.html">banterbot.types package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="banterbot.utils.html">banterbot.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">BanterBot</a></li>
+          <li class="breadcrumb-item"><a href="banterbot.html">BanterBot Package</a></li>
+      <li class="breadcrumb-item active">banterbot.managers package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/banterbot.managers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="banterbot-managers-package">
+<h1>banterbot.managers package<a class="headerlink" href="#banterbot-managers-package" title="Link to this heading"></a></h1>
+<section id="module-banterbot.managers.azure_neural_voice_manager">
+<span id="banterbot-managers-azure-neural-voice-manager-module"></span><h2>banterbot.managers.azure_neural_voice_manager module<a class="headerlink" href="#module-banterbot.managers.azure_neural_voice_manager" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.managers.azure_neural_voice_manager.</span></span><span class="sig-name descname"><span class="pre">AzureNeuralVoiceManager</span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Management utility for loading Microsoft Azure Cognitive Services Neural Voice models from the Speech SDK. Only one
+instance per name is permitted to exist at a time, and loading occurs lazily, meaning that when the voices are
+downloaded, they are subsequently stored in cache as instances of class <cite>AzureNeuralVoice</cite>, and all future calls
+refer to these same cached instances.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.data">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><span class="pre">AzureNeuralVoiceProfile</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.data" title="Link to this definition"></a></dt>
+<dd><p>Access the data dictionary, downloading it first using the <cite>_download</cite> classmethod if necessary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dict containing the downloaded <cite>AzureNeuralVoiceProfile</cite> instances.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, <a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile">AzureNeuralVoiceProfile</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_countries">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_countries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.list_countries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_countries" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of two-character country codes (e.g., us, fr, etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of country codes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_genders">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_genders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.list_genders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_genders" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of available voice genders</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of genders.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_languages">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_languages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.list_languages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_languages" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of two-character language codes (e.g., en, fr, etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of language codes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_locales">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_locales</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.list_locales"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_locales" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of locales, which are language codes followed by countries, in some cases followed by a region,
+(e.g., en-US fr-FR, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of locales.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_regions">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_regions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.list_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_regions" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of regions (e.g., sichuan, shandong, etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of regions.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_styles">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_styles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.list_styles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.list_styles" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of styles (e.g., sichuan, shandong, etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of styles.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><span class="pre">AzureNeuralVoiceProfile</span></a></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.load" title="Link to this definition"></a></dt>
+<dd><p>Retrieve or initialize an <cite>AzureNeuralVoice</cite> instance by a name in the Neural Voices resource JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the voice profile.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <cite>AzureNeuralVoice</cite> instance loaded with data from the specified name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AzureNeuralVoice</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If the specified name is not found in the resource file defined by <cite>config.azure_neural_voices</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.search">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile"><span class="pre">AzureNeuralVoiceProfile</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/azure_neural_voice_manager.html#AzureNeuralVoiceManager.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.azure_neural_voice_manager.AzureNeuralVoiceManager.search" title="Link to this definition"></a></dt>
+<dd><p>Search through all the available Microsoft Azure Cognitive Services Neural Voice models using any combination
+of the provided arguments to get a list of relevant <cite>AzureNeuralVoiceProfile</cite> instances. For information on
+searchable languages, countries, and regions, visit:</p>
+<p><a class="reference external" href="https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts#supported-languages">https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts#supported-languages</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gender</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>str</em><em>]</em><em>]</em>) – Can take the values MALE, FEMALE, and/or UNKNOWN.</p></li>
+<li><p><strong>language</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>str</em><em>]</em><em>]</em>) – Can take any language abbreviations (e.g., en, fr, etc.)</p></li>
+<li><p><strong>country</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>str</em><em>]</em><em>]</em>) – Can take any country abbreviations (e.g., US, FR, etc.)</p></li>
+<li><p><strong>region</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>str</em><em>]</em><em>]</em>) – Can take any region names (e.g., shaanxi, sichuan, etc.)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of <cite>AzureNeuralVoiceProfile</cite> instances.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="banterbot.models.html#banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile" title="banterbot.models.azure_neural_voice_profile.AzureNeuralVoiceProfile">AzureNeuralVoiceProfile</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.managers.memory_chain">
+<span id="banterbot-managers-memory-chain-module"></span><h2>banterbot.managers.memory_chain module<a class="headerlink" href="#module-banterbot.managers.memory_chain" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.managers.memory_chain.</span></span><span class="sig-name descname"><span class="pre">MemoryChain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MemoryChain is a class responsible for managing and handling arrays of memories using Protocol Buffers. It provides
+functionality to save memories to a binary file, load memories from a binary file, and retrieve memories based on
+keywords. The MemoryChain class is designed to efficiently store and retrieve memories based on keywords, allowing
+for quick access to relevant information.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">memory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory" title="banterbot.models.memory.Memory"><span class="pre">Memory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.append" title="Link to this definition"></a></dt>
+<dd><p>Append a memory to the current set of memories. This method is used to add a single memory to the MemoryChain,
+allowing for the storage of new information. All changes are saved to file as soon as they are made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>memory</strong> (<a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory" title="banterbot.models.memory.Memory"><em>Memory</em></a>) – The memory to append.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.create" title="Link to this definition"></a></dt>
+<dd><p>Generate a new empty set of memories and associated UUID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new instance of MemoryChain with an empty set of memories and a unique UUID.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#banterbot.managers.memory_chain.MemoryChain" title="banterbot.managers.memory_chain.MemoryChain">MemoryChain</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.delete">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.delete" title="Link to this definition"></a></dt>
+<dd><p>Delete the directory associated with a MemoryChain instance. This method is used to clean up the file system
+by removing the directory and all its contents, including memory files and the memory index file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uuid</strong> (<em>str</em>) – The UUID associated with this set of memories.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.extend">
+<span class="sig-name descname"><span class="pre">extend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">memories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory" title="banterbot.models.memory.Memory"><span class="pre">Memory</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.extend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.extend" title="Link to this definition"></a></dt>
+<dd><p>Extend the current set of memories with a list of memories. This method is used to add multiple memories to the
+MemoryChain at once, allowing for the storage of new information in bulk. All changes are saved to file as soon
+as they are made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>memories</strong> (<em>list</em><em>[</em><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory" title="banterbot.models.memory.Memory"><em>Memory</em></a><em>]</em>) – The list of memories to append.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.load" title="Link to this definition"></a></dt>
+<dd><p>Load the memories from a binary file using Protocol Buffers deserialization and creates a MemoryChain instance.
+This method is used to load an existing set of memories from a file, allowing for the continuation of a previous
+session or the sharing of memories between different instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uuid</strong> (<em>str</em>) – The UUID of the memory files to load.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new instance of MemoryChain with loaded memories.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#banterbot.managers.memory_chain.MemoryChain" title="banterbot.managers.memory_chain.MemoryChain">MemoryChain</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.memory_chain.MemoryChain.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keywords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuzzy_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory" title="banterbot.models.memory.Memory"><span class="pre">Memory</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/memory_chain.html#MemoryChain.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.memory_chain.MemoryChain.search" title="Link to this definition"></a></dt>
+<dd><p>Look up memories based on keywords. This method is used to retrieve memories that are relevant to the specified
+keywords. It can also perform fuzzy matching, allowing for the retrieval of memories that are similar to the
+given keywords based on a similarity threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keywords</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – The list of keywords to look up.</p></li>
+<li><p><strong>fuzzy_threshold</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – The threshold for fuzzy matching. If None, only returns exact matches. If</p></li>
+<li><p><strong>provided</strong> (<em>a value is</em>)</p></li>
+<li><p><strong>the</strong> (<em>memories with keywords that have a similarity score greater than</em><em> or </em><em>equal to</em>)</p></li>
+<li><p><strong>returned.</strong> (<em>threshold will also be</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of matching memories.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="banterbot.models.html#banterbot.models.memory.Memory" title="banterbot.models.memory.Memory">Memory</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.managers.openai_model_manager">
+<span id="banterbot-managers-openai-model-manager-module"></span><h2>banterbot.managers.openai_model_manager module<a class="headerlink" href="#module-banterbot.managers.openai_model_manager" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.managers.openai_model_manager.OpenAIModelManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.managers.openai_model_manager.</span></span><span class="sig-name descname"><span class="pre">OpenAIModelManager</span></span><a class="reference internal" href="_modules/banterbot/managers/openai_model_manager.html#OpenAIModelManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_model_manager.OpenAIModelManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Management utility for loading OpenAI ChatCompletion models from the resource JSON specified by
+<cite>config.openai_models</cite>. Only one instance per name is permitted to exist at a time, and loading occurs lazily,
+meaning that when a name is loaded, it is subsequently stored in cache and all future calls refer to the cached
+instance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_model_manager.OpenAIModelManager.list">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_model_manager.html#OpenAIModelManager.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_model_manager.OpenAIModelManager.list" title="Link to this definition"></a></dt>
+<dd><p>List the names of all the available OpenAI ChatCompletion models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of names.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.openai_model_manager.OpenAIModelManager.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel"><span class="pre">OpenAIModel</span></a></span></span><a class="reference internal" href="_modules/banterbot/managers/openai_model_manager.html#OpenAIModelManager.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.openai_model_manager.OpenAIModelManager.load" title="Link to this definition"></a></dt>
+<dd><p>Retrieve or initialize an <cite>OpenAIModel</cite> instance by a name in the OpenAIModels resource JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the OpenAI ChatCompletion model.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <cite>OpenAIModel</cite> instance loaded with data from the specified name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="banterbot.models.html#banterbot.models.openai_model.OpenAIModel" title="banterbot.models.openai_model.OpenAIModel">OpenAIModel</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If the specified name is not found in the resource file defined by <cite>config.openai_models</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-banterbot.managers.resource_manager">
+<span id="banterbot-managers-resource-manager-module"></span><h2>banterbot.managers.resource_manager module<a class="headerlink" href="#module-banterbot.managers.resource_manager" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">banterbot.managers.resource_manager.</span></span><span class="sig-name descname"><span class="pre">ResourceManager</span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An interface to simplify loading resources from the <cite>/banterbot/resources/</cite> data directory. In addition to
+syntactically simplifying the process, this class gives the option to cache the loaded files to reduce overhead on
+future calls.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager.load_csv">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quotechar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'&quot;'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'excel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager.load_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager.load_csv" title="Link to this definition"></a></dt>
+<dd><p>Load a specified CSV file by filename and return its contents as a nested list of strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The name of the resource file — should be a CSV file.</p></li>
+<li><p><strong>cache</strong> (<em>bool</em>) – If True, cache the loaded data to reduce overhead the next time its loaded.</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – If set to True, reloads the contents from file, disregarding the current state of the cache.</p></li>
+<li><p><strong>encoding</strong> (<em>str</em>) – The type of encoding to use when loading the resource.</p></li>
+<li><p><strong>delimiter</strong> (<em>str</em>) – The CSV delimiter character.</p></li>
+<li><p><strong>quotechar</strong> (<em>str</em>) – The CSV quote character.</p></li>
+<li><p><strong>dialect</strong> (<em>str</em>) – The CSV dialect.</p></li>
+<li><p><strong>strict</strong> (<em>bool</em>) – If True, raises an exception when the file is not correctly formatted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The CSV data formatted as a nested list of strings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager.load_json">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager.load_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager.load_json" title="Link to this definition"></a></dt>
+<dd><p>Load a specified JSON file by filename and return its contents as a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The name of the resource file — should be a JSON file.</p></li>
+<li><p><strong>cache</strong> (<em>bool</em>) – If True, cache the loaded data to reduce overhead the next time its loaded.</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – If set to True, reloads the contents from file, disregarding the current state of the cache.</p></li>
+<li><p><strong>encoding</strong> (<em>str</em>) – The type of encoding to use when loading the resource.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The JSON data formatted as a dictionary.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager.load_raw">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager.load_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager.load_raw" title="Link to this definition"></a></dt>
+<dd><p>Load a specified file by filename and return its contents as a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The name of the resource file — should including its suffix.</p></li>
+<li><p><strong>cache</strong> (<em>bool</em>) – If True, cache the loaded data to reduce overhead the next time its loaded.</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – If set to True, reloads the contents from file, disregarding the current state of the cache.</p></li>
+<li><p><strong>encoding</strong> (<em>str</em>) – The type of encoding to use when loading the resource.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resource file’s contents as a string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager.reset_cache">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager.reset_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager.reset_cache" title="Link to this definition"></a></dt>
+<dd><p>Reset the entire cache by deleting the contents of the <cite>ResourceLoader._raw_data</cite>, <cite>ResourceLoader._csv_data</cite>,
+and <cite>ResourceLoader._json_data</cite> dicts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager.reset_csv_cache">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset_csv_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager.reset_csv_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager.reset_csv_cache" title="Link to this definition"></a></dt>
+<dd><p>Reset the CSV data cache by deleting the contents of the <cite>ResourceLoader._csv_data</cite> dict.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager.reset_json_cache">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset_json_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager.reset_json_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager.reset_json_cache" title="Link to this definition"></a></dt>
+<dd><p>Reset the JSON data cache by deleting the contents of the <cite>ResourceLoader._json_data</cite> dict.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="banterbot.managers.resource_manager.ResourceManager.reset_raw_cache">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset_raw_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/banterbot/managers/resource_manager.html#ResourceManager.reset_raw_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#banterbot.managers.resource_manager.ResourceManager.reset_raw_cache" title="Link to this definition"></a></dt>
+<dd><p>Reset the raw data cache by deleting the contents of the <cite>ResourceLoader._raw_data</cite> dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="banterbot-managers-stream-manager-module">
+<h2>banterbot.managers.stream_manager module<a class="headerlink" href="#banterbot-managers-stream-manager-module" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="banterbot.handlers.html" class="btn btn-neutral float-left" title="banterbot.handlers package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="banterbot.models.html" class="btn btn-neutral float-right" title="banterbot.models package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

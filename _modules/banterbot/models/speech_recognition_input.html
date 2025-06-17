@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>banterbot.models.speech_recognition_input &mdash; BanterBot  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BanterBot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">BanterBot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BanterBot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">banterbot.models.speech_recognition_input</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for banterbot.models.speech_recognition_input</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">azure.cognitiveservices.speech</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">speechsdk</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.data.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaCyLangModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.models.word</span><span class="w"> </span><span class="kn">import</span> <span class="n">Word</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.types.wordjson</span><span class="w"> </span><span class="kn">import</span> <span class="n">WordJSON</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banterbot.utils.nlp</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLP</span>
+
+
+<div class="viewcode-block" id="SpeechRecognitionInput">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpeechRecognitionInput</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that encapsulates the speech-to-text output data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SpeechRecognitionInput.from_recognition_result">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.from_recognition_result">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_recognition_result</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">recognition_result</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechRecognitionResult</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the `SpeechRecognitionInput` class. Designed to create lightweight instances with most</span>
+<span class="sd">        attributes initially set to None. Computation-intensive operations are performed on-demand when respective</span>
+<span class="sd">        properties are accessed, instead of during initialization.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            recognition_result (speechsdk.SpeechRecognitionResult): The result from a speech recognition event.</span>
+<span class="sd">            language (str, optional): The language used during the speech-to-text recognition, if not auto-detected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">recognition_result</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+        <span class="n">language</span> <span class="o">=</span> <span class="n">language</span> <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_extract_language</span><span class="p">(</span><span class="n">recognition_result</span><span class="o">=</span><span class="n">recognition_result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span></div>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_language</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">recognition_result</span><span class="p">:</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">SpeechRecognitionResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the language is not provided (as it should be if auto-detection is disabled) then extract the auto-detected</span>
+<span class="sd">        language as a string. Return None if the process fails.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            recognition_result (speechsdk.SpeechRecognitionResult): The result from a speech recognition event.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str, optional: The auto-detected language from the speech-to-text output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">language_key</span> <span class="o">=</span> <span class="n">speechsdk</span><span class="o">.</span><span class="n">PropertyId</span><span class="o">.</span><span class="n">SpeechServiceConnection_AutoDetectSourceLanguageResult</span>
+        <span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">language_key</span> <span class="ow">in</span> <span class="n">recognition_result</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="n">recognition_result</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">language_key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">language</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sents</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Word</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">display</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the `SpeechRecognitionInput` class. Designed to create lightweight instances with most</span>
+<span class="sd">        attributes initially set to None unless provided explicitly on initialization. Computation-intensive operations</span>
+<span class="sd">        are instead performed lazily: i.e., when respective properties are accessed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (speechsdk.SpeechRecognitionResult): The JSON data output from a speech recognition event.</span>
+<span class="sd">            language (str): The language used during the speech-to-text recognition.</span>
+<span class="sd">            offset (optional, datetime.timedelta): The number of milliseconds between recognition start and the output.</span>
+<span class="sd">            duration (optional, datetime.timedelta): The duration of the output in milliseconds.</span>
+<span class="sd">            sents (optional, tuple[str, ...]): The split sentences of the output as a tuple.</span>
+<span class="sd">            words (optional, list[Word]): A list of words from the output.</span>
+<span class="sd">            display (optional, str): The display form of the output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_language</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="n">offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="n">duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offset_end</span> <span class="o">=</span> <span class="n">offset_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sents</span> <span class="o">=</span> <span class="n">sents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_words</span> <span class="o">=</span> <span class="n">words</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display</span> <span class="o">=</span> <span class="n">display</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_words</span><span class="p">(</span>
+        <span class="n">input_words</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">input_tokens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">offsets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method that extracts the words from the input text that are within a cutoff interval of the recognized</span>
+<span class="sd">        speech. This is used to determine the words that were spoken during a specific interval of the audio stream.</span>
+<span class="sd">        Uses Numba to speed up the process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_words (list[str]): The words in the input text.</span>
+<span class="sd">            input_tokens (list[str]): The tokens in the input text.</span>
+<span class="sd">            indices (list[int]): The indices of the tokens in the input text.</span>
+<span class="sd">            offsets (list[int]): The offsets of the words in the input text.</span>
+<span class="sd">            cutoff (int): The cutoff interval in microseconds.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[int, int]: The index of the first word in the cutoff interval and the index of the last word in the</span>
+<span class="sd">                cutoff interval.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">word_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">display_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">token_word</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">input_tokens</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">display_word</span><span class="p">,</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">input_words</span><span class="p">[</span><span class="n">word_idx</span><span class="p">:],</span> <span class="n">offsets</span><span class="p">[</span><span class="n">word_idx</span><span class="p">:]):</span>
+                <span class="k">if</span> <span class="n">token_word</span> <span class="o">==</span> <span class="n">display_word</span> <span class="ow">and</span> <span class="n">offset</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">:</span>
+                    <span class="n">word_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">display_idx</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">token_word</span><span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="n">word_idx</span><span class="p">,</span> <span class="n">display_idx</span>
+
+<div class="viewcode-block" id="SpeechRecognitionInput.from_cutoff">
+<a class="viewcode-back" href="../../../banterbot.models.html#banterbot.models.speech_recognition_input.SpeechRecognitionInput.from_cutoff">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_cutoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new instance of class `SpeechRecognitionInput` that only contains the text spoken within a cutoff</span>
+<span class="sd">        interval.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cutoff (datetime.timedelta): The upper cutoff time (or duration) of the new instance.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SpeechRecognitionInput: The new instance of `SpeechRecognitionInput`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">NLP</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">SpaCyLangModel</span><span class="o">.</span><span class="n">EN_CORE_WEB_SM</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">)</span>
+
+        <span class="n">input_words</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">]</span>
+        <span class="n">input_tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">offset</span><span class="o">.</span><span class="n">microseconds</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">]</span>
+        <span class="n">cutoff</span> <span class="o">=</span> <span class="n">cutoff</span><span class="o">.</span><span class="n">microseconds</span>
+
+        <span class="n">word_idx</span><span class="p">,</span> <span class="n">display_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_words</span><span class="p">(</span>
+            <span class="n">input_words</span><span class="o">=</span><span class="n">input_words</span><span class="p">,</span> <span class="n">input_tokens</span><span class="o">=</span><span class="n">input_tokens</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">word_idx</span><span class="p">:</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">i</span><span class="o">.</span><span class="n">duration</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">[:</span><span class="n">word_idx</span><span class="p">]),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">())</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;Offset&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;Offset&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;Duration&quot;</span><span class="p">:</span> <span class="n">duration</span><span class="p">,</span>
+                <span class="s2">&quot;NBest&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;Display&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;NBest&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Display&quot;</span><span class="p">][:</span><span class="n">display_idx</span><span class="p">],</span>
+                        <span class="s2">&quot;Words&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;NBest&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Words&quot;</span><span class="p">][:</span><span class="n">word_idx</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">],</span>
+            <span class="p">}</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">language</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span>
+                <span class="n">offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+                <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+                <span class="n">words</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">[:</span><span class="n">word_idx</span><span class="p">],</span>
+                <span class="n">display</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">[:</span><span class="n">display_idx</span><span class="p">],</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_words</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">words_raw</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">WordJSON</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Word</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method that extracts `Word` objects from raw data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            words_raw (list[WordJSON]): A list of dictionaries containing raw word data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Word]: A list of `Word` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words_raw</span><span class="p">:</span>
+            <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Word</span><span class="p">(</span>
+                    <span class="n">text</span><span class="o">=</span><span class="n">word</span><span class="p">[</span><span class="s2">&quot;Word&quot;</span><span class="p">],</span>
+                    <span class="n">offset</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">word</span><span class="p">[</span><span class="s2">&quot;Offset&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span>
+                    <span class="n">duration</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">word</span><span class="p">[</span><span class="s2">&quot;Duration&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">words</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">words</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Word</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A getter property that returns a list of Word objects. If the list is not already computed, it triggers</span>
+<span class="sd">        computation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of words.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_words</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_words</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_words</span><span class="p">(</span><span class="n">words_raw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;NBest&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Words&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_words</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A getter property that returns a list of sentences. If the list is not already computed, it triggers</span>
+<span class="sd">        computation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[str]: A list of sentences.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sents</span> <span class="o">=</span> <span class="n">NLP</span><span class="o">.</span><span class="n">segment_sentences</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span> <span class="n">whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sents</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A getter property that returns the offset of the recognized speech in the audio stream.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            datetime.timedelta: The offset in the form of a datetime.timedelta object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;Offset&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A getter property that returns the duration of the recognized speech in the audio stream.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            datetime.timedelta: The duration in the form of a datetime.timedelta object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;Duration&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">offset_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A getter property that returns the offset + duration of the recognized speech in the audio stream.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            datetime.timedelta: The duration + offset in the form of a datetime.timedelta object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_offset_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset_end</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A getter property that returns the display form of the recognized speech. The display form is fully processed</span>
+<span class="sd">        with Inverse Text Normalization (ITN), Capitalization, Disfluency Removal, and Punctuation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The display form of the speech.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_display</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;NBest&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Display&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_display</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Word</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overloads the indexing operator to retrieve words at specific positions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            idx (int): The index of the word to retrieve.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Word: The word at the specified index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Word</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overloads the iterator to allow for iteration over the `Word` objects in the output.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Word: The next Word object in the output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">word</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overloads the len() operator to return the number of words in the output.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The number of words in the output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overloads the str() operator to return the fully processed speech-to-text output. The processing includes</span>
+<span class="sd">        Inverse Text Normalization (ITN), Capitalization, Disfluency Removal, and Punctuation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The fully processed string representation of the speech-to-text output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Gabriel S. Cabrera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
