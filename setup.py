@@ -13,7 +13,7 @@ dependencies = [
     "numba>=0.59.1",
     "numpy>=1.26.2",
     "openai>=1.23.2",
-    "protobuf==4.25.1",
+    "protobuf==4.25.8",
     "requests>=2.31.0",
     "spacy>=3.7.4",
     "tiktoken>=0.7.0",
